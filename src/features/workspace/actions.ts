@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 function generateSlug(name: string): string {
   return name
@@ -12,8 +13,8 @@ function generateSlug(name: string): string {
 }
 
 export async function createWorkspace(formData: FormData) {
+  // Verify authentication via the session-aware server client
   const supabase = await createClient();
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -24,7 +25,14 @@ export async function createWorkspace(formData: FormData) {
 
   const slug = generateSlug(name.trim());
 
-  const { data: workspace, error: wsError } = await supabase
+  // Use admin client for the bootstrapping transaction.
+  // The user has no workspace membership yet, so RLS policies that depend
+  // on membership (SELECT, workspace_members INSERT) would reject the
+  // operation. Auth is verified above via getUser(). RLS stays enabled
+  // on all tables — only this specific operation uses elevated privileges.
+  const admin = createAdminClient();
+
+  const { data: workspace, error: wsError } = await admin
     .from("workspaces")
     .insert({ name: name.trim(), slug })
     .select("id, slug")
@@ -32,7 +40,7 @@ export async function createWorkspace(formData: FormData) {
 
   if (wsError) return { error: wsError.message };
 
-  const { error: memberError } = await supabase
+  const { error: memberError } = await admin
     .from("workspace_members")
     .insert({
       workspace_id: workspace.id,
@@ -42,8 +50,7 @@ export async function createWorkspace(formData: FormData) {
 
   if (memberError) return { error: memberError.message };
 
-  // Create the user's profile if it doesn't exist
-  await supabase.from("profiles").upsert(
+  await admin.from("profiles").upsert(
     {
       id: user.id,
       full_name: user.user_metadata?.full_name ?? null,
