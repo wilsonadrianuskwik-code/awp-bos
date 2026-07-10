@@ -4,9 +4,9 @@
 -- and audit trail.
 
 ALTER TABLE activities ALTER COLUMN actor_id DROP NOT NULL;
-ALTER TABLE activities ADD COLUMN actor_type TEXT NOT NULL DEFAULT 'user'
+ALTER TABLE activities ADD COLUMN IF NOT EXISTS actor_type TEXT NOT NULL DEFAULT 'user'
   CHECK (actor_type IN ('user','customer','system'));
 
 ALTER TABLE audit_logs ALTER COLUMN actor_id DROP NOT NULL;
-ALTER TABLE audit_logs ADD COLUMN actor_type TEXT NOT NULL DEFAULT 'user'
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS actor_type TEXT NOT NULL DEFAULT 'user'
   CHECK (actor_type IN ('user','customer','system'));

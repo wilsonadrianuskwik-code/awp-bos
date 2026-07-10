@@ -1,4 +1,4 @@
-CREATE TABLE document_sequences (
+CREATE TABLE IF NOT EXISTS document_sequences (
   id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   workspace_id   UUID NOT NULL REFERENCES workspaces(id),
   document_type  TEXT NOT NULL CHECK (document_type IN ('quotation','invoice')),
@@ -10,14 +10,17 @@ CREATE TABLE document_sequences (
 
 ALTER TABLE document_sequences ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Staff can view document sequences" ON document_sequences;
 CREATE POLICY "Staff can view document sequences"
   ON document_sequences FOR SELECT
   USING (get_user_role(workspace_id) IN ('staff', 'admin', 'owner'));
 
+DROP POLICY IF EXISTS "Staff can create document sequences" ON document_sequences;
 CREATE POLICY "Staff can create document sequences"
   ON document_sequences FOR INSERT
   WITH CHECK (get_user_role(workspace_id) IN ('staff', 'admin', 'owner'));
 
+DROP POLICY IF EXISTS "Staff can update document sequences" ON document_sequences;
 CREATE POLICY "Staff can update document sequences"
   ON document_sequences FOR UPDATE
   USING (get_user_role(workspace_id) IN ('staff', 'admin', 'owner'));

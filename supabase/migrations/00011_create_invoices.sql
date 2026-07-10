@@ -1,4 +1,4 @@
-CREATE TABLE invoices (
+CREATE TABLE IF NOT EXISTS invoices (
   id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   workspace_id        UUID NOT NULL REFERENCES workspaces(id),
   client_id           UUID NOT NULL REFERENCES clients(id),
@@ -28,28 +28,32 @@ CREATE TABLE invoices (
   UNIQUE (workspace_id, invoice_number)
 );
 
-CREATE INDEX idx_invoices_workspace ON invoices(workspace_id) WHERE deleted_at IS NULL;
-CREATE INDEX idx_invoices_client ON invoices(client_id) WHERE deleted_at IS NULL;
-CREATE INDEX idx_invoices_status ON invoices(workspace_id, status) WHERE deleted_at IS NULL;
-CREATE INDEX idx_invoices_overdue ON invoices(due_date)
+CREATE INDEX IF NOT EXISTS idx_invoices_workspace ON invoices(workspace_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_invoices_client ON invoices(client_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(workspace_id, status) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_invoices_overdue ON invoices(due_date)
   WHERE deleted_at IS NULL AND status IN ('sent','partial');
 
 -- Now that invoices exists, add the FK from quotations.generated_invoice_id
+ALTER TABLE quotations DROP CONSTRAINT IF EXISTS fk_quotations_generated_invoice;
 ALTER TABLE quotations ADD CONSTRAINT fk_quotations_generated_invoice
   FOREIGN KEY (generated_invoice_id) REFERENCES invoices(id);
 
 ALTER TABLE invoices ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Members can view invoices" ON invoices;
 CREATE POLICY "Members can view invoices"
   ON invoices FOR SELECT
   USING (workspace_id IN (SELECT get_user_workspace_ids()) AND deleted_at IS NULL);
 
+DROP POLICY IF EXISTS "Staff can create invoices" ON invoices;
 CREATE POLICY "Staff can create invoices"
   ON invoices FOR INSERT
   WITH CHECK (
     get_user_role(workspace_id) IN ('staff', 'admin', 'owner')
   );
 
+DROP POLICY IF EXISTS "Staff can update invoices" ON invoices;
 CREATE POLICY "Staff can update invoices"
   ON invoices FOR UPDATE
   USING (
