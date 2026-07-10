@@ -1,0 +1,158 @@
+import { createClient } from "@/lib/supabase/server";
+import type {
+  Quotation,
+  QuotationDetail,
+  QuotationFilters,
+  QuotationListResult,
+  QuotationTemplateWithItems,
+  QuotationWithClient,
+} from "@/features/quotations/types";
+
+const CLIENT_JOIN = "client:clients(id,name,company,email,payment_terms)";
+
+export async function getQuotations(
+  workspaceId: string,
+  filters?: QuotationFilters
+): Promise<QuotationListResult> {
+  const supabase = await createClient();
+
+  let query = supabase
+    .from("quotations")
+    .select(`*, ${CLIENT_JOIN}`, { count: "exact" })
+    .eq("workspace_id", workspaceId)
+    .is("deleted_at", null);
+
+  if (filters?.status && filters.status !== "all") {
+    query = query.eq("status", filters.status);
+  }
+
+  if (filters?.clientId) {
+    query = query.eq("client_id", filters.clientId);
+  }
+
+  if (filters?.search) {
+    const term = filters.search.replace(/[%_]/g, "");
+    query = query.or(`title.ilike.%${term}%,quotation_number.ilike.%${term}%`);
+  }
+
+  const sortBy = filters?.sortBy ?? "created_at";
+  const sortDir = filters?.sortDir ?? "desc";
+  query = query.order(sortBy, { ascending: sortDir === "asc" });
+
+  const page = filters?.page ?? 1;
+  const pageSize = filters?.pageSize ?? 20;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+  query = query.range(from, to);
+
+  const { data, error, count } = await query;
+  if (error) throw error;
+
+  return {
+    quotations: (data ?? []) as unknown as QuotationWithClient[],
+    count: count ?? 0,
+  };
+}
+
+export async function getQuotation(
+  quotationId: string,
+  workspaceId: string
+): Promise<QuotationDetail | null> {
+  const supabase = await createClient();
+
+  const { data: quotation, error } = await supabase
+    .from("quotations")
+    .select(
+      `*, ${CLIENT_JOIN}, created_by_profile:profiles!created_by(full_name,avatar_url), approved_by_profile:profiles!approved_by(full_name,avatar_url)`
+    )
+    .eq("id", quotationId)
+    .eq("workspace_id", workspaceId)
+    .is("deleted_at", null)
+    .single();
+
+  if (error || !quotation) return null;
+
+  const { data: lineItems } = await supabase
+    .from("line_items")
+    .select("*")
+    .eq("entity_type", "quotation")
+    .eq("entity_id", quotationId)
+    .order("sort_order", { ascending: true });
+
+  return {
+    ...quotation,
+    line_items: lineItems ?? [],
+  } as unknown as QuotationDetail;
+}
+
+export async function getQuotationActivities(quotationId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("activities")
+    .select("*, actor:profiles!actor_id(full_name, avatar_url)")
+    .eq("entity_type", "quotation")
+    .eq("entity_id", quotationId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  return data ?? [];
+}
+
+export async function getQuotationVersions(
+  quotationId: string,
+  workspaceId: string
+): Promise<QuotationWithClient[]> {
+  const supabase = await createClient();
+
+  const { data: current } = await supabase
+    .from("quotations")
+    .select("id, parent_quotation_id")
+    .eq("id", quotationId)
+    .eq("workspace_id", workspaceId)
+    .single();
+
+  if (!current) return [];
+
+  const rootId = current.parent_quotation_id ?? current.id;
+
+  const { data } = await supabase
+    .from("quotations")
+    .select(`*, ${CLIENT_JOIN}`)
+    .eq("workspace_id", workspaceId)
+    .is("deleted_at", null)
+    .or(`id.eq.${rootId},parent_quotation_id.eq.${rootId}`)
+    .order("version", { ascending: true });
+
+  return (data ?? []) as unknown as QuotationWithClient[];
+}
+
+export async function getQuotationsByClient(
+  clientId: string,
+  workspaceId: string
+): Promise<Quotation[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("quotations")
+    .select("*")
+    .eq("client_id", clientId)
+    .eq("workspace_id", workspaceId)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false })
+    .limit(10);
+
+  return (data ?? []) as Quotation[];
+}
+
+export async function getQuotationTemplates(
+  workspaceId: string
+): Promise<QuotationTemplateWithItems[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("quotation_templates")
+    .select("*, items:quotation_template_items(*)")
+    .eq("workspace_id", workspaceId)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false });
+
+  return (data ?? []) as unknown as QuotationTemplateWithItems[];
+}
