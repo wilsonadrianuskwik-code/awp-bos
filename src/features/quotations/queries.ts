@@ -61,11 +61,15 @@ export async function getQuotation(
 ): Promise<QuotationDetail | null> {
   const supabase = await createClient();
 
+  // Only client:clients(...) is a genuine embed — quotations.client_id has
+  // a real FK to clients(id). created_by/approved_by reference auth.users,
+  // not profiles, so there is no relationship PostgREST can traverse for a
+  // `profiles!created_by(...)` style embed; that select silently errors,
+  // which previously made every quotation look "not found". Profiles are
+  // fetched separately instead, same as line_items below.
   const { data: quotation, error } = await supabase
     .from("quotations")
-    .select(
-      `*, ${CLIENT_JOIN}, created_by_profile:profiles!created_by(full_name,avatar_url), approved_by_profile:profiles!approved_by(full_name,avatar_url)`
-    )
+    .select(`*, ${CLIENT_JOIN}`)
     .eq("id", quotationId)
     .eq("workspace_id", workspaceId)
     .is("deleted_at", null)
@@ -73,16 +77,29 @@ export async function getQuotation(
 
   if (error || !quotation) return null;
 
-  const { data: lineItems } = await supabase
-    .from("line_items")
-    .select("*")
-    .eq("entity_type", "quotation")
-    .eq("entity_id", quotationId)
-    .order("sort_order", { ascending: true });
+  const profileIds = quotation.approved_by
+    ? [quotation.created_by, quotation.approved_by]
+    : [quotation.created_by];
+
+  const [{ data: lineItems }, { data: profiles }] = await Promise.all([
+    supabase
+      .from("line_items")
+      .select("*")
+      .eq("entity_type", "quotation")
+      .eq("entity_id", quotationId)
+      .order("sort_order", { ascending: true }),
+    supabase.from("profiles").select("id, full_name, avatar_url").in("id", profileIds),
+  ]);
+
+  const profileById = new Map((profiles ?? []).map((p) => [p.id, p]));
 
   return {
     ...quotation,
     line_items: lineItems ?? [],
+    created_by_profile: profileById.get(quotation.created_by) ?? null,
+    approved_by_profile: quotation.approved_by
+      ? (profileById.get(quotation.approved_by) ?? null)
+      : null,
   } as unknown as QuotationDetail;
 }
 
@@ -158,33 +175,43 @@ export async function getQuotationByShareToken(
 
   const { data: quotation, error } = await supabase
     .from("quotations")
-    .select(
-      `*, ${CLIENT_JOIN}, created_by_profile:profiles!created_by(full_name,avatar_url), approved_by_profile:profiles!approved_by(full_name,avatar_url)`
-    )
+    .select(`*, ${CLIENT_JOIN}`)
     .eq("share_token", shareToken)
     .is("deleted_at", null)
     .single();
 
   if (error || !quotation) return null;
 
-  const [{ data: lineItems }, { data: workspace }] = await Promise.all([
-    supabase
-      .from("line_items")
-      .select("*")
-      .eq("entity_type", "quotation")
-      .eq("entity_id", quotation.id)
-      .order("sort_order", { ascending: true }),
-    supabase
-      .from("workspaces")
-      .select("name")
-      .eq("id", quotation.workspace_id)
-      .single(),
-  ]);
+  const profileIds = quotation.approved_by
+    ? [quotation.created_by, quotation.approved_by]
+    : [quotation.created_by];
+
+  const [{ data: lineItems }, { data: workspace }, { data: profiles }] =
+    await Promise.all([
+      supabase
+        .from("line_items")
+        .select("*")
+        .eq("entity_type", "quotation")
+        .eq("entity_id", quotation.id)
+        .order("sort_order", { ascending: true }),
+      supabase
+        .from("workspaces")
+        .select("name")
+        .eq("id", quotation.workspace_id)
+        .single(),
+      supabase.from("profiles").select("id, full_name, avatar_url").in("id", profileIds),
+    ]);
+
+  const profileById = new Map((profiles ?? []).map((p) => [p.id, p]));
 
   return {
     quotation: {
       ...quotation,
       line_items: lineItems ?? [],
+      created_by_profile: profileById.get(quotation.created_by) ?? null,
+      approved_by_profile: quotation.approved_by
+        ? (profileById.get(quotation.approved_by) ?? null)
+        : null,
     } as unknown as QuotationDetail,
     workspaceName: workspace?.name ?? "",
   };
