@@ -77,32 +77,41 @@ export async function getInvoice(
 
   if (error || !invoice) return null;
 
-  const [{ data: lineItems }, { data: payments }, { data: profiles }] =
-    await Promise.all([
-      supabase
-        .from("line_items")
-        .select("*")
-        .eq("entity_type", "invoice")
-        .eq("entity_id", invoiceId)
-        .order("sort_order", { ascending: true }),
-      supabase
-        .from("payments")
-        .select("*")
-        .eq("invoice_id", invoiceId)
-        .is("deleted_at", null)
-        .order("payment_date", { ascending: true }),
-      supabase
-        .from("profiles")
-        .select("id, full_name, avatar_url")
-        .in("id", [invoice.created_by]),
-    ]);
+  const [{ data: lineItems }, { data: payments }] = await Promise.all([
+    supabase
+      .from("line_items")
+      .select("*")
+      .eq("entity_type", "invoice")
+      .eq("entity_id", invoiceId)
+      .order("sort_order", { ascending: true }),
+    supabase
+      .from("payments")
+      .select("*")
+      .eq("invoice_id", invoiceId)
+      .is("deleted_at", null)
+      .order("payment_date", { ascending: true }),
+  ]);
+
+  // payments.recorded_by references auth.users, not profiles — same P0
+  // lesson as invoices.created_by, so profiles are fetched separately
+  // rather than via a `profiles!recorded_by(...)` embed.
+  const profileIds = Array.from(
+    new Set([invoice.created_by, ...(payments ?? []).map((p) => p.recorded_by)])
+  );
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("id, full_name, avatar_url")
+    .in("id", profileIds);
 
   const profileById = new Map((profiles ?? []).map((p) => [p.id, p]));
 
   return {
     ...invoice,
     line_items: lineItems ?? [],
-    payments: payments ?? [],
+    payments: (payments ?? []).map((p) => ({
+      ...p,
+      recorded_by_profile: profileById.get(p.recorded_by) ?? null,
+    })),
     created_by_profile: profileById.get(invoice.created_by) ?? null,
   } as unknown as InvoiceDetail;
 }
@@ -170,7 +179,7 @@ export async function getInvoiceByShareToken(
 
   if (error || !invoice) return null;
 
-  const [{ data: lineItems }, { data: payments }, { data: workspace }, { data: profiles }] =
+  const [{ data: lineItems }, { data: payments }, { data: workspace }] =
     await Promise.all([
       supabase
         .from("line_items")
@@ -189,11 +198,15 @@ export async function getInvoiceByShareToken(
         .select("name")
         .eq("id", invoice.workspace_id)
         .single(),
-      supabase
-        .from("profiles")
-        .select("id, full_name, avatar_url")
-        .in("id", [invoice.created_by]),
     ]);
+
+  const profileIds = Array.from(
+    new Set([invoice.created_by, ...(payments ?? []).map((p) => p.recorded_by)])
+  );
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("id, full_name, avatar_url")
+    .in("id", profileIds);
 
   const profileById = new Map((profiles ?? []).map((p) => [p.id, p]));
 
@@ -201,7 +214,10 @@ export async function getInvoiceByShareToken(
     invoice: {
       ...invoice,
       line_items: lineItems ?? [],
-      payments: payments ?? [],
+      payments: (payments ?? []).map((p) => ({
+        ...p,
+        recorded_by_profile: profileById.get(p.recorded_by) ?? null,
+      })),
       created_by_profile: profileById.get(invoice.created_by) ?? null,
     } as unknown as InvoiceDetail,
     workspaceName: workspace?.name ?? "",

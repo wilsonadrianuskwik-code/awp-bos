@@ -31,3 +31,32 @@ export function getPaymentProgress(totalPaid: number, total: number): number {
   if (total <= 0) return 0;
   return Math.min(100, Math.max(0, Math.round((totalPaid / total) * 100)));
 }
+
+/**
+ * Formats a timestamp for the read-receipt style display ("Viewed / Today
+ * 14:31") — Today/Yesterday + 24-hour time for recent events, a full date
+ * otherwise. Mirrors quotations/helpers.ts's formatTimelineTimestamp; kept
+ * as a separate small copy rather than a cross-feature import, since
+ * features don't import from each other in this codebase.
+ */
+export function formatTimelineTimestamp(iso: string): string {
+  const date = new Date(iso);
+  const now = new Date();
+  const time = date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  if (date.toDateString() === now.toDateString()) return `Today ${time}`;
+
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (date.toDateString() === yesterday.toDateString()) return `Yesterday ${time}`;
+
+  return `${date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })} ${time}`;
+}

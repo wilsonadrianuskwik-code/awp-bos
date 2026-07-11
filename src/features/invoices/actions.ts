@@ -113,6 +113,28 @@ export async function updateInvoiceStatus(
   });
 }
 
+export async function regenerateInvoiceShareToken(
+  workspaceId: string,
+  invoiceId: string
+) {
+  return withWorkspace(workspaceId, "staff", async (ctx) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc(
+      "regenerate_invoice_share_token",
+      {
+        p_invoice_id: invoiceId,
+        p_workspace_id: ctx.workspaceId,
+        p_actor_id: ctx.userId,
+      }
+    );
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath(`/${ctx.workspaceId}`);
+    return data as { id: string; share_token: string };
+  });
+}
+
 /**
  * Bulk-transitions sent/viewed/partial invoices past their due_date to
  * overdue. Called from the invoice list page on each load — a lazy

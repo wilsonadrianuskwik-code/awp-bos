@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -207,10 +208,12 @@ export function QuotationStatusActions({
 
       {quotation.status === "approved" &&
         (quotation.generated_invoice_id ? (
-          // The invoice module doesn't exist yet (Phase 4) — never link to
-          // a route that 404s. This stays disabled until that page ships.
-          <Button variant="outline" disabled title="Invoice management arrives in Phase 4">
-            View Invoice (Coming in Phase 4)
+          <Button variant="outline" asChild>
+            <Link
+              href={`/${workspace.slug}/invoices/${quotation.generated_invoice_id}`}
+            >
+              View Invoice
+            </Link>
           </Button>
         ) : (
           <Button onClick={onGenerateInvoice}>Generate Invoice</Button>

@@ -85,10 +85,14 @@ export type InvoiceProfileSummary = {
   avatar_url: string | null;
 };
 
+export type PaymentWithRecorder = Payment & {
+  recorded_by_profile: InvoiceProfileSummary | null;
+};
+
 export type InvoiceDetail = Invoice & {
   client: ClientSummary;
   line_items: LineItem[];
-  payments: Payment[];
+  payments: PaymentWithRecorder[];
   created_by_profile: InvoiceProfileSummary | null;
 };
 

@@ -1,0 +1,164 @@
+"use client";
+
+import { useState } from "react";
+import { Copy, Printer } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StatusBadge } from "@/components/shared/status-badge";
+import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
+import { useToast } from "@/providers/toast-provider";
+import { LineItemsTable } from "@/features/line-items/components/line-items-table";
+import { InvoiceStatusActions } from "@/features/invoices/components/invoice-status-actions";
+import { RecordPaymentDialog } from "@/features/invoices/components/record-payment-dialog";
+import { PaymentHistory } from "@/features/invoices/components/payment-history";
+import { OutstandingBalanceCard } from "@/features/invoices/components/outstanding-balance-card";
+import { InvoicePortalAccessCard } from "@/features/invoices/components/invoice-portal-access-card";
+import { InvoicePrintView } from "@/features/invoices/components/invoice-print-view";
+import { getOverdueDays } from "@/features/invoices/helpers";
+import type { InvoiceDetail as InvoiceDetailType } from "@/features/invoices/types";
+import type { Activity } from "@/features/activities/types";
+
+type InvoiceDetailProps = {
+  invoice: InvoiceDetailType;
+  activities: Activity[];
+  workspaceName: string;
+};
+
+export function InvoiceDetail({
+  invoice,
+  activities,
+  workspaceName,
+}: InvoiceDetailProps) {
+  const { toast } = useToast();
+  const [recordPaymentOpen, setRecordPaymentOpen] = useState(false);
+
+  function handlePrint() {
+    window.print();
+  }
+
+  function handleCopyNumber() {
+    navigator.clipboard.writeText(invoice.invoice_number);
+    toast("Invoice number copied", "success");
+  }
+
+  return (
+    <div>
+      <div className="space-y-6 print:hidden">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-semibold tracking-tight">
+                {invoice.title || invoice.invoice_number}
+              </h1>
+              <StatusBadge
+                status={invoice.status}
+                label={
+                  invoice.status === "overdue" && invoice.due_date
+                    ? `Overdue • ${getOverdueDays(invoice.due_date)} days`
+                    : undefined
+                }
+              />
+            </div>
+            <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+              {invoice.invoice_number} · {invoice.client.name}
+              {invoice.client.company ? ` · ${invoice.client.company}` : ""}
+              <button
+                type="button"
+                onClick={handleCopyNumber}
+                title="Copy invoice number"
+                className="text-muted-foreground/70 hover:text-foreground"
+              >
+                <Copy className="h-3.5 w-3.5" />
+              </button>
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" onClick={handlePrint}>
+              <Printer className="mr-2 h-4 w-4" />
+              Print
+            </Button>
+          </div>
+        </div>
+
+        <InvoiceStatusActions
+          invoice={invoice}
+          onRecordPayment={() => setRecordPaymentOpen(true)}
+        />
+
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Line Items</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <LineItemsTable
+                  lineItems={invoice.line_items}
+                  currency={invoice.currency}
+                />
+              </CardContent>
+            </Card>
+
+            {invoice.notes && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Notes</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div
+                    className="text-sm [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
+                    dangerouslySetInnerHTML={{ __html: invoice.notes }}
+                  />
+                </CardContent>
+              </Card>
+            )}
+
+            {invoice.payment_terms && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Payment Terms</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">{invoice.payment_terms}</p>
+                </CardContent>
+              </Card>
+            )}
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Payments</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <PaymentHistory payments={invoice.payments} />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Activity</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ActivityTimeline activities={activities} />
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="space-y-6">
+            <OutstandingBalanceCard invoice={invoice} />
+
+            <InvoicePortalAccessCard invoice={invoice} />
+          </div>
+        </div>
+      </div>
+
+      <InvoicePrintView invoice={invoice} workspaceName={workspaceName} />
+
+      <RecordPaymentDialog
+        open={recordPaymentOpen}
+        onOpenChange={setRecordPaymentOpen}
+        invoice={invoice}
+      />
+    </div>
+  );
+}
