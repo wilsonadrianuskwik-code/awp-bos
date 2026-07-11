@@ -5,19 +5,13 @@ import { createClient } from "@/lib/supabase/server";
 import { withWorkspace } from "@/lib/with-workspace";
 import {
   createQuotationSchema,
-  createQuotationTemplateSchema,
   generateInvoiceSchema,
 } from "@/features/quotations/validators";
 import type {
   CreateQuotationInput,
-  CreateQuotationTemplateInput,
   GenerateInvoiceInput,
 } from "@/features/quotations/validators";
-import type {
-  Quotation,
-  QuotationStatus,
-  QuotationTemplateWithItems,
-} from "@/features/quotations/types";
+import type { Quotation, QuotationStatus } from "@/features/quotations/types";
 
 type CustomerActionResult<T> =
   | { data: T; error: null }
@@ -228,79 +222,6 @@ export async function generateInvoiceFromQuotation(
 
     revalidatePath(`/${ctx.workspaceId}`);
     return data;
-  });
-}
-
-export async function createQuotationTemplate(
-  workspaceId: string,
-  input: CreateQuotationTemplateInput
-) {
-  return withWorkspace(workspaceId, "staff", async (ctx) => {
-    const parsed = createQuotationTemplateSchema.safeParse(input);
-    if (!parsed.success) {
-      throw new Error(parsed.error.issues[0].message);
-    }
-
-    const supabase = await createClient();
-    const { data, error } = await supabase.rpc("create_quotation_template", {
-      p_workspace_id: ctx.workspaceId,
-      p_actor_id: ctx.userId,
-      p_name: parsed.data.name,
-      p_description: parsed.data.description || null,
-      p_items: parsed.data.items,
-    });
-
-    if (error) throw new Error(error.message);
-
-    revalidatePath(`/${ctx.workspaceId}`);
-    return data as unknown as QuotationTemplateWithItems;
-  });
-}
-
-export async function updateQuotationTemplate(
-  workspaceId: string,
-  templateId: string,
-  input: CreateQuotationTemplateInput
-) {
-  return withWorkspace(workspaceId, "staff", async (ctx) => {
-    const parsed = createQuotationTemplateSchema.safeParse(input);
-    if (!parsed.success) {
-      throw new Error(parsed.error.issues[0].message);
-    }
-
-    const supabase = await createClient();
-    const { data, error } = await supabase.rpc("update_quotation_template", {
-      p_template_id: templateId,
-      p_workspace_id: ctx.workspaceId,
-      p_actor_id: ctx.userId,
-      p_name: parsed.data.name,
-      p_description: parsed.data.description || null,
-      p_items: parsed.data.items,
-    });
-
-    if (error) throw new Error(error.message);
-
-    revalidatePath(`/${ctx.workspaceId}`);
-    return data as unknown as QuotationTemplateWithItems;
-  });
-}
-
-export async function deleteQuotationTemplate(
-  workspaceId: string,
-  templateId: string
-) {
-  return withWorkspace(workspaceId, "staff", async (ctx) => {
-    const supabase = await createClient();
-    const { data, error } = await supabase.rpc("delete_quotation_template", {
-      p_template_id: templateId,
-      p_workspace_id: ctx.workspaceId,
-      p_actor_id: ctx.userId,
-    });
-
-    if (error) throw new Error(error.message);
-
-    revalidatePath(`/${ctx.workspaceId}`);
-    return data as { success: true; id: string };
   });
 }
 

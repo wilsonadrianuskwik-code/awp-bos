@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getWorkspaceBySlug } from "@/lib/workspace";
 import { getClients } from "@/features/clients/queries";
-import { getQuotationTemplates } from "@/features/quotations/queries";
+import { getLineItemTemplates } from "@/features/line-items/queries";
 import { QuotationBuilder } from "@/features/quotations/components/quotation-builder";
 
 export default async function NewQuotationPage({
@@ -18,7 +18,7 @@ export default async function NewQuotationPage({
 
   const [clients, templates] = await Promise.all([
     getClients(workspace.id),
-    getQuotationTemplates(workspace.id),
+    getLineItemTemplates(workspace.id),
   ]);
 
   return (

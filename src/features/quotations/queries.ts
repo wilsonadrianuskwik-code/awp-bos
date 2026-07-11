@@ -5,7 +5,6 @@ import type {
   QuotationDetail,
   QuotationFilters,
   QuotationListResult,
-  QuotationTemplateWithItems,
   QuotationWithClient,
 } from "@/features/quotations/types";
 
@@ -215,18 +214,4 @@ export async function getQuotationByShareToken(
     } as unknown as QuotationDetail,
     workspaceName: workspace?.name ?? "",
   };
-}
-
-export async function getQuotationTemplates(
-  workspaceId: string
-): Promise<QuotationTemplateWithItems[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("quotation_templates")
-    .select("*, items:quotation_template_items(*)")
-    .eq("workspace_id", workspaceId)
-    .is("deleted_at", null)
-    .order("created_at", { ascending: false });
-
-  return (data ?? []) as unknown as QuotationTemplateWithItems[];
 }

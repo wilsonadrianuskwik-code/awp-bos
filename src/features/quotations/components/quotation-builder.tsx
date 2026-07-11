@@ -24,11 +24,14 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { cn } from "@/lib/utils/cn";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
-import { ClientSelector } from "./client-selector";
-import { LineItemRow, LINE_ITEM_GRID_COLS } from "./line-item-row";
-import { PricingSummary } from "./pricing-summary";
-import { TemplatePickerDialog } from "./template-picker-dialog";
-import { SaveAsTemplateDialog } from "./save-as-template-dialog";
+import { ClientSelector } from "@/features/line-items/components/client-selector";
+import {
+  LineItemRow,
+  LINE_ITEM_GRID_COLS,
+} from "@/features/line-items/components/line-item-row";
+import { PricingSummary } from "@/features/line-items/components/pricing-summary";
+import { TemplatePickerDialog } from "@/features/line-items/components/template-picker-dialog";
+import { SaveAsTemplateDialog } from "@/features/line-items/components/save-as-template-dialog";
 import {
   createQuotation,
   updateQuotation,
@@ -37,17 +40,16 @@ import {
 import {
   createQuotationSchema,
   type CreateQuotationInput,
-  type LineItemInput,
 } from "@/features/quotations/validators";
-import { computeQuotationTotals } from "@/features/quotations/helpers";
+import type { LineItemInput } from "@/features/line-items/validators";
+import { computeLineItemTotals } from "@/features/line-items/helpers";
 import {
   LINE_ITEM_CATEGORIES,
   type LineItemCategory,
-  type Quotation,
-  type QuotationClientSummary,
-  type QuotationDetail,
-  type QuotationTemplateWithItems,
-} from "@/features/quotations/types";
+  type ClientSummary,
+  type TemplateWithItems,
+} from "@/features/line-items/types";
+import type { Quotation, QuotationDetail } from "@/features/quotations/types";
 
 const CURRENCIES = ["USD", "EUR", "GBP", "SGD", "MYR", "IDR", "AUD", "CAD"];
 
@@ -75,8 +77,8 @@ function todayISO() {
 
 type QuotationBuilderProps = {
   quotation?: QuotationDetail;
-  clients: QuotationClientSummary[];
-  templates: QuotationTemplateWithItems[];
+  clients: ClientSummary[];
+  templates: TemplateWithItems[];
   initialClientId?: string;
 };
 
@@ -169,7 +171,7 @@ export function QuotationBuilder({
     line_items: submittableLineItems,
   };
 
-  const totals = computeQuotationTotals(submittableLineItems);
+  const totals = computeLineItemTotals(submittableLineItems);
 
   useEffect(() => {
     if (isFirstRender.current) {

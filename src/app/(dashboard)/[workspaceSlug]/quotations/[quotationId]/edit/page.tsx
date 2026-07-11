@@ -1,7 +1,8 @@
 import { notFound, redirect } from "next/navigation";
 import { getWorkspaceBySlug } from "@/lib/workspace";
 import { getClients } from "@/features/clients/queries";
-import { getQuotation, getQuotationTemplates } from "@/features/quotations/queries";
+import { getQuotation } from "@/features/quotations/queries";
+import { getLineItemTemplates } from "@/features/line-items/queries";
 import { QuotationBuilder } from "@/features/quotations/components/quotation-builder";
 import { isEditableStatus } from "@/features/quotations/helpers";
 
@@ -23,7 +24,7 @@ export default async function EditQuotationPage({
 
   const [clients, templates] = await Promise.all([
     getClients(workspace.id),
-    getQuotationTemplates(workspace.id),
+    getLineItemTemplates(workspace.id),
   ]);
 
   return (

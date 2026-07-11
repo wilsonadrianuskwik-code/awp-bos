@@ -14,15 +14,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
-import { createQuotationTemplate } from "@/features/quotations/actions";
-import type { LineItemInput } from "@/features/quotations/validators";
-import type { QuotationTemplateWithItems } from "@/features/quotations/types";
+import { createLineItemTemplate } from "@/features/line-items/actions";
+import type { LineItemInput } from "@/features/line-items/validators";
+import type { TemplateWithItems } from "@/features/line-items/types";
 
 type SaveAsTemplateDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   items: LineItemInput[];
-  onSaved: (template: QuotationTemplateWithItems) => void;
+  onSaved: (template: TemplateWithItems) => void;
 };
 
 export function SaveAsTemplateDialog({
@@ -48,7 +48,7 @@ export function SaveAsTemplateDialog({
     }
 
     startTransition(async () => {
-      const result = await createQuotationTemplate(workspace.id, {
+      const result = await createLineItemTemplate(workspace.id, {
         name,
         description,
         items,

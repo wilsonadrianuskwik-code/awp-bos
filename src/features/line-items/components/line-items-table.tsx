@@ -1,4 +1,4 @@
-import type { LineItem, LineItemCategory } from "@/features/quotations/types";
+import type { LineItem, LineItemCategory } from "@/features/line-items/types";
 import { formatCurrency } from "@/lib/utils/format-currency";
 
 const CATEGORY_LABEL: Record<LineItemCategory, string> = {
@@ -9,15 +9,12 @@ const CATEGORY_LABEL: Record<LineItemCategory, string> = {
 
 const CATEGORIES: LineItemCategory[] = ["package", "add_on", "per_unit"];
 
-type QuotationLineItemsTableProps = {
+type LineItemsTableProps = {
   lineItems: LineItem[];
   currency: string;
 };
 
-export function QuotationLineItemsTable({
-  lineItems,
-  currency,
-}: QuotationLineItemsTableProps) {
+export function LineItemsTable({ lineItems, currency }: LineItemsTableProps) {
   const fmt = (value: number) => formatCurrency(value, currency);
 
   return (

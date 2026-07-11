@@ -1,3 +1,5 @@
+import type { ClientSummary, LineItem } from "@/features/line-items/types";
+
 export const QUOTATION_STATUSES = [
   "draft",
   "sent",
@@ -10,10 +12,6 @@ export const QUOTATION_STATUSES = [
 ] as const;
 
 export type QuotationStatus = (typeof QUOTATION_STATUSES)[number];
-
-export const LINE_ITEM_CATEGORIES = ["package", "add_on", "per_unit"] as const;
-
-export type LineItemCategory = (typeof LINE_ITEM_CATEGORIES)[number];
 
 export type Quotation = {
   id: string;
@@ -50,34 +48,8 @@ export type Quotation = {
   deleted_at: string | null;
 };
 
-export type LineItem = {
-  id: string;
-  workspace_id: string;
-  entity_type: "quotation" | "invoice";
-  entity_id: string;
-  category: LineItemCategory;
-  sort_order: number;
-  description: string;
-  quantity: number;
-  unit_price: number;
-  unit: string | null;
-  discount_percent: number | null;
-  tax_percent: number | null;
-  line_total: number;
-  created_at: string;
-};
-
-export type QuotationClientSummary = {
-  id: string;
-  name: string;
-  company: string | null;
-  email: string | null;
-  payment_terms?: number;
-  preferred_currency?: string;
-};
-
 export type QuotationWithClient = Quotation & {
-  client: QuotationClientSummary;
+  client: ClientSummary;
 };
 
 export type QuotationWithLineItems = Quotation & {
@@ -90,7 +62,7 @@ export type QuotationProfileSummary = {
 };
 
 export type QuotationDetail = Quotation & {
-  client: QuotationClientSummary;
+  client: ClientSummary;
   line_items: LineItem[];
   created_by_profile: QuotationProfileSummary | null;
   approved_by_profile: QuotationProfileSummary | null;
@@ -109,33 +81,4 @@ export type QuotationFilters = {
 export type QuotationListResult = {
   quotations: QuotationWithClient[];
   count: number;
-};
-
-export type QuotationTemplateItem = {
-  id: string;
-  template_id: string;
-  category: LineItemCategory;
-  sort_order: number;
-  description: string;
-  quantity: number;
-  unit_price: number;
-  unit: string | null;
-  discount_percent: number | null;
-  tax_percent: number | null;
-  created_at: string;
-};
-
-export type QuotationTemplate = {
-  id: string;
-  workspace_id: string;
-  name: string;
-  description: string | null;
-  created_by: string;
-  created_at: string;
-  updated_at: string;
-  deleted_at: string | null;
-};
-
-export type QuotationTemplateWithItems = QuotationTemplate & {
-  items: QuotationTemplateItem[];
 };

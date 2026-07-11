@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 import { formatCurrency, getCurrencyPrefix } from "@/lib/utils/format-currency";
-import type { LineItemInput } from "@/features/quotations/validators";
-import type { LineItemCategory } from "@/features/quotations/types";
+import type { LineItemInput } from "@/features/line-items/validators";
+import type { LineItemCategory } from "@/features/line-items/types";
 
 const CATEGORY_ICON: Record<LineItemCategory, typeof Package> = {
   package: Package,
@@ -20,9 +20,9 @@ const CATEGORY_LABEL: Record<LineItemCategory, string> = {
   per_unit: "Per-unit",
 };
 
-// Shared with the header row in quotation-builder.tsx — keep the two in
-// sync so columns stay aligned: type | description | qty | unit |
-// unit price | discount | tax | total | remove.
+// Shared with the header row in quotation-builder.tsx / invoice-builder.tsx
+// — keep the two in sync so columns stay aligned: type | description | qty
+// | unit | unit price | discount | tax | total | remove.
 export const LINE_ITEM_GRID_COLS =
   "md:grid-cols-[28px_minmax(0,1fr)_72px_84px_112px_84px_84px_128px_32px]";
 

@@ -1,4 +1,5 @@
-import type { QuotationDetail, LineItemCategory } from "@/features/quotations/types";
+import type { QuotationDetail } from "@/features/quotations/types";
+import type { LineItemCategory } from "@/features/line-items/types";
 import { formatCurrency } from "@/lib/utils/format-currency";
 
 const CATEGORY_LABEL: Record<LineItemCategory, string> = {

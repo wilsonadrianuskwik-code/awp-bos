@@ -19,8 +19,8 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/providers/toast-provider";
-import { QuotationLineItemsTable } from "@/features/quotations/components/quotation-line-items-table";
-import { PricingSummary } from "@/features/quotations/components/pricing-summary";
+import { LineItemsTable } from "@/features/line-items/components/line-items-table";
+import { PricingSummary } from "@/features/line-items/components/pricing-summary";
 import {
   recordQuotationFirstView,
   approveQuotationByCustomer,
@@ -172,7 +172,7 @@ export function QuotationPortalView({
           <CardTitle className="text-base">Line Items</CardTitle>
         </CardHeader>
         <CardContent>
-          <QuotationLineItemsTable
+          <LineItemsTable
             lineItems={quotation.line_items}
             currency={quotation.currency}
           />

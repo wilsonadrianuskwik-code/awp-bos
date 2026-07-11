@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { generateInvoiceFromQuotation } from "@/features/quotations/actions";
-import { QuotationLineItemsTable } from "./quotation-line-items-table";
+import { LineItemsTable } from "@/features/line-items/components/line-items-table";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { QuotationDetail } from "@/features/quotations/types";
 
@@ -156,7 +156,7 @@ export function GenerateInvoiceDialog({
                 </div>
               </div>
 
-              <QuotationLineItemsTable
+              <LineItemsTable
                 lineItems={quotation.line_items}
                 currency={quotation.currency}
               />

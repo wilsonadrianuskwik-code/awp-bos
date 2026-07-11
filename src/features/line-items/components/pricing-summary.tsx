@@ -1,8 +1,8 @@
-import type { QuotationTotals } from "@/features/quotations/helpers";
+import type { LineItemTotals } from "@/features/line-items/helpers";
 import { formatCurrency } from "@/lib/utils/format-currency";
 
 type PricingSummaryProps = {
-  totals: QuotationTotals;
+  totals: LineItemTotals;
   currency: string;
   itemCount: number;
   sticky?: boolean;

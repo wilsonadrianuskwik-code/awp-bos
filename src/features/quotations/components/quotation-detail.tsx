@@ -8,13 +8,13 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
 import { useToast } from "@/providers/toast-provider";
 import { QuotationLifecycleTimeline } from "./quotation-lifecycle-timeline";
-import { QuotationLineItemsTable } from "./quotation-line-items-table";
+import { LineItemsTable } from "@/features/line-items/components/line-items-table";
 import { QuotationStatusActions } from "./quotation-status-actions";
 import { QuotationVersionHistory } from "./quotation-version-history";
 import { QuotationVersionDiffDialog } from "./quotation-version-diff-dialog";
 import { GenerateInvoiceDialog } from "./generate-invoice-dialog";
 import { QuotationPortalAccessCard } from "./quotation-portal-access-card";
-import { PricingSummary } from "./pricing-summary";
+import { PricingSummary } from "@/features/line-items/components/pricing-summary";
 import { QuotationPrintView } from "./quotation-print-view";
 import type {
   QuotationDetail as QuotationDetailType,
@@ -106,7 +106,7 @@ export function QuotationDetail({
                 <CardTitle className="text-base">Line Items</CardTitle>
               </CardHeader>
               <CardContent>
-                <QuotationLineItemsTable
+                <LineItemsTable
                   lineItems={quotation.line_items}
                   currency={quotation.currency}
                 />

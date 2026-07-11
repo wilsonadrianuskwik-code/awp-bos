@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils/cn";
-import type { QuotationClientSummary } from "@/features/quotations/types";
+import type { ClientSummary } from "@/features/line-items/types";
 
 type ClientSelectorProps = {
-  clients: QuotationClientSummary[];
+  clients: ClientSummary[];
   value: string;
-  onChange: (clientId: string, client: QuotationClientSummary) => void;
+  onChange: (clientId: string, client: ClientSummary) => void;
 };
 
 export function ClientSelector({ clients, value, onChange }: ClientSelectorProps) {

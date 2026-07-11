@@ -8,13 +8,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import type { QuotationTemplateWithItems } from "@/features/quotations/types";
-import type { LineItemInput } from "@/features/quotations/validators";
+import type { TemplateWithItems } from "@/features/line-items/types";
+import type { LineItemInput } from "@/features/line-items/validators";
 
 type TemplatePickerDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  templates: QuotationTemplateWithItems[];
+  templates: TemplateWithItems[];
   onInsert: (items: LineItemInput[]) => void;
 };
 
@@ -30,7 +30,7 @@ export function TemplatePickerDialog({
         <DialogHeader>
           <DialogTitle>Insert from Template</DialogTitle>
           <DialogDescription>
-            Add a saved bundle of line items to this quotation.
+            Add a saved bundle of line items to this document.
           </DialogDescription>
         </DialogHeader>
 
