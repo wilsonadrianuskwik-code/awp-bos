@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { GitCompare, Link as LinkIcon, Printer } from "lucide-react";
+import { Copy, GitCompare, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
-import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { QuotationLifecycleTimeline } from "./quotation-lifecycle-timeline";
 import { QuotationLineItemsTable } from "./quotation-line-items-table";
@@ -14,6 +13,7 @@ import { QuotationStatusActions } from "./quotation-status-actions";
 import { QuotationVersionHistory } from "./quotation-version-history";
 import { QuotationVersionDiffDialog } from "./quotation-version-diff-dialog";
 import { GenerateInvoiceDialog } from "./generate-invoice-dialog";
+import { QuotationPortalAccessCard } from "./quotation-portal-access-card";
 import { PricingSummary } from "./pricing-summary";
 import { QuotationPrintView } from "./quotation-print-view";
 import type {
@@ -37,7 +37,6 @@ export function QuotationDetail({
   previousVersion,
   workspaceName,
 }: QuotationDetailProps) {
-  const { workspace } = useWorkspace();
   const { toast } = useToast();
   const [generateInvoiceOpen, setGenerateInvoiceOpen] = useState(false);
   const [diffOpen, setDiffOpen] = useState(false);
@@ -46,10 +45,9 @@ export function QuotationDetail({
     window.print();
   }
 
-  function handleCopyLink() {
-    const url = `${window.location.origin}/portal/quotations/${quotation.share_token}`;
-    navigator.clipboard.writeText(url);
-    toast("Portal link copied to clipboard", "success");
+  function handleCopyNumber() {
+    navigator.clipboard.writeText(quotation.quotation_number);
+    toast("Quotation number copied", "success");
   }
 
   return (
@@ -68,9 +66,17 @@ export function QuotationDetail({
               )}
               <StatusBadge status={quotation.status} />
             </div>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
               {quotation.quotation_number} · {quotation.client.name}
               {quotation.client.company ? ` · ${quotation.client.company}` : ""}
+              <button
+                type="button"
+                onClick={handleCopyNumber}
+                title="Copy quotation number"
+                className="text-muted-foreground/70 hover:text-foreground"
+              >
+                <Copy className="h-3.5 w-3.5" />
+              </button>
             </p>
           </div>
 
@@ -81,10 +87,6 @@ export function QuotationDetail({
                 Compare with V{previousVersion.version}
               </Button>
             )}
-            <Button variant="outline" size="sm" onClick={handleCopyLink}>
-              <LinkIcon className="mr-2 h-4 w-4" />
-              Share Link
-            </Button>
             <Button variant="outline" size="sm" onClick={handlePrint}>
               <Printer className="mr-2 h-4 w-4" />
               Print
@@ -193,6 +195,8 @@ export function QuotationDetail({
               itemCount={quotation.line_items.length}
               sticky={false}
             />
+
+            <QuotationPortalAccessCard quotation={quotation} />
 
             <Card>
               <CardHeader>

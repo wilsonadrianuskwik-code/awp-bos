@@ -6,6 +6,7 @@ import {
   Calendar,
   Copy,
   GitBranch,
+  Hash,
   MoreHorizontal,
   Pencil,
   Trash2,
@@ -138,9 +139,18 @@ export function QuotationCard({ quotation }: QuotationCardProps) {
                   Edit
                 </DropdownMenuItem>
               )}
+              <DropdownMenuItem
+                onClick={() => {
+                  navigator.clipboard.writeText(quotation.quotation_number);
+                  toast("Quotation number copied", "success");
+                }}
+              >
+                <Hash className="mr-2 h-4 w-4" />
+                Copy Number
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={handleDuplicate}>
                 <Copy className="mr-2 h-4 w-4" />
-                Duplicate
+                Duplicate as New Draft
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleNewVersion}>
                 <GitBranch className="mr-2 h-4 w-4" />

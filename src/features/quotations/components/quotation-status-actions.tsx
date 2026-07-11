@@ -219,15 +219,16 @@ export function QuotationStatusActions({
       {(quotation.status === "rejected" ||
         quotation.status === "expired" ||
         quotation.status === "cancelled") && (
-        <>
-          <Button variant="outline" onClick={handleDuplicate} disabled={isPending}>
-            Duplicate
-          </Button>
-          <Button variant="outline" onClick={handleNewVersion} disabled={isPending}>
-            Create New Version
-          </Button>
-        </>
+        <Button variant="outline" onClick={handleNewVersion} disabled={isPending}>
+          Create New Version
+        </Button>
       )}
+
+      {/* Available regardless of status — a quick way to start a fresh
+          quotation from this one's contents, at any point in its lifecycle. */}
+      <Button variant="outline" onClick={handleDuplicate} disabled={isPending}>
+        Duplicate as New Draft
+      </Button>
 
       <Dialog
         open={!!confirmTarget}

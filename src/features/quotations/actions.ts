@@ -140,6 +140,28 @@ export async function duplicateQuotation(
   });
 }
 
+export async function regenerateShareToken(
+  workspaceId: string,
+  quotationId: string
+) {
+  return withWorkspace(workspaceId, "staff", async (ctx) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc(
+      "regenerate_quotation_share_token",
+      {
+        p_quotation_id: quotationId,
+        p_workspace_id: ctx.workspaceId,
+        p_actor_id: ctx.userId,
+      }
+    );
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath(`/${ctx.workspaceId}`);
+    return data as { id: string; share_token: string };
+  });
+}
+
 export async function createQuotationVersion(
   workspaceId: string,
   quotationId: string

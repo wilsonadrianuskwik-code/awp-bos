@@ -38,6 +38,8 @@ export type Quotation = {
   parent_quotation_id: string | null;
   share_token: string;
   first_viewed_at: string | null;
+  view_count: number;
+  last_viewed_at: string | null;
   customer_response_notes: string | null;
   generated_invoice_id: string | null;
   created_by: string;
