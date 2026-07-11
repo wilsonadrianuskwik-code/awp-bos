@@ -113,6 +113,24 @@ export async function updateInvoiceStatus(
   });
 }
 
+/**
+ * Bulk-transitions sent/viewed/partial invoices past their due_date to
+ * overdue. Called from the invoice list page on each load — a lazy
+ * "automatic status update" rather than a real scheduled job (see the
+ * Phase 4 plan's scope boundaries).
+ */
+export async function checkOverdueInvoices(workspaceId: string) {
+  return withWorkspace(workspaceId, "staff", async (ctx) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("check_overdue_invoices", {
+      p_workspace_id: ctx.workspaceId,
+    });
+
+    if (error) throw new Error(error.message);
+    return data as number;
+  });
+}
+
 export async function deleteInvoice(workspaceId: string, invoiceId: string) {
   return withWorkspace(workspaceId, "staff", async (ctx) => {
     const supabase = await createClient();

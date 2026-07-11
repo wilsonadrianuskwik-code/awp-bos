@@ -19,14 +19,22 @@ const STATUS_COLORS: Record<string, string> = {
   expired: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
   cancelled: "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
   revision_requested: "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300",
+  // Invoice lifecycle (draft/sent/viewed/cancelled reuse the quotation colors above)
+  partial: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
+  paid: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
+  overdue: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
+  refunded: "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300",
 };
 
 type StatusBadgeProps = {
   status: string;
   className?: string;
+  // Overrides the displayed text (still colored by `status`) — used for
+  // the invoice "Overdue • N days" display.
+  label?: string;
 };
 
-export function StatusBadge({ status, className }: StatusBadgeProps) {
+export function StatusBadge({ status, className, label }: StatusBadgeProps) {
   return (
     <span
       className={cn(
@@ -35,7 +43,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
         className
       )}
     >
-      {status.replace(/_/g, " ")}
+      {label ?? status.replace(/_/g, " ")}
     </span>
   );
 }
