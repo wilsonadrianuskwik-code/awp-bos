@@ -12,17 +12,6 @@ export const BANK_OPTIONS = [
   "Other",
 ] as const;
 
-const MS_PER_DAY = 86_400_000;
-
-/**
- * Whole days an invoice is past its due date, for the "Overdue • N days"
- * display on invoice-card.tsx and invoice-detail.tsx. Only meaningful when
- * the invoice is actually overdue — callers should gate on status.
- */
-export function getOverdueDays(dueDate: string): number {
-  return Math.floor((Date.now() - new Date(dueDate).getTime()) / MS_PER_DAY);
-}
-
 /**
  * 0-100 percentage of the invoice total collected so far, for the payment
  * progress bar shown on invoice-card.tsx when status === 'partial'.

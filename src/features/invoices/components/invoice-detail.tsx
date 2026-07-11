@@ -14,7 +14,7 @@ import { PaymentHistory } from "@/features/invoices/components/payment-history";
 import { OutstandingBalanceCard } from "@/features/invoices/components/outstanding-balance-card";
 import { InvoicePortalAccessCard } from "@/features/invoices/components/invoice-portal-access-card";
 import { InvoicePrintView } from "@/features/invoices/components/invoice-print-view";
-import { getOverdueDays } from "@/features/invoices/helpers";
+import { getOverdueDays } from "@/lib/utils/date";
 import type { InvoiceDetail as InvoiceDetailType } from "@/features/invoices/types";
 import type { Activity } from "@/features/activities/types";
 

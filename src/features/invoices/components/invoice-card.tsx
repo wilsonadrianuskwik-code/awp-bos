@@ -15,8 +15,9 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { deleteInvoice } from "@/features/invoices/actions";
-import { getOverdueDays, getPaymentProgress } from "@/features/invoices/helpers";
+import { getPaymentProgress } from "@/features/invoices/helpers";
 import { formatCurrency } from "@/lib/utils/format-currency";
+import { getOverdueDays } from "@/lib/utils/date";
 import type { InvoiceWithClient } from "@/features/invoices/types";
 
 function formatDate(date: string | null) {
