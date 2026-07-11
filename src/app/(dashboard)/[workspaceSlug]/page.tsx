@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
 import { getWorkspaceBySlug } from "@/lib/workspace";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   getClientSummary,
   getInvoiceSummary,
   getLeadSummary,
   getRevenueSummary,
 } from "@/features/dashboard/queries";
+import { StatCard } from "@/features/dashboard/components/stat-card";
+import { LeadPipelineCard } from "@/features/dashboard/components/lead-pipeline-card";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { CurrencyAmount } from "@/features/dashboard/types";
 
@@ -35,29 +36,6 @@ export default async function DashboardPage({
       getRevenueSummary(workspace.id),
     ]);
 
-  const stats = [
-    {
-      title: "Total Leads",
-      value: String(leadSummary.total),
-      description: "Active leads in pipeline",
-    },
-    {
-      title: "Active Clients",
-      value: String(clientSummary.activeCount),
-      description: "Clients with ongoing work",
-    },
-    {
-      title: "Open Invoices",
-      value: formatCurrencyAmounts(invoiceSummary.amountDueByCurrency),
-      description: `${invoiceSummary.openCount} outstanding`,
-    },
-    {
-      title: "Revenue This Month",
-      value: formatCurrencyAmounts(revenueSummary.totalByCurrency),
-      description: "Payments received this month",
-    },
-  ];
-
   return (
     <div className="space-y-6">
       <div>
@@ -68,21 +46,30 @@ export default async function DashboardPage({
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {stat.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">
-                {stat.description}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
+        <StatCard
+          title="Total Leads"
+          value={String(leadSummary.total)}
+          description="Active leads in pipeline"
+        />
+        <StatCard
+          title="Active Clients"
+          value={String(clientSummary.activeCount)}
+          description="Clients with ongoing work"
+        />
+        <StatCard
+          title="Open Invoices"
+          value={formatCurrencyAmounts(invoiceSummary.amountDueByCurrency)}
+          description={`${invoiceSummary.openCount} outstanding`}
+        />
+        <StatCard
+          title="Revenue This Month"
+          value={formatCurrencyAmounts(revenueSummary.totalByCurrency)}
+          description="Payments received this month"
+        />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <LeadPipelineCard summary={leadSummary} />
       </div>
     </div>
   );
