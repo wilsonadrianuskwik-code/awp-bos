@@ -1,0 +1,601 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { FileDown, FileUp, Loader2, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { useWorkspace } from "@/providers/workspace-provider";
+import { useToast } from "@/providers/toast-provider";
+import { ClientSelector } from "./client-selector";
+import { LineItemRow } from "./line-item-row";
+import { PricingSummary } from "./pricing-summary";
+import { TemplatePickerDialog } from "./template-picker-dialog";
+import { SaveAsTemplateDialog } from "./save-as-template-dialog";
+import {
+  createQuotation,
+  updateQuotation,
+  updateQuotationStatus,
+} from "@/features/quotations/actions";
+import {
+  createQuotationSchema,
+  type CreateQuotationInput,
+  type LineItemInput,
+} from "@/features/quotations/validators";
+import { computeQuotationTotals } from "@/features/quotations/helpers";
+import {
+  LINE_ITEM_CATEGORIES,
+  type LineItemCategory,
+  type Quotation,
+  type QuotationClientSummary,
+  type QuotationDetail,
+  type QuotationTemplateWithItems,
+} from "@/features/quotations/types";
+
+const CURRENCIES = ["USD", "EUR", "GBP", "SGD", "AUD", "CAD"];
+
+const CATEGORY_LABEL: Record<LineItemCategory, string> = {
+  package: "Packages",
+  add_on: "Add-ons",
+  per_unit: "Per-unit",
+};
+
+function emptyItem(category: LineItemCategory): LineItemInput {
+  return {
+    category,
+    description: "",
+    quantity: 1,
+    unit_price: 0,
+    unit: "",
+    discount_percent: 0,
+    tax_percent: 0,
+  };
+}
+
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+type QuotationBuilderProps = {
+  quotation?: QuotationDetail;
+  clients: QuotationClientSummary[];
+  templates: QuotationTemplateWithItems[];
+};
+
+export function QuotationBuilder({
+  quotation,
+  clients,
+  templates: initialTemplates,
+}: QuotationBuilderProps) {
+  const router = useRouter();
+  const { workspace } = useWorkspace();
+  const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
+
+  const [quotationId, setQuotationId] = useState<string | null>(
+    quotation?.id ?? null
+  );
+  const [clientId, setClientId] = useState(quotation?.client_id ?? "");
+  const [title, setTitle] = useState(quotation?.title ?? "");
+  const [summary, setSummary] = useState(quotation?.summary ?? "");
+  const [currency, setCurrency] = useState(quotation?.currency ?? "USD");
+  const [issueDate, setIssueDate] = useState(quotation?.issue_date ?? todayISO());
+  const [expiryDate, setExpiryDate] = useState(quotation?.expiry_date ?? "");
+  const [terms, setTerms] = useState(quotation?.terms_and_conditions ?? "");
+  const [notes, setNotes] = useState(quotation?.notes ?? "");
+  const [internalNotes, setInternalNotes] = useState(
+    quotation?.internal_notes ?? ""
+  );
+  const [activeCategory, setActiveCategory] =
+    useState<LineItemCategory>("per_unit");
+  const [lineItems, setLineItems] = useState<LineItemInput[]>(
+    quotation?.line_items?.length
+      ? quotation.line_items.map((li) => ({
+          category: li.category,
+          description: li.description,
+          quantity: li.quantity,
+          unit_price: li.unit_price,
+          unit: li.unit ?? "",
+          discount_percent: li.discount_percent ?? 0,
+          tax_percent: li.tax_percent ?? 0,
+        }))
+      : []
+  );
+  const [templates, setTemplates] = useState(initialTemplates);
+  const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
+  const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
+
+  const [isDirty, setIsDirty] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<
+    "idle" | "saving" | "saved" | "error"
+  >("idle");
+  const lastSavedRef = useRef<string>("");
+  const isFirstRender = useRef(true);
+  const removedItemRef = useRef<{ item: LineItemInput; index: number } | null>(
+    null
+  );
+
+  const isEditable =
+    !quotation ||
+    quotation.status === "draft" ||
+    quotation.status === "revision_requested";
+
+  const currentPayload: CreateQuotationInput = {
+    client_id: clientId,
+    title,
+    summary,
+    currency,
+    issue_date: issueDate,
+    expiry_date: expiryDate,
+    terms_and_conditions: terms,
+    notes,
+    internal_notes: internalNotes,
+    line_items: lineItems,
+  };
+
+  const totals = computeQuotationTotals(lineItems);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      lastSavedRef.current = JSON.stringify(currentPayload);
+      return;
+    }
+    const serialized = JSON.stringify(currentPayload);
+    if (serialized !== lastSavedRef.current) setIsDirty(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    clientId,
+    title,
+    summary,
+    currency,
+    issueDate,
+    expiryDate,
+    terms,
+    notes,
+    internalNotes,
+    lineItems,
+  ]);
+
+  const saveDraft = useCallback(async (): Promise<Quotation | null> => {
+    if (!isEditable) return null;
+    const parsed = createQuotationSchema.safeParse(currentPayload);
+    if (!parsed.success) return null;
+
+    setSaveStatus("saving");
+    const result = quotationId
+      ? await updateQuotation(workspace.id, quotationId, parsed.data)
+      : await createQuotation(workspace.id, parsed.data);
+
+    if (result.error) {
+      setSaveStatus("error");
+      toast(result.error, "error");
+      return null;
+    }
+
+    lastSavedRef.current = JSON.stringify(currentPayload);
+    setIsDirty(false);
+    setSaveStatus("saved");
+
+    if (!quotationId && result.data) {
+      setQuotationId(result.data.id);
+      router.replace(`/${workspace.slug}/quotations/${result.data.id}/edit`);
+    }
+
+    return result.data;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPayload, quotationId, workspace.id, workspace.slug, isEditable]);
+
+  // Debounced autosave shortly after the user stops editing.
+  useEffect(() => {
+    if (!isDirty || !isEditable) return;
+    const timeout = setTimeout(() => {
+      startTransition(() => {
+        saveDraft();
+      });
+    }, 2500);
+    return () => clearTimeout(timeout);
+  }, [isDirty, isEditable, saveDraft]);
+
+  // 30-second safety-net autosave in case the debounce never settles.
+  useEffect(() => {
+    if (!isEditable) return;
+    const interval = setInterval(() => {
+      if (isDirty) {
+        startTransition(() => {
+          saveDraft();
+        });
+      }
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [isDirty, isEditable, saveDraft]);
+
+  // Warn before closing the tab / navigating away with unsaved changes.
+  useEffect(() => {
+    function handler(e: BeforeUnloadEvent) {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    }
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isDirty]);
+
+  const handleManualSave = useCallback(async () => {
+    const parsed = createQuotationSchema.safeParse(currentPayload);
+    if (!parsed.success) {
+      toast(parsed.error.issues[0].message, "error");
+      return;
+    }
+    const saved = await saveDraft();
+    if (saved) toast("Draft saved", "success");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPayload, saveDraft]);
+
+  const handleSendShortcut = useCallback(async () => {
+    const parsed = createQuotationSchema.safeParse(currentPayload);
+    if (!parsed.success) {
+      toast(parsed.error.issues[0].message, "error");
+      return;
+    }
+    const saved = await saveDraft();
+    if (!saved) return;
+
+    const id = quotationId ?? saved.id;
+    const statusResult = await updateQuotationStatus(workspace.id, id, "sent");
+    if (statusResult.error) {
+      toast(statusResult.error, "error");
+      return;
+    }
+    toast("Quotation sent", "success");
+    router.push(`/${workspace.slug}/quotations/${id}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPayload, saveDraft, quotationId, workspace.id, workspace.slug]);
+
+  // Keyboard shortcuts: Cmd/Ctrl+S save, Cmd/Ctrl+Enter send.
+  useEffect(() => {
+    function handler(e: KeyboardEvent) {
+      const mod = e.metaKey || e.ctrlKey;
+      if (!mod) return;
+      if (e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        startTransition(() => {
+          handleManualSave();
+        });
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        startTransition(() => {
+          handleSendShortcut();
+        });
+      }
+    }
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [handleManualSave, handleSendShortcut]);
+
+  function updateLineItem(index: number, patch: Partial<LineItemInput>) {
+    setLineItems((prev) =>
+      prev.map((it, i) => (i === index ? { ...it, ...patch } : it))
+    );
+  }
+
+  function addLineItem(category: LineItemCategory) {
+    setLineItems((prev) => [...prev, emptyItem(category)]);
+  }
+
+  function removeLineItem(index: number) {
+    const item = lineItems[index];
+    removedItemRef.current = { item, index };
+    setLineItems((prev) => prev.filter((_, i) => i !== index));
+    toast(`Removed "${item.description || "item"}"`, "info", {
+      duration: 6000,
+      action: {
+        label: "Undo",
+        onClick: () => {
+          const removed = removedItemRef.current;
+          if (!removed) return;
+          setLineItems((prev) => {
+            const next = [...prev];
+            next.splice(removed.index, 0, removed.item);
+            return next;
+          });
+          removedItemRef.current = null;
+        },
+      },
+    });
+  }
+
+  function handleInsertTemplate(items: LineItemInput[]) {
+    setLineItems((prev) => [...prev, ...items]);
+    setTemplatePickerOpen(false);
+    toast("Template items inserted", "success");
+  }
+
+  function handleCancel() {
+    if (isDirty && !confirm("You have unsaved changes. Leave anyway?")) return;
+    router.push(
+      quotationId
+        ? `/${workspace.slug}/quotations/${quotationId}`
+        : `/${workspace.slug}/quotations`
+    );
+  }
+
+  const itemsByCategory: Record<
+    LineItemCategory,
+    { item: LineItemInput; originalIndex: number }[]
+  > = { package: [], add_on: [], per_unit: [] };
+  lineItems.forEach((item, originalIndex) => {
+    itemsByCategory[item.category].push({ item, originalIndex });
+  });
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-3">
+      <div className="space-y-6 lg:col-span-2">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {quotation ? `Edit ${quotation.quotation_number}` : "New Quotation"}
+          </h1>
+          <SaveStatusIndicator status={saveStatus} isDirty={isDirty} />
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Client &amp; Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Client *</Label>
+              <ClientSelector
+                clients={clients}
+                value={clientId}
+                onChange={(id, client) => {
+                  setClientId(id);
+                  if (client.preferred_currency) setCurrency(client.preferred_currency);
+                }}
+              />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Title</Label>
+                <Input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g. Website Redesign Package"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Currency</Label>
+                <Select value={currency} onValueChange={setCurrency}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CURRENCIES.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Issue date</Label>
+                <Input
+                  type="date"
+                  value={issueDate}
+                  onChange={(e) => setIssueDate(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Expiry date</Label>
+                <Input
+                  type="date"
+                  value={expiryDate}
+                  onChange={(e) => setExpiryDate(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Summary</Label>
+              <Input
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                placeholder="One-line summary shown to the client"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
+            <CardTitle className="text-base">Line Items</CardTitle>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setTemplatePickerOpen(true)}
+              >
+                <FileDown className="mr-2 h-4 w-4" />
+                Insert from Template
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setSaveTemplateOpen(true)}
+              >
+                <FileUp className="mr-2 h-4 w-4" />
+                Save as Template
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Tabs
+              value={activeCategory}
+              onValueChange={(v) => setActiveCategory(v as LineItemCategory)}
+            >
+              <TabsList>
+                {LINE_ITEM_CATEGORIES.map((cat) => (
+                  <TabsTrigger key={cat} value={cat}>
+                    {CATEGORY_LABEL[cat]}
+                    {itemsByCategory[cat].length > 0 && (
+                      <span className="ml-1.5 text-xs text-muted-foreground">
+                        {itemsByCategory[cat].length}
+                      </span>
+                    )}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              {LINE_ITEM_CATEGORIES.map((cat) => (
+                <TabsContent key={cat} value={cat} className="space-y-2">
+                  {itemsByCategory[cat].length === 0 ? (
+                    <p className="py-6 text-center text-sm text-muted-foreground">
+                      No {CATEGORY_LABEL[cat].toLowerCase()} yet.
+                    </p>
+                  ) : (
+                    itemsByCategory[cat].map(({ item, originalIndex }) => (
+                      <LineItemRow
+                        key={originalIndex}
+                        item={item}
+                        currency={currency}
+                        onChange={(patch) => updateLineItem(originalIndex, patch)}
+                        onRemove={() => removeLineItem(originalIndex)}
+                      />
+                    ))
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addLineItem(cat)}
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add {CATEGORY_LABEL[cat].replace(/s$/, "")}
+                  </Button>
+                </TabsContent>
+              ))}
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Notes &amp; Terms</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Notes (visible to client)</Label>
+              <RichTextEditor
+                value={notes}
+                onChange={setNotes}
+                placeholder="Add notes for your client..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Terms &amp; conditions</Label>
+              <RichTextEditor
+                value={terms}
+                onChange={setTerms}
+                placeholder="Payment terms, validity, etc."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="flex items-center gap-1.5">
+                Internal notes
+                <span className="text-xs font-normal text-muted-foreground">
+                  (staff only)
+                </span>
+              </Label>
+              <RichTextEditor
+                value={internalNotes}
+                onChange={setInternalNotes}
+                placeholder="Not visible to the client..."
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            type="button"
+            onClick={() => startTransition(() => handleManualSave())}
+            disabled={isPending}
+          >
+            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Save Draft
+          </Button>
+          <Button type="button" variant="outline" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <span className="text-xs text-muted-foreground">
+            <kbd className="rounded border px-1 py-0.5">⌘S</kbd> save ·{" "}
+            <kbd className="rounded border px-1 py-0.5">⌘⏎</kbd> send
+          </span>
+        </div>
+      </div>
+
+      <div>
+        <PricingSummary
+          totals={totals}
+          currency={currency}
+          itemCount={lineItems.length}
+        />
+      </div>
+
+      <TemplatePickerDialog
+        open={templatePickerOpen}
+        onOpenChange={setTemplatePickerOpen}
+        templates={templates}
+        onInsert={handleInsertTemplate}
+      />
+      <SaveAsTemplateDialog
+        open={saveTemplateOpen}
+        onOpenChange={setSaveTemplateOpen}
+        items={lineItems}
+        onSaved={(t) => setTemplates((prev) => [t, ...prev])}
+      />
+    </div>
+  );
+}
+
+function SaveStatusIndicator({
+  status,
+  isDirty,
+}: {
+  status: "idle" | "saving" | "saved" | "error";
+  isDirty: boolean;
+}) {
+  if (status === "saving") {
+    return <span className="text-xs text-muted-foreground">Saving...</span>;
+  }
+  if (status === "error") {
+    return <span className="text-xs text-destructive">Save failed</span>;
+  }
+  if (isDirty) {
+    return <span className="text-xs text-muted-foreground">Unsaved changes</span>;
+  }
+  if (status === "saved") {
+    return <span className="text-xs text-muted-foreground">Saved</span>;
+  }
+  return null;
+}

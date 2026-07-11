@@ -2,15 +2,26 @@
 
 import { createContext, useCallback, useContext, useState } from "react";
 
+type ToastAction = {
+  label: string;
+  onClick: () => void;
+};
+
 type Toast = {
   id: string;
   message: string;
   type: "success" | "error" | "info";
+  action?: ToastAction;
+};
+
+type ToastOptions = {
+  action?: ToastAction;
+  duration?: number;
 };
 
 type ToastContextType = {
   toasts: Toast[];
-  toast: (message: string, type?: Toast["type"]) => void;
+  toast: (message: string, type?: Toast["type"], options?: ToastOptions) => void;
   dismiss: (id: string) => void;
 };
 
@@ -20,12 +31,16 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const toast = useCallback(
-    (message: string, type: Toast["type"] = "info") => {
+    (
+      message: string,
+      type: Toast["type"] = "info",
+      options?: ToastOptions
+    ) => {
       const id = crypto.randomUUID();
-      setToasts((prev) => [...prev, { id, message, type }]);
+      setToasts((prev) => [...prev, { id, message, type, action: options?.action }]);
       setTimeout(() => {
         setToasts((prev) => prev.filter((t) => t.id !== id));
-      }, 5000);
+      }, options?.duration ?? 5000);
     },
     []
   );
@@ -50,12 +65,25 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           >
             <div className="flex items-center justify-between gap-3">
               <span>{t.message}</span>
-              <button
-                onClick={() => dismiss(t.id)}
-                className="shrink-0 opacity-70 hover:opacity-100"
-              >
-                &times;
-              </button>
+              <div className="flex shrink-0 items-center gap-2">
+                {t.action && (
+                  <button
+                    onClick={() => {
+                      t.action!.onClick();
+                      dismiss(t.id);
+                    }}
+                    className="rounded bg-white/20 px-2 py-0.5 text-xs font-medium hover:bg-white/30"
+                  >
+                    {t.action.label}
+                  </button>
+                )}
+                <button
+                  onClick={() => dismiss(t.id)}
+                  className="opacity-70 hover:opacity-100"
+                >
+                  &times;
+                </button>
+              </div>
             </div>
           </div>
         ))}

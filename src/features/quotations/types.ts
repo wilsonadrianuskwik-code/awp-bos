@@ -71,6 +71,7 @@ export type QuotationClientSummary = {
   company: string | null;
   email: string | null;
   payment_terms?: number;
+  preferred_currency?: string;
 };
 
 export type QuotationWithClient = Quotation & {
