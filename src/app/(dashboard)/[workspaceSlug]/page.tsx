@@ -5,9 +5,11 @@ import {
   getInvoiceSummary,
   getLeadSummary,
   getRevenueSummary,
+  getWorkspaceActivities,
 } from "@/features/dashboard/queries";
 import { StatCard } from "@/features/dashboard/components/stat-card";
 import { LeadPipelineCard } from "@/features/dashboard/components/lead-pipeline-card";
+import { RecentActivityCard } from "@/features/dashboard/components/recent-activity-card";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { CurrencyAmount } from "@/features/dashboard/types";
 
@@ -28,12 +30,13 @@ export default async function DashboardPage({
   const workspace = await getWorkspaceBySlug(workspaceSlug);
   if (!workspace) notFound();
 
-  const [leadSummary, clientSummary, invoiceSummary, revenueSummary] =
+  const [leadSummary, clientSummary, invoiceSummary, revenueSummary, activities] =
     await Promise.all([
       getLeadSummary(workspace.id),
       getClientSummary(workspace.id),
       getInvoiceSummary(workspace.id),
       getRevenueSummary(workspace.id),
+      getWorkspaceActivities(workspace.id, 15),
     ]);
 
   return (
@@ -70,6 +73,9 @@ export default async function DashboardPage({
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <LeadPipelineCard summary={leadSummary} />
+        <div className="md:col-span-2 lg:col-span-3">
+          <RecentActivityCard activities={activities} />
+        </div>
       </div>
     </div>
   );

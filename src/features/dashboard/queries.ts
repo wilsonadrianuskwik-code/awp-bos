@@ -110,3 +110,22 @@ export async function getRevenueSummary(
 
   return { totalByCurrency: sumByCurrency(data ?? []) };
 }
+
+/**
+ * Workspace-wide recent activity feed — the first read of `activities`
+ * that isn't scoped to a single entity (every existing caller, e.g.
+ * getQuotationActivities/getInvoiceActivities, filters by entity_type +
+ * entity_id). Same table, same actor join, just a wider filter and a
+ * caller-supplied limit.
+ */
+export async function getWorkspaceActivities(workspaceId: string, limit: number) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("activities")
+    .select("*, actor:profiles!actor_id(full_name, avatar_url)")
+    .eq("workspace_id", workspaceId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  return data ?? [];
+}
