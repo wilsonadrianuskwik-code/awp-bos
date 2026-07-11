@@ -1,4 +1,5 @@
 import type { QuotationDetail, LineItemCategory } from "@/features/quotations/types";
+import { formatCurrency } from "@/lib/utils/format-currency";
 
 const CATEGORY_LABEL: Record<LineItemCategory, string> = {
   package: "Packages",
@@ -17,11 +18,7 @@ export function QuotationPrintView({
   quotation,
   workspaceName,
 }: QuotationPrintViewProps) {
-  const fmt = (value: number) =>
-    new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: quotation.currency,
-    }).format(value);
+  const fmt = (value: number) => formatCurrency(value, quotation.currency);
 
   return (
     <div className="hidden print:block print:text-black">

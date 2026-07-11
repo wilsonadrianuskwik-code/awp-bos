@@ -207,10 +207,10 @@ export function QuotationStatusActions({
 
       {quotation.status === "approved" &&
         (quotation.generated_invoice_id ? (
-          <Button variant="outline" asChild>
-            <a href={`/${workspace.slug}/invoices/${quotation.generated_invoice_id}`}>
-              View Invoice
-            </a>
+          // The invoice module doesn't exist yet (Phase 4) — never link to
+          // a route that 404s. This stays disabled until that page ships.
+          <Button variant="outline" disabled title="Invoice management arrives in Phase 4">
+            View Invoice (Coming in Phase 4)
           </Button>
         ) : (
           <Button onClick={onGenerateInvoice}>Generate Invoice</Button>

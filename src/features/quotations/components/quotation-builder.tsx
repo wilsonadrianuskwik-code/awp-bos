@@ -21,10 +21,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { cn } from "@/lib/utils/cn";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { ClientSelector } from "./client-selector";
-import { LineItemRow } from "./line-item-row";
+import { LineItemRow, LINE_ITEM_GRID_COLS } from "./line-item-row";
 import { PricingSummary } from "./pricing-summary";
 import { TemplatePickerDialog } from "./template-picker-dialog";
 import { SaveAsTemplateDialog } from "./save-as-template-dialog";
@@ -48,7 +49,7 @@ import {
   type QuotationTemplateWithItems,
 } from "@/features/quotations/types";
 
-const CURRENCIES = ["USD", "EUR", "GBP", "SGD", "AUD", "CAD"];
+const CURRENCIES = ["USD", "EUR", "GBP", "SGD", "MYR", "IDR", "AUD", "CAD"];
 
 const CATEGORY_LABEL: Record<LineItemCategory, string> = {
   package: "Packages",
@@ -144,6 +145,17 @@ export function QuotationBuilder({
     quotation.status === "draft" ||
     quotation.status === "revision_requested";
 
+  // A freshly-added row (via "Add Package/Add-on/Per-unit") starts with an
+  // empty description. It stays visible in its tab so nothing the user
+  // added silently disappears, but it isn't a real line item yet — treating
+  // it as one meant validation could fail on a blank row sitting in a tab
+  // the user isn't currently looking at, with no indication of where the
+  // problem was. Excluding it here (not from `lineItems` itself) keeps it
+  // on screen while removing it from what gets validated/saved.
+  const submittableLineItems = lineItems.filter(
+    (item) => item.description.trim() !== ""
+  );
+
   const currentPayload: CreateQuotationInput = {
     client_id: clientId,
     title,
@@ -154,10 +166,10 @@ export function QuotationBuilder({
     terms_and_conditions: terms,
     notes,
     internal_notes: internalNotes,
-    line_items: lineItems,
+    line_items: submittableLineItems,
   };
 
-  const totals = computeQuotationTotals(lineItems);
+  const totals = computeQuotationTotals(submittableLineItems);
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -476,6 +488,24 @@ export function QuotationBuilder({
               </TabsList>
               {LINE_ITEM_CATEGORIES.map((cat) => (
                 <TabsContent key={cat} value={cat} className="space-y-2">
+                  {itemsByCategory[cat].length > 0 && (
+                    <div
+                      className={cn(
+                        "hidden gap-x-3 px-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground md:grid",
+                        LINE_ITEM_GRID_COLS
+                      )}
+                    >
+                      <span />
+                      <span>Description</span>
+                      <span>Qty</span>
+                      <span>Unit</span>
+                      <span>Unit Price</span>
+                      <span>Discount</span>
+                      <span>Tax</span>
+                      <span className="text-right">Total</span>
+                      <span />
+                    </div>
+                  )}
                   {itemsByCategory[cat].length === 0 ? (
                     <p className="py-6 text-center text-sm text-muted-foreground">
                       No {CATEGORY_LABEL[cat].toLowerCase()} yet.
@@ -579,7 +609,7 @@ export function QuotationBuilder({
       <SaveAsTemplateDialog
         open={saveTemplateOpen}
         onOpenChange={setSaveTemplateOpen}
-        items={lineItems}
+        items={submittableLineItems}
         onSaved={(t) => setTemplates((prev) => [t, ...prev])}
       />
     </div>

@@ -1,4 +1,5 @@
 import type { QuotationTotals } from "@/features/quotations/helpers";
+import { formatCurrency } from "@/lib/utils/format-currency";
 
 type PricingSummaryProps = {
   totals: QuotationTotals;
@@ -13,10 +14,7 @@ export function PricingSummary({
   itemCount,
   sticky = true,
 }: PricingSummaryProps) {
-  const fmt = (value: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency }).format(
-      value
-    );
+  const fmt = (value: number) => formatCurrency(value, currency);
 
   return (
     <div className={sticky ? "lg:sticky lg:top-6" : ""}>

@@ -28,15 +28,8 @@ import {
   createQuotationVersion,
 } from "@/features/quotations/actions";
 import { isEditableStatus } from "@/features/quotations/helpers";
+import { formatCurrency } from "@/lib/utils/format-currency";
 import type { QuotationWithClient } from "@/features/quotations/types";
-
-function formatMoney(value: number, currency: string) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 2,
-  }).format(value);
-}
 
 function formatDate(date: string | null) {
   if (!date) return null;
@@ -176,7 +169,7 @@ export function QuotationCard({ quotation }: QuotationCardProps) {
 
       <div className="mt-4 flex items-end justify-between">
         <span className="text-xl font-semibold tabular-nums tracking-tight">
-          {formatMoney(quotation.total, quotation.currency)}
+          {formatCurrency(quotation.total, quotation.currency)}
         </span>
         <StatusBadge status={quotation.status} />
       </div>

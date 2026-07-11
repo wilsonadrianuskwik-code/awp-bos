@@ -17,6 +17,7 @@ import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { generateInvoiceFromQuotation } from "@/features/quotations/actions";
 import { QuotationLineItemsTable } from "./quotation-line-items-table";
+import { formatCurrency } from "@/lib/utils/format-currency";
 import type { QuotationDetail } from "@/features/quotations/types";
 
 type GenerateInvoiceDialogProps = {
@@ -162,12 +163,7 @@ export function GenerateInvoiceDialog({
 
               <div className="flex justify-between rounded-lg border p-3 font-semibold">
                 <span>Total</span>
-                <span>
-                  {new Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: quotation.currency,
-                  }).format(quotation.total)}
-                </span>
+                <span>{formatCurrency(quotation.total, quotation.currency)}</span>
               </div>
             </div>
 

@@ -1,4 +1,5 @@
 import type { LineItem, LineItemCategory } from "@/features/quotations/types";
+import { formatCurrency } from "@/lib/utils/format-currency";
 
 const CATEGORY_LABEL: Record<LineItemCategory, string> = {
   package: "Packages",
@@ -17,10 +18,7 @@ export function QuotationLineItemsTable({
   lineItems,
   currency,
 }: QuotationLineItemsTableProps) {
-  const fmt = (value: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency }).format(
-      value
-    );
+  const fmt = (value: number) => formatCurrency(value, currency);
 
   return (
     <div className="space-y-6">

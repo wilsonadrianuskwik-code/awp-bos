@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { cn } from "@/lib/utils/cn";
+import { formatCurrency } from "@/lib/utils/format-currency";
 import { useWorkspace } from "@/providers/workspace-provider";
 import type { QuotationWithClient } from "@/features/quotations/types";
 
@@ -51,10 +52,7 @@ export function QuotationVersionHistory({
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <span className="text-sm tabular-nums">
-              {new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: v.currency,
-              }).format(v.total)}
+              {formatCurrency(v.total, v.currency)}
             </span>
             <StatusBadge status={v.status} />
           </div>

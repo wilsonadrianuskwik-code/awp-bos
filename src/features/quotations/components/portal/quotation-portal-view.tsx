@@ -82,11 +82,6 @@ export function QuotationPortalView({
   }, []);
 
   const canRespond = quotation.status === "sent" || quotation.status === "viewed";
-  const fmt = (v: number) =>
-    new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: quotation.currency,
-    }).format(v);
 
   function handleApprove() {
     startTransition(async () => {
