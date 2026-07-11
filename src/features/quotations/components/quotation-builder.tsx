@@ -76,12 +76,14 @@ type QuotationBuilderProps = {
   quotation?: QuotationDetail;
   clients: QuotationClientSummary[];
   templates: QuotationTemplateWithItems[];
+  initialClientId?: string;
 };
 
 export function QuotationBuilder({
   quotation,
   clients,
   templates: initialTemplates,
+  initialClientId,
 }: QuotationBuilderProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
@@ -91,10 +93,16 @@ export function QuotationBuilder({
   const [quotationId, setQuotationId] = useState<string | null>(
     quotation?.id ?? null
   );
-  const [clientId, setClientId] = useState(quotation?.client_id ?? "");
+  const [clientId, setClientId] = useState(
+    quotation?.client_id ?? initialClientId ?? ""
+  );
   const [title, setTitle] = useState(quotation?.title ?? "");
   const [summary, setSummary] = useState(quotation?.summary ?? "");
-  const [currency, setCurrency] = useState(quotation?.currency ?? "USD");
+  const [currency, setCurrency] = useState(
+    quotation?.currency ??
+      clients.find((c) => c.id === initialClientId)?.preferred_currency ??
+      "USD"
+  );
   const [issueDate, setIssueDate] = useState(quotation?.issue_date ?? todayISO());
   const [expiryDate, setExpiryDate] = useState(quotation?.expiry_date ?? "");
   const [terms, setTerms] = useState(quotation?.terms_and_conditions ?? "");

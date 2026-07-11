@@ -20,6 +20,7 @@ function parseFilters(params: {
   status?: string;
   sort?: string;
   page?: string;
+  clientId?: string;
 }): QuotationFilters {
   const [sortBy, sortDir] = (params.sort ?? "created_at:desc").split(":");
 
@@ -28,6 +29,7 @@ function parseFilters(params: {
     status: QUOTATION_STATUSES.includes(params.status as QuotationStatus)
       ? (params.status as QuotationStatus)
       : "all",
+    clientId: params.clientId || undefined,
     sortBy: SORT_FIELDS.includes(sortBy as (typeof SORT_FIELDS)[number])
       ? (sortBy as QuotationFilters["sortBy"])
       : "created_at",
@@ -47,6 +49,7 @@ export default async function QuotationsPage({
     status?: string;
     sort?: string;
     page?: string;
+    clientId?: string;
   }>;
 }) {
   const [{ workspaceSlug }, search] = await Promise.all([params, searchParams]);
@@ -57,7 +60,9 @@ export default async function QuotationsPage({
   const { quotations, count } = await getQuotations(workspace.id, filters);
 
   const hasAnyFilters =
-    !!filters.search || (filters.status && filters.status !== "all");
+    !!filters.search ||
+    (filters.status && filters.status !== "all") ||
+    !!filters.clientId;
 
   return (
     <div className="space-y-6">

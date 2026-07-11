@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2 } from "lucide-react";
+import { FileText, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -13,12 +14,24 @@ import { deleteClient } from "@/features/clients/actions";
 import type { Client } from "@/features/clients/types";
 import type { Activity } from "@/features/activities/types";
 
+// Deliberately local, not imported from the quotations feature — features
+// only compose with each other through the app/ page layer.
+type ClientQuotationSummary = {
+  id: string;
+  quotation_number: string;
+  status: string;
+  total: number;
+  currency: string;
+  created_at: string;
+};
+
 type ClientDetailProps = {
   client: Client;
   activities: Activity[];
+  quotations: ClientQuotationSummary[];
 };
 
-export function ClientDetail({ client, activities }: ClientDetailProps) {
+export function ClientDetail({ client, activities, quotations }: ClientDetailProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const { workspace } = useWorkspace();
@@ -101,6 +114,67 @@ export function ClientDetail({ client, activities }: ClientDetailProps) {
                   value={client.preferred_currency}
                 />
               </dl>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Quotations</CardTitle>
+              <div className="flex gap-2">
+                {quotations.length > 0 && (
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link
+                      href={`/${workspace.slug}/quotations?clientId=${client.id}`}
+                    >
+                      View All
+                    </Link>
+                  </Button>
+                )}
+                <Button size="sm" asChild>
+                  <Link
+                    href={`/${workspace.slug}/quotations/new?clientId=${client.id}`}
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Quotation
+                  </Link>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {quotations.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <FileText className="h-8 w-8 text-muted-foreground/50" />
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    No quotations yet for this client.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {quotations.map((q) => (
+                    <Link
+                      key={q.id}
+                      href={`/${workspace.slug}/quotations/${q.id}`}
+                      className="flex items-center justify-between rounded-lg border p-3 text-sm transition-colors hover:bg-accent"
+                    >
+                      <div>
+                        <p className="font-medium">{q.quotation_number}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(q.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="tabular-nums">
+                          {new Intl.NumberFormat("en-US", {
+                            style: "currency",
+                            currency: q.currency,
+                          }).format(q.total)}
+                        </span>
+                        <StatusBadge status={q.status} />
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 

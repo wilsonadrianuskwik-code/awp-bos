@@ -6,10 +6,13 @@ import { QuotationBuilder } from "@/features/quotations/components/quotation-bui
 
 export default async function NewQuotationPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ workspaceSlug: string }>;
+  searchParams: Promise<{ clientId?: string }>;
 }) {
   const { workspaceSlug } = await params;
+  const { clientId } = await searchParams;
   const workspace = await getWorkspaceBySlug(workspaceSlug);
   if (!workspace) notFound();
 
@@ -18,5 +21,11 @@ export default async function NewQuotationPage({
     getQuotationTemplates(workspace.id),
   ]);
 
-  return <QuotationBuilder clients={clients} templates={templates} />;
+  return (
+    <QuotationBuilder
+      clients={clients}
+      templates={templates}
+      initialClientId={clientId}
+    />
+  );
 }
