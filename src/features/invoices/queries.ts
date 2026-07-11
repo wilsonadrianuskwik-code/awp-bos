@@ -1,0 +1,209 @@
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import type {
+  Invoice,
+  InvoiceDetail,
+  InvoiceFilters,
+  InvoiceListResult,
+  InvoiceWithClient,
+  Payment,
+} from "@/features/invoices/types";
+
+const CLIENT_JOIN = "client:clients(id,name,company,email,payment_terms)";
+
+export async function getInvoices(
+  workspaceId: string,
+  filters?: InvoiceFilters
+): Promise<InvoiceListResult> {
+  const supabase = await createClient();
+
+  let query = supabase
+    .from("invoices")
+    .select(`*, ${CLIENT_JOIN}`, { count: "exact" })
+    .eq("workspace_id", workspaceId)
+    .is("deleted_at", null);
+
+  if (filters?.status && filters.status !== "all") {
+    query = query.eq("status", filters.status);
+  }
+
+  if (filters?.clientId) {
+    query = query.eq("client_id", filters.clientId);
+  }
+
+  if (filters?.search) {
+    const term = filters.search.replace(/[%_]/g, "");
+    query = query.or(`title.ilike.%${term}%,invoice_number.ilike.%${term}%`);
+  }
+
+  const sortBy = filters?.sortBy ?? "created_at";
+  const sortDir = filters?.sortDir ?? "desc";
+  query = query.order(sortBy, { ascending: sortDir === "asc" });
+
+  const page = filters?.page ?? 1;
+  const pageSize = filters?.pageSize ?? 20;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+  query = query.range(from, to);
+
+  const { data, error, count } = await query;
+  if (error) throw error;
+
+  return {
+    invoices: (data ?? []) as unknown as InvoiceWithClient[],
+    count: count ?? 0,
+  };
+}
+
+export async function getInvoice(
+  invoiceId: string,
+  workspaceId: string
+): Promise<InvoiceDetail | null> {
+  const supabase = await createClient();
+
+  // Only client:clients(...) is a genuine embed — invoices.client_id has a
+  // real FK to clients(id). created_by references auth.users, not
+  // profiles, so there is no relationship PostgREST can traverse for a
+  // `profiles!created_by(...)` style embed — that select silently errors
+  // (the P0 lesson from the quotation feature). Profiles are fetched
+  // separately instead, same as line_items/payments below.
+  const { data: invoice, error } = await supabase
+    .from("invoices")
+    .select(`*, ${CLIENT_JOIN}`)
+    .eq("id", invoiceId)
+    .eq("workspace_id", workspaceId)
+    .is("deleted_at", null)
+    .single();
+
+  if (error || !invoice) return null;
+
+  const [{ data: lineItems }, { data: payments }, { data: profiles }] =
+    await Promise.all([
+      supabase
+        .from("line_items")
+        .select("*")
+        .eq("entity_type", "invoice")
+        .eq("entity_id", invoiceId)
+        .order("sort_order", { ascending: true }),
+      supabase
+        .from("payments")
+        .select("*")
+        .eq("invoice_id", invoiceId)
+        .is("deleted_at", null)
+        .order("payment_date", { ascending: true }),
+      supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url")
+        .in("id", [invoice.created_by]),
+    ]);
+
+  const profileById = new Map((profiles ?? []).map((p) => [p.id, p]));
+
+  return {
+    ...invoice,
+    line_items: lineItems ?? [],
+    payments: payments ?? [],
+    created_by_profile: profileById.get(invoice.created_by) ?? null,
+  } as unknown as InvoiceDetail;
+}
+
+export async function getInvoiceActivities(invoiceId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("activities")
+    .select("*, actor:profiles!actor_id(full_name, avatar_url)")
+    .eq("entity_type", "invoice")
+    .eq("entity_id", invoiceId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  return data ?? [];
+}
+
+export async function getPayments(invoiceId: string): Promise<Payment[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("payments")
+    .select("*")
+    .eq("invoice_id", invoiceId)
+    .is("deleted_at", null)
+    .order("payment_date", { ascending: true });
+
+  return (data ?? []) as Payment[];
+}
+
+export async function getInvoicesByClient(
+  clientId: string,
+  workspaceId: string
+): Promise<Invoice[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("invoices")
+    .select("*")
+    .eq("client_id", clientId)
+    .eq("workspace_id", workspaceId)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false })
+    .limit(10);
+
+  return (data ?? []) as Invoice[];
+}
+
+/**
+ * Reads an invoice by its public share_token for the unauthenticated
+ * customer portal. Uses the admin (service role) client deliberately —
+ * there is no `invoices` RLS SELECT policy for anon/customer access; the
+ * share_token itself (a capability URL) is the access control here, not
+ * row-level security. Mirrors getQuotationByShareToken.
+ */
+export async function getInvoiceByShareToken(
+  shareToken: string
+): Promise<{ invoice: InvoiceDetail; workspaceName: string } | null> {
+  const supabase = createAdminClient();
+
+  const { data: invoice, error } = await supabase
+    .from("invoices")
+    .select(`*, ${CLIENT_JOIN}`)
+    .eq("share_token", shareToken)
+    .is("deleted_at", null)
+    .single();
+
+  if (error || !invoice) return null;
+
+  const [{ data: lineItems }, { data: payments }, { data: workspace }, { data: profiles }] =
+    await Promise.all([
+      supabase
+        .from("line_items")
+        .select("*")
+        .eq("entity_type", "invoice")
+        .eq("entity_id", invoice.id)
+        .order("sort_order", { ascending: true }),
+      supabase
+        .from("payments")
+        .select("*")
+        .eq("invoice_id", invoice.id)
+        .is("deleted_at", null)
+        .order("payment_date", { ascending: true }),
+      supabase
+        .from("workspaces")
+        .select("name")
+        .eq("id", invoice.workspace_id)
+        .single(),
+      supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url")
+        .in("id", [invoice.created_by]),
+    ]);
+
+  const profileById = new Map((profiles ?? []).map((p) => [p.id, p]));
+
+  return {
+    invoice: {
+      ...invoice,
+      line_items: lineItems ?? [],
+      payments: payments ?? [],
+      created_by_profile: profileById.get(invoice.created_by) ?? null,
+    } as unknown as InvoiceDetail,
+    workspaceName: workspace?.name ?? "",
+  };
+}
