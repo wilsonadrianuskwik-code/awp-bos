@@ -20,24 +20,28 @@ export function WorkspaceShell({
   const closeMobile = useCallback(() => setMobileOpen(false), []);
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <div className="hidden md:flex">
+    <div className="flex h-screen overflow-hidden print:h-auto print:overflow-visible">
+      <div className="hidden md:flex print:hidden">
         <Sidebar
           workspaceSlug={workspaceSlug}
           workspaceName={workspaceName}
         />
       </div>
 
-      <MobileSidebar
-        open={mobileOpen}
-        onClose={closeMobile}
-        workspaceSlug={workspaceSlug}
-        workspaceName={workspaceName}
-      />
+      <div className="print:hidden">
+        <MobileSidebar
+          open={mobileOpen}
+          onClose={closeMobile}
+          workspaceSlug={workspaceSlug}
+          workspaceName={workspaceName}
+        />
+      </div>
 
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <Header onMobileMenuToggle={() => setMobileOpen(true)} />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+      <div className="flex flex-1 flex-col overflow-hidden print:overflow-visible">
+        <div className="print:hidden">
+          <Header onMobileMenuToggle={() => setMobileOpen(true)} />
+        </div>
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 print:overflow-visible print:p-0">
           {children}
         </main>
       </div>

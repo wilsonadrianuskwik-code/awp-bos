@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   Quotation,
   QuotationDetail,
@@ -141,6 +142,52 @@ export async function getQuotationsByClient(
     .limit(10);
 
   return (data ?? []) as Quotation[];
+}
+
+/**
+ * Reads a quotation by its public share_token for the unauthenticated
+ * customer portal. Uses the admin (service role) client deliberately —
+ * there is no `quotations` RLS SELECT policy for anon/customer access;
+ * the share_token itself (a capability URL) is the access control here,
+ * not row-level security.
+ */
+export async function getQuotationByShareToken(
+  shareToken: string
+): Promise<{ quotation: QuotationDetail; workspaceName: string } | null> {
+  const supabase = createAdminClient();
+
+  const { data: quotation, error } = await supabase
+    .from("quotations")
+    .select(
+      `*, ${CLIENT_JOIN}, created_by_profile:profiles!created_by(full_name,avatar_url), approved_by_profile:profiles!approved_by(full_name,avatar_url)`
+    )
+    .eq("share_token", shareToken)
+    .is("deleted_at", null)
+    .single();
+
+  if (error || !quotation) return null;
+
+  const [{ data: lineItems }, { data: workspace }] = await Promise.all([
+    supabase
+      .from("line_items")
+      .select("*")
+      .eq("entity_type", "quotation")
+      .eq("entity_id", quotation.id)
+      .order("sort_order", { ascending: true }),
+    supabase
+      .from("workspaces")
+      .select("name")
+      .eq("id", quotation.workspace_id)
+      .single(),
+  ]);
+
+  return {
+    quotation: {
+      ...quotation,
+      line_items: lineItems ?? [],
+    } as unknown as QuotationDetail,
+    workspaceName: workspace?.name ?? "",
+  };
 }
 
 export async function getQuotationTemplates(

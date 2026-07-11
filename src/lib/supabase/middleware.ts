@@ -35,7 +35,12 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/forgot-password") ||
     request.nextUrl.pathname.startsWith("/auth/callback");
 
-  if (!user && !isAuthPage) {
+  // The customer quotation portal is a public, unauthenticated surface —
+  // access is gated by possession of the share_token in the URL, not by
+  // a Supabase session (customers never sign in to this app).
+  const isPublicPage = isAuthPage || request.nextUrl.pathname.startsWith("/portal");
+
+  if (!user && !isPublicPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
