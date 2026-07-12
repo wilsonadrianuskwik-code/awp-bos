@@ -37,8 +37,13 @@ export async function updateSession(request: NextRequest) {
 
   // The customer quotation portal is a public, unauthenticated surface —
   // access is gated by possession of the share_token in the URL, not by
-  // a Supabase session (customers never sign in to this app).
-  const isPublicPage = isAuthPage || request.nextUrl.pathname.startsWith("/portal");
+  // a Supabase session (customers never sign in to this app). The invite
+  // accept page is the same shape: gated by the invite token, and must be
+  // reachable by a signed-out invitee before they've ever logged in.
+  const isPublicPage =
+    isAuthPage ||
+    request.nextUrl.pathname.startsWith("/portal") ||
+    request.nextUrl.pathname.startsWith("/invite");
 
   if (!user && !isPublicPage) {
     const url = request.nextUrl.clone();

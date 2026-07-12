@@ -15,10 +15,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export function SignupForm() {
+type SignupFormProps = {
+  next?: string;
+};
+
+export function SignupForm({ next }: SignupFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const loginHref = next ? `/login?next=${encodeURIComponent(next)}` : "/login";
 
   async function handleSubmit(formData: FormData) {
     setError(null);
@@ -43,6 +48,7 @@ export function SignupForm() {
       </CardHeader>
       <CardContent>
         <form action={handleSubmit} className="space-y-4">
+          {next && <input type="hidden" name="next" value={next} />}
           {error && (
             <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {error}
@@ -94,7 +100,7 @@ export function SignupForm() {
       <CardFooter className="flex justify-center">
         <p className="text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" className="text-primary hover:underline">
+          <Link href={loginHref} className="text-primary hover:underline">
             Sign in
           </Link>
         </p>
