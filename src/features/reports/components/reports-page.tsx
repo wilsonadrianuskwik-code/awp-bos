@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { DateRangePicker, type DateRange } from "@/components/ui/date-range-picker";
 import { CurrencySelector } from "@/features/reports/components/currency-selector";
 import { RevenueChart } from "@/features/reports/components/revenue-chart";
+import { ArAgingCard } from "@/features/reports/components/ar-aging-card";
 
 function defaultDateRange(): DateRange {
   const to = new Date();
@@ -57,9 +58,6 @@ export function ReportsPage({
         />
       </div>
 
-      {/* AR Aging is filled in by Milestone 4; this shell establishes the
-          shared date-range/currency state and the section layout both
-          reports (and any future report) plug into. */}
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
@@ -79,7 +77,7 @@ export function ReportsPage({
             <CardTitle className="text-base">AR Aging</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">{currency} · as of today</p>
+            <ArAgingCard workspaceId={workspaceId} currency={currency} />
           </CardContent>
         </Card>
       </div>

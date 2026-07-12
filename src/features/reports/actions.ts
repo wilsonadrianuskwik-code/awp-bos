@@ -1,7 +1,10 @@
 "use server";
 
-import { getRevenueByPeriod } from "@/features/reports/queries";
-import type { RevenueByPeriodInput } from "@/features/reports/validators";
+import { getArAging, getRevenueByPeriod } from "@/features/reports/queries";
+import type {
+  ArAgingInput,
+  RevenueByPeriodInput,
+} from "@/features/reports/validators";
 
 /**
  * Server Action wrapper — getRevenueByPeriod (queries.ts) uses the
@@ -20,6 +23,21 @@ export async function getRevenueByPeriodAction(
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Failed to load revenue report";
+    return { data: null, error: message };
+  }
+}
+
+/**
+ * Same reasoning as getRevenueByPeriodAction, for the AR Aging card's
+ * currency-change refetching.
+ */
+export async function getArAgingAction(workspaceId: string, input: ArAgingInput) {
+  try {
+    const data = await getArAging(workspaceId, input);
+    return { data, error: null };
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Failed to load AR aging report";
     return { data: null, error: message };
   }
 }
