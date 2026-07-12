@@ -8,13 +8,21 @@ export async function signUp(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const fullName = formData.get("fullName") as string;
+  // Optional — e.g. an invite-accept link (/invite/{token}) carried
+  // through as ?next= so a brand-new user lands back there after
+  // confirming their email, instead of just the workspace-agnostic root.
+  // Omitted by every existing caller today, so behavior is unchanged
+  // unless a form explicitly includes a "next" field.
+  const next = (formData.get("next") as string | null) || null;
 
   const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: { full_name: fullName },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+      emailRedirectTo: next
+        ? `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=${encodeURIComponent(next)}`
+        : `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
     },
   });
 
@@ -29,6 +37,8 @@ export async function signIn(formData: FormData) {
   const supabase = await createClient();
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+  // Same optional, backward-compatible "next" as signUp above.
+  const next = (formData.get("next") as string | null) || null;
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
@@ -36,7 +46,7 @@ export async function signIn(formData: FormData) {
     return { error: error.message };
   }
 
-  redirect("/");
+  redirect(next || "/");
 }
 
 export async function signOut() {
