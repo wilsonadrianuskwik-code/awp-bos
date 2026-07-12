@@ -22,6 +22,7 @@ export default async function ReportsRoute({
         description="Revenue trends and outstanding balances over time"
       />
       <ReportsPage
+        workspaceId={workspace.id}
         availableCurrencies={availableCurrencies}
         defaultCurrency={workspace.default_currency}
       />

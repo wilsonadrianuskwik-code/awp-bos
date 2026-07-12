@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { DateRangePicker, type DateRange } from "@/components/ui/date-range-picker";
 import { CurrencySelector } from "@/features/reports/components/currency-selector";
+import { RevenueChart } from "@/features/reports/components/revenue-chart";
 
 function defaultDateRange(): DateRange {
   const to = new Date();
@@ -18,11 +19,13 @@ function defaultDateRange(): DateRange {
 }
 
 type ReportsPageProps = {
+  workspaceId: string;
   availableCurrencies: string[];
   defaultCurrency: string;
 };
 
 export function ReportsPage({
+  workspaceId,
   availableCurrencies,
   defaultCurrency,
 }: ReportsPageProps) {
@@ -54,19 +57,20 @@ export function ReportsPage({
         />
       </div>
 
-      {/* Revenue Trend and AR Aging are filled in by Milestones 3–4;
-          this shell only establishes the shared date-range/currency state
-          and the section layout both reports (and any future report)
-          plug into. */}
+      {/* AR Aging is filled in by Milestone 4; this shell establishes the
+          shared date-range/currency state and the section layout both
+          reports (and any future report) plug into. */}
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Revenue Trend</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
-              {currency} · {dateRange.from} to {dateRange.to}
-            </p>
+            <RevenueChart
+              workspaceId={workspaceId}
+              currency={currency}
+              dateRange={dateRange}
+            />
           </CardContent>
         </Card>
 
