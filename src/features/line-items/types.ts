@@ -22,6 +22,9 @@ export type LineItem = {
   tax_percent: number | null;
   line_total: number;
   created_at: string;
+  // Traceability only (Phase 8) — which catalog item this line item was
+  // inserted from, if any. Never re-read for pricing.
+  catalog_item_id: string | null;
 };
 
 export type ClientSummary = {

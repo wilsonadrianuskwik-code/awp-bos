@@ -32,7 +32,7 @@ const NAV_ITEMS = [
   { label: "Quotations", href: "/quotations", icon: FileText },
   { label: "Invoices", href: "/invoices", icon: Receipt },
   { label: "Payments", href: "/payments", icon: CreditCard },
-  { label: "Packages", href: "/packages", icon: Package },
+  { label: "Catalog", href: "/catalog", icon: Package },
   { label: "Reports", href: "/reports", icon: BarChart3 },
 ] as const;
 

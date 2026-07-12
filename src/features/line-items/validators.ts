@@ -9,6 +9,11 @@ export const lineItemSchema = z.object({
   unit: z.string().max(50).optional().or(z.literal("")),
   discount_percent: z.coerce.number().min(0).max(100).default(0),
   tax_percent: z.coerce.number().min(0).max(100).default(0),
+  // Traceability only — set when a line item was inserted from the
+  // catalog (Phase 8), never read back for pricing. Absent/null for
+  // manual-entry or template-derived items, same as before this field
+  // existed.
+  catalog_item_id: z.string().uuid().optional().nullable(),
 });
 
 export const createTemplateSchema = z.object({

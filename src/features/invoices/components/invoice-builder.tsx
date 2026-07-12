@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { FileDown, FileUp, Loader2, Plus } from "lucide-react";
+import { FileDown, FileUp, Loader2, Package, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +32,7 @@ import {
 import { PricingSummary } from "@/features/line-items/components/pricing-summary";
 import { TemplatePickerDialog } from "@/features/line-items/components/template-picker-dialog";
 import { SaveAsTemplateDialog } from "@/features/line-items/components/save-as-template-dialog";
+import { CatalogPickerDialog } from "@/features/line-items/components/catalog-picker-dialog";
 import {
   createInvoice,
   updateInvoice,
@@ -50,6 +51,7 @@ import {
   type TemplateWithItems,
 } from "@/features/line-items/types";
 import type { Invoice, InvoiceDetail } from "@/features/invoices/types";
+import type { CatalogItem } from "@/features/catalog/types";
 
 const CURRENCIES = ["USD", "EUR", "GBP", "SGD", "MYR", "IDR", "AUD", "CAD"];
 
@@ -79,6 +81,7 @@ type InvoiceBuilderProps = {
   invoice?: InvoiceDetail;
   clients: ClientSummary[];
   templates: TemplateWithItems[];
+  catalogItems: CatalogItem[];
   initialClientId?: string;
 };
 
@@ -86,6 +89,7 @@ export function InvoiceBuilder({
   invoice,
   clients,
   templates: initialTemplates,
+  catalogItems,
   initialClientId,
 }: InvoiceBuilderProps) {
   const router = useRouter();
@@ -120,12 +124,14 @@ export function InvoiceBuilder({
           unit: li.unit ?? "",
           discount_percent: li.discount_percent ?? 0,
           tax_percent: li.tax_percent ?? 0,
+          catalog_item_id: li.catalog_item_id,
         }))
       : []
   );
   const [templates, setTemplates] = useState(initialTemplates);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
+  const [catalogPickerOpen, setCatalogPickerOpen] = useState(false);
 
   const [isDirty, setIsDirty] = useState(false);
   const [saveStatus, setSaveStatus] = useState<
@@ -340,6 +346,12 @@ export function InvoiceBuilder({
     toast("Template items inserted", "success");
   }
 
+  function handleInsertCatalogItem(item: LineItemInput) {
+    setLineItems((prev) => [...prev, item]);
+    setCatalogPickerOpen(false);
+    toast("Catalog item inserted", "success");
+  }
+
   function handleCancel() {
     if (isDirty && !confirm("You have unsaved changes. Leave anyway?")) return;
     router.push(
@@ -450,6 +462,15 @@ export function InvoiceBuilder({
           <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
             <CardTitle className="text-base">Line Items</CardTitle>
             <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setCatalogPickerOpen(true)}
+              >
+                <Package className="mr-2 h-4 w-4" />
+                Insert from Catalog
+              </Button>
               <Button
                 type="button"
                 variant="outline"
@@ -591,6 +612,13 @@ export function InvoiceBuilder({
         onOpenChange={setSaveTemplateOpen}
         items={submittableLineItems}
         onSaved={(t) => setTemplates((prev) => [t, ...prev])}
+      />
+      <CatalogPickerDialog
+        open={catalogPickerOpen}
+        onOpenChange={setCatalogPickerOpen}
+        catalogItems={catalogItems}
+        documentCurrency={currency}
+        onInsert={handleInsertCatalogItem}
       />
     </div>
   );
