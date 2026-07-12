@@ -37,9 +37,17 @@ BEGIN
     RAISE EXCEPTION 'Invalid granularity: %', p_granularity;
   END IF;
 
+  -- Fixed literals rather than passing p_granularity straight into
+  -- date_trunc(): the value is already validated above, but an explicit
+  -- CASE over the three supported literals avoids handing a runtime
+  -- string to date_trunc() at all.
   RETURN QUERY
   SELECT
-    date_trunc(p_granularity, p.payment_date)::DATE AS period,
+    CASE p_granularity
+      WHEN 'day' THEN date_trunc('day', p.payment_date)::DATE
+      WHEN 'week' THEN date_trunc('week', p.payment_date)::DATE
+      WHEN 'month' THEN date_trunc('month', p.payment_date)::DATE
+    END AS period,
     COALESCE(SUM(p.amount), 0) AS total
   FROM public.payments p
   WHERE p.workspace_id = p_workspace_id
@@ -62,7 +70,7 @@ CREATE OR REPLACE FUNCTION get_ar_aging(
   p_workspace_id UUID,
   p_currency TEXT
 )
-RETURNS TABLE (bucket TEXT, invoice_count INTEGER, outstanding_amount NUMERIC)
+RETURNS TABLE (bucket TEXT, invoice_count BIGINT, outstanding_amount NUMERIC)
 LANGUAGE plpgsql
 STABLE
 SECURITY DEFINER
@@ -94,7 +102,7 @@ BEGIN
   )
   SELECT
     b.bucket,
-    COUNT(ib.amount_due)::INTEGER AS invoice_count,
+    COUNT(ib.amount_due) AS invoice_count,
     COALESCE(SUM(ib.amount_due), 0) AS outstanding_amount
   FROM buckets b
   LEFT JOIN invoice_buckets ib ON ib.bucket = b.bucket
