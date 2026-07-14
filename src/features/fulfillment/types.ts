@@ -72,19 +72,13 @@ export type FulfillmentItemWithProgress = {
   is_over_delivered: boolean;
 };
 
-// The "actually billed" invoice statuses established by the Catalog
-// Revenue Report (Phase 10) — an invoice line item is only eligible for
-// fulfillment tracking once its invoice has reached one of these. Used at
-// the UI layer to decide whether to offer "Track Fulfillment"; the RPCs
-// (sync_fulfillment_items/create_fulfillment_item) are the actual source
-// of truth and re-check this server-side.
-export const FULFILLMENT_ELIGIBLE_INVOICE_STATUSES = [
-  "sent",
-  "viewed",
-  "partial",
-  "paid",
-  "overdue",
-] as const;
+// Fulfillment only begins once an invoice has actually started being paid
+// — sent/viewed/overdue invoices are billed but not yet paid, so their
+// line items aren't eligible. Used at the UI layer to decide whether to
+// offer "Track Fulfillment"; the RPCs (sync_fulfillment_items/
+// create_fulfillment_item, 00032_fulfillment_workflow_refinements.sql) are
+// the actual source of truth and re-check this server-side.
+export const FULFILLMENT_ELIGIBLE_INVOICE_STATUSES = ["partial", "paid"] as const;
 
 export type FulfillmentItemFilters = {
   status?: FulfillmentStatus;

@@ -11,6 +11,7 @@ import { ActivityTimeline } from "@/features/activities/components/activity-time
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { deleteCatalogItem } from "@/features/catalog/actions";
+import { BackButton } from "@/components/shared/back-button";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { CatalogItem, ItemType } from "@/features/catalog/types";
 import type { LineItemCategory } from "@/features/line-items/types";
@@ -54,6 +55,8 @@ export function CatalogDetail({ item, activities }: CatalogDetailProps) {
 
   return (
     <div className="space-y-6">
+      <BackButton href={`/${workspace.slug}/catalog`} label="Back to Catalog" />
+
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">

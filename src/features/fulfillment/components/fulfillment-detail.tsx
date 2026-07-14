@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { BackButton } from "@/components/shared/back-button";
+import { useWorkspace } from "@/providers/workspace-provider";
 import { FulfillmentItemContext } from "@/features/fulfillment/components/fulfillment-item-context";
 import { FulfillmentProgress } from "@/features/fulfillment/components/fulfillment-progress";
 import { FulfillmentStatusActions } from "@/features/fulfillment/components/fulfillment-status-actions";
@@ -19,10 +21,13 @@ type FulfillmentDetailProps = {
 };
 
 export function FulfillmentDetail({ item, events }: FulfillmentDetailProps) {
+  const { workspace } = useWorkspace();
   const [recordOpen, setRecordOpen] = useState(false);
 
   return (
     <div className="space-y-6">
+      <BackButton href={`/${workspace.slug}/fulfillment`} label="Back to Fulfillment" />
+
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm font-medium text-muted-foreground">
           Fulfillment Tracker

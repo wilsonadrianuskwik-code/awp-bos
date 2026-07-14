@@ -11,6 +11,7 @@ import { ActivityTimeline } from "@/features/activities/components/activity-time
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { deleteLead } from "@/features/leads/actions";
+import { BackButton } from "@/components/shared/back-button";
 import type { Lead } from "@/features/leads/types";
 import type { Activity } from "@/features/activities/types";
 
@@ -44,6 +45,8 @@ export function LeadDetail({ lead, activities, onConvert }: LeadDetailProps) {
 
   return (
     <div className="space-y-6">
+      <BackButton href={`/${workspace.slug}/leads`} label="Back to Leads" />
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{lead.name}</h1>

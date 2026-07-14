@@ -23,6 +23,7 @@ import { deleteClient } from "@/features/clients/actions";
 import { getOverdueDays } from "@/lib/utils/date";
 import { PAYMENT_METHOD_LABEL } from "@/features/invoices/helpers";
 import { FulfillmentProgress } from "@/features/fulfillment/components/fulfillment-progress";
+import { BackButton } from "@/components/shared/back-button";
 import type { Client } from "@/features/clients/types";
 import type { PaymentMethod } from "@/features/invoices/types";
 import type { Activity } from "@/features/activities/types";
@@ -117,6 +118,8 @@ export function ClientDetail({
 
   return (
     <div className="space-y-6">
+      <BackButton href={`/${workspace.slug}/clients`} label="Back to Clients" />
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{client.name}</h1>

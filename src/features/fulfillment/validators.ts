@@ -2,8 +2,13 @@ import { z } from "zod/v4";
 import { FULFILLMENT_STATUSES } from "@/features/fulfillment/types";
 
 export const recordFulfillmentEventSchema = z.object({
+  // Whole numbers only — remove decimal support unless intentionally added
+  // back later (see the matching DB CHECK constraint and
+  // record_fulfillment_event's own guard in
+  // 00032_fulfillment_workflow_refinements.sql).
   quantity_delivered: z.coerce
     .number()
+    .int("Quantity delivered must be a whole number")
     .positive("Quantity delivered must be greater than 0"),
   event_date: z.string().min(1, "Event date is required"),
   notes: z.string().max(2000).optional().or(z.literal("")),

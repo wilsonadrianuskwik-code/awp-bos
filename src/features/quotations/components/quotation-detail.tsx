@@ -5,7 +5,9 @@ import { Copy, GitCompare, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { BackButton } from "@/components/shared/back-button";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
+import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { QuotationLifecycleTimeline } from "./quotation-lifecycle-timeline";
 import { LineItemsTable } from "@/features/line-items/components/line-items-table";
@@ -37,6 +39,7 @@ export function QuotationDetail({
   previousVersion,
   workspaceName,
 }: QuotationDetailProps) {
+  const { workspace } = useWorkspace();
   const { toast } = useToast();
   const [generateInvoiceOpen, setGenerateInvoiceOpen] = useState(false);
   const [diffOpen, setDiffOpen] = useState(false);
@@ -53,6 +56,8 @@ export function QuotationDetail({
   return (
     <div>
       <div className="space-y-6 print:hidden">
+        <BackButton href={`/${workspace.slug}/quotations`} label="Back to Quotations" />
+
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
