@@ -1,15 +1,11 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { type ColumnDef } from "@tanstack/react-table";
-import { DataTable } from "@/components/shared/data-table";
-import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/shared/status-badge";
-import { useWorkspace } from "@/providers/workspace-provider";
-import { FulfillmentProgress } from "@/features/fulfillment/components/fulfillment-progress";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ClientFulfillmentGroup } from "@/features/fulfillment/components/client-fulfillment-group";
+import { RecordDeliveryDialog } from "@/features/fulfillment/components/record-delivery-dialog";
 import { FULFILLMENT_STATUSES } from "@/features/fulfillment/types";
 import type { FulfillmentItemWithProgress } from "@/features/fulfillment/types";
 
@@ -21,21 +17,36 @@ const STATUS_TABS = [
   })),
 ] as const;
 
-const PAGE_SIZE = 25;
+const ACTIVE_STATUSES = new Set(["pending", "in_progress"]);
+
+type ClientGroup = {
+  clientId: string;
+  clientName: string;
+  items: FulfillmentItemWithProgress[];
+};
 
 type FulfillmentListProps = {
   items: FulfillmentItemWithProgress[];
   totalCount: number;
 };
 
+// Client-centric ledger: trackers are grouped into a collapsible section
+// per client rather than a flat table, so "what does this client still
+// need delivered" is answerable at a glance — clients with active work
+// sort first and start expanded; fully-complete clients collapse out of
+// the way by default. Filtering by client is a client-side search over
+// the already-fetched batch (see the page's GROUPED_VIEW_BATCH_SIZE
+// comment) rather than a new server round trip.
 export function FulfillmentList({ items, totalCount }: FulfillmentListProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { workspace } = useWorkspace();
 
   const status = searchParams.get("status") ?? "all";
-  const page = Math.max(1, Number(searchParams.get("page") ?? "1"));
+  const [clientSearch, setClientSearch] = useState("");
+  const [recordingItem, setRecordingItem] = useState<FulfillmentItemWithProgress | null>(
+    null
+  );
 
   const setParams = useCallback(
     (updates: Record<string, string | null>) => {
@@ -49,126 +60,114 @@ export function FulfillmentList({ items, totalCount }: FulfillmentListProps) {
     [router, pathname, searchParams]
   );
 
-  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const groups = useMemo(() => {
+    const byClient = new Map<string, ClientGroup>();
+    for (const item of items) {
+      const existing = byClient.get(item.client_id);
+      if (existing) {
+        existing.items.push(item);
+      } else {
+        byClient.set(item.client_id, {
+          clientId: item.client_id,
+          clientName: item.client_name,
+          items: [item],
+        });
+      }
+    }
 
-  const columns: ColumnDef<FulfillmentItemWithProgress, unknown>[] = [
-    {
-      id: "client",
-      header: "Client",
-      cell: ({ row }) => (
-        <Link
-          href={`/${workspace.slug}/clients/${row.original.client_id}`}
-          className="text-primary hover:underline"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {row.original.client_name}
-        </Link>
-      ),
-    },
-    {
-      id: "invoice",
-      header: "Invoice",
-      cell: ({ row }) => (
-        <Link
-          href={`/${workspace.slug}/invoices/${row.original.invoice_id}`}
-          className="text-primary hover:underline"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {row.original.invoice_number}
-        </Link>
-      ),
-    },
-    {
-      accessorKey: "description",
-      header: "Item",
-      cell: ({ row }) => (
-        <span className="line-clamp-1 max-w-64">{row.original.description}</span>
-      ),
-    },
-    {
-      id: "progress",
-      header: "Progress",
-      cell: ({ row }) => (
-        <div className="min-w-48">
-          <FulfillmentProgress
-            purchased={row.original.purchased}
-            delivered={row.original.delivered}
-            remaining={row.original.remaining}
-            progressPercent={row.original.progress_percent}
-            isOverDelivered={row.original.is_over_delivered}
-            unitLabel={row.original.unit}
-          />
-        </div>
-      ),
-    },
-    {
-      accessorKey: "status",
-      header: "Status",
-      cell: ({ row }) => <StatusBadge status={row.original.status} />,
-    },
-  ];
+    const term = clientSearch.trim().toLowerCase();
+    const filtered = term
+      ? [...byClient.values()].filter((g) =>
+          g.clientName.toLowerCase().includes(term)
+        )
+      : [...byClient.values()];
+
+    return filtered.sort((a, b) => {
+      const aActive = a.items.some((i) => ACTIVE_STATUSES.has(i.status));
+      const bActive = b.items.some((i) => ACTIVE_STATUSES.has(i.status));
+      if (aActive !== bActive) return aActive ? -1 : 1;
+      return a.clientName.localeCompare(b.clientName);
+    });
+  }, [items, clientSearch]);
+
+  const activeClientCount = groups.filter((g) =>
+    g.items.some((i) => ACTIVE_STATUSES.has(i.status))
+  ).length;
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-1 overflow-x-auto pb-1">
-        {STATUS_TABS.map((tab) => (
-          <button
-            key={tab.value}
-            onClick={() =>
-              setParams({ status: tab.value === "all" ? null : tab.value, page: null })
-            }
-            className={
-              status === tab.value
-                ? "shrink-0 rounded-full bg-foreground px-3 py-1.5 text-xs font-medium capitalize text-background"
-                : "shrink-0 rounded-full px-3 py-1.5 text-xs font-medium capitalize text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            }
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="flex gap-1 overflow-x-auto pb-1">
+          {STATUS_TABS.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() =>
+                setParams({ status: tab.value === "all" ? null : tab.value })
+              }
+              className={
+                status === tab.value
+                  ? "shrink-0 rounded-full bg-foreground px-3 py-1.5 text-xs font-medium capitalize text-background"
+                  : "shrink-0 rounded-full px-3 py-1.5 text-xs font-medium capitalize text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              }
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="relative w-full sm:max-w-xs">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={clientSearch}
+            onChange={(e) => setClientSearch(e.target.value)}
+            placeholder="Search client..."
+            className="h-9 pl-9"
+          />
+        </div>
       </div>
 
-      {items.length === 0 ? (
+      <p className="text-xs text-muted-foreground">
+        {groups.length} client{groups.length === 1 ? "" : "s"} · {totalCount} tracker
+        {totalCount === 1 ? "" : "s"}
+        {activeClientCount > 0
+          ? ` · ${activeClientCount} client${activeClientCount === 1 ? "" : "s"} with active work`
+          : ""}
+      </p>
+
+      {groups.length === 0 ? (
         <div className="rounded-xl border border-dashed py-16 text-center text-sm text-muted-foreground">
           No fulfillment trackers match your filters.
         </div>
       ) : (
-        <DataTable
-          columns={columns}
-          data={items}
-          onRowClick={(item) =>
-            router.push(`/${workspace.slug}/fulfillment/${item.id}`)
-          }
-        />
+        <div className="space-y-3">
+          {groups.map((group) => (
+            <ClientFulfillmentGroup
+              key={group.clientId}
+              clientId={group.clientId}
+              clientName={group.clientName}
+              items={group.items}
+              defaultOpen={group.items.some((i) => ACTIVE_STATUSES.has(i.status))}
+              onRecordDelivery={setRecordingItem}
+            />
+          ))}
+        </div>
       )}
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between border-t pt-4">
-          <p className="text-xs text-muted-foreground">
-            Page {page} of {totalPages} · {totalCount} tracker
-            {totalCount === 1 ? "" : "s"}
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page <= 1}
-              onClick={() => setParams({ page: String(page - 1) })}
-            >
-              <ChevronLeft className="mr-1 h-4 w-4" />
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page >= totalPages}
-              onClick={() => setParams({ page: String(page + 1) })}
-            >
-              Next
-              <ChevronRight className="ml-1 h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+      {recordingItem && (
+        <RecordDeliveryDialog
+          open={!!recordingItem}
+          onOpenChange={(open) => !open && setRecordingItem(null)}
+          fulfillmentItemId={recordingItem.id}
+          description={recordingItem.description}
+          invoiceId={recordingItem.invoice_id}
+          invoiceNumber={recordingItem.invoice_number}
+          clientId={recordingItem.client_id}
+          clientName={recordingItem.client_name}
+          purchased={recordingItem.purchased}
+          delivered={recordingItem.delivered}
+          remaining={recordingItem.remaining}
+          unitLabel={recordingItem.unit}
+        />
       )}
     </div>
   );
