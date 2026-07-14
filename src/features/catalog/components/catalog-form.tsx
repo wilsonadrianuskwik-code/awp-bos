@@ -174,6 +174,24 @@ export function CatalogForm({ item }: CatalogFormProps) {
                 placeholder="e.g. hour, page, seat"
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="is_active">Status</Label>
+              <Select
+                name="is_active"
+                defaultValue={
+                  item && !item.is_active ? "inactive" : "active"
+                }
+              >
+                <SelectTrigger id="is_active">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">

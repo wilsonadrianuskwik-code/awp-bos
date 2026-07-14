@@ -59,6 +59,11 @@ export function CatalogDetail({ item, activities }: CatalogDetailProps) {
           <div className="flex items-center gap-2">
             <h1 className="text-3xl font-bold tracking-tight">{item.name}</h1>
             <Badge variant="secondary">{ITEM_TYPE_LABEL[item.item_type]}</Badge>
+            {item.is_active ? (
+              <Badge>Active</Badge>
+            ) : (
+              <Badge variant="secondary">Inactive</Badge>
+            )}
           </div>
           {item.sku && (
             <p className="mt-1 text-muted-foreground">SKU: {item.sku}</p>

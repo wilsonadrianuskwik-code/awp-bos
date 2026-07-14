@@ -36,6 +36,16 @@ const columns: ColumnDef<CatalogItem, unknown>[] = [
     cell: ({ row }) => row.getValue("sku") || "-",
   },
   {
+    accessorKey: "is_active",
+    header: "Status",
+    cell: ({ row }) =>
+      row.getValue("is_active") ? (
+        <Badge>Active</Badge>
+      ) : (
+        <Badge variant="secondary">Inactive</Badge>
+      ),
+  },
+  {
     accessorKey: "default_unit_price",
     header: "Default Price",
     cell: ({ row }) =>
