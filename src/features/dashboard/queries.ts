@@ -4,7 +4,10 @@ import type {
   CurrencyAmount,
   InvoiceSummary,
   LeadSummary,
+  OverdueSummary,
   RevenueSummary,
+  RevenueTrendPoint,
+  TopCatalogItem,
 } from "@/features/dashboard/types";
 
 // Mirrors the invoice lifecycle's non-terminal, awaiting-payment statuses
@@ -109,6 +112,105 @@ export async function getRevenueSummary(
     .gte("payment_date", monthStart);
 
   return { totalByCurrency: sumByCurrency(data ?? []) };
+}
+
+/**
+ * Overdue-invoice amount, grouped by currency — a narrower, more
+ * actionable number than getInvoiceSummary's "open" count above (which
+ * includes sent/viewed/partial invoices that aren't yet late). Same
+ * shape, same sumByCurrency helper, just a single status instead of the
+ * broader OPEN_INVOICE_STATUSES set.
+ */
+export async function getOverdueSummary(
+  workspaceId: string
+): Promise<OverdueSummary> {
+  const supabase = await createClient();
+  const { data, count } = await supabase
+    .from("invoices")
+    .select("currency, amount_due", { count: "exact" })
+    .eq("workspace_id", workspaceId)
+    .is("deleted_at", null)
+    .eq("status", "overdue");
+
+  return {
+    overdueCount: count ?? 0,
+    amountOverdueByCurrency: sumByCurrency(
+      (data ?? []).map((row) => ({ currency: row.currency, amount: row.amount_due }))
+    ),
+  };
+}
+
+/**
+ * Fixed-window revenue trend (last 90 days, weekly buckets) for the
+ * dashboard's compact chart — a thin, dashboard-owned wrapper around the
+ * same get_revenue_by_period RPC Reports uses (00022_create_reporting_
+ * functions.sql), with no date-range/granularity controls: the dashboard
+ * is a fixed at-a-glance summary, not a second Reports page.
+ */
+export async function getRevenueTrend(
+  workspaceId: string,
+  currency: string
+): Promise<RevenueTrendPoint[]> {
+  const supabase = await createClient();
+  const to = new Date();
+  const from = new Date();
+  from.setDate(to.getDate() - 89);
+
+  const { data, error } = await supabase.rpc("get_revenue_by_period", {
+    p_workspace_id: workspaceId,
+    p_currency: currency,
+    p_granularity: "week",
+    p_from_date: from.toISOString().slice(0, 10),
+    p_to_date: to.toISOString().slice(0, 10),
+  });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []) as RevenueTrendPoint[];
+}
+
+/**
+ * The single best-selling catalog item this month, for the dashboard's
+ * highlight card — a thin wrapper around get_revenue_by_catalog_item
+ * (00029_create_catalog_revenue_report.sql, Phase 10), which already
+ * returns up to 10 rows ordered by total descending; the dashboard just
+ * takes the first.
+ */
+export async function getTopCatalogItem(
+  workspaceId: string,
+  currency: string
+): Promise<TopCatalogItem> {
+  const supabase = await createClient();
+  const now = new Date();
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
+    .toISOString()
+    .slice(0, 10);
+  const today = now.toISOString().slice(0, 10);
+
+  const { data, error } = await supabase.rpc("get_revenue_by_catalog_item", {
+    p_workspace_id: workspaceId,
+    p_currency: currency,
+    p_from_date: monthStart,
+    p_to_date: today,
+  });
+
+  if (error) throw new Error(error.message);
+
+  const rows = (data ?? []) as {
+    catalog_item_id: string;
+    catalog_item_name: string;
+    quantity: number;
+    total: number;
+  }[];
+
+  if (rows.length === 0) return null;
+
+  const top = rows[0];
+  return {
+    catalogItemId: top.catalog_item_id,
+    catalogItemName: top.catalog_item_name,
+    quantity: top.quantity,
+    total: top.total,
+  };
 }
 
 /**

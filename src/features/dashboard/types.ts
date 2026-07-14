@@ -25,3 +25,20 @@ export type InvoiceSummary = {
 export type RevenueSummary = {
   totalByCurrency: CurrencyAmount[];
 };
+
+export type OverdueSummary = {
+  overdueCount: number;
+  amountOverdueByCurrency: CurrencyAmount[];
+};
+
+export type RevenueTrendPoint = {
+  period: string;
+  total: number;
+};
+
+export type TopCatalogItem = {
+  catalogItemId: string;
+  catalogItemName: string;
+  quantity: number;
+  total: number;
+} | null;
