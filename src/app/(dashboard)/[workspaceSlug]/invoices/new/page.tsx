@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getWorkspaceBySlug } from "@/lib/workspace";
 import { getClients } from "@/features/clients/queries";
 import { getLineItemTemplates } from "@/features/line-items/queries";
-import { getCatalogItems } from "@/features/catalog/queries";
+import { getActiveCatalogItems } from "@/features/catalog/queries";
 import { InvoiceBuilder } from "@/features/invoices/components/invoice-builder";
 
 export default async function NewInvoicePage({
@@ -20,7 +20,7 @@ export default async function NewInvoicePage({
   const [clients, templates, catalogItems] = await Promise.all([
     getClients(workspace.id),
     getLineItemTemplates(workspace.id),
-    getCatalogItems(workspace.id),
+    getActiveCatalogItems(workspace.id),
   ]);
 
   return (

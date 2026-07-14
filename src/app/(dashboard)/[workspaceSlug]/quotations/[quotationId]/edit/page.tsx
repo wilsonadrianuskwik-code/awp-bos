@@ -3,7 +3,7 @@ import { getWorkspaceBySlug } from "@/lib/workspace";
 import { getClients } from "@/features/clients/queries";
 import { getQuotation } from "@/features/quotations/queries";
 import { getLineItemTemplates } from "@/features/line-items/queries";
-import { getCatalogItems } from "@/features/catalog/queries";
+import { getActiveCatalogItems } from "@/features/catalog/queries";
 import { QuotationBuilder } from "@/features/quotations/components/quotation-builder";
 import { isEditableStatus } from "@/features/quotations/helpers";
 
@@ -26,7 +26,7 @@ export default async function EditQuotationPage({
   const [clients, templates, catalogItems] = await Promise.all([
     getClients(workspace.id),
     getLineItemTemplates(workspace.id),
-    getCatalogItems(workspace.id),
+    getActiveCatalogItems(workspace.id),
   ]);
 
   return (
