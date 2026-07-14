@@ -18,6 +18,7 @@ import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { recordFulfillmentEventAction } from "@/features/fulfillment/actions";
 import { recordFulfillmentEventSchema } from "@/features/fulfillment/validators";
+import { FulfillmentItemContext } from "@/features/fulfillment/components/fulfillment-item-context";
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -27,6 +28,13 @@ type RecordDeliveryDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   fulfillmentItemId: string;
+  description: string;
+  invoiceId: string;
+  invoiceNumber: string;
+  clientId: string;
+  clientName: string;
+  purchased: number;
+  delivered: number;
   remaining: number;
   unitLabel?: string | null;
 };
@@ -35,6 +43,13 @@ export function RecordDeliveryDialog({
   open,
   onOpenChange,
   fulfillmentItemId,
+  description,
+  invoiceId,
+  invoiceNumber,
+  clientId,
+  clientName,
+  purchased,
+  delivered,
   remaining,
   unitLabel,
 }: RecordDeliveryDialogProps) {
@@ -95,21 +110,31 @@ export function RecordDeliveryDialog({
         <DialogHeader>
           <DialogTitle>Record Delivery</DialogTitle>
           <DialogDescription>
-            Log a delivery against this fulfillment tracker.
-            {remaining > 0
-              ? ` ${remaining}${unitLabel ? ` ${unitLabel}` : ""} remaining.`
-              : ""}
+            Confirm the item below before logging a delivery against it.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
+          <FulfillmentItemContext
+            description={description}
+            invoiceId={invoiceId}
+            invoiceNumber={invoiceNumber}
+            clientId={clientId}
+            clientName={clientName}
+            purchased={purchased}
+            delivered={delivered}
+            remaining={remaining}
+            unitLabel={unitLabel}
+            linkable={false}
+          />
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label>Quantity delivered *</Label>
               <Input
                 type="number"
                 min={0}
-                step="0.001"
+                step={1}
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
               />

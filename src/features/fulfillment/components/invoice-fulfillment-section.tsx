@@ -134,6 +134,13 @@ export function InvoiceFulfillmentSection({
           open={!!recordingItem}
           onOpenChange={(open) => !open && setRecordingId(null)}
           fulfillmentItemId={recordingItem.id}
+          description={recordingItem.description}
+          invoiceId={recordingItem.invoice_id}
+          invoiceNumber={recordingItem.invoice_number}
+          clientId={recordingItem.client_id}
+          clientName={recordingItem.client_name}
+          purchased={recordingItem.purchased}
+          delivered={recordingItem.delivered}
           remaining={recordingItem.remaining}
           unitLabel={recordingItem.unit}
         />
