@@ -4,21 +4,13 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { deletePayment } from "@/features/invoices/actions";
+import { PAYMENT_METHOD_LABEL } from "@/features/invoices/helpers";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { PaymentWithRecorder } from "@/features/invoices/types";
-
-const PAYMENT_METHOD_LABEL: Record<string, string> = {
-  bank_transfer: "Bank Transfer",
-  credit_card: "Credit Card",
-  cash: "Cash",
-  check: "Check",
-  paypal: "PayPal",
-  stripe: "Stripe",
-  other: "Other",
-};
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString("en-US", {
@@ -76,12 +68,14 @@ export function PaymentHistory({ payments }: PaymentHistoryProps) {
                 {formatDate(payment.payment_date)}
               </span>
             </div>
-            <p className="font-semibold tabular-nums">
-              {formatCurrency(payment.amount, payment.currency)}
-              <span className="ml-1.5 font-normal text-muted-foreground">
-                via {PAYMENT_METHOD_LABEL[payment.payment_method] ?? payment.payment_method}
-              </span>
-            </p>
+            <div className="flex items-center gap-1.5">
+              <p className="font-semibold tabular-nums">
+                {formatCurrency(payment.amount, payment.currency)}
+              </p>
+              <Badge variant="secondary">
+                {PAYMENT_METHOD_LABEL[payment.payment_method]}
+              </Badge>
+            </div>
             {payment.bank_name && (
               <p className="text-xs text-muted-foreground">
                 {payment.bank_name}

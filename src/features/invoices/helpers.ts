@@ -1,3 +1,18 @@
+import type { PaymentMethod } from "@/features/invoices/types";
+
+// Single source of truth for payment-method display labels — reused by
+// record-payment-dialog.tsx, payment-history.tsx, and the Phase 9
+// payments ledger, instead of each keeping its own copy.
+export const PAYMENT_METHOD_LABEL: Record<PaymentMethod, string> = {
+  bank_transfer: "Bank Transfer",
+  credit_card: "Credit Card",
+  cash: "Cash",
+  check: "Check",
+  paypal: "PayPal",
+  stripe: "Stripe",
+  other: "Other",
+};
+
 // Indonesian bank options for the Record Payment dialog's bank-name picker
 // (Milestone 7). Free-text "Other" fallback means new banks never require
 // a code change — bank_name is a plain TEXT column, not a DB enum.

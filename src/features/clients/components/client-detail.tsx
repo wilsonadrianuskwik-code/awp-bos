@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { FileText, Pencil, Plus, Receipt, Trash2 } from "lucide-react";
+import { CreditCard, FileText, Pencil, Plus, Receipt, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
@@ -12,7 +13,9 @@ import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { deleteClient } from "@/features/clients/actions";
 import { getOverdueDays } from "@/lib/utils/date";
+import { PAYMENT_METHOD_LABEL } from "@/features/invoices/helpers";
 import type { Client } from "@/features/clients/types";
+import type { PaymentMethod } from "@/features/invoices/types";
 import type { Activity } from "@/features/activities/types";
 
 // Deliberately local, not imported from the quotations feature — features
@@ -40,11 +43,24 @@ type ClientInvoiceSummary = {
   created_at: string;
 };
 
+// Deliberately local, not imported from the payments feature — same
+// isolation rule as ClientQuotationSummary/ClientInvoiceSummary above.
+type ClientPaymentSummary = {
+  id: string;
+  payment_number: string;
+  amount: number;
+  currency: string;
+  payment_method: PaymentMethod;
+  payment_date: string;
+  invoice: { id: string; invoice_number: string } | null;
+};
+
 type ClientDetailProps = {
   client: Client;
   activities: Activity[];
   quotations: ClientQuotationSummary[];
   invoices: ClientInvoiceSummary[];
+  payments: ClientPaymentSummary[];
 };
 
 export function ClientDetail({
@@ -52,6 +68,7 @@ export function ClientDetail({
   activities,
   quotations,
   invoices,
+  payments,
 }: ClientDetailProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -268,6 +285,63 @@ export function ClientDetail({
                               : undefined
                           }
                         />
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Payments</CardTitle>
+              {payments.length > 0 && (
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href={`/${workspace.slug}/payments?clientId=${client.id}`}>
+                    View All
+                  </Link>
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent>
+              {payments.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <CreditCard className="h-8 w-8 text-muted-foreground/50" />
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    No payments recorded yet for this client.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {payments.map((p) => (
+                    <Link
+                      key={p.id}
+                      href={
+                        p.invoice
+                          ? `/${workspace.slug}/invoices/${p.invoice.id}`
+                          : `/${workspace.slug}/payments`
+                      }
+                      className="flex items-center justify-between rounded-lg border p-3 text-sm transition-colors hover:bg-accent"
+                    >
+                      <div>
+                        <p className="font-medium">
+                          {p.invoice?.invoice_number ?? p.payment_number}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(p.payment_date).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="tabular-nums">
+                          {new Intl.NumberFormat("en-US", {
+                            style: "currency",
+                            currency: p.currency,
+                          }).format(p.amount)}
+                        </span>
+                        <Badge variant="secondary">
+                          {PAYMENT_METHOD_LABEL[p.payment_method]}
+                        </Badge>
                       </div>
                     </Link>
                   ))}

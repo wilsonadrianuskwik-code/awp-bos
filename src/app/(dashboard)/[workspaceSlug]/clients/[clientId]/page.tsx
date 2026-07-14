@@ -6,6 +6,7 @@ import {
 } from "@/features/clients/queries";
 import { getQuotationsByClient } from "@/features/quotations/queries";
 import { getInvoicesByClient } from "@/features/invoices/queries";
+import { getPayments } from "@/features/payments/queries";
 import { ClientDetail } from "@/features/clients/components/client-detail";
 
 export default async function ClientDetailPage({
@@ -17,11 +18,12 @@ export default async function ClientDetailPage({
   const workspace = await getWorkspaceBySlug(workspaceSlug);
   if (!workspace) notFound();
 
-  const [client, activities, quotations, invoices] = await Promise.all([
+  const [client, activities, quotations, invoices, payments] = await Promise.all([
     getClient(clientId, workspace.id),
     getClientActivities(clientId),
     getQuotationsByClient(clientId, workspace.id),
     getInvoicesByClient(clientId, workspace.id),
+    getPayments(workspace.id, { clientId }),
   ]);
 
   if (!client) notFound();
@@ -32,6 +34,7 @@ export default async function ClientDetailPage({
       activities={activities}
       quotations={quotations}
       invoices={invoices}
+      payments={payments}
     />
   );
 }

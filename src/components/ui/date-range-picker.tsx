@@ -20,6 +20,15 @@ function formatDate(date: string) {
   });
 }
 
+// Callers that treat an empty range as "no filter" (e.g. a ledger showing
+// everything by default) would otherwise render "Invalid Date – Invalid
+// Date" here. Every existing caller always passes a fully-populated
+// range, so this branch is inert for them.
+function formatRangeLabel(value: DateRange): string {
+  if (!value.from || !value.to) return "All dates";
+  return `${formatDate(value.from)} – ${formatDate(value.to)}`;
+}
+
 type DateRangePickerProps = {
   value: DateRange;
   onChange: (value: DateRange) => void;
@@ -51,7 +60,7 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
       <PopoverTrigger asChild>
         <Button variant="outline" className="justify-start font-normal">
           <Calendar className="mr-2 h-4 w-4" />
-          {formatDate(value.from)} – {formatDate(value.to)}
+          {formatRangeLabel(value)}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-4" align="start">

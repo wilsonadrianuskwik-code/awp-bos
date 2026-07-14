@@ -25,18 +25,8 @@ import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { recordPayment } from "@/features/invoices/actions";
 import { recordPaymentSchema } from "@/features/invoices/validators";
-import { BANK_OPTIONS } from "@/features/invoices/helpers";
+import { BANK_OPTIONS, PAYMENT_METHOD_LABEL } from "@/features/invoices/helpers";
 import { PAYMENT_METHODS, type Invoice, type PaymentMethod } from "@/features/invoices/types";
-
-const PAYMENT_METHOD_LABEL: Record<PaymentMethod, string> = {
-  bank_transfer: "Bank Transfer",
-  credit_card: "Credit Card",
-  cash: "Cash",
-  check: "Check",
-  paypal: "PayPal",
-  stripe: "Stripe",
-  other: "Other",
-};
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
