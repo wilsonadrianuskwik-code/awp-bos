@@ -15,6 +15,7 @@ export type CatalogItem = {
   default_unit_price: number;
   default_unit: string | null;
   currency: string;
+  is_active: boolean;
   created_by: string;
   created_at: string;
   updated_at: string;

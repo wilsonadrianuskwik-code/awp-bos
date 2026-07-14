@@ -33,6 +33,7 @@ export async function createCatalogItem(
         default_unit_price: parsed.data.default_unit_price,
         default_unit: parsed.data.default_unit || null,
         currency: parsed.data.currency,
+        is_active: parsed.data.is_active,
         created_by: ctx.userId,
       })
       .select("id")

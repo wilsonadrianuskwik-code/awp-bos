@@ -11,6 +11,14 @@ export const createCatalogItemSchema = z.object({
   default_unit_price: z.coerce.number().min(0, "Price cannot be negative"),
   default_unit: z.string().max(50).optional().or(z.literal("")),
   currency: z.string().length(3),
+  // Backed by a Select ("active"/"inactive"), not a checkbox — checkbox
+  // values serialize as "on"/absent in FormData, and z.coerce.boolean()
+  // would treat the literal string "false" as true. An explicit enum +
+  // transform avoids both footguns.
+  is_active: z
+    .enum(["active", "inactive"])
+    .default("active")
+    .transform((v) => v === "active"),
 });
 
 export const updateCatalogItemSchema = createCatalogItemSchema.partial();

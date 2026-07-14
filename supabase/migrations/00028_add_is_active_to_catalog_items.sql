@@ -1,0 +1,11 @@
+-- Refinement: Active/Inactive status for catalog items.
+--
+-- Deliberately a different axis from deleted_at: a soft-deleted item is
+-- gone from normal operations entirely, while an inactive item is still
+-- a fully live, manageable catalog entry (visible and editable on the
+-- Catalog page) that's just temporarily excluded from the quotation/
+-- invoice picker's default offering. Because catalog items are always
+-- copied into line_items at insert time (never live-referenced), toggling
+-- this flag has zero effect on any document that already references the
+-- item via line_items.catalog_item_id.
+ALTER TABLE catalog_items ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT true;
