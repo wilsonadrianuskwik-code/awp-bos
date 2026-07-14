@@ -22,3 +22,10 @@ export type ArAgingBucket = {
 };
 
 export type AvailableCurrencies = string[];
+
+export type CatalogRevenueRow = {
+  catalogItemId: string;
+  catalogItemName: string;
+  quantity: number;
+  total: number;
+};

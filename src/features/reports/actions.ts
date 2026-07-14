@@ -1,8 +1,13 @@
 "use server";
 
-import { getArAging, getRevenueByPeriod } from "@/features/reports/queries";
+import {
+  getArAging,
+  getRevenueByCatalogItem,
+  getRevenueByPeriod,
+} from "@/features/reports/queries";
 import type {
   ArAgingInput,
+  CatalogRevenueInput,
   RevenueByPeriodInput,
 } from "@/features/reports/validators";
 
@@ -38,6 +43,24 @@ export async function getArAgingAction(workspaceId: string, input: ArAgingInput)
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Failed to load AR aging report";
+    return { data: null, error: message };
+  }
+}
+
+/**
+ * Same reasoning as getRevenueByPeriodAction, for the Catalog Revenue
+ * card's date-range/currency-change refetching.
+ */
+export async function getCatalogRevenueAction(
+  workspaceId: string,
+  input: CatalogRevenueInput
+) {
+  try {
+    const data = await getRevenueByCatalogItem(workspaceId, input);
+    return { data, error: null };
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Failed to load catalog revenue report";
     return { data: null, error: message };
   }
 }

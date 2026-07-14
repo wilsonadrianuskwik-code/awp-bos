@@ -12,5 +12,12 @@ export const arAgingSchema = z.object({
   currency: z.string().length(3),
 });
 
+export const catalogRevenueSchema = z.object({
+  currency: z.string().length(3),
+  fromDate: z.string().min(1, "Start date is required"),
+  toDate: z.string().min(1, "End date is required"),
+});
+
 export type RevenueByPeriodInput = z.infer<typeof revenueByPeriodSchema>;
 export type ArAgingInput = z.infer<typeof arAgingSchema>;
+export type CatalogRevenueInput = z.infer<typeof catalogRevenueSchema>;

@@ -1,13 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
 import {
   arAgingSchema,
+  catalogRevenueSchema,
   revenueByPeriodSchema,
   type ArAgingInput,
+  type CatalogRevenueInput,
   type RevenueByPeriodInput,
 } from "@/features/reports/validators";
 import type {
   ArAgingBucket,
   AvailableCurrencies,
+  CatalogRevenueRow,
   RevenuePeriodPoint,
 } from "@/features/reports/types";
 
@@ -69,6 +72,52 @@ export async function getArAging(
       outstandingAmount: row.outstanding_amount,
     })
   ) as ArAgingBucket[];
+}
+
+/**
+ * Top 10 catalog items by invoiced revenue in the given date range/
+ * currency. Unlike getRevenueByPeriod (payments-based, i.e. cash actually
+ * collected), payments are recorded against a whole invoice with no link
+ * to individual line items — so this can only measure invoiced amounts
+ * (line_items.line_total), scoped to statuses that represent "actually
+ * billed and still standing" (see get_revenue_by_catalog_item's own
+ * comment in 00029_create_catalog_revenue_report.sql for the exact set
+ * and why). A third, distinct definition of "revenue" from the other two
+ * reports on this page — not an inconsistency, just what this join can
+ * actually answer.
+ */
+export async function getRevenueByCatalogItem(
+  workspaceId: string,
+  input: CatalogRevenueInput
+): Promise<CatalogRevenueRow[]> {
+  const parsed = catalogRevenueSchema.safeParse(input);
+  if (!parsed.success) {
+    throw new Error(parsed.error.issues[0].message);
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_revenue_by_catalog_item", {
+    p_workspace_id: workspaceId,
+    p_currency: parsed.data.currency,
+    p_from_date: parsed.data.fromDate,
+    p_to_date: parsed.data.toDate,
+  });
+
+  if (error) throw new Error(error.message);
+
+  return (data ?? []).map(
+    (row: {
+      catalog_item_id: string;
+      catalog_item_name: string;
+      quantity: number;
+      total: number;
+    }) => ({
+      catalogItemId: row.catalog_item_id,
+      catalogItemName: row.catalog_item_name,
+      quantity: row.quantity,
+      total: row.total,
+    })
+  );
 }
 
 /**

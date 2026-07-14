@@ -8,6 +8,7 @@ import { DateRangePicker, type DateRange } from "@/components/ui/date-range-pick
 import { CurrencySelector } from "@/features/reports/components/currency-selector";
 import { RevenueChart } from "@/features/reports/components/revenue-chart";
 import { ArAgingCard } from "@/features/reports/components/ar-aging-card";
+import { CatalogRevenueCard } from "@/features/reports/components/catalog-revenue-card";
 
 function defaultDateRange(): DateRange {
   const to = new Date();
@@ -78,6 +79,19 @@ export function ReportsPage({
           </CardHeader>
           <CardContent>
             <ArAgingCard workspaceId={workspaceId} currency={currency} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Top Catalog Items</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CatalogRevenueCard
+              workspaceId={workspaceId}
+              currency={currency}
+              dateRange={dateRange}
+            />
           </CardContent>
         </Card>
       </div>
