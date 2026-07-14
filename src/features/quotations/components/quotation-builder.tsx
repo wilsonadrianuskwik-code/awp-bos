@@ -514,7 +514,7 @@ export function QuotationBuilder({
                   {itemsByCategory[cat].length > 0 && (
                     <div
                       className={cn(
-                        "hidden gap-x-3 px-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground md:grid",
+                        "hidden gap-x-2 px-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground md:grid",
                         LINE_ITEM_GRID_COLS
                       )}
                     >
@@ -523,8 +523,8 @@ export function QuotationBuilder({
                       <span>Qty</span>
                       <span>Unit</span>
                       <span>Unit Price</span>
-                      <span>Discount</span>
-                      <span>Tax</span>
+                      <span>Disc %</span>
+                      <span>Tax %</span>
                       <span className="text-right">Total</span>
                       <span />
                     </div>
