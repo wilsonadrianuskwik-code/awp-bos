@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { withWorkspace } from "@/lib/with-workspace";
+import { getFulfillmentEvents } from "@/features/fulfillment/queries";
 import {
   recordFulfillmentEventSchema,
   updateFulfillmentStatusSchema,
@@ -23,6 +24,19 @@ import type { FulfillmentItem } from "@/features/fulfillment/types";
  * staff+ here (update_fulfillment_status additionally gates the "Reopen"
  * transition to admin+ inside the RPC itself).
  */
+
+// Read wrapper so the cockpit's client components can lazily fetch a
+// tracker's delivery history on demand (when a card's timeline is expanded)
+// instead of fetching every tracker's events up front. RLS already scopes
+// events to workspace members, and the read is open to all roles.
+export async function getFulfillmentEventsAction(
+  workspaceId: string,
+  fulfillmentItemId: string
+) {
+  return withWorkspace(workspaceId, "viewer", async () => {
+    return getFulfillmentEvents(fulfillmentItemId);
+  });
+}
 
 // Idempotent — safe to call on every fulfillment-page load. Returns the
 // number of newly-created trackers.

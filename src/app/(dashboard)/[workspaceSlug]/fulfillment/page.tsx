@@ -2,65 +2,57 @@ import { notFound } from "next/navigation";
 import { PackageCheck } from "lucide-react";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
-import { FulfillmentList } from "@/features/fulfillment/components/fulfillment-list";
+import { FulfillmentCockpit } from "@/features/fulfillment/components/fulfillment-cockpit";
 import { getFulfillmentItems } from "@/features/fulfillment/queries";
 import { syncFulfillmentItemsAction } from "@/features/fulfillment/actions";
 import { getWorkspaceBySlug } from "@/lib/workspace";
-import { FULFILLMENT_STATUSES, type FulfillmentStatus } from "@/features/fulfillment/types";
-
-// The ledger groups trackers by client (see FulfillmentList), which needs
-// full visibility into every matching tracker rather than an arbitrary
-// row-count slice — a client's trackers must never be split across two
-// pages. A generous fixed batch size stands in for row-level pagination;
-// no DB/RPC change is needed either way since get_fulfillment_items
-// already accepts any p_limit. If a workspace ever has more open trackers
-// than this, the fix is raising this number (or later adding server-side
-// per-client aggregation), not a schema change.
-const GROUPED_VIEW_BATCH_SIZE = 300;
+import {
+  FULFILLMENT_COCKPIT_BATCH_SIZE,
+  FULFILLMENT_STALLED_AFTER_DAYS,
+} from "@/features/fulfillment/config";
 
 export default async function FulfillmentPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ workspaceSlug: string }>;
-  searchParams: Promise<{ status?: string }>;
 }) {
-  const [{ workspaceSlug }, search] = await Promise.all([params, searchParams]);
+  const { workspaceSlug } = await params;
   const workspace = await getWorkspaceBySlug(workspaceSlug);
   if (!workspace) notFound();
 
-  // Idempotent — safe to call on every load. Creates trackers for any
-  // eligible-but-untracked invoice line item (see sync_fulfillment_items).
+  // Idempotent — creates trackers for any eligible-but-untracked invoice
+  // line item on load (see sync_fulfillment_items).
   await syncFulfillmentItemsAction(workspace.id);
-
-  const status = FULFILLMENT_STATUSES.includes(search.status as FulfillmentStatus)
-    ? (search.status as FulfillmentStatus)
-    : undefined;
 
   const { items, totalCount } = await getFulfillmentItems(
     workspace.id,
-    { status },
+    {},
     1,
-    GROUPED_VIEW_BATCH_SIZE
+    FULFILLMENT_COCKPIT_BATCH_SIZE
   );
-
-  const hasAnyFilters = !!status;
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Fulfillment"
-        description="Track delivery progress for quantity-based products and services"
+        description="Deliver outstanding work and record progress, client by client"
       />
 
-      {totalCount === 0 && !hasAnyFilters ? (
+      {totalCount === 0 ? (
         <EmptyState
           icon={PackageCheck}
           title="Nothing to fulfill yet"
-          description="Trackers are created automatically for eligible invoice line items with quantity greater than 1."
+          description="Trackers appear automatically once an invoice is partially or fully paid."
         />
       ) : (
-        <FulfillmentList items={items} totalCount={totalCount} />
+        // The stalled threshold is read here (from a named constant today, a
+        // workspace setting later) and passed down — the cockpit never
+        // references the constant directly, so the source can change without
+        // touching any component.
+        <FulfillmentCockpit
+          items={items}
+          stalledAfterDays={FULFILLMENT_STALLED_AFTER_DAYS}
+        />
       )}
     </div>
   );
