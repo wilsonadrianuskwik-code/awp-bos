@@ -24,6 +24,10 @@ const STATUS_COLORS: Record<string, string> = {
   paid: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
   overdue: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
   refunded: "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300",
+  // Fulfillment lifecycle (cancelled reuses the shared color above)
+  pending: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+  in_progress: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
+  completed: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
 };
 
 type StatusBadgeProps = {

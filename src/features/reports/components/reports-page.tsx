@@ -9,6 +9,7 @@ import { CurrencySelector } from "@/features/reports/components/currency-selecto
 import { RevenueChart } from "@/features/reports/components/revenue-chart";
 import { ArAgingCard } from "@/features/reports/components/ar-aging-card";
 import { CatalogRevenueCard } from "@/features/reports/components/catalog-revenue-card";
+import { FulfillmentOverviewCard } from "@/features/reports/components/fulfillment-overview-card";
 
 function defaultDateRange(): DateRange {
   const to = new Date();
@@ -92,6 +93,15 @@ export function ReportsPage({
               currency={currency}
               dateRange={dateRange}
             />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Fulfillment Overview</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <FulfillmentOverviewCard workspaceId={workspaceId} />
           </CardContent>
         </Card>
       </div>

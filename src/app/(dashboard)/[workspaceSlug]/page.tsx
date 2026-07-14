@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getWorkspaceBySlug } from "@/lib/workspace";
 import {
+  getActiveFulfillmentSummary,
   getClientSummary,
   getInvoiceSummary,
   getLeadSummary,
@@ -10,6 +11,7 @@ import {
   getTopCatalogItem,
   getWorkspaceActivities,
 } from "@/features/dashboard/queries";
+import { syncFulfillmentItemsAction } from "@/features/fulfillment/actions";
 import { StatCard } from "@/features/dashboard/components/stat-card";
 import { LeadPipelineCard } from "@/features/dashboard/components/lead-pipeline-card";
 import { RecentActivityCard } from "@/features/dashboard/components/recent-activity-card";
@@ -36,6 +38,11 @@ export default async function DashboardPage({
   const workspace = await getWorkspaceBySlug(workspaceSlug);
   if (!workspace) notFound();
 
+  // Idempotent — same sync every fulfillment read path calls (see
+  // sync_fulfillment_items), so the widget below reflects newly-eligible
+  // line items without any invoice-side hook.
+  await syncFulfillmentItemsAction(workspace.id);
+
   const [
     leadSummary,
     clientSummary,
@@ -44,6 +51,7 @@ export default async function DashboardPage({
     overdueSummary,
     revenueTrend,
     topCatalogItem,
+    activeFulfillmentSummary,
     activities,
   ] = await Promise.all([
     getLeadSummary(workspace.id),
@@ -53,6 +61,7 @@ export default async function DashboardPage({
     getOverdueSummary(workspace.id),
     getRevenueTrend(workspace.id, workspace.default_currency),
     getTopCatalogItem(workspace.id, workspace.default_currency),
+    getActiveFulfillmentSummary(workspace.id),
     getWorkspaceActivities(workspace.id, 15),
   ]);
 
@@ -65,7 +74,7 @@ export default async function DashboardPage({
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <StatCard
           title="Total Leads"
           value={String(leadSummary.total)}
@@ -90,6 +99,11 @@ export default async function DashboardPage({
           title="Revenue This Month"
           value={formatCurrencyAmounts(revenueSummary.totalByCurrency)}
           description="Payments received this month"
+        />
+        <StatCard
+          title="Active Fulfillments"
+          value={String(activeFulfillmentSummary.activeCount)}
+          description="Trackers pending or in progress"
         />
       </div>
 

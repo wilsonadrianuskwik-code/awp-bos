@@ -7,6 +7,7 @@ import {
 import { getQuotationsByClient } from "@/features/quotations/queries";
 import { getInvoicesByClient } from "@/features/invoices/queries";
 import { getPayments } from "@/features/payments/queries";
+import { getFulfillmentItems } from "@/features/fulfillment/queries";
 import { ClientDetail } from "@/features/clients/components/client-detail";
 
 export default async function ClientDetailPage({
@@ -18,13 +19,15 @@ export default async function ClientDetailPage({
   const workspace = await getWorkspaceBySlug(workspaceSlug);
   if (!workspace) notFound();
 
-  const [client, activities, quotations, invoices, payments] = await Promise.all([
-    getClient(clientId, workspace.id),
-    getClientActivities(clientId),
-    getQuotationsByClient(clientId, workspace.id),
-    getInvoicesByClient(clientId, workspace.id),
-    getPayments(workspace.id, { clientId }),
-  ]);
+  const [client, activities, quotations, invoices, payments, { items: fulfillmentItems }] =
+    await Promise.all([
+      getClient(clientId, workspace.id),
+      getClientActivities(clientId),
+      getQuotationsByClient(clientId, workspace.id),
+      getInvoicesByClient(clientId, workspace.id),
+      getPayments(workspace.id, { clientId }),
+      getFulfillmentItems(workspace.id, { clientId }),
+    ]);
 
   if (!client) notFound();
 
@@ -35,6 +38,7 @@ export default async function ClientDetailPage({
       quotations={quotations}
       invoices={invoices}
       payments={payments}
+      fulfillmentItems={fulfillmentItems}
     />
   );
 }

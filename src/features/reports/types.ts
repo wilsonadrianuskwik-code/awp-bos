@@ -29,3 +29,16 @@ export type CatalogRevenueRow = {
   quantity: number;
   total: number;
 };
+
+export const FULFILLMENT_OVERVIEW_STATUSES = [
+  "pending",
+  "in_progress",
+  "completed",
+  "cancelled",
+] as const;
+
+export type FulfillmentOverviewRow = {
+  status: (typeof FULFILLMENT_OVERVIEW_STATUSES)[number];
+  itemCount: number;
+  totalRemaining: number;
+};

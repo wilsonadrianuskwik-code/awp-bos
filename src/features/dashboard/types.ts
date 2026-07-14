@@ -42,3 +42,7 @@ export type TopCatalogItem = {
   quantity: number;
   total: number;
 } | null;
+
+export type ActiveFulfillmentSummary = {
+  activeCount: number;
+};

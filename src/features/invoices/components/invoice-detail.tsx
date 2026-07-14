@@ -14,20 +14,24 @@ import { PaymentHistory } from "@/features/invoices/components/payment-history";
 import { OutstandingBalanceCard } from "@/features/invoices/components/outstanding-balance-card";
 import { InvoicePortalAccessCard } from "@/features/invoices/components/invoice-portal-access-card";
 import { InvoicePrintView } from "@/features/invoices/components/invoice-print-view";
+import { InvoiceFulfillmentSection } from "@/features/fulfillment/components/invoice-fulfillment-section";
 import { getOverdueDays } from "@/lib/utils/date";
 import type { InvoiceDetail as InvoiceDetailType } from "@/features/invoices/types";
 import type { Activity } from "@/features/activities/types";
+import type { FulfillmentItemWithProgress } from "@/features/fulfillment/types";
 
 type InvoiceDetailProps = {
   invoice: InvoiceDetailType;
   activities: Activity[];
   workspaceName: string;
+  fulfillmentItems: FulfillmentItemWithProgress[];
 };
 
 export function InvoiceDetail({
   invoice,
   activities,
   workspaceName,
+  fulfillmentItems,
 }: InvoiceDetailProps) {
   const { toast } = useToast();
   const [recordPaymentOpen, setRecordPaymentOpen] = useState(false);
@@ -131,6 +135,19 @@ export function InvoiceDetail({
               </CardHeader>
               <CardContent>
                 <PaymentHistory payments={invoice.payments} />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Fulfillment</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <InvoiceFulfillmentSection
+                  invoiceStatus={invoice.status}
+                  lineItems={invoice.line_items}
+                  fulfillmentItems={fulfillmentItems}
+                />
               </CardContent>
             </Card>
 

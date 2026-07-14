@@ -10,6 +10,7 @@ import {
   Receipt,
   CreditCard,
   Package,
+  PackageCheck,
   BarChart3,
   Settings,
   ChevronLeft,
@@ -33,6 +34,7 @@ const NAV_ITEMS = [
   { label: "Invoices", href: "/invoices", icon: Receipt },
   { label: "Payments", href: "/payments", icon: CreditCard },
   { label: "Catalog", href: "/catalog", icon: Package },
+  { label: "Fulfillment", href: "/fulfillment", icon: PackageCheck },
   { label: "Reports", href: "/reports", icon: BarChart3 },
 ] as const;
 

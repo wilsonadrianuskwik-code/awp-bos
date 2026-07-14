@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type {
+  ActiveFulfillmentSummary,
   ClientSummary,
   CurrencyAmount,
   InvoiceSummary,
@@ -211,6 +212,26 @@ export async function getTopCatalogItem(
     quantity: top.quantity,
     total: top.total,
   };
+}
+
+/**
+ * Open (pending/in_progress) fulfillment tracker count — a plain head-only
+ * count query, the same cheap shape as getClientSummary. Callers are
+ * expected to call syncFulfillmentItemsAction first (idempotent — see
+ * sync_fulfillment_items) so newly-eligible line items are counted too.
+ */
+export async function getActiveFulfillmentSummary(
+  workspaceId: string
+): Promise<ActiveFulfillmentSummary> {
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("fulfillment_items")
+    .select("*", { count: "exact", head: true })
+    .eq("workspace_id", workspaceId)
+    .is("deleted_at", null)
+    .in("status", ["pending", "in_progress"]);
+
+  return { activeCount: count ?? 0 };
 }
 
 /**

@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { getWorkspaceBySlug } from "@/lib/workspace";
 import { getInvoice, getInvoiceActivities } from "@/features/invoices/queries";
+import { getFulfillmentItems } from "@/features/fulfillment/queries";
+import { syncFulfillmentItemsAction } from "@/features/fulfillment/actions";
 import { InvoiceDetail } from "@/features/invoices/components/invoice-detail";
 
 export default async function InvoiceDetailRoute({
@@ -12,9 +14,14 @@ export default async function InvoiceDetailRoute({
   const workspace = await getWorkspaceBySlug(workspaceSlug);
   if (!workspace) notFound();
 
-  const [invoice, activities] = await Promise.all([
+  // Idempotent — creates a tracker for this invoice's eligible-but-untracked
+  // line items on load, same as the ledger page (see sync_fulfillment_items).
+  await syncFulfillmentItemsAction(workspace.id);
+
+  const [invoice, activities, { items: fulfillmentItems }] = await Promise.all([
     getInvoice(invoiceId, workspace.id),
     getInvoiceActivities(invoiceId),
+    getFulfillmentItems(workspace.id, { invoiceId }),
   ]);
 
   if (!invoice) notFound();
@@ -24,6 +31,7 @@ export default async function InvoiceDetailRoute({
       invoice={invoice}
       activities={activities}
       workspaceName={workspace.name}
+      fulfillmentItems={fulfillmentItems}
     />
   );
 }

@@ -2,6 +2,7 @@
 
 import {
   getArAging,
+  getFulfillmentOverview,
   getRevenueByCatalogItem,
   getRevenueByPeriod,
 } from "@/features/reports/queries";
@@ -61,6 +62,23 @@ export async function getCatalogRevenueAction(
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Failed to load catalog revenue report";
+    return { data: null, error: message };
+  }
+}
+
+/**
+ * Fulfillment Overview has no user-adjustable inputs (no currency, no date
+ * range — see getFulfillmentOverview), so this action takes only a
+ * workspaceId; still a Server Action wrapper for the same "use client"
+ * data-fetching reason as the other report cards.
+ */
+export async function getFulfillmentOverviewAction(workspaceId: string) {
+  try {
+    const data = await getFulfillmentOverview(workspaceId);
+    return { data, error: null };
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Failed to load fulfillment overview";
     return { data: null, error: message };
   }
 }

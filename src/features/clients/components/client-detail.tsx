@@ -3,7 +3,15 @@
 import Link from "next/link";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CreditCard, FileText, Pencil, Plus, Receipt, Trash2 } from "lucide-react";
+import {
+  CreditCard,
+  FileText,
+  PackageCheck,
+  Pencil,
+  Plus,
+  Receipt,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +22,7 @@ import { useToast } from "@/providers/toast-provider";
 import { deleteClient } from "@/features/clients/actions";
 import { getOverdueDays } from "@/lib/utils/date";
 import { PAYMENT_METHOD_LABEL } from "@/features/invoices/helpers";
+import { FulfillmentProgress } from "@/features/fulfillment/components/fulfillment-progress";
 import type { Client } from "@/features/clients/types";
 import type { PaymentMethod } from "@/features/invoices/types";
 import type { Activity } from "@/features/activities/types";
@@ -55,12 +64,28 @@ type ClientPaymentSummary = {
   invoice: { id: string; invoice_number: string } | null;
 };
 
+// Deliberately local, not imported from the fulfillment feature — same
+// isolation rule as ClientQuotationSummary/ClientInvoiceSummary/
+// ClientPaymentSummary above.
+type ClientFulfillmentSummary = {
+  id: string;
+  description: string;
+  unit: string | null;
+  status: string;
+  purchased: number;
+  delivered: number;
+  remaining: number;
+  progress_percent: number;
+  is_over_delivered: boolean;
+};
+
 type ClientDetailProps = {
   client: Client;
   activities: Activity[];
   quotations: ClientQuotationSummary[];
   invoices: ClientInvoiceSummary[];
   payments: ClientPaymentSummary[];
+  fulfillmentItems: ClientFulfillmentSummary[];
 };
 
 export function ClientDetail({
@@ -69,6 +94,7 @@ export function ClientDetail({
   quotations,
   invoices,
   payments,
+  fulfillmentItems,
 }: ClientDetailProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -342,6 +368,56 @@ export function ClientDetail({
                         <Badge variant="secondary">
                           {PAYMENT_METHOD_LABEL[p.payment_method]}
                         </Badge>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Fulfillment</CardTitle>
+              {fulfillmentItems.length > 0 && (
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href={`/${workspace.slug}/fulfillment?clientId=${client.id}`}>
+                    View All
+                  </Link>
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent>
+              {fulfillmentItems.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <PackageCheck className="h-8 w-8 text-muted-foreground/50" />
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    No fulfillment tracking for this client yet.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {fulfillmentItems.map((fi) => (
+                    <Link
+                      key={fi.id}
+                      href={`/${workspace.slug}/fulfillment/${fi.id}`}
+                      className="block rounded-lg border p-3 transition-colors hover:bg-accent"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="truncate text-sm font-medium">
+                          {fi.description}
+                        </span>
+                        <StatusBadge status={fi.status} />
+                      </div>
+                      <div className="mt-2">
+                        <FulfillmentProgress
+                          purchased={fi.purchased}
+                          delivered={fi.delivered}
+                          remaining={fi.remaining}
+                          progressPercent={fi.progress_percent}
+                          isOverDelivered={fi.is_over_delivered}
+                          unitLabel={fi.unit}
+                        />
                       </div>
                     </Link>
                   ))}

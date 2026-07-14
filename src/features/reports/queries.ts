@@ -11,6 +11,7 @@ import type {
   ArAgingBucket,
   AvailableCurrencies,
   CatalogRevenueRow,
+  FulfillmentOverviewRow,
   RevenuePeriodPoint,
 } from "@/features/reports/types";
 
@@ -118,6 +119,32 @@ export async function getRevenueByCatalogItem(
       total: row.total,
     })
   );
+}
+
+/**
+ * Fulfillment status breakdown, as of today — mirrors getArAging's exact
+ * shape (a point-in-time snapshot, always four zero-filled rows), but
+ * counts items/remaining quantity rather than money, so it takes no
+ * currency parameter (see get_fulfillment_overview,
+ * 00031_create_fulfillment_overview_report.sql).
+ */
+export async function getFulfillmentOverview(
+  workspaceId: string
+): Promise<FulfillmentOverviewRow[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_fulfillment_overview", {
+    p_workspace_id: workspaceId,
+  });
+
+  if (error) throw new Error(error.message);
+
+  return (data ?? []).map(
+    (row: { status: string; item_count: number; total_remaining: number }) => ({
+      status: row.status,
+      itemCount: row.item_count,
+      totalRemaining: row.total_remaining,
+    })
+  ) as FulfillmentOverviewRow[];
 }
 
 /**
