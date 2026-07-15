@@ -6,6 +6,7 @@ import {
   getQuotationVersions,
 } from "@/features/quotations/queries";
 import { QuotationDetail } from "@/features/quotations/components/quotation-detail";
+import { getDefaultTemplate } from "@/features/templates/queries";
 
 export default async function QuotationDetailRoute({
   params,
@@ -16,10 +17,11 @@ export default async function QuotationDetailRoute({
   const workspace = await getWorkspaceBySlug(workspaceSlug);
   if (!workspace) notFound();
 
-  const [quotation, activities, versions] = await Promise.all([
+  const [quotation, activities, versions, template] = await Promise.all([
     getQuotation(quotationId, workspace.id),
     getQuotationActivities(quotationId),
     getQuotationVersions(quotationId, workspace.id),
+    getDefaultTemplate(workspace.id, "quotation"),
   ]);
 
   if (!quotation) notFound();
@@ -38,7 +40,8 @@ export default async function QuotationDetailRoute({
       activities={activities}
       versions={versions}
       previousVersion={previousVersion}
-      workspaceName={workspace.name}
+      workspace={workspace}
+      template={template}
     />
   );
 }

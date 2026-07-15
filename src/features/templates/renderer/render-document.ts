@@ -62,6 +62,63 @@ function pageDimensions(pageSettings: PageSettings): { widthMm: number; heightMm
   return isLandscape ? { widthMm: base.heightMm, heightMm: base.widthMm } : base;
 }
 
+export type DocumentRenderFragment = {
+  /** CSS text (no <style> tags) — inject as-is, e.g. into a <style> element. */
+  css: string;
+  /** Block HTML only (no <html>/<head>/<body>) — safe to inject as a fragment,
+   * e.g. inline into an existing page for print, unlike the full document
+   * `renderDocument()` returns (which can't be dropped into an existing DOM). */
+  html: string;
+  widthMm: number;
+  heightMm: number;
+};
+
+// Used where the caller already owns the surrounding page (print views,
+// the live editor preview before it's wrapped in an iframe) and just
+// needs the styled block markup, not a standalone document.
+export function renderDocumentFragment(
+  blocks: TemplateBlock[],
+  theme: ThemeConfig,
+  data: DocumentRenderData,
+  pageSettings: PageSettings = { size: "A4", orientation: "portrait" },
+  options?: RenderOptions
+): DocumentRenderFragment {
+  const cssVars = themeToCssVariables(theme);
+  const { widthMm, heightMm } = pageDimensions(pageSettings);
+  const html = renderBlockList(blocks, data, options);
+
+  const css = `
+    :root { ${cssVars} }
+    .tpl-document { box-sizing: border-box; }
+    .tpl-document * { box-sizing: border-box; }
+    .tpl-document {
+      width: ${widthMm}mm;
+      min-height: ${heightMm}mm;
+      padding: var(--t-margin-top) var(--t-margin-right) var(--t-margin-bottom) var(--t-margin-left);
+      background: var(--t-bg);
+      color: var(--t-text);
+      font-family: var(--t-body-font);
+      font-weight: var(--t-body-weight);
+      font-size: var(--t-base-size);
+      line-height: var(--t-line-height);
+      position: relative;
+    }
+    .tpl-document h1, .tpl-document h2, .tpl-document h3, .tpl-document .tpl-block b, .tpl-document .tpl-block strong {
+      font-family: var(--t-heading-font); font-weight: var(--t-heading-weight);
+    }
+    .tpl-document table { border-radius: var(--t-radius); }
+    .tpl-document .tpl-block[data-block-id] { outline: 1px dashed transparent; cursor: pointer; }
+    .tpl-document .tpl-block[data-block-id]:hover { outline-color: var(--t-primary); }
+  `.trim();
+
+  return { css, html, widthMm, heightMm };
+}
+
+// Full, standalone HTML document — used where the renderer owns the
+// entire page: the editor's iframe srcdoc preview, the client portal,
+// and PDF generation via Playwright. Composed directly from
+// renderDocumentFragment() so there is exactly one place that turns
+// blocks+theme+data into markup.
 export function renderDocument(
   blocks: TemplateBlock[],
   theme: ThemeConfig,
@@ -69,38 +126,20 @@ export function renderDocument(
   pageSettings: PageSettings = { size: "A4", orientation: "portrait" },
   options?: RenderOptions
 ): string {
-  const cssVars = themeToCssVariables(theme);
-  const { widthMm, heightMm } = pageDimensions(pageSettings);
-  const body = renderBlockList(blocks, data, options);
+  const { css, html } = renderDocumentFragment(blocks, theme, data, pageSettings, options);
 
   return `<!doctype html>
 <html>
 <head>
 <meta charset="utf-8">
 <style>
-  :root { ${cssVars} }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
-  body {
-    width: ${widthMm}mm;
-    min-height: ${heightMm}mm;
-    padding: var(--t-margin-top) var(--t-margin-right) var(--t-margin-bottom) var(--t-margin-left);
-    background: var(--t-bg);
-    color: var(--t-text);
-    font-family: var(--t-body-font);
-    font-weight: var(--t-body-weight);
-    font-size: var(--t-base-size);
-    line-height: var(--t-line-height);
-    position: relative;
-  }
-  h1, h2, h3, .tpl-block b, .tpl-block strong { font-family: var(--t-heading-font); font-weight: var(--t-heading-weight); }
-  table { border-radius: var(--t-radius); }
-  .tpl-block[data-block-id] { outline: 1px dashed transparent; cursor: pointer; }
-  .tpl-block[data-block-id]:hover { outline-color: var(--t-primary); }
+  ${css}
 </style>
 </head>
-<body>
-${body}
+<body class="tpl-document">
+${html}
 </body>
 </html>`;
 }

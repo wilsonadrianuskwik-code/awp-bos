@@ -17,24 +17,29 @@ import { OutstandingBalanceCard } from "@/features/invoices/components/outstandi
 import { InvoicePortalAccessCard } from "@/features/invoices/components/invoice-portal-access-card";
 import { InvoicePrintView } from "@/features/invoices/components/invoice-print-view";
 import { InvoiceFulfillmentSection } from "@/features/fulfillment/components/invoice-fulfillment-section";
+import { DocumentRenderView } from "@/features/templates/renderer/components/document-render-view";
+import { invoiceToRenderData } from "@/features/templates/renderer/adapters";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import { getOverdueDays } from "@/lib/utils/date";
 import type { InvoiceDetail as InvoiceDetailType } from "@/features/invoices/types";
 import type { Activity } from "@/features/activities/types";
 import type { FulfillmentItemWithProgress } from "@/features/fulfillment/types";
+import type { DocumentTemplateWithTheme, CompanyProfile } from "@/features/templates/types";
 
 type InvoiceDetailProps = {
   invoice: InvoiceDetailType;
   activities: Activity[];
-  workspaceName: string;
+  workspace: { name: string; logo_url: string | null; settings?: { company_profile?: CompanyProfile } | null };
   fulfillmentItems: FulfillmentItemWithProgress[];
+  template: DocumentTemplateWithTheme | null;
 };
 
 export function InvoiceDetail({
   invoice,
   activities,
-  workspaceName,
+  workspace: workspaceInfo,
   fulfillmentItems,
+  template,
 }: InvoiceDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
@@ -181,7 +186,11 @@ export function InvoiceDetail({
         </div>
       </div>
 
-      <InvoicePrintView invoice={invoice} workspaceName={workspaceName} />
+      <DocumentRenderView
+        template={template}
+        data={invoiceToRenderData(invoice, workspaceInfo)}
+        fallback={<InvoicePrintView invoice={invoice} workspaceName={workspaceInfo.name} />}
+      />
 
       <RecordPaymentDialog
         open={recordPaymentOpen}

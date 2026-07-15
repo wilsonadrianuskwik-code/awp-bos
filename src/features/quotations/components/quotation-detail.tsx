@@ -18,19 +18,23 @@ import { GenerateInvoiceDialog } from "./generate-invoice-dialog";
 import { QuotationPortalAccessCard } from "./quotation-portal-access-card";
 import { PricingSummary } from "@/features/line-items/components/pricing-summary";
 import { QuotationPrintView } from "./quotation-print-view";
+import { DocumentRenderView } from "@/features/templates/renderer/components/document-render-view";
+import { quotationToRenderData } from "@/features/templates/renderer/adapters";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type {
   QuotationDetail as QuotationDetailType,
   QuotationWithClient,
 } from "@/features/quotations/types";
 import type { Activity } from "@/features/activities/types";
+import type { DocumentTemplateWithTheme, CompanyProfile } from "@/features/templates/types";
 
 type QuotationDetailProps = {
   quotation: QuotationDetailType;
   activities: Activity[];
   versions: QuotationWithClient[];
   previousVersion: QuotationDetailType | null;
-  workspaceName: string;
+  workspace: { name: string; logo_url: string | null; settings?: { company_profile?: CompanyProfile } | null };
+  template: DocumentTemplateWithTheme | null;
 };
 
 export function QuotationDetail({
@@ -38,7 +42,8 @@ export function QuotationDetail({
   activities,
   versions,
   previousVersion,
-  workspaceName,
+  workspace: workspaceInfo,
+  template,
 }: QuotationDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
@@ -237,7 +242,11 @@ export function QuotationDetail({
         </div>
       </div>
 
-      <QuotationPrintView quotation={quotation} workspaceName={workspaceName} />
+      <DocumentRenderView
+        template={template}
+        data={quotationToRenderData(quotation, workspaceInfo)}
+        fallback={<QuotationPrintView quotation={quotation} workspaceName={workspaceInfo.name} />}
+      />
 
       <GenerateInvoiceDialog
         open={generateInvoiceOpen}
