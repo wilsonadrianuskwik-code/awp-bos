@@ -92,7 +92,7 @@ export function QuotationListPage({
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by title or number..."
+            placeholder="Search number, title, client, company..."
             className="h-9 pl-9"
           />
         </div>

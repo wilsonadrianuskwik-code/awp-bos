@@ -33,7 +33,22 @@ export async function getInvoices(
 
   if (filters?.search) {
     const term = filters.search.replace(/[%_]/g, "");
-    query = query.or(`title.ilike.%${term}%,invoice_number.ilike.%${term}%`);
+    const like = `%${term}%`;
+
+    const { data: matchingClients } = await supabase
+      .from("clients")
+      .select("id")
+      .eq("workspace_id", workspaceId)
+      .is("deleted_at", null)
+      .or(`name.ilike.${like},company.ilike.${like}`);
+
+    const clientIds = (matchingClients ?? []).map((c) => c.id);
+
+    const orClauses = [`title.ilike.${like}`, `invoice_number.ilike.${like}`];
+    if (clientIds.length > 0) {
+      orClauses.push(`client_id.in.(${clientIds.join(",")})`);
+    }
+    query = query.or(orClauses.join(","));
   }
 
   const sortBy = filters?.sortBy ?? "created_at";
