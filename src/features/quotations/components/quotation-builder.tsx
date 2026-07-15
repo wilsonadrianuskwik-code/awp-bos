@@ -54,7 +54,7 @@ import {
 import type { Quotation, QuotationDetail } from "@/features/quotations/types";
 import type { CatalogItem } from "@/features/catalog/types";
 
-const CURRENCIES = ["USD", "EUR", "GBP", "SGD", "MYR", "IDR", "AUD", "CAD"];
+const CURRENCIES = ["IDR", "USD", "EUR", "GBP", "SGD", "MYR", "AUD", "CAD"];
 
 const CATEGORY_LABEL: Record<LineItemCategory, string> = {
   package: "Packages",
@@ -109,7 +109,7 @@ export function QuotationBuilder({
   const [currency, setCurrency] = useState(
     quotation?.currency ??
       clients.find((c) => c.id === initialClientId)?.preferred_currency ??
-      "USD"
+      "IDR"
   );
   const [issueDate, setIssueDate] = useState(quotation?.issue_date ?? todayISO());
   const [expiryDate, setExpiryDate] = useState(quotation?.expiry_date ?? "");
@@ -224,7 +224,6 @@ export function QuotationBuilder({
 
     if (!quotationId && result.data) {
       setQuotationId(result.data.id);
-      router.replace(`/${workspace.slug}/quotations/${result.data.id}/edit`);
     }
 
     return result.data;
@@ -273,10 +272,16 @@ export function QuotationBuilder({
       toast(parsed.error.issues[0].message, "error");
       return;
     }
+    const wasNew = !quotationId;
     const saved = await saveDraft();
-    if (saved) toast("Draft saved", "success");
+    if (saved) {
+      toast("Draft saved", "success");
+      if (wasNew) {
+        router.push(`/${workspace.slug}/quotations/${saved.id}`);
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPayload, saveDraft]);
+  }, [currentPayload, saveDraft, quotationId, workspace.slug]);
 
   const handleSendShortcut = useCallback(async () => {
     const parsed = createQuotationSchema.safeParse(currentPayload);

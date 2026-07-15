@@ -28,7 +28,7 @@ const CATEGORY_LABEL: Record<LineItemCategory, string> = {
 // description dominates the row on desktop. The row's horizontal gap
 // (gap-x-2) must match the header's gap so the columns line up.
 export const LINE_ITEM_GRID_COLS =
-  "md:grid-cols-[20px_minmax(0,1fr)_52px_48px_84px_48px_48px_88px_28px]";
+  "md:grid-cols-[20px_minmax(0,1fr)_56px_52px_110px_60px_60px_110px_28px]";
 
 type LineItemRowProps = {
   item: LineItemInput;

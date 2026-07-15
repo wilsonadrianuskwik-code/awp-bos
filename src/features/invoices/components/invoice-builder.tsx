@@ -54,7 +54,7 @@ import {
 import type { Invoice, InvoiceDetail } from "@/features/invoices/types";
 import type { CatalogItem } from "@/features/catalog/types";
 
-const CURRENCIES = ["USD", "EUR", "GBP", "SGD", "MYR", "IDR", "AUD", "CAD"];
+const CURRENCIES = ["IDR", "USD", "EUR", "GBP", "SGD", "MYR", "AUD", "CAD"];
 
 const CATEGORY_LABEL: Record<LineItemCategory, string> = {
   package: "Packages",
@@ -107,7 +107,7 @@ export function InvoiceBuilder({
   const [currency, setCurrency] = useState(
     invoice?.currency ??
       clients.find((c) => c.id === initialClientId)?.preferred_currency ??
-      "USD"
+      "IDR"
   );
   const [issueDate, setIssueDate] = useState(invoice?.issue_date ?? todayISO());
   const [dueDate, setDueDate] = useState(invoice?.due_date ?? "");
@@ -214,7 +214,6 @@ export function InvoiceBuilder({
 
     if (!invoiceId && result.data) {
       setInvoiceId(result.data.id);
-      router.replace(`/${workspace.slug}/invoices/${result.data.id}/edit`);
     }
 
     return result.data;
@@ -263,10 +262,16 @@ export function InvoiceBuilder({
       toast(parsed.error.issues[0].message, "error");
       return;
     }
+    const wasNew = !invoiceId;
     const saved = await saveDraft();
-    if (saved) toast("Draft saved", "success");
+    if (saved) {
+      toast("Draft saved", "success");
+      if (wasNew) {
+        router.push(`/${workspace.slug}/invoices/${saved.id}`);
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPayload, saveDraft]);
+  }, [currentPayload, saveDraft, invoiceId, workspace.slug]);
 
   const handleSendShortcut = useCallback(async () => {
     const parsed = createInvoiceSchema.safeParse(currentPayload);
