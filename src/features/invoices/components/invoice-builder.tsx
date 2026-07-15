@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { FileDown, FileUp, Loader2, Package, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/shared/back-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -370,7 +371,10 @@ export function InvoiceBuilder({
   });
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
+    <div className="space-y-4">
+      <BackButton onClick={handleCancel} label={invoice ? "Back to Invoice" : "Back to Invoices"} />
+
+      <div className="grid gap-6 lg:grid-cols-3">
       <div className="space-y-6 lg:col-span-2">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">
@@ -620,6 +624,7 @@ export function InvoiceBuilder({
         documentCurrency={currency}
         onInsert={handleInsertCatalogItem}
       />
+      </div>
     </div>
   );
 }
