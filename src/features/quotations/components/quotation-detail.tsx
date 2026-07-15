@@ -18,6 +18,7 @@ import { GenerateInvoiceDialog } from "./generate-invoice-dialog";
 import { QuotationPortalAccessCard } from "./quotation-portal-access-card";
 import { PricingSummary } from "@/features/line-items/components/pricing-summary";
 import { QuotationPrintView } from "./quotation-print-view";
+import { formatCurrency } from "@/lib/utils/format-currency";
 import type {
   QuotationDetail as QuotationDetailType,
   QuotationWithClient,
@@ -45,7 +46,13 @@ export function QuotationDetail({
   const [diffOpen, setDiffOpen] = useState(false);
 
   function handlePrint() {
+    const clientName = quotation.client?.name ?? "Client";
+    const total = formatCurrency(quotation.total ?? 0, quotation.currency);
+    const filename = sanitizeFilename(`${clientName} - ${quotation.quotation_number} - ${total}`);
+    const prevTitle = document.title;
+    document.title = filename;
     window.print();
+    document.title = prevTitle;
   }
 
   function handleCopyNumber() {
@@ -248,4 +255,8 @@ export function QuotationDetail({
       )}
     </div>
   );
+}
+
+function sanitizeFilename(name: string): string {
+  return name.replace(/[<>:"/\\|?*]/g, "").replace(/\s+/g, " ").trim();
 }

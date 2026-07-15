@@ -17,6 +17,7 @@ import { OutstandingBalanceCard } from "@/features/invoices/components/outstandi
 import { InvoicePortalAccessCard } from "@/features/invoices/components/invoice-portal-access-card";
 import { InvoicePrintView } from "@/features/invoices/components/invoice-print-view";
 import { InvoiceFulfillmentSection } from "@/features/fulfillment/components/invoice-fulfillment-section";
+import { formatCurrency } from "@/lib/utils/format-currency";
 import { getOverdueDays } from "@/lib/utils/date";
 import type { InvoiceDetail as InvoiceDetailType } from "@/features/invoices/types";
 import type { Activity } from "@/features/activities/types";
@@ -40,7 +41,13 @@ export function InvoiceDetail({
   const [recordPaymentOpen, setRecordPaymentOpen] = useState(false);
 
   function handlePrint() {
+    const clientName = invoice.client?.name ?? "Client";
+    const total = formatCurrency(invoice.total ?? 0, invoice.currency);
+    const filename = sanitizeFilename(`${clientName} - ${invoice.invoice_number} - ${total}`);
+    const prevTitle = document.title;
+    document.title = filename;
     window.print();
+    document.title = prevTitle;
   }
 
   function handleCopyNumber() {
@@ -183,4 +190,8 @@ export function InvoiceDetail({
       />
     </div>
   );
+}
+
+function sanitizeFilename(name: string): string {
+  return name.replace(/[<>:"/\\|?*]/g, "").replace(/\s+/g, " ").trim();
 }
