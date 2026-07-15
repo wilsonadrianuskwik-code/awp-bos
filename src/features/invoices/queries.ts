@@ -9,7 +9,7 @@ import type {
   Payment,
 } from "@/features/invoices/types";
 
-const CLIENT_JOIN = "client:clients(id,name,company,email,payment_terms)";
+const CLIENT_JOIN = "client:clients(id,name,company,email,payment_terms,phone,address,tax_id)";
 
 export async function getInvoices(
   workspaceId: string,

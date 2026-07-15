@@ -34,6 +34,19 @@ export type ClientSummary = {
   email: string | null;
   payment_terms?: number;
   preferred_currency?: string;
+  // Added for the Document Design System's render adapters (Phase 13) —
+  // the company_info/client_info blocks need phone/address/tax_id, which
+  // the query embed didn't previously select.
+  phone?: string | null;
+  address?: {
+    line1?: string;
+    line2?: string;
+    city?: string;
+    state?: string;
+    postal_code?: string;
+    country?: string;
+  } | null;
+  tax_id?: string | null;
 };
 
 export type TemplateItem = {

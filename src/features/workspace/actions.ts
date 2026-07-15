@@ -12,6 +12,7 @@ import {
   type UpdateMemberRoleInput,
   type UpdateWorkspaceProfileInput,
 } from "@/features/workspace/validators";
+import { seedDefaultTemplates } from "@/features/templates/seed";
 
 function generateSlug(name: string): string {
   return name
@@ -67,6 +68,8 @@ export async function createWorkspace(formData: FormData) {
     },
     { onConflict: "id" }
   );
+
+  await seedDefaultTemplates(admin, workspace.id, user.id);
 
   redirect(`/${workspace.slug}`);
 }

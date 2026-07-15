@@ -8,7 +8,7 @@ import type {
   QuotationWithClient,
 } from "@/features/quotations/types";
 
-const CLIENT_JOIN = "client:clients(id,name,company,email,payment_terms)";
+const CLIENT_JOIN = "client:clients(id,name,company,email,payment_terms,phone,address,tax_id)";
 
 export async function getQuotations(
   workspaceId: string,

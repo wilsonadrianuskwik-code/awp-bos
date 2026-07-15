@@ -3,6 +3,7 @@ import { getWorkspaceBySlug } from "@/lib/workspace";
 import { PageHeader } from "@/components/shared/page-header";
 import { getWorkspaceMembers, getWorkspaceInvites } from "@/features/workspace/queries";
 import { SettingsPage } from "@/features/workspace/components/settings-page";
+import type { CompanyProfile } from "@/features/templates/types";
 
 export default async function WorkspaceSettingsRoute({
   params,
@@ -18,13 +19,20 @@ export default async function WorkspaceSettingsRoute({
     getWorkspaceInvites(workspace.id),
   ]);
 
+  const companyProfile = (workspace.settings?.company_profile ?? {}) as CompanyProfile;
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Settings"
         description="Manage your workspace profile and team"
       />
-      <SettingsPage workspace={workspace} members={members} invites={invites} />
+      <SettingsPage
+        workspace={workspace}
+        members={members}
+        invites={invites}
+        companyProfile={companyProfile}
+      />
     </div>
   );
 }
