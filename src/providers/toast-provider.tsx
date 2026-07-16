@@ -1,6 +1,8 @@
 "use client";
 
 import { createContext, useCallback, useContext, useState } from "react";
+import { CheckCircle2, AlertCircle, Info, X } from "lucide-react";
+import { cn } from "@/lib/utils/cn";
 
 type ToastAction = {
   label: string;
@@ -27,6 +29,19 @@ type ToastContextType = {
 
 const Context = createContext<ToastContextType | undefined>(undefined);
 
+// Toasts follow the design system's surface language (card background,
+// hairline border, shadow-lg) with a single semantic accent per type
+// carried by the leading icon — not a saturated full-bleed fill, which
+// reads as an alert box rather than a notification.
+const TOAST_STYLES: Record<
+  Toast["type"],
+  { icon: typeof Info; iconClass: string }
+> = {
+  success: { icon: CheckCircle2, iconClass: "text-emerald-600 dark:text-emerald-400" },
+  error: { icon: AlertCircle, iconClass: "text-destructive" },
+  info: { icon: Info, iconClass: "text-primary" },
+};
+
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
@@ -52,48 +67,43 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <Context.Provider value={{ toasts, toast, dismiss }}>
       {children}
-      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
-        {toasts.map((t) => (
-          <div
-            key={t.id}
-            className={cn(
-              "rounded-lg px-4 py-3 text-sm shadow-lg transition-all animate-in slide-in-from-bottom-2",
-              t.type === "success" && "bg-green-600 text-white",
-              t.type === "error" && "bg-destructive text-destructive-foreground",
-              t.type === "info" && "bg-primary text-primary-foreground"
-            )}
-          >
-            <div className="flex items-center justify-between gap-3">
-              <span>{t.message}</span>
-              <div className="flex shrink-0 items-center gap-2">
+      <div className="pointer-events-none fixed bottom-4 right-4 z-[100] flex w-full max-w-sm flex-col gap-2">
+        {toasts.map((t) => {
+          const { icon: Icon, iconClass } = TOAST_STYLES[t.type];
+          return (
+            <div
+              key={t.id}
+              role="status"
+              className="pointer-events-auto flex items-start gap-3 rounded-lg border bg-card p-3.5 text-card-foreground shadow-lg duration-150 animate-in fade-in slide-in-from-bottom-2"
+            >
+              <Icon className={cn("mt-0.5 h-4 w-4 shrink-0", iconClass)} />
+              <p className="flex-1 text-[13px] leading-snug">{t.message}</p>
+              <div className="flex shrink-0 items-center gap-1">
                 {t.action && (
                   <button
                     onClick={() => {
                       t.action!.onClick();
                       dismiss(t.id);
                     }}
-                    className="rounded bg-white/20 px-2 py-0.5 text-xs font-medium hover:bg-white/30"
+                    className="rounded-md px-2 py-0.5 text-[13px] font-medium text-primary transition-colors hover:bg-primary/10"
                   >
                     {t.action.label}
                   </button>
                 )}
                 <button
                   onClick={() => dismiss(t.id)}
-                  className="opacity-70 hover:opacity-100"
+                  aria-label="Dismiss"
+                  className="rounded-md p-0.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
-                  &times;
+                  <X className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </Context.Provider>
   );
-}
-
-function cn(...classes: (string | false | undefined)[]) {
-  return classes.filter(Boolean).join(" ");
 }
 
 export function useToast() {

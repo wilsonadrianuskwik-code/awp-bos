@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import { type ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/shared/data-table";
+import { ListEmpty } from "@/components/shared/list-empty";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -197,9 +198,7 @@ export function PaymentsList({ payments }: PaymentsListProps) {
       </div>
 
       {payments.length === 0 ? (
-        <div className="rounded-xl border border-dashed py-16 text-center text-sm text-muted-foreground">
-          No payments match your filters.
-        </div>
+        <ListEmpty message="No payments match your filters." />
       ) : (
         <DataTable columns={columns} data={payments} />
       )}

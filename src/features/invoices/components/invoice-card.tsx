@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useTransition, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Calendar, Hash, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -56,8 +56,13 @@ export function InvoiceCard({ invoice }: InvoiceCardProps) {
 
   return (
     <div
-      className="group relative flex cursor-pointer flex-col rounded-xl border bg-card p-5 transition-all duration-150 hover:border-foreground/20 hover:shadow-md"
+      role="button"
+      tabIndex={0}
+      className="group relative flex cursor-pointer flex-col rounded-lg border bg-card p-5 shadow-2xs outline-none transition-all duration-150 hover:border-primary/40 hover:shadow-md focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-ring/30"
       onClick={() => router.push(href)}
+      onKeyDown={(e: KeyboardEvent) => {
+        if (e.key === "Enter") router.push(href);
+      }}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">

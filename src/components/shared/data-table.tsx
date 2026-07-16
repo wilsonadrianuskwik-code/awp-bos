@@ -8,7 +8,7 @@ import {
   type ColumnDef,
   type SortingState,
 } from "@tanstack/react-table";
-import { useState } from "react";
+import { useState, type KeyboardEvent } from "react";
 import { ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
@@ -87,9 +87,20 @@ export function DataTable<TData>({
                 key={row.id}
                 className={cn(
                   "border-b text-[13px] transition-colors duration-100 last:border-0 hover:bg-muted/40",
-                  onRowClick && "cursor-pointer"
+                  onRowClick &&
+                    "cursor-pointer outline-none focus-visible:bg-muted/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/50"
                 )}
                 onClick={() => onRowClick?.(row.original)}
+                {...(onRowClick && {
+                  role: "button",
+                  tabIndex: 0,
+                  onKeyDown: (e: KeyboardEvent) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onRowClick(row.original);
+                    }
+                  },
+                })}
               >
                 {row.getVisibleCells().map((cell) => (
                   <td

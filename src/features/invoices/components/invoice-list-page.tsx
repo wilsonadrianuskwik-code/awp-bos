@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Pagination } from "@/components/shared/pagination";
+import { ListEmpty } from "@/components/shared/list-empty";
 import {
   Select,
   SelectContent,
@@ -132,9 +133,7 @@ export function InvoiceListPage({ invoices, count }: InvoiceListPageProps) {
       </div>
 
       {invoices.length === 0 ? (
-        <div className="rounded-xl border border-dashed py-16 text-center text-sm text-muted-foreground">
-          No invoices match your filters.
-        </div>
+        <ListEmpty message="No invoices match your filters." />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {invoices.map((i) => (
@@ -143,34 +142,13 @@ export function InvoiceListPage({ invoices, count }: InvoiceListPageProps) {
         </div>
       )}
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between border-t pt-4">
-          <p className="text-xs text-muted-foreground">
-            Page {page} of {totalPages} · {count} invoice
-            {count === 1 ? "" : "s"}
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page <= 1}
-              onClick={() => setParams({ page: String(page - 1) })}
-            >
-              <ChevronLeft className="mr-1 h-4 w-4" />
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page >= totalPages}
-              onClick={() => setParams({ page: String(page + 1) })}
-            >
-              Next
-              <ChevronRight className="ml-1 h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        count={count}
+        noun="invoice"
+        onPageChange={(p) => setParams({ page: String(p) })}
+      />
     </div>
   );
 }
