@@ -13,6 +13,7 @@ import { useToast } from "@/providers/toast-provider";
 import { useConfirm } from "@/providers/confirm-provider";
 import { deleteLead } from "@/features/leads/actions";
 import { DetailHeader } from "@/components/shared/detail-header";
+import { FieldList, DetailItem } from "@/components/shared/detail-item";
 import type { Lead } from "@/features/leads/types";
 import type { Activity } from "@/features/activities/types";
 
@@ -92,7 +93,7 @@ export function LeadDetail({ lead, activities, onConvert }: LeadDetailProps) {
               <CardTitle>Details</CardTitle>
             </CardHeader>
             <CardContent>
-              <dl className="grid gap-4 sm:grid-cols-2">
+              <FieldList>
                 <DetailItem label="Email" value={lead.email} />
                 <DetailItem label="Phone" value={lead.phone} />
                 <DetailItem label="Company" value={lead.company} />
@@ -119,7 +120,7 @@ export function LeadDetail({ lead, activities, onConvert }: LeadDetailProps) {
                       : null
                   }
                 />
-              </dl>
+              </FieldList>
             </CardContent>
           </Card>
 
@@ -174,17 +175,3 @@ export function LeadDetail({ lead, activities, onConvert }: LeadDetailProps) {
   );
 }
 
-function DetailItem({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | null | undefined;
-}) {
-  return (
-    <div>
-      <dt className="text-sm font-medium text-muted-foreground">{label}</dt>
-      <dd className="mt-1 text-sm">{value || "-"}</dd>
-    </div>
-  );
-}

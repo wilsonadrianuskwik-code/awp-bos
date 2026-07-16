@@ -25,6 +25,7 @@ import { getOverdueDays } from "@/lib/utils/date";
 import { PAYMENT_METHOD_LABEL } from "@/features/invoices/helpers";
 import { FulfillmentProgress } from "@/features/fulfillment/components/fulfillment-progress";
 import { DetailHeader } from "@/components/shared/detail-header";
+import { FieldList, DetailItem } from "@/components/shared/detail-item";
 import type { Client } from "@/features/clients/types";
 import type { PaymentMethod } from "@/features/invoices/types";
 import type { Activity } from "@/features/activities/types";
@@ -158,12 +159,12 @@ export function ClientDetail({
               <CardTitle>Contact Information</CardTitle>
             </CardHeader>
             <CardContent>
-              <dl className="grid gap-4 sm:grid-cols-2">
+              <FieldList>
                 <DetailItem label="Email" value={client.email} />
                 <DetailItem label="Phone" value={client.phone} />
                 <DetailItem label="Company" value={client.company} />
                 <DetailItem label="Website" value={client.website} />
-              </dl>
+              </FieldList>
             </CardContent>
           </Card>
 
@@ -172,7 +173,7 @@ export function ClientDetail({
               <CardTitle>Billing</CardTitle>
             </CardHeader>
             <CardContent>
-              <dl className="grid gap-4 sm:grid-cols-2">
+              <FieldList>
                 <DetailItem
                   label="Billing Email"
                   value={client.billing_email}
@@ -186,7 +187,7 @@ export function ClientDetail({
                   label="Preferred Currency"
                   value={client.preferred_currency}
                 />
-              </dl>
+              </FieldList>
             </CardContent>
           </Card>
 
@@ -471,17 +472,3 @@ export function ClientDetail({
   );
 }
 
-function DetailItem({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | null | undefined;
-}) {
-  return (
-    <div>
-      <dt className="text-sm font-medium text-muted-foreground">{label}</dt>
-      <dd className="mt-1 text-sm">{value || "-"}</dd>
-    </div>
-  );
-}

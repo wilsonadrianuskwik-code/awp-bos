@@ -13,6 +13,7 @@ import { useToast } from "@/providers/toast-provider";
 import { useConfirm } from "@/providers/confirm-provider";
 import { deleteCatalogItem } from "@/features/catalog/actions";
 import { DetailHeader } from "@/components/shared/detail-header";
+import { FieldList, DetailItem } from "@/components/shared/detail-item";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { CatalogItem, ItemType } from "@/features/catalog/types";
 import type { LineItemCategory } from "@/features/line-items/types";
@@ -103,7 +104,7 @@ export function CatalogDetail({ item, activities }: CatalogDetailProps) {
               <CardTitle>Details</CardTitle>
             </CardHeader>
             <CardContent>
-              <dl className="grid gap-4 sm:grid-cols-2">
+              <FieldList>
                 <DetailItem
                   label="Default Price"
                   value={formatCurrency(item.default_unit_price, item.currency)}
@@ -114,15 +115,15 @@ export function CatalogDetail({ item, activities }: CatalogDetailProps) {
                   value={CATEGORY_LABEL[item.default_category]}
                 />
                 <DetailItem label="Unit" value={item.default_unit} />
-              </dl>
+              </FieldList>
               {item.description && (
                 <div className="mt-4">
-                  <dt className="text-sm font-medium text-muted-foreground">
+                  <p className="text-sm font-medium text-muted-foreground">
                     Description
-                  </dt>
-                  <dd className="mt-1 whitespace-pre-wrap text-sm">
+                  </p>
+                  <p className="mt-1 whitespace-pre-wrap text-sm">
                     {item.description}
-                  </dd>
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -144,17 +145,3 @@ export function CatalogDetail({ item, activities }: CatalogDetailProps) {
   );
 }
 
-function DetailItem({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | null | undefined;
-}) {
-  return (
-    <div>
-      <dt className="text-sm font-medium text-muted-foreground">{label}</dt>
-      <dd className="mt-1 text-sm">{value || "-"}</dd>
-    </div>
-  );
-}

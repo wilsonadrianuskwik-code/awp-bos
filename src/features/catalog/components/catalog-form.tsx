@@ -4,9 +4,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -14,6 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  FormSection,
+  FormGrid,
+  FieldGroup,
+  FormActions,
+} from "@/components/shared/form";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { createCatalogItem, updateCatalogItem } from "@/features/catalog/actions";
@@ -61,9 +65,7 @@ export function CatalogForm({ item }: CatalogFormProps) {
       }
 
       toast(
-        isEditing
-          ? "Catalog item updated successfully"
-          : "Catalog item created successfully",
+        isEditing ? "Catalog item updated" : "Catalog item created",
         "success"
       );
       router.push(`/${workspace.slug}/catalog`);
@@ -72,154 +74,114 @@ export function CatalogForm({ item }: CatalogFormProps) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Card>
-        <CardHeader>
-          <CardTitle>{isEditing ? "Edit Catalog Item" : "New Catalog Item"}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name *</Label>
-              <Input
-                id="name"
-                name="name"
-                defaultValue={item?.name ?? ""}
-                required
-                maxLength={255}
-              />
-            </div>
+      <FormSection title={isEditing ? "Edit Catalog Item" : "New Catalog Item"}>
+        <FormGrid>
+          <FieldGroup label="Name" htmlFor="name" required>
+            <Input id="name" name="name" defaultValue={item?.name ?? ""} required maxLength={255} />
+          </FieldGroup>
 
-            <div className="space-y-2">
-              <Label htmlFor="sku">SKU</Label>
-              <Input
-                id="sku"
-                name="sku"
-                defaultValue={item?.sku ?? ""}
-                maxLength={100}
-                placeholder="Optional, must be unique"
-              />
-            </div>
+          <FieldGroup label="SKU" htmlFor="sku" hint="Optional, must be unique">
+            <Input id="sku" name="sku" defaultValue={item?.sku ?? ""} maxLength={100} />
+          </FieldGroup>
 
-            <div className="space-y-2">
-              <Label htmlFor="item_type">Type</Label>
-              <Select name="item_type" defaultValue={item?.item_type ?? "service"}>
-                <SelectTrigger id="item_type">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {ITEM_TYPES.map((t) => (
-                    <SelectItem key={t} value={t}>
-                      {ITEM_TYPE_LABEL[t]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <FieldGroup label="Type" htmlFor="item_type">
+            <Select name="item_type" defaultValue={item?.item_type ?? "service"}>
+              <SelectTrigger id="item_type">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ITEM_TYPES.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {ITEM_TYPE_LABEL[t]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FieldGroup>
 
-            <div className="space-y-2">
-              <Label htmlFor="default_category">Billing Category</Label>
-              <Select
-                name="default_category"
-                defaultValue={item?.default_category ?? "per_unit"}
-              >
-                <SelectTrigger id="default_category">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {LINE_ITEM_CATEGORIES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {CATEGORY_LABEL[c]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <FieldGroup label="Billing Category" htmlFor="default_category">
+            <Select name="default_category" defaultValue={item?.default_category ?? "per_unit"}>
+              <SelectTrigger id="default_category">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {LINE_ITEM_CATEGORIES.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {CATEGORY_LABEL[c]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FieldGroup>
 
-            <div className="space-y-2">
-              <Label htmlFor="default_unit_price">Default Price *</Label>
-              <Input
-                id="default_unit_price"
-                name="default_unit_price"
-                type="number"
-                min={0}
-                step="0.01"
-                defaultValue={item?.default_unit_price ?? 0}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="currency">Currency *</Label>
-              <Select name="currency" defaultValue={item?.currency ?? workspace.default_currency}>
-                <SelectTrigger id="currency">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CURRENCIES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="default_unit">Unit</Label>
-              <Input
-                id="default_unit"
-                name="default_unit"
-                defaultValue={item?.default_unit ?? ""}
-                maxLength={50}
-                placeholder="e.g. hour, page, seat"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="is_active">Status</Label>
-              <Select
-                name="is_active"
-                defaultValue={
-                  item && !item.is_active ? "inactive" : "active"
-                }
-              >
-                <SelectTrigger id="is_active">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              name="description"
-              defaultValue={item?.description ?? ""}
-              placeholder="Optional"
+          <FieldGroup label="Default Price" htmlFor="default_unit_price" required>
+            <Input
+              id="default_unit_price"
+              name="default_unit_price"
+              type="number"
+              min={0}
+              step="0.01"
+              defaultValue={item?.default_unit_price ?? 0}
+              required
             />
-          </div>
+          </FieldGroup>
 
-          <div className="flex gap-3">
-            <Button type="submit" disabled={isPending}>
-              {isPending
-                ? isEditing
-                  ? "Updating..."
-                  : "Creating..."
-                : isEditing
-                  ? "Update Item"
-                  : "Create Item"}
-            </Button>
-            <Button type="button" variant="outline" onClick={() => router.back()}>
-              Cancel
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          <FieldGroup label="Currency" htmlFor="currency" required>
+            <Select name="currency" defaultValue={item?.currency ?? workspace.default_currency}>
+              <SelectTrigger id="currency">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CURRENCIES.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FieldGroup>
+
+          <FieldGroup label="Unit" htmlFor="default_unit">
+            <Input
+              id="default_unit"
+              name="default_unit"
+              defaultValue={item?.default_unit ?? ""}
+              maxLength={50}
+              placeholder="e.g. hour, page, seat"
+            />
+          </FieldGroup>
+
+          <FieldGroup label="Status" htmlFor="is_active">
+            <Select name="is_active" defaultValue={item && !item.is_active ? "inactive" : "active"}>
+              <SelectTrigger id="is_active">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </FieldGroup>
+        </FormGrid>
+
+        <FieldGroup label="Description" htmlFor="description">
+          <Textarea
+            id="description"
+            name="description"
+            defaultValue={item?.description ?? ""}
+            placeholder="Optional"
+          />
+        </FieldGroup>
+
+        <FormActions>
+          <Button type="submit" loading={isPending}>
+            {isEditing ? "Update Item" : "Create Item"}
+          </Button>
+          <Button type="button" variant="outline" onClick={() => router.back()}>
+            Cancel
+          </Button>
+        </FormActions>
+      </FormSection>
     </form>
   );
 }

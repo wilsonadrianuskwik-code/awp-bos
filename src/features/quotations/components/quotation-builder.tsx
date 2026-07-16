@@ -25,6 +25,7 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { cn } from "@/lib/utils/cn";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
+import { useConfirm } from "@/providers/confirm-provider";
 import { ClientSelector } from "@/features/line-items/components/client-selector";
 import {
   LineItemRow,
@@ -100,6 +101,7 @@ export function QuotationBuilder({
   const router = useRouter();
   const { workspace } = useWorkspace();
   const { toast } = useToast();
+  const confirm = useConfirm();
   const [isPending, startTransition] = useTransition();
 
   const [quotationId, setQuotationId] = useState<string | null>(
@@ -374,8 +376,17 @@ export function QuotationBuilder({
     toast("Catalog item inserted", "success");
   }
 
-  function handleCancel() {
-    if (isDirty && !confirm("You have unsaved changes. Leave anyway?")) return;
+  async function handleCancel() {
+    if (isDirty) {
+      const ok = await confirm({
+        title: "Leave without saving?",
+        description: "You have unsaved changes that will be lost.",
+        confirmLabel: "Leave",
+        cancelLabel: "Stay",
+        destructive: true,
+      });
+      if (!ok) return;
+    }
     router.push(
       quotationId
         ? `/${workspace.slug}/quotations/${quotationId}`

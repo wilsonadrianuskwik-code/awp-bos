@@ -4,8 +4,12 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  FormSection,
+  FormGrid,
+  FieldGroup,
+  FormActions,
+} from "@/components/shared/form";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { createClientAction, updateClient } from "@/features/clients/actions";
@@ -38,9 +42,7 @@ export function ClientForm({ client }: ClientFormProps) {
       }
 
       toast(
-        isEditing
-          ? "Client updated successfully"
-          : "Client created successfully",
+        isEditing ? "Client updated" : "Client created",
         "success"
       );
       router.push(`/${workspace.slug}/clients`);
@@ -49,117 +51,57 @@ export function ClientForm({ client }: ClientFormProps) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Card>
-        <CardHeader>
-          <CardTitle>{isEditing ? "Edit Client" : "New Client"}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name *</Label>
-              <Input
-                id="name"
-                name="name"
-                defaultValue={client?.name ?? ""}
-                required
-                maxLength={255}
-              />
-            </div>
+      <FormSection title={isEditing ? "Edit Client" : "New Client"}>
+        <FormGrid>
+          <FieldGroup label="Name" htmlFor="name" required>
+            <Input id="name" name="name" defaultValue={client?.name ?? ""} required maxLength={255} />
+          </FieldGroup>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                defaultValue={client?.email ?? ""}
-              />
-            </div>
+          <FieldGroup label="Email" htmlFor="email">
+            <Input id="email" name="email" type="email" defaultValue={client?.email ?? ""} />
+          </FieldGroup>
 
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
-              <Input
-                id="phone"
-                name="phone"
-                defaultValue={client?.phone ?? ""}
-                maxLength={50}
-              />
-            </div>
+          <FieldGroup label="Phone" htmlFor="phone">
+            <Input id="phone" name="phone" defaultValue={client?.phone ?? ""} maxLength={50} />
+          </FieldGroup>
 
-            <div className="space-y-2">
-              <Label htmlFor="company">Company</Label>
-              <Input
-                id="company"
-                name="company"
-                defaultValue={client?.company ?? ""}
-                maxLength={255}
-              />
-            </div>
+          <FieldGroup label="Company" htmlFor="company">
+            <Input id="company" name="company" defaultValue={client?.company ?? ""} maxLength={255} />
+          </FieldGroup>
 
-            <div className="space-y-2">
-              <Label htmlFor="website">Website</Label>
-              <Input
-                id="website"
-                name="website"
-                type="url"
-                defaultValue={client?.website ?? ""}
-                placeholder="https://"
-              />
-            </div>
+          <FieldGroup label="Website" htmlFor="website">
+            <Input id="website" name="website" type="url" defaultValue={client?.website ?? ""} placeholder="https://" />
+          </FieldGroup>
 
-            <div className="space-y-2">
-              <Label htmlFor="billing_email">Billing Email</Label>
-              <Input
-                id="billing_email"
-                name="billing_email"
-                type="email"
-                defaultValue={client?.billing_email ?? ""}
-              />
-            </div>
+          <FieldGroup label="Billing Email" htmlFor="billing_email">
+            <Input id="billing_email" name="billing_email" type="email" defaultValue={client?.billing_email ?? ""} />
+          </FieldGroup>
 
-            <div className="space-y-2">
-              <Label htmlFor="tax_id">Tax ID</Label>
-              <Input
-                id="tax_id"
-                name="tax_id"
-                defaultValue={client?.tax_id ?? ""}
-                maxLength={50}
-              />
-            </div>
+          <FieldGroup label="Tax ID" htmlFor="tax_id">
+            <Input id="tax_id" name="tax_id" defaultValue={client?.tax_id ?? ""} maxLength={50} />
+          </FieldGroup>
 
-            <div className="space-y-2">
-              <Label htmlFor="payment_terms">Payment Terms (days)</Label>
-              <Input
-                id="payment_terms"
-                name="payment_terms"
-                type="number"
-                min={0}
-                max={365}
-                defaultValue={client?.payment_terms ?? 30}
-              />
-            </div>
-          </div>
+          <FieldGroup label="Payment Terms (days)" htmlFor="payment_terms">
+            <Input
+              id="payment_terms"
+              name="payment_terms"
+              type="number"
+              min={0}
+              max={365}
+              defaultValue={client?.payment_terms ?? 30}
+            />
+          </FieldGroup>
+        </FormGrid>
 
-          <div className="flex gap-3">
-            <Button type="submit" disabled={isPending}>
-              {isPending
-                ? isEditing
-                  ? "Updating..."
-                  : "Creating..."
-                : isEditing
-                  ? "Update Client"
-                  : "Create Client"}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.back()}
-            >
-              Cancel
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        <FormActions>
+          <Button type="submit" loading={isPending}>
+            {isEditing ? "Update Client" : "Create Client"}
+          </Button>
+          <Button type="button" variant="outline" onClick={() => router.back()}>
+            Cancel
+          </Button>
+        </FormActions>
+      </FormSection>
     </form>
   );
 }

@@ -83,6 +83,46 @@ Font: Geist Sans (already wired via `--font-geist-sans`).
   add new statuses there, never as one-off colors.
 - **EmptyState** — soft icon container + one-line explanation + the
   creating action. Empty states onboard, they don't apologize.
+- **ListEmpty** — the lighter "no results match your filters" state for
+  list views (distinct from EmptyState's onboarding role).
+- **SearchInput** — the leading-glyph search field; every list uses it so
+  search looks and sits identically.
+- **Pagination** — shared list pagination footer (renders only when there's
+  more than one page; tabular-nums summary).
+- **DetailHeader** — THE entity detail-page header: back control, 20px
+  title, inline badge slot (status/version/type), subtitle line, and a
+  right-aligned action cluster that wraps below on mobile. Every detail
+  page (Lead/Client/Catalog/Quotation/Invoice/Fulfillment) uses it.
+- **DetailItem / FieldList** — the read-only key/value pattern on detail
+  pages. `FieldList` is the responsive `<dl>` grid; `DetailItem` is one
+  label/value pair with an em-dash fallback for empty values.
+
+## Forms
+
+Every create/edit form composes the shared form system
+(`src/components/shared/form.tsx`) so field spacing, grid behavior,
+required markers, and the action row are identical across modules:
+
+- **FormSection** — a titled Card grouping related fields (`space-y-6`
+  content).
+- **FormGrid** — responsive field layout: two columns from `sm` up, one on
+  mobile.
+- **FieldGroup** — a label + control pair (`space-y-1.5`), optional
+  required asterisk and hint line.
+- **FormActions** — the trailing action row, separated from fields by a
+  hairline; primary action first (left).
+- Submit buttons use the Button `loading` prop (leading spinner + disabled)
+  rather than ad-hoc "Saving…" label swaps.
+
+## Confirmation
+
+Destructive actions never use the native `confirm()`. `useConfirm()`
+(`src/providers/confirm-provider.tsx`) returns a promise-based dialog —
+`if (!(await confirm({ title, description, confirmLabel, destructive }))) return;`
+— rendering the product's own Dialog (safe Cancel focused by default,
+destructive confirm). One shared instance, mounted in the dashboard
+layout, so every confirmation looks and behaves the same. (The builders'
+`beforeunload` tab-close guard necessarily stays native.)
 
 ## App shell
 
