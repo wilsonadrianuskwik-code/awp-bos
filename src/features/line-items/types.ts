@@ -33,7 +33,8 @@ export type ClientSummary = {
   company: string | null;
   email: string | null;
   payment_terms?: number;
-  preferred_currency?: string;
+  // NULL/absent = use the workspace's default currency.
+  preferred_currency?: string | null;
   // Added for the Document Design System's render adapters (Phase 13) —
   // the company_info/client_info blocks need phone/address/tax_id, which
   // the query embed didn't previously select.

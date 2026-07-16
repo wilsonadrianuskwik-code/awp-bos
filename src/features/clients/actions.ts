@@ -20,6 +20,12 @@ export async function createClientAction(
       throw new Error(parsed.error.issues[0].message);
     }
 
+    if (parsed.data.currency_mode === "custom" && !parsed.data.preferred_currency) {
+      throw new Error("Select a preferred currency");
+    }
+    const preferredCurrency =
+      parsed.data.currency_mode === "custom" ? parsed.data.preferred_currency : null;
+
     const supabase = await createClient();
     const { data: client, error } = await supabase
       .from("clients")
@@ -33,6 +39,7 @@ export async function createClientAction(
         billing_email: parsed.data.billing_email || null,
         tax_id: parsed.data.tax_id || null,
         payment_terms: parsed.data.payment_terms ?? 30,
+        preferred_currency: preferredCurrency,
         created_by: ctx.userId,
       })
       .select("id")
@@ -86,12 +93,26 @@ export async function updateClient(
 
     if (!existing) throw new Error("Client not found");
 
+    if (parsed.data.currency_mode === "custom" && !parsed.data.preferred_currency) {
+      throw new Error("Select a preferred currency");
+    }
+
+    // currency_mode is a form-only concept (not a clients column) — resolve
+    // it together with preferred_currency into that one column's final
+    // value before the generic diff loop below.
+    const { currency_mode, ...rest } = parsed.data;
+    const formValues: Record<string, unknown> = { ...rest };
+    if (currency_mode !== undefined) {
+      formValues.preferred_currency =
+        currency_mode === "custom" ? parsed.data.preferred_currency : null;
+    }
+
     const updates: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
     };
     const changes: Record<string, { old: unknown; new: unknown }> = {};
 
-    for (const [key, value] of Object.entries(parsed.data)) {
+    for (const [key, value] of Object.entries(formValues)) {
       const newVal = value === "" ? null : value;
       if (existing[key as keyof typeof existing] !== newVal) {
         updates[key] = newVal;

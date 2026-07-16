@@ -17,7 +17,9 @@ export type Client = {
   billing_email: string | null;
   tax_id: string | null;
   payment_terms: number;
-  preferred_currency: string;
+  // NULL = use the workspace's default currency; a 3-letter code = an
+  // explicit per-client override. See migration 00037.
+  preferred_currency: string | null;
   tags: string[];
   custom_fields: Record<string, unknown>;
   source_lead_id: string | null;

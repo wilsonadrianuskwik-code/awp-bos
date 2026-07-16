@@ -113,7 +113,7 @@ export function InvoiceBuilder({
   const [currency, setCurrency] = useState(
     invoice?.currency ??
       clients.find((c) => c.id === initialClientId)?.preferred_currency ??
-      "IDR"
+      workspace.default_currency
   );
   const [issueDate, setIssueDate] = useState(invoice?.issue_date ?? todayISO());
   const [dueDate, setDueDate] = useState(invoice?.due_date ?? "");
@@ -417,7 +417,7 @@ export function InvoiceBuilder({
                 value={clientId}
                 onChange={(id, client) => {
                   setClientId(id);
-                  if (client.preferred_currency) setCurrency(client.preferred_currency);
+                  setCurrency(client.preferred_currency ?? workspace.default_currency);
                 }}
               />
             </div>

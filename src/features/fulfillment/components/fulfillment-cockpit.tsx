@@ -48,7 +48,10 @@ type ClientStats = {
 
 type EnrichedClient = ClientGroup & { stats: ClientStats };
 
-const VIEWS: View[] = ["attention", "active", "completed", "all"];
+// Order matches the KPI tile row below (also what the 1–4 keyboard
+// shortcuts map to) — "what should I work on now" first, "what needs
+// triage" last, so opening the cockpit doesn't lead with problems.
+const VIEWS: View[] = ["active", "completed", "all", "attention"];
 
 function groupByClient(items: FulfillmentItemWithProgress[]): ClientGroup[] {
   const map = new Map<string, ClientGroup>();
@@ -161,13 +164,14 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
     [enriched]
   );
 
-  // Default to the view that has work in it, so opening the page always
-  // lands on something actionable: attention first, then active, then all.
+  // Default to the view that answers "what should I work on now": active
+  // work first (the primary operational queue), then attention items if
+  // there's no active work to show, then all clients as the final fallback.
   const initialView: View =
     (VIEWS.includes(searchParams.get("view") as View)
       ? (searchParams.get("view") as View)
       : null) ??
-    (counts.attention > 0 ? "attention" : counts.active > 0 ? "active" : "all");
+    (counts.active > 0 ? "active" : counts.attention > 0 ? "attention" : "all");
 
   const [view, setView] = useState<View>(initialView);
   const [reason, setReason] = useState<AttentionReason | "all">("all");
@@ -258,19 +262,11 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
 
   return (
     <div className="space-y-4">
-      {/* Operational summary — each tile is the primary filter */}
+      {/* Operational summary — each tile is the primary filter. Ordered to
+          answer "what should I work on now" before "what's wrong": active
+          work leads, Needs Attention trails (still fully visible, still
+          styled as a warning — just not the first thing you see). */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <KpiTile
-          label="Needs attention"
-          value={counts.attention}
-          hint="stalled, over-delivered or in progress"
-          tone="crit"
-          active={view === "attention"}
-          onClick={() => {
-            setView("attention");
-            setReason("all");
-          }}
-        />
         <KpiTile
           label="Active work"
           value={counts.active}
@@ -294,6 +290,17 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
           tone="muted"
           active={view === "all"}
           onClick={() => setView("all")}
+        />
+        <KpiTile
+          label="Needs attention"
+          value={counts.attention}
+          hint="stalled, over-delivered or in progress"
+          tone="crit"
+          active={view === "attention"}
+          onClick={() => {
+            setView("attention");
+            setReason("all");
+          }}
         />
       </div>
 

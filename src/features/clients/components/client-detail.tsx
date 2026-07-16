@@ -185,7 +185,11 @@ export function ClientDetail({
                 />
                 <DetailItem
                   label="Preferred Currency"
-                  value={client.preferred_currency}
+                  value={
+                    client.preferred_currency
+                      ? `${client.preferred_currency} (custom)`
+                      : `${workspace.default_currency} (workspace default)`
+                  }
                 />
               </FieldList>
             </CardContent>

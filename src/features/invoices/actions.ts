@@ -113,6 +113,22 @@ export async function updateInvoiceStatus(
   });
 }
 
+export async function duplicateInvoice(workspaceId: string, invoiceId: string) {
+  return withWorkspace(workspaceId, "staff", async (ctx) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("duplicate_invoice", {
+      p_invoice_id: invoiceId,
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+    });
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath(`/${ctx.workspaceId}`);
+    return data as unknown as Invoice;
+  });
+}
+
 export async function regenerateInvoiceShareToken(
   workspaceId: string,
   invoiceId: string

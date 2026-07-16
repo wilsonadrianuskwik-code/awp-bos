@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Copy, GitCompare, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,6 +48,9 @@ export function QuotationDetail({
 }: QuotationDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [generateInvoiceOpen, setGenerateInvoiceOpen] = useState(false);
   const [diffOpen, setDiffOpen] = useState(false);
 
@@ -59,6 +63,19 @@ export function QuotationDetail({
     window.print();
     document.title = prevTitle;
   }
+
+  // Lets the quotation card's "Download PDF"/"Print" quick actions trigger
+  // the browser print dialog right after navigating here, instead of
+  // requiring the user to land on the page and click Print themselves.
+  useEffect(() => {
+    if (searchParams.get("autoprint") !== "1") return;
+    handlePrint();
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("autoprint");
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleCopyNumber() {
     navigator.clipboard.writeText(quotation.quotation_number);

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Copy, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,6 +44,9 @@ export function InvoiceDetail({
 }: InvoiceDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [recordPaymentOpen, setRecordPaymentOpen] = useState(false);
 
   function handlePrint() {
@@ -54,6 +58,19 @@ export function InvoiceDetail({
     window.print();
     document.title = prevTitle;
   }
+
+  // Lets the invoice card's "Download PDF"/"Print" quick actions trigger
+  // the browser print dialog right after navigating here, instead of
+  // requiring the user to land on the page and click Print themselves.
+  useEffect(() => {
+    if (searchParams.get("autoprint") !== "1") return;
+    handlePrint();
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("autoprint");
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleCopyNumber() {
     navigator.clipboard.writeText(invoice.invoice_number);
@@ -143,7 +160,10 @@ export function InvoiceDetail({
               </Card>
             )}
 
-            <Card>
+            {/* scroll-mt gives the anchor breathing room above the fold when
+                the invoice card's "View Payment History" quick action links
+                here as #payments. */}
+            <Card id="payments" className="scroll-mt-6">
               <CardHeader>
                 <CardTitle className="text-base">Payments</CardTitle>
               </CardHeader>
@@ -152,7 +172,7 @@ export function InvoiceDetail({
               </CardContent>
             </Card>
 
-            <Card>
+            <Card id="fulfillment" className="scroll-mt-6">
               <CardHeader>
                 <CardTitle className="text-base">Fulfillment</CardTitle>
               </CardHeader>

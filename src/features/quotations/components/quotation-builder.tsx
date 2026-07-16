@@ -115,7 +115,7 @@ export function QuotationBuilder({
   const [currency, setCurrency] = useState(
     quotation?.currency ??
       clients.find((c) => c.id === initialClientId)?.preferred_currency ??
-      "IDR"
+      workspace.default_currency
   );
   const [issueDate, setIssueDate] = useState(quotation?.issue_date ?? todayISO());
   const [expiryDate, setExpiryDate] = useState(quotation?.expiry_date ?? "");
@@ -427,7 +427,7 @@ export function QuotationBuilder({
                 value={clientId}
                 onChange={(id, client) => {
                   setClientId(id);
-                  if (client.preferred_currency) setCurrency(client.preferred_currency);
+                  setCurrency(client.preferred_currency ?? workspace.default_currency);
                 }}
               />
             </div>
