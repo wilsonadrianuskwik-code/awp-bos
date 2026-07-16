@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
+import { useConfirm } from "@/providers/confirm-provider";
 import { deleteInvoice, updateInvoiceStatus } from "@/features/invoices/actions";
 import type { Invoice, InvoiceStatus } from "@/features/invoices/types";
 
@@ -44,6 +45,7 @@ export function InvoiceStatusActions({
   const router = useRouter();
   const { workspace } = useWorkspace();
   const { toast } = useToast();
+  const confirm = useConfirm();
   const [isPending, startTransition] = useTransition();
   const [confirmTarget, setConfirmTarget] = useState<InvoiceStatus | null>(null);
 
@@ -60,8 +62,14 @@ export function InvoiceStatusActions({
     });
   }
 
-  function handleDelete() {
-    if (!confirm(`Delete ${invoice.invoice_number}?`)) return;
+  async function handleDelete() {
+    const ok = await confirm({
+      title: `Delete ${invoice.invoice_number}?`,
+      description: "It will move to trash.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     startTransition(async () => {
       const result = await deleteInvoice(workspace.id, invoice.id);
       if (result.error) {

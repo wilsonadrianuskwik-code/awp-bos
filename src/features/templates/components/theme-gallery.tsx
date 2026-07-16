@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/providers/toast-provider";
+import { useConfirm } from "@/providers/confirm-provider";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { ThemeEditorDialog } from "@/features/templates/components/theme-editor-dialog";
 import { deleteTheme } from "@/features/templates/actions";
@@ -26,6 +27,7 @@ export function ThemeGallery({ workspaceId, themes }: ThemeGalleryProps) {
   const router = useRouter();
   const { toast } = useToast();
   const { can } = useWorkspace();
+  const confirm = useConfirm();
   const canEdit = can("staff");
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingTheme, setEditingTheme] = useState<TemplateTheme | null>(null);
@@ -41,8 +43,14 @@ export function ThemeGallery({ workspaceId, themes }: ThemeGalleryProps) {
     setEditorOpen(true);
   }
 
-  function handleDelete(themeId: string) {
-    if (!window.confirm("Delete this theme? This can't be undone.")) return;
+  async function handleDelete(themeId: string) {
+    const ok = await confirm({
+      title: "Delete this theme?",
+      description: "This can't be undone.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     startTransition(async () => {
       const result = await deleteTheme(workspaceId, themeId);
       if (result.error) {

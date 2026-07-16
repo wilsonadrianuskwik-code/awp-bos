@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
+import { useConfirm } from "@/providers/confirm-provider";
 import { deletePayment } from "@/features/invoices/actions";
 import { PAYMENT_METHOD_LABEL } from "@/features/invoices/helpers";
 import { formatCurrency } from "@/lib/utils/format-currency";
@@ -28,11 +29,17 @@ export function PaymentHistory({ payments }: PaymentHistoryProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
   const { toast } = useToast();
+  const confirm = useConfirm();
   const [isPending, startTransition] = useTransition();
 
-  function handleDelete(payment: PaymentWithRecorder) {
-    if (!confirm(`Delete payment ${payment.payment_number}? This cannot be undone.`))
-      return;
+  async function handleDelete(payment: PaymentWithRecorder) {
+    const ok = await confirm({
+      title: `Delete payment ${payment.payment_number}?`,
+      description: "This cannot be undone.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     startTransition(async () => {
       const result = await deletePayment(workspace.id, payment.id);
       if (result.error) {

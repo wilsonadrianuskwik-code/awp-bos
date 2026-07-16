@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
+import { useConfirm } from "@/providers/confirm-provider";
 import { updateMemberRole, removeMember } from "@/features/workspace/actions";
 import { ROLES, type Role } from "@/lib/constants/roles";
 import type { WorkspaceMember } from "@/features/workspace/types";
@@ -47,6 +48,7 @@ export function MemberList({ workspaceId, members }: MemberListProps) {
   const router = useRouter();
   const { can } = useWorkspace();
   const { toast } = useToast();
+  const confirm = useConfirm();
   const [isPending, startTransition] = useTransition();
 
   const ownerCount = members.filter((m) => m.role === "owner").length;
@@ -63,9 +65,15 @@ export function MemberList({ workspaceId, members }: MemberListProps) {
     });
   }
 
-  function handleRemove(member: WorkspaceMember) {
+  async function handleRemove(member: WorkspaceMember) {
     const name = member.profile?.full_name || member.email || "this member";
-    if (!confirm(`Remove ${name} from the workspace?`)) return;
+    const ok = await confirm({
+      title: `Remove ${name}?`,
+      description: "They'll lose access to this workspace.",
+      confirmLabel: "Remove",
+      destructive: true,
+    });
+    if (!ok) return;
 
     startTransition(async () => {
       const result = await removeMember(workspaceId, member.user_id);

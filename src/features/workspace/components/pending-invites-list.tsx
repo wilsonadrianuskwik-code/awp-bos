@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/providers/toast-provider";
+import { useConfirm } from "@/providers/confirm-provider";
 import { revokeInvite } from "@/features/workspace/actions";
 import type { WorkspaceInvite } from "@/features/workspace/types";
 
@@ -19,10 +20,17 @@ export function PendingInvitesList({
 }: PendingInvitesListProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const confirm = useConfirm();
   const [isPending, startTransition] = useTransition();
 
-  function handleRevoke(invite: WorkspaceInvite) {
-    if (!confirm(`Revoke the invite for ${invite.email}?`)) return;
+  async function handleRevoke(invite: WorkspaceInvite) {
+    const ok = await confirm({
+      title: "Revoke invite?",
+      description: `The invitation for ${invite.email} will no longer work.`,
+      confirmLabel: "Revoke",
+      destructive: true,
+    });
+    if (!ok) return;
 
     startTransition(async () => {
       const result = await revokeInvite(workspaceId, invite.id);

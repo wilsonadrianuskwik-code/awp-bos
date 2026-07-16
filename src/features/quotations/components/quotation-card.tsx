@@ -22,6 +22,7 @@ import {
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
+import { useConfirm } from "@/providers/confirm-provider";
 import {
   deleteQuotation,
   duplicateQuotation,
@@ -49,6 +50,7 @@ export function QuotationCard({ quotation }: QuotationCardProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
   const { toast } = useToast();
+  const confirm = useConfirm();
 
   const href = `/${workspace.slug}/quotations/${quotation.id}`;
   const editable = isEditableStatus(quotation.status);
@@ -71,9 +73,14 @@ export function QuotationCard({ quotation }: QuotationCardProps) {
     });
   }
 
-  function handleDelete() {
-    if (!confirm(`Delete ${quotation.quotation_number}? It will move to trash.`))
-      return;
+  async function handleDelete() {
+    const ok = await confirm({
+      title: `Delete ${quotation.quotation_number}?`,
+      description: "It will move to trash.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     startTransition(async () => {
       const result = await deleteQuotation(workspace.id, quotation.id);
       if (result.error) return toast(result.error, "error");

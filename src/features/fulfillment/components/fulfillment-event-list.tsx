@@ -6,6 +6,7 @@ import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
+import { useConfirm } from "@/providers/confirm-provider";
 import { deleteFulfillmentEventAction } from "@/features/fulfillment/actions";
 import type { FulfillmentEventWithRecorder } from "@/features/fulfillment/types";
 
@@ -29,10 +30,17 @@ export function FulfillmentEventList({ events, unitLabel }: FulfillmentEventList
   const router = useRouter();
   const { workspace } = useWorkspace();
   const { toast } = useToast();
+  const confirm = useConfirm();
   const [isPending, startTransition] = useTransition();
 
-  function handleDelete(event: FulfillmentEventWithRecorder) {
-    if (!confirm("Delete this delivery entry? This cannot be undone.")) return;
+  async function handleDelete(event: FulfillmentEventWithRecorder) {
+    const ok = await confirm({
+      title: "Delete this delivery entry?",
+      description: "This cannot be undone.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     startTransition(async () => {
       const result = await deleteFulfillmentEventAction(workspace.id, event.id);
       if (result.error) {

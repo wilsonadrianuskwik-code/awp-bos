@@ -10,6 +10,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
+import { useConfirm } from "@/providers/confirm-provider";
 import { deleteLead } from "@/features/leads/actions";
 import { DetailHeader } from "@/components/shared/detail-header";
 import type { Lead } from "@/features/leads/types";
@@ -26,9 +27,16 @@ export function LeadDetail({ lead, activities, onConvert }: LeadDetailProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
   const { toast } = useToast();
+  const confirm = useConfirm();
 
-  function handleDelete() {
-    if (!confirm("Are you sure you want to delete this lead?")) return;
+  async function handleDelete() {
+    const ok = await confirm({
+      title: "Delete this lead?",
+      description: "This can't be undone.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
 
     startTransition(async () => {
       const result = await deleteLead(workspace.id, lead.id);

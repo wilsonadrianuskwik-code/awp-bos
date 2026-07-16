@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
+import { useConfirm } from "@/providers/confirm-provider";
 import { deleteCatalogItem } from "@/features/catalog/actions";
 import { DetailHeader } from "@/components/shared/detail-header";
 import { formatCurrency } from "@/lib/utils/format-currency";
@@ -38,9 +39,16 @@ export function CatalogDetail({ item, activities }: CatalogDetailProps) {
   const router = useRouter();
   const { workspace, can } = useWorkspace();
   const { toast } = useToast();
+  const confirm = useConfirm();
 
-  function handleDelete() {
-    if (!confirm("Are you sure you want to delete this catalog item?")) return;
+  async function handleDelete() {
+    const ok = await confirm({
+      title: "Delete this catalog item?",
+      description: "This can't be undone.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
 
     startTransition(async () => {
       const result = await deleteCatalogItem(workspace.id, item.id);

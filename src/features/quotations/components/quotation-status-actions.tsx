@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
+import { useConfirm } from "@/providers/confirm-provider";
 import {
   duplicateQuotation,
   createQuotationVersion,
@@ -62,6 +63,7 @@ export function QuotationStatusActions({
   const router = useRouter();
   const { workspace } = useWorkspace();
   const { toast } = useToast();
+  const confirm = useConfirm();
   const [isPending, startTransition] = useTransition();
   const [confirmTarget, setConfirmTarget] = useState<QuotationStatus | null>(
     null
@@ -108,8 +110,14 @@ export function QuotationStatusActions({
     });
   }
 
-  function handleDelete() {
-    if (!confirm(`Delete ${quotation.quotation_number}?`)) return;
+  async function handleDelete() {
+    const ok = await confirm({
+      title: `Delete ${quotation.quotation_number}?`,
+      description: "It will move to trash.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     startTransition(async () => {
       const result = await deleteQuotation(workspace.id, quotation.id);
       if (result.error) {

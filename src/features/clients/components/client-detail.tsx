@@ -19,6 +19,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
+import { useConfirm } from "@/providers/confirm-provider";
 import { deleteClient } from "@/features/clients/actions";
 import { getOverdueDays } from "@/lib/utils/date";
 import { PAYMENT_METHOD_LABEL } from "@/features/invoices/helpers";
@@ -101,9 +102,16 @@ export function ClientDetail({
   const router = useRouter();
   const { workspace } = useWorkspace();
   const { toast } = useToast();
+  const confirm = useConfirm();
 
-  function handleDelete() {
-    if (!confirm("Are you sure you want to delete this client?")) return;
+  async function handleDelete() {
+    const ok = await confirm({
+      title: "Delete this client?",
+      description: "This can't be undone.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
 
     startTransition(async () => {
       const result = await deleteClient(workspace.id, client.id);

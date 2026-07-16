@@ -14,6 +14,7 @@ import {
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
+import { useConfirm } from "@/providers/confirm-provider";
 import { deleteInvoice } from "@/features/invoices/actions";
 import { getPaymentProgress } from "@/features/invoices/helpers";
 import { formatCurrency } from "@/lib/utils/format-currency";
@@ -38,14 +39,20 @@ export function InvoiceCard({ invoice }: InvoiceCardProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
   const { toast } = useToast();
+  const confirm = useConfirm();
 
   const href = `/${workspace.slug}/invoices/${invoice.id}`;
   const editable = invoice.status === "draft";
   const progress = getPaymentProgress(invoice.amount_paid, invoice.total);
 
-  function handleDelete() {
-    if (!confirm(`Delete ${invoice.invoice_number}? It will move to trash.`))
-      return;
+  async function handleDelete() {
+    const ok = await confirm({
+      title: `Delete ${invoice.invoice_number}?`,
+      description: "It will move to trash.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     startTransition(async () => {
       const result = await deleteInvoice(workspace.id, invoice.id);
       if (result.error) return toast(result.error, "error");

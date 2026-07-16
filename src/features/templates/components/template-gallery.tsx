@@ -28,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/providers/toast-provider";
+import { useConfirm } from "@/providers/confirm-provider";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { TemplateThumbnail } from "@/features/templates/components/template-thumbnail";
 import { createTemplate, duplicateTemplate, deleteTemplate, setDefaultTemplate } from "@/features/templates/actions";
@@ -49,6 +50,7 @@ export function TemplateGallery({ workspaceId, templates, themes }: TemplateGall
   const router = useRouter();
   const { toast } = useToast();
   const { can } = useWorkspace();
+  const confirm = useConfirm();
   const canEdit = can("staff");
   const [activeType, setActiveType] = useState<TemplateDocumentType>("invoice");
   const [newDesignOpen, setNewDesignOpen] = useState(false);
@@ -83,8 +85,14 @@ export function TemplateGallery({ workspaceId, templates, themes }: TemplateGall
     });
   }
 
-  function handleDelete(templateId: string) {
-    if (!window.confirm("Delete this design? This can't be undone.")) return;
+  async function handleDelete(templateId: string) {
+    const ok = await confirm({
+      title: "Delete this design?",
+      description: "This can't be undone.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     startTransition(async () => {
       const result = await deleteTemplate(workspaceId, templateId);
       if (result.error) {
