@@ -93,7 +93,15 @@ export function ThemeGallery({ workspaceId, themes }: ThemeGalleryProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => openEdit(theme)}>Edit</DropdownMenuItem>
-                    {!theme.is_preset && (
+                    {theme.is_preset ? (
+                      <DropdownMenuItem
+                        disabled
+                        className="flex-col items-start gap-0.5 text-muted-foreground"
+                      >
+                        <span>Delete</span>
+                        <span className="text-xs">Built-in themes can&apos;t be deleted</span>
+                      </DropdownMenuItem>
+                    ) : (
                       <DropdownMenuItem
                         onClick={() => handleDelete(theme.id)}
                         className="text-destructive focus:text-destructive"

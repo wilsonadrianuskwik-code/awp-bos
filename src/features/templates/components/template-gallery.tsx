@@ -161,13 +161,24 @@ export function TemplateGallery({ workspaceId, templates, themes }: TemplateGall
                     <DropdownMenuItem onClick={() => handleDuplicate(template.id)}>
                       Duplicate
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleDelete(template.id)}
-                      disabled={template.is_default}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      Delete
-                    </DropdownMenuItem>
+                    {template.is_default ? (
+                      <DropdownMenuItem
+                        disabled
+                        className="flex-col items-start gap-0.5 text-muted-foreground"
+                      >
+                        <span>Delete</span>
+                        <span className="text-xs">
+                          Set another design as default first
+                        </span>
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem
+                        onClick={() => handleDelete(template.id)}
+                        className="text-destructive focus:text-destructive"
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}

@@ -147,13 +147,21 @@ function renderClientInfo(block: TemplateBlock, data: DocumentRenderData): strin
     }
     if (!value) continue;
     const text = showLabels && label ? `${label}: ${escapeHtml(value)}` : escapeHtml(value);
-    lines.push(`<div>${text}</div>`);
+    const lineStyle =
+      field === "name"
+        ? "font-weight:600; color:var(--t-text); margin-bottom:1px;"
+        : "color:var(--t-text); font-size:9pt; line-height:1.5;";
+    lines.push(`<div style="${lineStyle}">${text}</div>`);
   }
+
+  const headingHtml = heading
+    ? `<div style="font-size:8pt; text-transform:uppercase; letter-spacing:.5px; color:var(--t-muted); margin-bottom:4px;">${escapeHtml(heading)}</div>`
+    : "";
 
   return `
     <div>
-      <div style="font-size:8pt; text-transform:uppercase; letter-spacing:.5px; color:var(--t-muted); margin-bottom:3px;">${escapeHtml(heading)}</div>
-      <div style="color:var(--t-text);">${lines.join("")}</div>
+      ${headingHtml}
+      <div>${lines.join("")}</div>
     </div>`;
 }
 
@@ -168,25 +176,42 @@ function formatDocDate(value: string | undefined, format: string): string {
   return format.replace(/DD/g, dd).replace(/MMM/g, months[date.getMonth()]).replace(/MM/g, mm).replace(/YYYY/g, yyyy);
 }
 
+// Full document-type word used for verbose metadata labels
+// ("Invoice Number" / "Quotation Date"), matching how Xero/Zoho label
+// their header metadata — distinct from the short DOCUMENT_TYPE_LABEL
+// used for the big all-caps title.
+const DOC_WORD: Record<string, string> = {
+  invoice: "Invoice",
+  quotation: "Quotation",
+  receipt: "Receipt",
+  purchase_order: "Purchase Order",
+  delivery_order: "Delivery Order",
+};
+
 function renderDocumentMeta(block: TemplateBlock, data: DocumentRenderData): string {
   const showLabel = cfg(block.config, "show_document_type_label", true);
   const customLabel = cfg<string | undefined>(block.config, "document_type_label", undefined);
   const showStatus = cfg(block.config, "show_status_badge", true);
   const fields = cfg<string[]>(block.config, "fields", ["number", "date", "due_date"]);
   const layout = cfg<string>(block.config, "layout", "stacked");
+  const align = cfg<string>(block.config, "align", "right");
+  const titleSize = cfg(block.config, "title_size_pt", 20);
   const dateFormat = cfg(block.config, "date_format", "DD MMM YYYY");
 
+  const docWord = DOC_WORD[data.document_type] ?? "Document";
+  // Verbose labels for the "labeled" layout, terse ones otherwise.
+  const labeled = layout === "labeled";
   const rows: { label: string; value: string }[] = [];
   for (const field of fields) {
     let label = "";
     let value = "";
     switch (field) {
       case "number":
-        label = "No.";
+        label = labeled ? `${docWord} Number` : "No.";
         value = data.document.number;
         break;
       case "date":
-        label = "Date";
+        label = labeled ? `${docWord} Date` : "Date";
         value = formatDocDate(data.document.date, dateFormat);
         break;
       case "due_date":
@@ -194,7 +219,7 @@ function renderDocumentMeta(block: TemplateBlock, data: DocumentRenderData): str
         value = formatDocDate(data.document.due_date, dateFormat);
         break;
       case "expiry_date":
-        label = "Valid Until";
+        label = labeled ? "Valid Until" : "Valid Until";
         value = formatDocDate(data.document.expiry_date, dateFormat);
         break;
       case "version":
@@ -214,23 +239,45 @@ function renderDocumentMeta(block: TemplateBlock, data: DocumentRenderData): str
     rows.push({ label, value });
   }
 
-  const title = customLabel || DOCUMENT_TYPE_LABEL[data.document_type] || data.document_type.toUpperCase();
-  const badge = STATUS_BADGE[data.document.status] ?? STATUS_BADGE.draft;
-  const statusHtml = showStatus
-    ? `<span class="tpl-badge" style="background:${badge.bg}; color:${badge.text};">${escapeHtml(data.document.status.replace(/_/g, " "))}</span>`
-    : "";
+  // Title mirrors Xero: draft documents read "DRAFT INVOICE"; issued
+  // ones just "INVOICE". The status pill is only shown for issued docs
+  // (a draft badge would be redundant with the title word).
+  const baseTitle = customLabel || DOCUMENT_TYPE_LABEL[data.document_type] || data.document_type.toUpperCase();
+  const isDraft = data.document.status === "draft";
+  const titleText = isDraft ? `DRAFT ${baseTitle}` : baseTitle;
+  const badge = STATUS_BADGE[data.document.status];
+  const statusHtml =
+    showStatus && !isDraft && badge
+      ? `<span class="tpl-badge" style="background:${badge.bg}; color:${badge.text};">${escapeHtml(data.document.status.replace(/_/g, " "))}</span>`
+      : "";
+
+  const justify = align === "right" ? "flex-end" : "flex-start";
   const heading = showLabel
-    ? `<div style="display:flex; align-items:center; justify-content:flex-end; gap:10px;"><span style="font-family:var(--t-heading-font); font-size:20pt; font-weight:var(--t-heading-weight); color:var(--t-primary); letter-spacing:1px;">${escapeHtml(title)}</span>${statusHtml}</div>`
+    ? `<div style="display:flex; align-items:center; gap:10px; justify-content:${justify}; flex-wrap:wrap;"><span style="font-family:var(--t-heading-font); font-size:${titleSize}pt; font-weight:var(--t-heading-weight); color:var(--t-primary); letter-spacing:.5px; line-height:1.1;">${escapeHtml(titleText)}</span>${statusHtml}</div>`
     : "";
 
-  const rowsHtml =
-    layout === "table"
-      ? `<table class="tpl-num" style="margin-left:auto; font-size:9pt;">${rows
-          .map((r) => `<tr><td style="color:var(--t-muted); padding-right:8px; padding-top:2px; text-align:right;">${escapeHtml(r.label)}</td><td style="text-align:right; padding-top:2px; color:var(--t-text);">${escapeHtml(r.value)}</td></tr>`)
-          .join("")}</table>`
-      : rows.map((r) => `<div style="font-size:9pt; color:var(--t-muted);">${escapeHtml(r.value)}</div>`).join("");
+  let rowsHtml = "";
+  if (labeled) {
+    rowsHtml = rows
+      .map(
+        (r) =>
+          `<div style="margin-bottom:9px;"><div style="font-size:8.5pt; font-weight:600; color:var(--t-text);">${escapeHtml(r.label)}</div><div class="tpl-num" style="font-size:9.5pt; color:var(--t-muted);">${escapeHtml(r.value)}</div></div>`
+      )
+      .join("");
+  } else if (layout === "table") {
+    const mlAuto = align === "right" ? "margin-left:auto;" : "";
+    rowsHtml = `<table class="tpl-num" style="${mlAuto} font-size:9pt;">${rows
+      .map(
+        (r) =>
+          `<tr><td style="color:var(--t-muted); padding-right:8px; padding-top:2px; text-align:${align};">${escapeHtml(r.label)}</td><td style="text-align:${align}; padding-top:2px; color:var(--t-text);">${escapeHtml(r.value)}</td></tr>`
+      )
+      .join("")}</table>`;
+  } else {
+    rowsHtml = rows.map((r) => `<div style="font-size:9pt; color:var(--t-muted);">${escapeHtml(r.value)}</div>`).join("");
+  }
 
-  return `<div style="text-align:right;">${heading}<div style="margin-top:8px;">${rowsHtml}</div></div>`;
+  const spacer = heading && rowsHtml ? `<div style="margin-top:${labeled ? 14 : 8}px;">${rowsHtml}</div>` : rowsHtml;
+  return `<div style="text-align:${align};">${heading}${spacer}</div>`;
 }
 
 const COLUMN_LABEL_DEFAULTS: Record<string, string> = {
@@ -253,10 +300,24 @@ function renderLineItemsTable(block: TemplateBlock, data: DocumentRenderData): s
   const headerBorder = data.theme_style?.header_border ?? true;
   const alternateShading = alternateShadingConfig || tableStyle === "striped";
 
+  const showCurrencyInAmountHeader = cfg(block.config, "show_currency_in_amount_header", false);
+
   const cellValue = (item: RenderLineItem, column: string): string => {
     switch (column) {
-      case "description":
-        return escapeHtml(item.description);
+      case "description": {
+        // Descriptions are often multi-line (e.g. a headline plus
+        // "Duration / Date / Time" detail lines, as in a court-rental
+        // invoice). The first line reads as the item; the rest render as
+        // muted supporting detail, the way Xero/Zoho stack line notes.
+        const lines = item.description.split("\n");
+        const first = escapeHtml(lines[0] ?? "");
+        const rest = lines.slice(1).filter((l) => l.trim() !== "");
+        const firstHtml = `<div style="color:var(--t-text);">${first}</div>`;
+        const restHtml = rest.length
+          ? `<div style="margin-top:2px; font-size:8.5pt; line-height:1.5; color:var(--t-muted);">${rest.map(escapeHtml).join("<br>")}</div>`
+          : "";
+        return firstHtml + restHtml;
+      }
       case "quantity":
         return String(item.quantity);
       case "unit":
@@ -272,6 +333,13 @@ function renderLineItemsTable(block: TemplateBlock, data: DocumentRenderData): s
       default:
         return "";
     }
+  };
+
+  const headerLabel = (c: string): string => {
+    const custom = columnLabels[c];
+    if (custom) return custom;
+    if (c === "total" && showCurrencyInAmountHeader) return `Amount ${currency}`;
+    return COLUMN_LABEL_DEFAULTS[c] ?? c;
   };
 
   const alignRight = new Set(["quantity", "unit_price", "discount", "tax", "total"]);
@@ -298,7 +366,7 @@ function renderLineItemsTable(block: TemplateBlock, data: DocumentRenderData): s
     showRowNumbers ? `<th style="width:24px; padding:${cellPadding}; ${headerBg} border-bottom:${headerBorderBottom};">#</th>` : "",
     ...columns.map(
       (c) =>
-        `<th style="text-align:${alignRight.has(c) ? "right" : "left"}; font-size:8pt; text-transform:uppercase; letter-spacing:.4px; color:var(--t-muted); padding:${cellPadding}; ${headerBg} border-bottom:${headerBorderBottom};">${escapeHtml(columnLabels[c] ?? COLUMN_LABEL_DEFAULTS[c] ?? c)}</th>`
+        `<th style="text-align:${alignRight.has(c) ? "right" : "left"}; font-size:8pt; text-transform:uppercase; letter-spacing:.4px; color:var(--t-muted); font-weight:600; padding:${cellPadding}; ${headerBg} border-bottom:${headerBorderBottom};">${escapeHtml(headerLabel(c))}</th>`
     ),
   ].join("");
 
@@ -306,10 +374,10 @@ function renderLineItemsTable(block: TemplateBlock, data: DocumentRenderData): s
     .map((item, index) => {
       const rowBg = alternateShading && index % 2 === 1 ? "background:var(--t-surface);" : "";
       const cells = [
-        showRowNumbers ? `<td style="padding:${cellPadding}; color:var(--t-muted); ${cellBorder}">${index + 1}</td>` : "",
+        showRowNumbers ? `<td style="padding:${cellPadding}; color:var(--t-muted); vertical-align:top; ${cellBorder}">${index + 1}</td>` : "",
         ...columns.map(
           (c) =>
-            `<td class="${isNumeric.has(c) ? "tpl-num" : ""}" style="padding:${cellPadding}; text-align:${alignRight.has(c) ? "right" : "left"}; ${cellBorder}">${cellValue(item, c)}</td>`
+            `<td class="${isNumeric.has(c) ? "tpl-num" : ""}" style="padding:${cellPadding}; text-align:${alignRight.has(c) ? "right" : "left"}; vertical-align:top; ${cellBorder}">${cellValue(item, c)}</td>`
         ),
       ].join("");
       return `<tr style="${rowBorderBottom} ${rowBg}">${cells}</tr>`;
@@ -335,7 +403,8 @@ const TOTALS_ROW_DEFAULTS: Record<string, string> = {
 function renderTotals(block: TemplateBlock, data: DocumentRenderData): string {
   const rows = cfg<string[]>(block.config, "rows", ["subtotal", "tax", "total"]);
   const rowLabels = cfg<Record<string, string>>(block.config, "row_labels", {});
-  const widthPercent = cfg(block.config, "width_percent", 40);
+  const widthPercent = cfg(block.config, "width_percent", 42);
+  const currencyInTotal = cfg(block.config, "show_currency_in_total_label", false);
   const currency = data.document.currency;
 
   const rowValue = (row: string): number | null => {
@@ -371,17 +440,20 @@ function renderTotals(block: TemplateBlock, data: DocumentRenderData): string {
       if (value === null) return "";
 
       const isTotal = row === "total";
-      const label = rowLabels[row] ?? TOTALS_ROW_DEFAULTS[row] ?? row;
-      const style = isTotal
-        ? "font-family:var(--t-heading-font); font-weight:var(--t-heading-weight); font-size:12pt; padding-top:8px; margin-top:6px; border-top:2px solid var(--t-primary); color:var(--t-primary);"
-        : "font-size:9pt; padding:3px 0; color:var(--t-text);";
-      const labelStyle = isTotal ? "color:var(--t-primary);" : "color:var(--t-muted);";
+      let label = rowLabels[row] ?? TOTALS_ROW_DEFAULTS[row] ?? row;
+      if (isTotal && currencyInTotal) label = `${label} ${currency}`;
 
-      return `<div style="display:flex; justify-content:space-between; align-items:baseline; ${style}"><span style="${labelStyle}">${escapeHtml(label)}</span><span>${formatCurrency(value, currency)}</span></div>`;
+      // Grand total gets a strong rule above it and the heading font,
+      // matching the reference's "TOTAL MYR" treatment; the other rows
+      // are quiet muted-label / dark-value pairs.
+      if (isTotal) {
+        return `<div style="display:flex; justify-content:space-between; align-items:baseline; margin-top:8px; padding-top:10px; border-top:2px solid var(--t-primary);"><span style="font-family:var(--t-heading-font); font-weight:var(--t-heading-weight); font-size:12.5pt; text-transform:uppercase; letter-spacing:.5px; color:var(--t-primary);">${escapeHtml(label)}</span><span style="font-family:var(--t-heading-font); font-weight:var(--t-heading-weight); font-size:12.5pt; color:var(--t-primary);">${formatCurrency(value, currency)}</span></div>`;
+      }
+      return `<div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; font-size:9.5pt;"><span style="color:var(--t-muted);">${escapeHtml(label)}</span><span style="color:var(--t-text);">${formatCurrency(value, currency)}</span></div>`;
     })
     .join("");
 
-  return `<div style="display:flex; justify-content:flex-end;"><div class="tpl-card tpl-num" style="width:${widthPercent}%; padding:14px 18px;">${html}</div></div>`;
+  return `<div style="display:flex; justify-content:flex-end;"><div class="tpl-num" style="width:${widthPercent}%; min-width:240px;">${html}</div></div>`;
 }
 
 function renderPaymentInfo(block: TemplateBlock, data: DocumentRenderData): string {
@@ -392,9 +464,11 @@ function renderPaymentInfo(block: TemplateBlock, data: DocumentRenderData): stri
   const blockInstructions = cfg<string | undefined>(block.config, "custom_instructions", undefined);
   const wp = data.workspace_payment_details;
 
+  const heading = cfg<string>(block.config, "heading", "Payment Details");
+
   const termsHtml =
     showTerms && data.document.payment_terms
-      ? `<div style="margin-bottom:8px; font-size:9pt; color:var(--t-text);">${nl2br(data.document.payment_terms)}</div>`
+      ? `<div style="margin-bottom:12px;"><div style="font-weight:600; font-size:9pt; margin-bottom:2px; color:var(--t-text);">Payment Terms</div><div style="font-size:9pt; color:var(--t-text);">${nl2br(data.document.payment_terms)}</div></div>`
       : "";
 
   const bankField = (label: string, value: string, numeric = false) =>
@@ -410,27 +484,30 @@ function renderPaymentInfo(block: TemplateBlock, data: DocumentRenderData): stri
       bank.account_number ? bankField("Account No.", bank.account_number, true) : "",
       bank.swift_code ? bankField("SWIFT", bank.swift_code) : "",
     ].join("");
-    bankGrid = `<div style="display:grid; grid-template-columns:auto 1fr; gap:3px 12px; font-size:9pt;">${rows}</div>`;
+    bankGrid = `<div style="display:grid; grid-template-columns:auto 1fr; gap:4px 16px; font-size:9pt; max-width:340px;">${rows}</div>`;
   }
 
   const qrisHtml =
     showQris && wp?.qris_image_url
-      ? `<div style="text-align:center; margin-top:10px;"><img src="${escapeHtml(wp.qris_image_url)}" style="max-width:110px;" alt="QRIS" /></div>`
+      ? `<div style="margin-top:12px;"><img src="${escapeHtml(wp.qris_image_url)}" style="max-width:110px;" alt="QRIS" /></div>`
       : "";
 
   const instructions = wp?.custom_instructions || blockInstructions;
   const instructionsHtml = instructions
-    ? `<div style="margin-top:8px; font-size:9pt; color:var(--t-muted);">${resolvePlaceholders(instructions, data)}</div>`
+    ? `<div style="margin-top:10px; font-size:9pt; color:var(--t-muted); line-height:1.5;">${resolvePlaceholders(instructions, data)}</div>`
     : "";
 
-  const cardBody = [bankGrid, qrisHtml, instructionsHtml].join("");
-  if (!termsHtml && !cardBody) return "";
+  const detailBody = [bankGrid, qrisHtml, instructionsHtml].join("");
+  if (!termsHtml && !detailBody) return "";
 
-  const card = cardBody
-    ? `<div style="font-size:8pt; text-transform:uppercase; letter-spacing:.4px; color:var(--t-muted); margin-bottom:6px;">Payment Information</div><div class="tpl-card" style="padding:12px 14px;">${bankGrid}${qrisHtml}${instructionsHtml}</div>`
+  // Plain, un-boxed section (no card) with a subtle top rule — matching
+  // the reference invoice's clean footer treatment rather than a
+  // shaded panel.
+  const detail = detailBody
+    ? `<div style="font-size:8pt; text-transform:uppercase; letter-spacing:.5px; color:var(--t-muted); margin-bottom:6px;">${escapeHtml(heading)}</div>${detailBody}`
     : "";
 
-  return `<div>${termsHtml}${card}</div>`;
+  return `<div style="border-top:1px solid var(--t-border); padding-top:12px;">${termsHtml}${detail}</div>`;
 }
 
 function renderPaymentSummary(block: TemplateBlock, data: DocumentRenderData): string {
