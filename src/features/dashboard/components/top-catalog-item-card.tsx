@@ -23,7 +23,7 @@ export function TopCatalogItemCard({
   workspaceSlug,
 }: TopCatalogItemCardProps) {
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-semibold">
           Top Catalog Item This Month
