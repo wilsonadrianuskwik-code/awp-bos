@@ -41,7 +41,7 @@ export function SignupForm({ next }: SignupFormProps) {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl text-center">Create an account</CardTitle>
+        <CardTitle className="text-xl text-center">Create an account</CardTitle>
         <CardDescription className="text-center">
           Enter your details to get started
         </CardDescription>

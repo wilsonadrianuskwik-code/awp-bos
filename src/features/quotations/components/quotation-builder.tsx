@@ -398,7 +398,7 @@ export function QuotationBuilder({
       <div className="grid gap-6 lg:grid-cols-3">
       <div className="space-y-6 lg:col-span-2">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="text-xl font-semibold tracking-tight">
             {quotation ? `Edit ${quotation.quotation_number}` : "New Quotation"}
           </h1>
           <SaveStatusIndicator status={saveStatus} isDirty={isDirty} />

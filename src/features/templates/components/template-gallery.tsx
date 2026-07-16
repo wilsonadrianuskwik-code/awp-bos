@@ -107,7 +107,7 @@ export function TemplateGallery({ workspaceId, templates, themes }: TemplateGall
               onClick={() => setActiveType(tab.value)}
               className={`rounded-sm px-3 py-1.5 text-sm font-medium transition-colors ${
                 activeType === tab.value
-                  ? "bg-background text-foreground shadow-sm"
+                  ? "bg-card text-foreground shadow-2xs"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -128,7 +128,7 @@ export function TemplateGallery({ workspaceId, templates, themes }: TemplateGall
         {visibleTemplates.map((template) => (
           <div
             key={template.id}
-            className="group overflow-hidden rounded-lg border-2 border-border bg-card transition-colors hover:border-primary"
+            className="group overflow-hidden rounded-lg border bg-card shadow-2xs transition-colors duration-150 hover:border-primary/50"
           >
             <div className="relative">
               <TemplateThumbnail template={template} theme={template.theme} />
@@ -190,7 +190,7 @@ export function TemplateGallery({ workspaceId, templates, themes }: TemplateGall
           <button
             type="button"
             onClick={() => setNewDesignOpen(true)}
-            className="flex min-h-[280px] flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+            className="flex min-h-[280px] flex-col items-center justify-center gap-2 rounded-lg border border-dashed text-muted-foreground transition-colors duration-150 hover:border-primary/50 hover:text-primary"
           >
             <Plus className="h-6 w-6" />
             <span className="text-sm font-medium">Start from a preset</span>

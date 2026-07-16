@@ -67,7 +67,7 @@ export function ThemeGallery({ workspaceId, themes }: ThemeGalleryProps) {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {themes.map((theme) => (
-          <div key={theme.id} className="rounded-lg border-2 border-border p-4 transition-colors hover:border-primary">
+          <div key={theme.id} className="rounded-lg border bg-card p-4 shadow-2xs transition-colors duration-150 hover:border-primary/50">
             <div className="mb-3 flex gap-1.5">
               {[theme.config.colors.primary, theme.config.colors.secondary, theme.config.colors.surface, theme.config.colors.border].map(
                 (color, i) => (

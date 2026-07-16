@@ -37,7 +37,7 @@ export function LoginForm({ next }: LoginFormProps) {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl text-center">Sign in</CardTitle>
+        <CardTitle className="text-xl text-center">Sign in</CardTitle>
         <CardDescription className="text-center">
           Enter your email and password to access your account
         </CardDescription>

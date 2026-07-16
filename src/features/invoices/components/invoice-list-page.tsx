@@ -120,9 +120,9 @@ export function InvoiceListPage({ invoices, count }: InvoiceListPageProps) {
               })
             }
             className={cn(
-              "shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
+              "shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors duration-100",
               status === tab.value
-                ? "bg-foreground text-background"
+                ? "bg-primary/10 text-primary ring-1 ring-inset ring-primary/20"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
           >

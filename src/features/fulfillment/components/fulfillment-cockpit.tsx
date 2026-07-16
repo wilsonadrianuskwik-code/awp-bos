@@ -637,9 +637,9 @@ function ReasonChip({
       type="button"
       onClick={onClick}
       className={cn(
-        "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+        "rounded-full border px-3 py-1 text-xs font-medium transition-colors duration-100",
         active
-          ? "border-foreground bg-foreground text-background"
+          ? "border-primary/20 bg-primary/10 text-primary"
           : "text-muted-foreground hover:bg-muted"
       )}
     >

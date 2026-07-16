@@ -47,8 +47,8 @@ export function DocumentSettingsNav({
   const { workspace } = useWorkspace();
 
   return (
-    <div className="flex gap-6">
-      <nav className="w-56 shrink-0 space-y-1">
+    <div className="flex flex-col gap-6 md:flex-row">
+      <nav className="w-full shrink-0 space-y-1 md:w-56">
         {SECTIONS.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
