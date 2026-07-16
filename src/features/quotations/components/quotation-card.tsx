@@ -73,7 +73,7 @@ export function QuotationCard({ quotation }: QuotationCardProps) {
   // rules.
   const canSend = quotation.status === "draft" || quotation.status === "revision_requested";
   const canApproveOrReject = quotation.status === "viewed";
-  const canCancel =
+  const canVoid =
     quotation.status === "sent" ||
     quotation.status === "viewed" ||
     quotation.status === "revision_requested";
@@ -133,11 +133,11 @@ export function QuotationCard({ quotation }: QuotationCardProps) {
     if (ok) transition("rejected");
   }
 
-  async function handleCancel() {
+  async function handleVoid() {
     const ok = await confirm({
-      title: "Cancel quotation?",
+      title: "Void quotation?",
       description: `This will cancel ${quotation.quotation_number}. This cannot be undone.`,
-      confirmLabel: "Cancel Quotation",
+      confirmLabel: "Void Quotation",
       destructive: true,
     });
     if (ok) transition("cancelled");
@@ -265,7 +265,7 @@ export function QuotationCard({ quotation }: QuotationCardProps) {
                 Print
               </DropdownMenuItem>
 
-              {(canApproveOrReject || canCancel) && (
+              {(canApproveOrReject || canVoid) && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuLabel>Status</DropdownMenuLabel>
@@ -281,13 +281,13 @@ export function QuotationCard({ quotation }: QuotationCardProps) {
                       Mark Rejected
                     </DropdownMenuItem>
                   )}
-                  {canCancel && (
+                  {canVoid && (
                     <DropdownMenuItem
-                      onClick={handleCancel}
+                      onClick={handleVoid}
                       className="text-destructive focus:text-destructive"
                     >
                       <Ban className="mr-2 h-4 w-4" />
-                      Cancel Quotation
+                      Void Quotation
                     </DropdownMenuItem>
                   )}
                 </>
