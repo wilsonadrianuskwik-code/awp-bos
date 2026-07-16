@@ -131,7 +131,21 @@ export function ClientDetail({
         backHref={`/${workspace.slug}/clients`}
         backLabel="Back to Clients"
         title={client.name}
-        subtitle={client.company || undefined}
+        badges={
+          client.tags.length > 0 ? (
+            <span className="flex flex-wrap items-center gap-1">
+              {client.tags.map((tag) => (
+                <Badge key={tag} variant="secondary" className="font-normal">
+                  {tag}
+                </Badge>
+              ))}
+            </span>
+          ) : undefined
+        }
+        subtitle={
+          [client.company, client.email].filter(Boolean).join(" · ") ||
+          undefined
+        }
         actions={
           <>
             <Button variant="outline" asChild>
@@ -152,49 +166,12 @@ export function ClientDetail({
         }
       />
 
+      {/* The Stripe customer-page composition: the money story
+          (quotations → invoices → payments → fulfillment) owns the main
+          column; identity and billing facts live in the right rail where
+          they're findable without pushing the documents below the fold. */}
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Contact Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FieldList>
-                <DetailItem label="Email" value={client.email} />
-                <DetailItem label="Phone" value={client.phone} />
-                <DetailItem label="Company" value={client.company} />
-                <DetailItem label="Website" value={client.website} />
-              </FieldList>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Billing</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FieldList>
-                <DetailItem
-                  label="Billing Email"
-                  value={client.billing_email}
-                />
-                <DetailItem label="Tax ID" value={client.tax_id} />
-                <DetailItem
-                  label="Payment Terms"
-                  value={`${client.payment_terms} days`}
-                />
-                <DetailItem
-                  label="Preferred Currency"
-                  value={
-                    client.preferred_currency
-                      ? `${client.preferred_currency} (custom)`
-                      : `${workspace.default_currency} (workspace default)`
-                  }
-                />
-              </FieldList>
-            </CardContent>
-          </Card>
-
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Quotations</CardTitle>
@@ -232,7 +209,7 @@ export function ClientDetail({
                     <Link
                       key={q.id}
                       href={`/${workspace.slug}/quotations/${q.id}`}
-                      className="flex items-center justify-between rounded-lg border p-3 text-sm transition-colors hover:bg-accent"
+                      className="flex items-center justify-between rounded-lg border p-3 text-sm transition-colors duration-100 hover:border-primary/30 hover:bg-accent/50"
                     >
                       <div>
                         <p className="font-medium">{q.quotation_number}</p>
@@ -293,7 +270,7 @@ export function ClientDetail({
                     <Link
                       key={inv.id}
                       href={`/${workspace.slug}/invoices/${inv.id}`}
-                      className="flex items-center justify-between rounded-lg border p-3 text-sm transition-colors hover:bg-accent"
+                      className="flex items-center justify-between rounded-lg border p-3 text-sm transition-colors duration-100 hover:border-primary/30 hover:bg-accent/50"
                     >
                       <div>
                         <p className="font-medium">{inv.invoice_number}</p>
@@ -362,7 +339,7 @@ export function ClientDetail({
                           ? `/${workspace.slug}/invoices/${p.invoice.id}`
                           : `/${workspace.slug}/payments`
                       }
-                      className="flex items-center justify-between rounded-lg border p-3 text-sm transition-colors hover:bg-accent"
+                      className="flex items-center justify-between rounded-lg border p-3 text-sm transition-colors duration-100 hover:border-primary/30 hover:bg-accent/50"
                     >
                       <div>
                         <p className="font-medium">
@@ -415,7 +392,7 @@ export function ClientDetail({
                     <Link
                       key={fi.id}
                       href={`/${workspace.slug}/fulfillment/${fi.id}`}
-                      className="block rounded-lg border p-3 transition-colors hover:bg-accent"
+                      className="block rounded-lg border p-3 transition-colors duration-100 hover:border-primary/30 hover:bg-accent/50"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <span className="truncate text-sm font-medium">
@@ -440,28 +417,60 @@ export function ClientDetail({
             </CardContent>
           </Card>
 
-          {client.source_lead_id && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Origin</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Converted from a lead.
-                </p>
-                <Button variant="link" className="mt-1 p-0" asChild>
-                  <Link
-                    href={`/${workspace.slug}/leads/${client.source_lead_id}`}
-                  >
-                    View Original Lead
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          )}
         </div>
 
-        <div>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Contact</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FieldList className="lg:grid-cols-1">
+                <DetailItem label="Email" value={client.email} />
+                <DetailItem label="Phone" value={client.phone} />
+                <DetailItem label="Company" value={client.company} />
+                <DetailItem label="Website" value={client.website} />
+              </FieldList>
+              {client.source_lead_id && (
+                <div className="mt-4 border-t pt-3">
+                  <Link
+                    href={`/${workspace.slug}/leads/${client.source_lead_id}`}
+                    className="text-xs text-muted-foreground transition-colors hover:text-primary"
+                  >
+                    Converted from a lead — view original →
+                  </Link>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Billing</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FieldList className="lg:grid-cols-1">
+                <DetailItem
+                  label="Billing Email"
+                  value={client.billing_email}
+                />
+                <DetailItem label="Tax ID" value={client.tax_id} />
+                <DetailItem
+                  label="Payment Terms"
+                  value={`${client.payment_terms} days`}
+                />
+                <DetailItem
+                  label="Preferred Currency"
+                  value={
+                    client.preferred_currency
+                      ? `${client.preferred_currency} (custom)`
+                      : `${workspace.default_currency} (workspace default)`
+                  }
+                />
+              </FieldList>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Activity</CardTitle>
