@@ -77,12 +77,27 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
 
   const navItemClass = (href: string) =>
     cn(
-      "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-100",
+      "relative flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-100",
       collapsed && "justify-center px-0 py-2",
       isActive(href)
-        ? "bg-primary/10 text-primary"
-        : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        ? "bg-sidebar-accent text-sidebar-accent-foreground"
+        : "text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
     );
+
+  // Icon carries the accent on the active item; the label stays neutral
+  // so the row doesn't shout — the rail + tinted icon are enough signal.
+  const navIconClass = (href: string) =>
+    cn(
+      "h-4 w-4 shrink-0 transition-colors duration-100",
+      isActive(href) ? "text-sidebar-primary" : "text-sidebar-foreground/70"
+    );
+
+  // 3px accent rail marking the active route (hidden when collapsed —
+  // the tinted icon carries the state on its own there).
+  const activeRail = (href: string) =>
+    isActive(href) && !collapsed ? (
+      <span className="absolute -left-2 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-full bg-sidebar-primary" />
+    ) : null;
 
   return (
     <aside
@@ -97,10 +112,10 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
             href={basePath}
             className="flex min-w-0 items-center gap-2.5"
           >
-            <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-primary text-[11px] font-semibold text-primary-foreground">
+            <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-gradient-to-br from-sidebar-primary to-indigo-500 text-[11px] font-semibold text-sidebar-primary-foreground shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]">
               {workspaceName.charAt(0).toUpperCase()}
             </span>
-            <span className="truncate text-sm font-semibold text-foreground">
+            <span className="truncate text-sm font-semibold text-sidebar-accent-foreground">
               {workspaceName}
             </span>
           </Link>
@@ -109,7 +124,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
           variant="ghost"
           size="icon"
           onClick={() => setCollapsed(!collapsed)}
-          className="h-7 w-7 shrink-0 text-muted-foreground hover:text-foreground"
+          className="h-7 w-7 shrink-0 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
         >
           {collapsed ? (
             <PanelLeftOpen className="h-4 w-4" />
@@ -126,7 +141,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
               collapsed ? (
                 <div className="mx-2 my-2 border-t border-sidebar-border" />
               ) : (
-                <div className="px-2.5 pb-1 pt-4 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+                <div className="px-2.5 pb-1 pt-4 text-[11px] font-medium uppercase tracking-wider text-sidebar-foreground/45">
                   {group.label}
                 </div>
               )
@@ -141,7 +156,8 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
                   className={navItemClass(item.href)}
                   title={collapsed ? item.label : undefined}
                 >
-                  <item.icon className="h-4 w-4 shrink-0" />
+                  {activeRail(item.href)}
+                  <item.icon className={navIconClass(item.href)} />
                   {!collapsed && <span className="truncate">{item.label}</span>}
                 </Link>
               ))}
@@ -158,7 +174,8 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
             className={navItemClass(item.href)}
             title={collapsed ? item.label : undefined}
           >
-            <item.icon className="h-4 w-4 shrink-0" />
+            {activeRail(item.href)}
+            <item.icon className={navIconClass(item.href)} />
             {!collapsed && <span className="truncate">{item.label}</span>}
           </Link>
         ))}

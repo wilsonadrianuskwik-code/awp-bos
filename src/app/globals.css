@@ -87,14 +87,18 @@
   --chart-4: 38 92% 50%;
   --chart-5: 340 70% 55%;
 
-  --sidebar-background: 220 18% 96.5%;
-  --sidebar-foreground: 224 14% 30%;
-  --sidebar-primary: 230 84% 54%;
+  /* The sidebar is a deep ink surface in BOTH themes (ClickUp/Notion
+     convention): the dark rail against a light canvas is the strongest
+     single "enterprise product" signal, and it makes the content area
+     read as the bright, focused workspace. */
+  --sidebar-background: 227 30% 10%;
+  --sidebar-foreground: 222 12% 72%;
+  --sidebar-primary: 228 88% 66%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 220 14% 91%;
-  --sidebar-accent-foreground: 224 18% 16%;
-  --sidebar-border: 220 14% 90%;
-  --sidebar-ring: 230 84% 54%;
+  --sidebar-accent: 226 22% 17%;
+  --sidebar-accent-foreground: 220 25% 96%;
+  --sidebar-border: 226 20% 16%;
+  --sidebar-ring: 228 88% 66%;
 }
 
 .dark {
@@ -127,14 +131,16 @@
   --chart-4: 38 90% 55%;
   --chart-5: 340 70% 58%;
 
-  --sidebar-background: 224 15% 8%;
-  --sidebar-foreground: 220 12% 72%;
-  --sidebar-primary: 228 82% 62%;
+  /* In dark mode the rail sits a step deeper than the canvas so the
+     content area still reads as the raised, focused surface. */
+  --sidebar-background: 225 18% 5%;
+  --sidebar-foreground: 220 12% 70%;
+  --sidebar-primary: 228 84% 66%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 224 13% 14%;
-  --sidebar-accent-foreground: 220 14% 90%;
-  --sidebar-border: 224 12% 14%;
-  --sidebar-ring: 228 82% 62%;
+  --sidebar-accent: 224 14% 12%;
+  --sidebar-accent-foreground: 220 14% 92%;
+  --sidebar-border: 224 12% 11%;
+  --sidebar-ring: 228 84% 66%;
 }
 
 @layer base {

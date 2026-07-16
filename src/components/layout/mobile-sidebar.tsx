@@ -45,7 +45,7 @@ export function MobileSidebar({
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="h-8 w-8"
+            className="h-8 w-8 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
           >
             <X className="h-4 w-4" />
           </Button>
