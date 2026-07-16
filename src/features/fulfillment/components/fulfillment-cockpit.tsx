@@ -615,7 +615,7 @@ function KpiTile({
           {label}
         </span>
       </div>
-      <div className={cn("font-mono text-2xl font-bold leading-none tabular-nums", fig)}>
+      <div className={cn("font-mono text-2xl font-semibold leading-none tabular-nums", fig)}>
         {value}
       </div>
       <div className="mt-1 text-xs text-muted-foreground">{hint}</div>

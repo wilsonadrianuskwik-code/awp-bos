@@ -9,7 +9,7 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 import { useState } from "react";
-import { ArrowUpDown } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 type DataTableProps<TData> = {
@@ -18,6 +18,10 @@ type DataTableProps<TData> = {
   onRowClick?: (row: TData) => void;
 };
 
+// List-view table. Density and hierarchy follow the system's table spec:
+// 13px cell text, 11px uppercase column labels, ~40px rows, hairline row
+// separators, quiet hover. Numeric columns should set `tabular-nums` in
+// their cell renderers so digits align.
 export function DataTable<TData>({
   columns,
   data,
@@ -35,26 +39,26 @@ export function DataTable<TData>({
   });
 
   return (
-    <div className="rounded-md border">
-      <table className="w-full caption-bottom text-sm">
-        <thead className="border-b bg-muted/50">
+    <div className="overflow-hidden rounded-lg border bg-card shadow-2xs">
+      <table className="w-full caption-bottom">
+        <thead className="border-b bg-muted/40">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className="h-12 px-4 text-left align-middle font-medium text-muted-foreground"
+                  className="h-9 px-3 text-left align-middle text-[11px] font-medium uppercase tracking-wider text-muted-foreground first:pl-4 last:pr-4"
                 >
                   {header.isPlaceholder ? null : header.column.getCanSort() ? (
                     <button
-                      className="flex items-center gap-1 hover:text-foreground"
+                      className="group inline-flex items-center gap-1 uppercase tracking-wider transition-colors hover:text-foreground"
                       onClick={header.column.getToggleSortingHandler()}
                     >
                       {flexRender(
                         header.column.columnDef.header,
                         header.getContext()
                       )}
-                      <ArrowUpDown className="h-3.5 w-3.5" />
+                      <ChevronsUpDown className="h-3 w-3 opacity-50 transition-opacity group-hover:opacity-100" />
                     </button>
                   ) : (
                     flexRender(
@@ -72,7 +76,7 @@ export function DataTable<TData>({
             <tr>
               <td
                 colSpan={columns.length}
-                className="h-24 text-center text-muted-foreground"
+                className="h-24 text-center text-[13px] text-muted-foreground"
               >
                 No results.
               </td>
@@ -82,13 +86,16 @@ export function DataTable<TData>({
               <tr
                 key={row.id}
                 className={cn(
-                  "border-b transition-colors hover:bg-muted/50",
+                  "border-b text-[13px] transition-colors duration-100 last:border-0 hover:bg-muted/40",
                   onRowClick && "cursor-pointer"
                 )}
                 onClick={() => onRowClick?.(row.original)}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="p-4 align-middle">
+                  <td
+                    key={cell.id}
+                    className="px-3 py-2.5 align-middle first:pl-4 last:pr-4"
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}

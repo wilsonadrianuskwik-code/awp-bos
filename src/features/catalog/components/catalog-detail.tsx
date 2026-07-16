@@ -60,7 +60,7 @@ export function CatalogDetail({ item, activities }: CatalogDetailProps) {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold tracking-tight">{item.name}</h1>
+            <h1 className="text-xl font-semibold tracking-tight">{item.name}</h1>
             <Badge variant="secondary">{ITEM_TYPE_LABEL[item.item_type]}</Badge>
             {item.is_active ? (
               <Badge>Active</Badge>

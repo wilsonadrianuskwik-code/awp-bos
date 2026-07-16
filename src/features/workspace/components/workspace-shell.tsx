@@ -39,10 +39,15 @@ export function WorkspaceShell({
 
       <div className="flex flex-1 flex-col overflow-hidden print:overflow-visible">
         <div className="print:hidden">
-          <Header onMobileMenuToggle={() => setMobileOpen(true)} />
+          <Header
+            workspaceSlug={workspaceSlug}
+            onMobileMenuToggle={() => setMobileOpen(true)}
+          />
         </div>
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 print:overflow-visible print:p-0">
-          {children}
+        <main className="flex-1 overflow-y-auto print:overflow-visible">
+          <div className="mx-auto w-full max-w-[1400px] p-4 md:p-6 print:max-w-none print:p-0">
+            {children}
+          </div>
         </main>
       </div>
     </div>

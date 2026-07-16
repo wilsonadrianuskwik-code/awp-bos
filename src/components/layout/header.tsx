@@ -1,6 +1,7 @@
 "use client";
 
-import { LogOut, User, Menu } from "lucide-react";
+import { useEffect, useState } from "react";
+import { LogOut, User, Menu, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,16 +13,30 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { CommandPalette } from "@/components/layout/command-palette";
 import { useSupabase } from "@/providers/supabase-provider";
 import { useRouter } from "next/navigation";
 
 type HeaderProps = {
+  workspaceSlug: string;
   onMobileMenuToggle?: () => void;
 };
 
-export function Header({ onMobileMenuToggle }: HeaderProps) {
+export function Header({ workspaceSlug, onMobileMenuToggle }: HeaderProps) {
   const { supabase, user } = useSupabase();
   const router = useRouter();
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen((open) => !open);
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   const initials = user?.user_metadata?.full_name
     ?.split(" ")
@@ -36,25 +51,45 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
   }
 
   return (
-    <header className="flex h-14 items-center justify-between border-b bg-background px-4">
-      <div className="flex items-center gap-2">
+    <header className="flex h-14 items-center justify-between gap-3 border-b bg-background px-4">
+      <div className="flex flex-1 items-center gap-2">
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden"
+          className="h-8 w-8 md:hidden"
           onClick={onMobileMenuToggle}
         >
           <Menu className="h-5 w-5" />
         </Button>
+
+        <button
+          type="button"
+          onClick={() => setPaletteOpen(true)}
+          className="hidden h-8 w-full max-w-64 items-center gap-2 rounded-md border bg-card px-2.5 text-[13px] text-muted-foreground shadow-2xs transition-colors duration-150 hover:border-input hover:text-foreground sm:flex"
+        >
+          <Search className="h-3.5 w-3.5 shrink-0" />
+          <span className="flex-1 text-left">Search…</span>
+          <kbd className="rounded border bg-muted px-1.5 py-px font-sans text-[10px] font-medium">
+            ⌘K
+          </kbd>
+        </button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 sm:hidden"
+          onClick={() => setPaletteOpen(true)}
+        >
+          <Search className="h-4 w-4" />
+        </Button>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <ThemeToggle />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-              <Avatar className="h-8 w-8">
+              <Avatar className="h-7 w-7">
                 <AvatarImage
                   src={user?.user_metadata?.avatar_url}
                   alt={user?.user_metadata?.full_name ?? "User"}
@@ -66,7 +101,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">
+                <p className="text-sm font-medium leading-none text-foreground">
                   {user?.user_metadata?.full_name ?? "User"}
                 </p>
                 <p className="text-xs leading-none text-muted-foreground">
@@ -87,6 +122,12 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      <CommandPalette
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        workspaceSlug={workspaceSlug}
+      />
     </header>
   );
 }

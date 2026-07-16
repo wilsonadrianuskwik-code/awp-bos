@@ -46,7 +46,7 @@ export function PricingSummary({
         <div className="mt-4 border-t pt-4">
           <div className="flex items-baseline justify-between">
             <span className="text-sm font-medium">Total</span>
-            <span className="text-2xl font-bold tabular-nums tracking-tight">
+            <span className="text-2xl font-semibold tabular-nums tracking-tight">
               {fmt(totals.total)}
             </span>
           </div>

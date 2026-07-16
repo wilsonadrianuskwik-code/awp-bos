@@ -2,6 +2,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ------------------------------------------------------------------ */
+/* Meridian design system — token layer.                               */
+/*                                                                     */
+/* Neutrals are slate-tinted (hue ~220–224), never pure gray: the      */
+/* slight blue cast is what separates a considered SaaS surface from   */
+/* a default admin template. One accent (cobalt) carries all primary   */
+/* actions and active states; status colors are semantic and live in   */
+/* the StatusBadge tone map, not here. The app canvas is a faint gray  */
+/* so white cards read as raised surfaces without heavy shadows.       */
+/* ------------------------------------------------------------------ */
+
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -44,74 +55,86 @@
 }
 
 :root {
-  --background: 0 0% 100%;
-  --foreground: 0 0% 3.9%;
+  /* Canvas & surfaces */
+  --background: 220 20% 98%;
+  --foreground: 224 24% 11%;
   --card: 0 0% 100%;
-  --card-foreground: 0 0% 3.9%;
+  --card-foreground: 224 24% 11%;
   --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 3.9%;
-  --primary: 0 0% 9%;
-  --primary-foreground: 0 0% 98%;
-  --secondary: 0 0% 96.1%;
-  --secondary-foreground: 0 0% 9%;
-  --muted: 0 0% 96.1%;
-  --muted-foreground: 0 0% 45.1%;
-  --accent: 0 0% 96.1%;
-  --accent-foreground: 0 0% 9%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 0 0% 89.8%;
-  --input: 0 0% 89.8%;
-  --ring: 0 0% 3.9%;
-  --radius: 0.5rem;
-  --chart-1: 12 76% 61%;
+  --popover-foreground: 224 24% 11%;
+
+  /* Accent — cobalt. Primary actions, active nav, focus. */
+  --primary: 230 84% 54%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 220 15% 94%;
+  --secondary-foreground: 224 18% 24%;
+  --muted: 220 15% 94%;
+  --muted-foreground: 220 10% 44%;
+  --accent: 220 15% 94%;
+  --accent-foreground: 224 18% 20%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 220 14% 90%;
+  --input: 220 13% 86%;
+  --ring: 230 84% 54%;
+  --radius: 0.625rem;
+
+  --chart-1: 230 84% 54%;
   --chart-2: 173 58% 39%;
-  --chart-3: 197 37% 24%;
-  --chart-4: 43 74% 66%;
-  --chart-5: 27 87% 67%;
-  --sidebar-background: 0 0% 98%;
-  --sidebar-foreground: 240 5.3% 26.1%;
-  --sidebar-primary: 240 5.9% 10%;
-  --sidebar-primary-foreground: 0 0% 98%;
-  --sidebar-accent: 240 4.8% 95.9%;
-  --sidebar-accent-foreground: 240 5.9% 10%;
-  --sidebar-border: 220 13% 91%;
-  --sidebar-ring: 217.2 91.2% 59.8%;
+  --chart-3: 262 60% 56%;
+  --chart-4: 38 92% 50%;
+  --chart-5: 340 70% 55%;
+
+  --sidebar-background: 220 18% 96.5%;
+  --sidebar-foreground: 224 14% 30%;
+  --sidebar-primary: 230 84% 54%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 220 14% 91%;
+  --sidebar-accent-foreground: 224 18% 16%;
+  --sidebar-border: 220 14% 90%;
+  --sidebar-ring: 230 84% 54%;
 }
 
 .dark {
-  --background: 0 0% 3.9%;
-  --foreground: 0 0% 98%;
-  --card: 0 0% 3.9%;
-  --card-foreground: 0 0% 98%;
-  --popover: 0 0% 3.9%;
-  --popover-foreground: 0 0% 98%;
-  --primary: 0 0% 98%;
-  --primary-foreground: 0 0% 9%;
-  --secondary: 0 0% 14.9%;
-  --secondary-foreground: 0 0% 98%;
-  --muted: 0 0% 14.9%;
-  --muted-foreground: 0 0% 63.9%;
-  --accent: 0 0% 14.9%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 0 0% 14.9%;
-  --input: 0 0% 14.9%;
-  --ring: 0 0% 83.1%;
-  --chart-1: 220 70% 50%;
+  --background: 224 16% 7%;
+  --foreground: 220 16% 92%;
+  --card: 224 15% 9%;
+  --card-foreground: 220 16% 92%;
+  --popover: 224 15% 9%;
+  --popover-foreground: 220 16% 92%;
+
+  --primary: 228 82% 62%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 224 13% 14%;
+  --secondary-foreground: 220 14% 88%;
+  --muted: 224 13% 14%;
+  --muted-foreground: 220 10% 60%;
+  --accent: 224 13% 15%;
+  --accent-foreground: 220 14% 90%;
+  --destructive: 0 68% 54%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 224 12% 16%;
+  --input: 224 12% 20%;
+  --ring: 228 82% 62%;
+
+  --chart-1: 228 82% 62%;
   --chart-2: 160 60% 45%;
-  --chart-3: 30 80% 55%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 340 75% 55%;
-  --sidebar-background: 240 5.9% 10%;
-  --sidebar-foreground: 240 4.8% 95.9%;
-  --sidebar-primary: 224.3 76.3% 48%;
+  --chart-3: 262 65% 64%;
+  --chart-4: 38 90% 55%;
+  --chart-5: 340 70% 58%;
+
+  --sidebar-background: 224 15% 8%;
+  --sidebar-foreground: 220 12% 72%;
+  --sidebar-primary: 228 82% 62%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 3.7% 15.9%;
-  --sidebar-accent-foreground: 240 4.8% 95.9%;
-  --sidebar-border: 240 3.7% 15.9%;
-  --sidebar-ring: 217.2 91.2% 59.8%;
+  --sidebar-accent: 224 13% 14%;
+  --sidebar-accent-foreground: 220 14% 90%;
+  --sidebar-border: 224 12% 14%;
+  --sidebar-ring: 228 82% 62%;
 }
 
 @layer base {
@@ -120,6 +143,47 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.15);
+  }
+
+  /* Quiet, thin scrollbars — the loud default gutter is one of the
+     strongest "internal tool" signals. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.25) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.25);
+    border-radius: 999px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.4);
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+/* Motion discipline: micro-interactions run 150ms ease-out; anything
+   longer feels sluggish in a productivity tool. Users who opt out of
+   motion get an instant UI. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

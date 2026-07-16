@@ -12,6 +12,7 @@ import {
   getWorkspaceActivities,
 } from "@/features/dashboard/queries";
 import { syncFulfillmentItemsAction } from "@/features/fulfillment/actions";
+import { PageHeader } from "@/components/shared/page-header";
 import { StatCard } from "@/features/dashboard/components/stat-card";
 import { LeadPipelineCard } from "@/features/dashboard/components/lead-pipeline-card";
 import { RecentActivityCard } from "@/features/dashboard/components/recent-activity-card";
@@ -67,12 +68,7 @@ export default async function DashboardPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome to {workspace.name}
-        </p>
-      </div>
+      <PageHeader title="Dashboard" description={`Welcome to ${workspace.name}`} />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <StatCard

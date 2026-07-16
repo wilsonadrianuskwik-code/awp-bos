@@ -175,7 +175,7 @@ export function InvoicePortalView({
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Outstanding Balance
             </p>
-            <p className="text-3xl font-bold tabular-nums tracking-tight">
+            <p className="text-3xl font-semibold tabular-nums tracking-tight">
               {fmt(invoice.amount_due)}
             </p>
           </div>

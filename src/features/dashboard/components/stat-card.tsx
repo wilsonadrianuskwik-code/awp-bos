@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 type StatCardProps = {
   title: string;
@@ -6,16 +6,18 @@ type StatCardProps = {
   description?: string;
 };
 
+// KPI tile: quiet 13px label above a prominent tabular-nums value —
+// the number is the content, the label is orientation.
 export function StatCard({ title, value, description }: StatCardProps) {
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+      <CardContent className="p-5">
+        <p className="text-[13px] font-medium text-muted-foreground">{title}</p>
+        <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums" title={value}>
+          {value}
+        </p>
         {description && (
-          <p className="text-xs text-muted-foreground">{description}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{description}</p>
         )}
       </CardContent>
     </Card>

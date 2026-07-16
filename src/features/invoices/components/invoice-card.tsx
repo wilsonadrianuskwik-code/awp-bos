@@ -126,7 +126,7 @@ export function InvoiceCard({ invoice }: InvoiceCardProps) {
           <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
             Outstanding Balance
           </p>
-          <span className="text-2xl font-bold tabular-nums tracking-tight">
+          <span className="text-2xl font-semibold tabular-nums tracking-tight">
             {formatCurrency(invoice.amount_due, invoice.currency)}
           </span>
         </div>

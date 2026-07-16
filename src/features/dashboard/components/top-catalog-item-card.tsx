@@ -45,7 +45,7 @@ export function TopCatalogItemCard({
             >
               {item.catalogItemName}
             </Link>
-            <p className="text-2xl font-bold">{formatCurrency(item.total, currency)}</p>
+            <p className="text-2xl font-semibold tracking-tight tabular-nums">{formatCurrency(item.total, currency)}</p>
             <p className="text-xs text-muted-foreground">
               {item.quantity} sold this month
             </p>

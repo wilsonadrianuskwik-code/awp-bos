@@ -49,7 +49,7 @@ export function LeadDetail({ lead, activities, onConvert }: LeadDetailProps) {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{lead.name}</h1>
+          <h1 className="text-xl font-semibold tracking-tight">{lead.name}</h1>
           <div className="mt-1 flex items-center gap-2">
             <StatusBadge status={lead.status} />
             {lead.company && (
