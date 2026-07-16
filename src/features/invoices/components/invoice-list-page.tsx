@@ -2,10 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/shared/pagination";
 import { ListEmpty } from "@/components/shared/list-empty";
+import { SearchInput } from "@/components/shared/search-input";
 import {
   Select,
   SelectContent,
@@ -84,15 +83,11 @@ export function InvoiceListPage({ invoices, count }: InvoiceListPageProps) {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative w-full sm:max-w-xs">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search number, title, client, company..."
-            className="h-9 pl-9"
-          />
-        </div>
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder="Search number, title, client, company…"
+        />
         <Select
           value={sort}
           onValueChange={(v) => setParams({ sort: v, page: null })}

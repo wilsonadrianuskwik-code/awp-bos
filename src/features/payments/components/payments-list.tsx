@@ -3,11 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Search } from "lucide-react";
 import { type ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/shared/data-table";
 import { ListEmpty } from "@/components/shared/list-empty";
-import { Input } from "@/components/ui/input";
+import { SearchInput } from "@/components/shared/search-input";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -145,15 +144,11 @@ export function PaymentsList({ payments }: PaymentsListProps) {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-        <div className="relative w-full sm:max-w-xs">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search payment #, invoice #, or client..."
-            className="h-9 pl-9"
-          />
-        </div>
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder="Search payment #, invoice #, or client…"
+        />
 
         <DateRangePicker
           value={dateRange}

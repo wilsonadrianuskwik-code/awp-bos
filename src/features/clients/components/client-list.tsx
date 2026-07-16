@@ -1,8 +1,10 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { type ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/shared/data-table";
+import { SearchInput } from "@/components/shared/search-input";
 import { useWorkspace } from "@/providers/workspace-provider";
 import type { Client } from "@/features/clients/types";
 
@@ -51,14 +53,28 @@ type ClientListProps = {
 export function ClientList({ clients }: ClientListProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
+  const [query, setQuery] = useState("");
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return clients;
+    return clients.filter((c) =>
+      [c.name, c.company, c.email, c.phone].some((v) =>
+        v?.toLowerCase().includes(q)
+      )
+    );
+  }, [clients, query]);
 
   return (
-    <DataTable
-      columns={columns}
-      data={clients}
-      onRowClick={(client) =>
-        router.push(`/${workspace.slug}/clients/${client.id}`)
-      }
-    />
+    <div className="space-y-4">
+      <SearchInput value={query} onChange={setQuery} placeholder="Search clients…" />
+      <DataTable
+        columns={columns}
+        data={filtered}
+        onRowClick={(client) =>
+          router.push(`/${workspace.slug}/clients/${client.id}`)
+        }
+      />
+    </div>
   );
 }

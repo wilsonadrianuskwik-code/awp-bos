@@ -1,8 +1,10 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { type ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/shared/data-table";
+import { SearchInput } from "@/components/shared/search-input";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import { useWorkspace } from "@/providers/workspace-provider";
@@ -71,12 +73,26 @@ type CatalogListProps = {
 export function CatalogList({ items }: CatalogListProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
+  const [query, setQuery] = useState("");
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return items;
+    return items.filter((item) =>
+      [item.name, item.sku, item.description].some((v) =>
+        v?.toLowerCase().includes(q)
+      )
+    );
+  }, [items, query]);
 
   return (
-    <DataTable
-      columns={columns}
-      data={items}
-      onRowClick={(item) => router.push(`/${workspace.slug}/catalog/${item.id}`)}
-    />
+    <div className="space-y-4">
+      <SearchInput value={query} onChange={setQuery} placeholder="Search products & services…" />
+      <DataTable
+        columns={columns}
+        data={filtered}
+        onRowClick={(item) => router.push(`/${workspace.slug}/catalog/${item.id}`)}
+      />
+    </div>
   );
 }
