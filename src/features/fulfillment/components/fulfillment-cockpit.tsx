@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { AnimatedValue } from "@/components/shared/animated-value";
 import { cn } from "@/lib/utils/cn";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { FulfillmentProgressCard } from "@/features/fulfillment/components/fulfillment-progress-card";
@@ -369,7 +370,7 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
                     type="button"
                     onClick={() => selectClient(c.clientId)}
                     className={cn(
-                      "relative flex w-full items-center gap-3 border-b px-3 py-2.5 text-left last:border-b-0 hover:bg-accent/50",
+                      "relative flex w-full items-center gap-3 border-b px-3 py-2.5 text-left transition-colors duration-100 last:border-b-0 hover:bg-accent/50",
                       isSel && "bg-accent"
                     )}
                   >
@@ -474,7 +475,9 @@ function ClientWorkPanel({
   const completed = client.trackers.filter((t) => t.status === "completed");
 
   return (
-    <div>
+    // Keyed by clientId in the parent, so switching clients remounts and
+    // replays this entrance — the panel visibly answers the selection.
+    <div className="duration-200 animate-in fade-in slide-in-from-right-1">
       <div className="border-b p-5">
         <button
           type="button"
@@ -487,12 +490,10 @@ function ClientWorkPanel({
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <h2 className="text-xl font-semibold tracking-tight">{client.clientName}</h2>
-            <Link
-              href={`/${workspace.slug}/clients/${client.clientId}`}
-              className="text-sm text-primary hover:underline"
-            >
-              View client record →
-            </Link>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              {client.trackers.length} tracker{client.trackers.length === 1 ? "" : "s"}
+              {s.remaining > 0 && ` · ${s.remaining} units remaining`}
+            </p>
           </div>
           <Button variant="outline" size="sm" asChild>
             <Link href={`/${workspace.slug}/clients/${client.clientId}`}>View client</Link>
@@ -510,7 +511,7 @@ function ClientWorkPanel({
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-muted">
               <div
-                className="h-full rounded-full bg-emerald-500"
+                className="animate-grow-x h-full rounded-full bg-emerald-500 transition-[width] duration-500"
                 style={{ width: `${s.purchased > 0 ? (s.delivered / s.purchased) * 100 : 0}%` }}
               />
             </div>
@@ -557,8 +558,9 @@ function ClientWorkPanel({
             </div>
           </>
         ) : (
-          <div className="rounded-lg border border-dashed py-10 text-center text-sm text-muted-foreground">
-            ✓ No outstanding work for this client.
+          <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed py-10 text-center text-sm text-muted-foreground">
+            <CheckCircle2 className="h-6 w-6 text-emerald-500/70" />
+            No outstanding work for this client.
           </div>
         )}
 
@@ -611,20 +613,21 @@ function KpiTile({
       type="button"
       onClick={onClick}
       className={cn(
-        "rounded-lg border bg-card p-3.5 text-left transition-colors hover:border-foreground/20",
+        "rounded-lg border bg-card p-3.5 text-left shadow-2xs transition-all duration-150 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-md",
         active && "border-primary ring-1 ring-primary",
         active && tone === "crit" && "border-red-500 ring-red-500"
       )}
     >
       <div className="mb-2 flex items-center gap-2">
         <span className={cn("h-2 w-2 rounded-full", swatch)} />
-        <span className="text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           {label}
         </span>
       </div>
-      <div className={cn("font-mono text-2xl font-semibold leading-none tabular-nums", fig)}>
-        {value}
-      </div>
+      <AnimatedValue
+        value={String(value)}
+        className={cn("block text-2xl font-semibold leading-none tracking-tight tabular-nums", fig)}
+      />
       <div className="mt-1 text-xs text-muted-foreground">{hint}</div>
     </button>
   );

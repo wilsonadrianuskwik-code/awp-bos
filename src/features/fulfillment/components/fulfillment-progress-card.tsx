@@ -184,7 +184,10 @@ export function FulfillmentProgressCard({
           <div className="min-w-0 flex-1">
             <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
               <div
-                className={cn("h-full rounded-full transition-all", style.bar)}
+                className={cn(
+                  "animate-grow-x h-full rounded-full transition-[width] duration-500",
+                  style.bar
+                )}
                 style={{ width: `${fillPct}%` }}
               />
             </div>
