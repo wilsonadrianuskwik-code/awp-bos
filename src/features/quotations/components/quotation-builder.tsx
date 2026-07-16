@@ -407,15 +407,38 @@ export function QuotationBuilder({
     <div className="space-y-4">
       <BackButton onClick={handleCancel} label={quotation ? "Back to Quotation" : "Back to Quotations"} />
 
-      <div className="grid gap-6 lg:grid-cols-3">
-      <div className="space-y-6 lg:col-span-2">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold tracking-tight">
+      {/* Command bar: title, live save state, and the exit/save actions
+          stay pinned while the (long) form scrolls — no hunting for the
+          save button at the bottom of the page. */}
+      <div className="sticky top-3 z-20 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-background/85 px-4 py-3 shadow-2xs backdrop-blur">
+        <div className="flex min-w-0 items-center gap-3">
+          <h1 className="truncate text-lg font-semibold tracking-tight">
             {quotation ? `Edit ${quotation.quotation_number}` : "New Quotation"}
           </h1>
           <SaveStatusPill status={saveStatus} isDirty={isDirty} />
         </div>
+        <div className="flex items-center gap-2.5">
+          <span className="hidden text-xs text-muted-foreground xl:block">
+            <kbd className="rounded border px-1 py-0.5">⌘S</kbd> save ·{" "}
+            <kbd className="rounded border px-1 py-0.5">⌘⏎</kbd> send
+          </span>
+          <Button type="button" variant="outline" size="sm" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => startTransition(() => handleManualSave())}
+            disabled={isPending}
+          >
+            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Save Draft
+          </Button>
+        </div>
+      </div>
 
+      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="space-y-6 lg:col-span-2">
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Client &amp; Details</CardTitle>
@@ -489,32 +512,37 @@ export function QuotationBuilder({
         <Card>
           <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
             <CardTitle className="text-base">Line Items</CardTitle>
-            <div className="flex gap-2">
+            {/* Quiet ghost toolbar — three affordances without three
+                competing boxed buttons next to the section title. */}
+            <div className="flex gap-1">
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 size="sm"
+                className="text-muted-foreground hover:text-foreground"
                 onClick={() => setCatalogPickerOpen(true)}
               >
-                <Package className="mr-2 h-4 w-4" />
-                Insert from Catalog
+                <Package className="mr-1.5 h-4 w-4" />
+                Catalog
               </Button>
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 size="sm"
+                className="text-muted-foreground hover:text-foreground"
                 onClick={() => setTemplatePickerOpen(true)}
               >
-                <FileDown className="mr-2 h-4 w-4" />
-                Insert from Template
+                <FileDown className="mr-1.5 h-4 w-4" />
+                Template
               </Button>
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 size="sm"
+                className="text-muted-foreground hover:text-foreground"
                 onClick={() => setSaveTemplateOpen(true)}
               >
-                <FileUp className="mr-2 h-4 w-4" />
+                <FileUp className="mr-1.5 h-4 w-4" />
                 Save as Template
               </Button>
             </div>
@@ -557,29 +585,39 @@ export function QuotationBuilder({
                     </div>
                   )}
                   {itemsByCategory[cat].length === 0 ? (
-                    <p className="py-6 text-center text-sm text-muted-foreground">
-                      No {CATEGORY_LABEL[cat].toLowerCase()} yet.
-                    </p>
+                    // The empty tab IS the add affordance: one large
+                    // dashed target instead of a dead "nothing here" line
+                    // plus a small button below it.
+                    <button
+                      type="button"
+                      onClick={() => addLineItem(cat)}
+                      className="flex w-full flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed py-8 text-sm text-muted-foreground transition-colors duration-150 hover:border-primary/40 hover:bg-primary/[0.02] hover:text-foreground"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add your first {CATEGORY_LABEL[cat].toLowerCase().replace(/s$/, "")}
+                    </button>
                   ) : (
-                    itemsByCategory[cat].map(({ item, originalIndex }) => (
-                      <LineItemRow
-                        key={originalIndex}
-                        item={item}
-                        currency={currency}
-                        onChange={(patch) => updateLineItem(originalIndex, patch)}
-                        onRemove={() => removeLineItem(originalIndex)}
-                      />
-                    ))
+                    <>
+                      {itemsByCategory[cat].map(({ item, originalIndex }) => (
+                        <LineItemRow
+                          key={originalIndex}
+                          item={item}
+                          currency={currency}
+                          onChange={(patch) => updateLineItem(originalIndex, patch)}
+                          onRemove={() => removeLineItem(originalIndex)}
+                        />
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => addLineItem(cat)}
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add {CATEGORY_LABEL[cat].replace(/s$/, "")}
+                      </Button>
+                    </>
                   )}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => addLineItem(cat)}
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add {CATEGORY_LABEL[cat].replace(/s$/, "")}
-                  </Button>
                 </TabsContent>
               ))}
             </Tabs>
@@ -623,23 +661,6 @@ export function QuotationBuilder({
           </CardContent>
         </Card>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <Button
-            type="button"
-            onClick={() => startTransition(() => handleManualSave())}
-            disabled={isPending}
-          >
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Save Draft
-          </Button>
-          <Button type="button" variant="outline" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <span className="text-xs text-muted-foreground">
-            <kbd className="rounded border px-1 py-0.5">⌘S</kbd> save ·{" "}
-            <kbd className="rounded border px-1 py-0.5">⌘⏎</kbd> send
-          </span>
-        </div>
       </div>
 
       <div>
