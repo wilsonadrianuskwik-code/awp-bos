@@ -5,16 +5,25 @@
 
 import type { TemplateBlock, TemplateDocumentType, ThemeConfig } from "@/features/templates/types";
 
-export const PRESET_THEME_NAMES = ["Modern", "Corporate", "Minimal"] as const;
+export const PRESET_THEME_NAMES = [
+  "Modern",
+  "Corporate",
+  "Minimal",
+  "Premium",
+  "Indonesian Business",
+] as const;
 
 export type PresetThemeName = (typeof PRESET_THEME_NAMES)[number];
 
 export const PRESET_THEMES: Record<PresetThemeName, ThemeConfig> = {
+  // Clean SaaS blue, the kind of confident, modern look Stripe/Xero
+  // documents use — subtle zebra striping, generous rounding, tight
+  // sans-serif type.
   Modern: {
     colors: {
-      primary: "#3b82f6",
-      secondary: "#1e293b",
-      text: "#1e293b",
+      primary: "#2563eb",
+      secondary: "#0f172a",
+      text: "#0f172a",
       muted: "#64748b",
       background: "#ffffff",
       surface: "#f8fafc",
@@ -28,27 +37,29 @@ export const PRESET_THEMES: Record<PresetThemeName, ThemeConfig> = {
       scale: 1.2,
       heading_weight: 700,
       body_weight: 400,
-      line_height: 1.5,
+      line_height: 1.55,
     },
     spacing: {
       page_margin_mm: { top: 18, right: 18, bottom: 18, left: 18 },
-      block_gap_mm: 4,
+      block_gap_mm: 5,
     },
     borders: {
-      radius_px: 6,
+      radius_px: 8,
       width_px: 1,
-      table_style: "minimal",
+      table_style: "striped",
       header_border: true,
     },
   },
+  // Formal navy + brass, serif type, fully bordered tables — the
+  // buttoned-up look of a law firm or bank statement.
   Corporate: {
     colors: {
       primary: "#1e3a5f",
-      secondary: "#c8a45c",
-      text: "#1e293b",
+      secondary: "#9c7a3c",
+      text: "#1c2430",
       muted: "#6b7280",
       background: "#ffffff",
-      surface: "#fafaf8",
+      surface: "#f7f6f2",
       border: "#d4d0c8",
     },
     typography: {
@@ -66,21 +77,23 @@ export const PRESET_THEMES: Record<PresetThemeName, ThemeConfig> = {
       block_gap_mm: 5,
     },
     borders: {
-      radius_px: 0,
+      radius_px: 2,
       width_px: 1,
       table_style: "bordered",
       header_border: true,
     },
   },
+  // Black on white, no table lines at all, maximum whitespace — the
+  // restraint reads as confidence, not an unfinished template.
   Minimal: {
     colors: {
       primary: "#111111",
       secondary: "#666666",
       text: "#111111",
-      muted: "#888888",
+      muted: "#8a8a8a",
       background: "#ffffff",
-      surface: "#ffffff",
-      border: "#eeeeee",
+      surface: "#fafafa",
+      border: "#ececec",
     },
     typography: {
       heading_family: "system-ui, -apple-system, sans-serif",
@@ -90,17 +103,84 @@ export const PRESET_THEMES: Record<PresetThemeName, ThemeConfig> = {
       scale: 1.15,
       heading_weight: 500,
       body_weight: 400,
-      line_height: 1.6,
+      line_height: 1.65,
     },
     spacing: {
-      page_margin_mm: { top: 22, right: 22, bottom: 22, left: 22 },
-      block_gap_mm: 5,
+      page_margin_mm: { top: 24, right: 24, bottom: 24, left: 24 },
+      block_gap_mm: 6,
     },
     borders: {
       radius_px: 0,
       width_px: 1,
       table_style: "none",
       header_border: false,
+    },
+  },
+  // A boutique-agency, high-end look: near-black ink, warm ivory surface,
+  // a bronze/gold accent, serif display headings over a quiet sans body.
+  Premium: {
+    colors: {
+      primary: "#8a6d3b",
+      secondary: "#1a1a1a",
+      text: "#201d18",
+      muted: "#7d7264",
+      background: "#ffffff",
+      surface: "#faf8f3",
+      border: "#e5ded0",
+    },
+    typography: {
+      heading_family: "'Playfair Display', Georgia, serif",
+      body_family: "'Inter', system-ui, sans-serif",
+      mono_family: "'SF Mono', ui-monospace, monospace",
+      base_size_pt: 10,
+      scale: 1.2,
+      heading_weight: 600,
+      body_weight: 400,
+      line_height: 1.55,
+    },
+    spacing: {
+      page_margin_mm: { top: 22, right: 22, bottom: 22, left: 22 },
+      block_gap_mm: 6,
+    },
+    borders: {
+      radius_px: 3,
+      width_px: 1,
+      table_style: "minimal",
+      header_border: true,
+    },
+  },
+  // Warm, professional palette drawing on Indonesian corporate
+  // identity — a deep maroon/red accent and cream surface, not a
+  // literal batik motif — over clean, legible sans type.
+  "Indonesian Business": {
+    colors: {
+      primary: "#9c2b3a",
+      secondary: "#5c4425",
+      text: "#241c18",
+      muted: "#79695c",
+      background: "#ffffff",
+      surface: "#fdf8f2",
+      border: "#e8dccc",
+    },
+    typography: {
+      heading_family: "'Inter', system-ui, sans-serif",
+      body_family: "'Inter', system-ui, sans-serif",
+      mono_family: "'SF Mono', ui-monospace, monospace",
+      base_size_pt: 10,
+      scale: 1.18,
+      heading_weight: 700,
+      body_weight: 400,
+      line_height: 1.55,
+    },
+    spacing: {
+      page_margin_mm: { top: 20, right: 20, bottom: 20, left: 20 },
+      block_gap_mm: 5,
+    },
+    borders: {
+      radius_px: 4,
+      width_px: 1,
+      table_style: "striped",
+      header_border: true,
     },
   },
 };
@@ -178,7 +258,7 @@ function defaultInvoiceBlocks(): TemplateBlock[] {
       id: blockId("totals"),
       type: "totals",
       enabled: true,
-      config: { rows: ["subtotal", "discount", "tax", "total", "amount_paid", "balance_due"], alignment: "right", width_percent: 40 },
+      config: { rows: ["subtotal", "discount", "tax", "total", "amount_paid", "balance_due"], alignment: "right", width_percent: 45 },
     },
     { id: blockId("divider2"), type: "divider", enabled: true, config: { line_style: "solid", thickness_px: 1 } },
     {

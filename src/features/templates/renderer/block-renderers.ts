@@ -26,6 +26,24 @@ const DOCUMENT_TYPE_LABEL: Record<string, string> = {
   delivery_order: "DELIVERY ORDER",
 };
 
+// Semantic status colors, deliberately fixed (not theme-driven) — a
+// "paid" badge should read as unambiguously green regardless of which
+// brand accent a workspace has chosen, the same convention Xero/Zoho use.
+const STATUS_BADGE: Record<string, { bg: string; text: string }> = {
+  draft: { bg: "#f1f5f9", text: "#475569" },
+  sent: { bg: "#dbeafe", text: "#1d4ed8" },
+  viewed: { bg: "#dbeafe", text: "#1d4ed8" },
+  partial: { bg: "#fef3c7", text: "#b45309" },
+  paid: { bg: "#dcfce7", text: "#15803d" },
+  approved: { bg: "#dcfce7", text: "#15803d" },
+  overdue: { bg: "#fee2e2", text: "#b91c1c" },
+  rejected: { bg: "#fee2e2", text: "#b91c1c" },
+  expired: { bg: "#fee2e2", text: "#b91c1c" },
+  cancelled: { bg: "#f1f5f9", text: "#64748b" },
+  refunded: { bg: "#f1f5f9", text: "#64748b" },
+  revision_requested: { bg: "#fef3c7", text: "#b45309" },
+};
+
 function renderLogo(block: TemplateBlock, data: DocumentRenderData): string {
   const alignment = cfg<string>(block.config, "alignment", "left");
   const maxHeight = cfg(block.config, "max_height_mm", 20);
@@ -80,10 +98,10 @@ function renderCompanyInfo(block: TemplateBlock, data: DocumentRenderData): stri
     if (!value) continue;
     const text = showLabels && label ? `${label}: ${escapeHtml(value)}` : escapeHtml(value);
     const style = field === "name"
-      ? "font-weight:var(--t-heading-weight); color:var(--t-text);"
+      ? "font-family:var(--t-heading-font); font-size:12.5pt; font-weight:var(--t-heading-weight); color:var(--t-text); margin-bottom:2px;"
       : field === "tagline"
-        ? "font-style:italic; color:var(--t-muted); font-size:9pt;"
-        : "color:var(--t-muted);";
+        ? "font-style:italic; color:var(--t-muted); font-size:9pt; margin-bottom:4px;"
+        : "color:var(--t-muted); font-size:9pt; line-height:1.5;";
     lines.push(`<div style="${style}">${text}</div>`);
   }
 
@@ -153,6 +171,7 @@ function formatDocDate(value: string | undefined, format: string): string {
 function renderDocumentMeta(block: TemplateBlock, data: DocumentRenderData): string {
   const showLabel = cfg(block.config, "show_document_type_label", true);
   const customLabel = cfg<string | undefined>(block.config, "document_type_label", undefined);
+  const showStatus = cfg(block.config, "show_status_badge", true);
   const fields = cfg<string[]>(block.config, "fields", ["number", "date", "due_date"]);
   const layout = cfg<string>(block.config, "layout", "stacked");
   const dateFormat = cfg(block.config, "date_format", "DD MMM YYYY");
@@ -196,18 +215,22 @@ function renderDocumentMeta(block: TemplateBlock, data: DocumentRenderData): str
   }
 
   const title = customLabel || DOCUMENT_TYPE_LABEL[data.document_type] || data.document_type.toUpperCase();
+  const badge = STATUS_BADGE[data.document.status] ?? STATUS_BADGE.draft;
+  const statusHtml = showStatus
+    ? `<span class="tpl-badge" style="background:${badge.bg}; color:${badge.text};">${escapeHtml(data.document.status.replace(/_/g, " "))}</span>`
+    : "";
   const heading = showLabel
-    ? `<div style="font-size:20pt; font-weight:var(--t-heading-weight); color:var(--t-primary); letter-spacing:1px;">${escapeHtml(title)}</div>`
+    ? `<div style="display:flex; align-items:center; justify-content:flex-end; gap:10px;"><span style="font-family:var(--t-heading-font); font-size:20pt; font-weight:var(--t-heading-weight); color:var(--t-primary); letter-spacing:1px;">${escapeHtml(title)}</span>${statusHtml}</div>`
     : "";
 
   const rowsHtml =
     layout === "table"
-      ? `<table style="margin-left:auto; font-size:9pt;">${rows
-          .map((r) => `<tr><td style="color:var(--t-muted); padding-right:8px; text-align:right;">${escapeHtml(r.label)}</td><td style="text-align:right; color:var(--t-text);">${escapeHtml(r.value)}</td></tr>`)
+      ? `<table class="tpl-num" style="margin-left:auto; font-size:9pt;">${rows
+          .map((r) => `<tr><td style="color:var(--t-muted); padding-right:8px; padding-top:2px; text-align:right;">${escapeHtml(r.label)}</td><td style="text-align:right; padding-top:2px; color:var(--t-text);">${escapeHtml(r.value)}</td></tr>`)
           .join("")}</table>`
       : rows.map((r) => `<div style="font-size:9pt; color:var(--t-muted);">${escapeHtml(r.value)}</div>`).join("");
 
-  return `<div style="text-align:right;">${heading}${rowsHtml}</div>`;
+  return `<div style="text-align:right;">${heading}<div style="margin-top:8px;">${rowsHtml}</div></div>`;
 }
 
 const COLUMN_LABEL_DEFAULTS: Record<string, string> = {
@@ -224,8 +247,11 @@ function renderLineItemsTable(block: TemplateBlock, data: DocumentRenderData): s
   const columns = cfg<string[]>(block.config, "columns", ["description", "quantity", "unit_price", "total"]);
   const columnLabels = cfg<Record<string, string>>(block.config, "column_labels", {});
   const showRowNumbers = cfg(block.config, "show_row_numbers", false);
-  const alternateShading = cfg(block.config, "alternate_row_shading", false);
+  const alternateShadingConfig = cfg(block.config, "alternate_row_shading", false);
   const currency = data.document.currency;
+  const tableStyle = data.theme_style?.table_style ?? "lined";
+  const headerBorder = data.theme_style?.header_border ?? true;
+  const alternateShading = alternateShadingConfig || tableStyle === "striped";
 
   const cellValue = (item: RenderLineItem, column: string): string => {
     switch (column) {
@@ -249,12 +275,30 @@ function renderLineItemsTable(block: TemplateBlock, data: DocumentRenderData): s
   };
 
   const alignRight = new Set(["quantity", "unit_price", "discount", "tax", "total"]);
+  const isNumeric = new Set(["quantity", "unit_price", "total"]);
+
+  // table_style shapes the whole table's structure, not just its color —
+  // this is the one place a theme's `borders.table_style` choice actually
+  // changes markup, everything else is CSS-variable repaint only.
+  const headerBg = tableStyle === "bordered" || tableStyle === "striped" ? "background:var(--t-surface);" : "";
+  const headerBorderBottom =
+    tableStyle === "none"
+      ? "none"
+      : tableStyle === "minimal"
+        ? "1px solid var(--t-border)"
+        : headerBorder
+          ? "2px solid var(--t-primary)"
+          : "1px solid var(--t-border)";
+  const cellBorder = tableStyle === "bordered" ? "border:1px solid var(--t-border);" : "";
+  const rowBorderBottom = tableStyle === "lined" || tableStyle === "striped" ? "border-bottom:1px solid var(--t-border);" : "";
+  const tableBorder = tableStyle === "bordered" ? "border:1px solid var(--t-border);" : "";
+  const cellPadding = tableStyle === "none" || tableStyle === "minimal" ? "10px 6px" : "9px 6px";
 
   const headerCells = [
-    showRowNumbers ? `<th style="width:24px;">#</th>` : "",
+    showRowNumbers ? `<th style="width:24px; padding:${cellPadding}; ${headerBg} border-bottom:${headerBorderBottom};">#</th>` : "",
     ...columns.map(
       (c) =>
-        `<th style="text-align:${alignRight.has(c) ? "right" : "left"}; font-size:8pt; text-transform:uppercase; color:var(--t-muted); padding:6px 4px;">${escapeHtml(columnLabels[c] ?? COLUMN_LABEL_DEFAULTS[c] ?? c)}</th>`
+        `<th style="text-align:${alignRight.has(c) ? "right" : "left"}; font-size:8pt; text-transform:uppercase; letter-spacing:.4px; color:var(--t-muted); padding:${cellPadding}; ${headerBg} border-bottom:${headerBorderBottom};">${escapeHtml(columnLabels[c] ?? COLUMN_LABEL_DEFAULTS[c] ?? c)}</th>`
     ),
   ].join("");
 
@@ -262,16 +306,19 @@ function renderLineItemsTable(block: TemplateBlock, data: DocumentRenderData): s
     .map((item, index) => {
       const rowBg = alternateShading && index % 2 === 1 ? "background:var(--t-surface);" : "";
       const cells = [
-        showRowNumbers ? `<td style="padding:6px 4px; color:var(--t-muted);">${index + 1}</td>` : "",
-        ...columns.map((c) => `<td style="padding:6px 4px; text-align:${alignRight.has(c) ? "right" : "left"};">${cellValue(item, c)}</td>`),
+        showRowNumbers ? `<td style="padding:${cellPadding}; color:var(--t-muted); ${cellBorder}">${index + 1}</td>` : "",
+        ...columns.map(
+          (c) =>
+            `<td class="${isNumeric.has(c) ? "tpl-num" : ""}" style="padding:${cellPadding}; text-align:${alignRight.has(c) ? "right" : "left"}; ${cellBorder}">${cellValue(item, c)}</td>`
+        ),
       ].join("");
-      return `<tr style="border-bottom:1px solid var(--t-border); ${rowBg}">${cells}</tr>`;
+      return `<tr style="${rowBorderBottom} ${rowBg}">${cells}</tr>`;
     })
     .join("");
 
   return `
-    <table style="width:100%; border-collapse:collapse; font-size:9pt;">
-      <thead><tr style="border-bottom:2px solid var(--t-primary);">${headerCells}</tr></thead>
+    <table style="width:100%; border-collapse:collapse; font-size:9pt; ${tableBorder} border-radius:var(--t-radius); overflow:hidden;">
+      <thead><tr>${headerCells}</tr></thead>
       <tbody>${bodyRows}</tbody>
     </table>`;
 }
@@ -326,14 +373,15 @@ function renderTotals(block: TemplateBlock, data: DocumentRenderData): string {
       const isTotal = row === "total";
       const label = rowLabels[row] ?? TOTALS_ROW_DEFAULTS[row] ?? row;
       const style = isTotal
-        ? "font-weight:var(--t-heading-weight); font-size:11pt; padding:6px 0; border-top:2px solid var(--t-primary); margin-top:4px; color:var(--t-primary);"
+        ? "font-family:var(--t-heading-font); font-weight:var(--t-heading-weight); font-size:12pt; padding-top:8px; margin-top:6px; border-top:2px solid var(--t-primary); color:var(--t-primary);"
         : "font-size:9pt; padding:3px 0; color:var(--t-text);";
+      const labelStyle = isTotal ? "color:var(--t-primary);" : "color:var(--t-muted);";
 
-      return `<div style="display:flex; justify-content:space-between; ${style}"><span style="color:var(--t-muted);">${escapeHtml(label)}</span><span>${formatCurrency(value, currency)}</span></div>`;
+      return `<div style="display:flex; justify-content:space-between; align-items:baseline; ${style}"><span style="${labelStyle}">${escapeHtml(label)}</span><span>${formatCurrency(value, currency)}</span></div>`;
     })
     .join("");
 
-  return `<div style="display:flex; justify-content:flex-end;"><div style="width:${widthPercent}%;">${html}</div></div>`;
+  return `<div style="display:flex; justify-content:flex-end;"><div class="tpl-card tpl-num" style="width:${widthPercent}%; padding:14px 18px;">${html}</div></div>`;
 }
 
 function renderPaymentInfo(block: TemplateBlock, data: DocumentRenderData): string {
@@ -344,45 +392,45 @@ function renderPaymentInfo(block: TemplateBlock, data: DocumentRenderData): stri
   const blockInstructions = cfg<string | undefined>(block.config, "custom_instructions", undefined);
   const wp = data.workspace_payment_details;
 
-  const parts: string[] = [];
+  const termsHtml =
+    showTerms && data.document.payment_terms
+      ? `<div style="margin-bottom:8px; font-size:9pt; color:var(--t-text);">${nl2br(data.document.payment_terms)}</div>`
+      : "";
 
-  if (showTerms && data.document.payment_terms) {
-    parts.push(`<div style="margin-bottom:6px;">${nl2br(data.document.payment_terms)}</div>`);
+  const bankField = (label: string, value: string, numeric = false) =>
+    `<div style="color:var(--t-muted);">${label}</div><div class="${numeric ? "tpl-num" : ""}" style="color:var(--t-text);">${escapeHtml(value)}</div>`;
+
+  let bankGrid = "";
+  const account = wp?.bank_accounts?.length ? wp.bank_accounts.find((a) => a.is_primary) ?? wp.bank_accounts[0] : null;
+  const bank = account ?? blockBank;
+  if (showBankDetails && bank) {
+    const rows = [
+      bank.bank_name ? bankField("Bank", bank.bank_name) : "",
+      bank.account_name ? bankField("Account Name", bank.account_name) : "",
+      bank.account_number ? bankField("Account No.", bank.account_number, true) : "",
+      bank.swift_code ? bankField("SWIFT", bank.swift_code) : "",
+    ].join("");
+    bankGrid = `<div style="display:grid; grid-template-columns:auto 1fr; gap:3px 12px; font-size:9pt;">${rows}</div>`;
   }
 
-  if (showBankDetails) {
-    if (wp?.bank_accounts?.length) {
-      const account = wp.bank_accounts.find((a) => a.is_primary) ?? wp.bank_accounts[0];
-      const rows = [
-        `Bank: ${account.bank_name}`,
-        `Account Name: ${account.account_name}`,
-        `Account No.: ${account.account_number}`,
-        account.swift_code ? `SWIFT: ${account.swift_code}` : "",
-      ].filter(Boolean);
-      parts.push(`<div style="font-size:9pt; color:var(--t-muted);">${rows.map(escapeHtml).join("<br>")}</div>`);
-    } else if (blockBank) {
-      const rows = [
-        blockBank.bank_name ? `Bank: ${blockBank.bank_name}` : "",
-        blockBank.account_name ? `Account Name: ${blockBank.account_name}` : "",
-        blockBank.account_number ? `Account No.: ${blockBank.account_number}` : "",
-        blockBank.swift_code ? `SWIFT: ${blockBank.swift_code}` : "",
-      ].filter(Boolean);
-      parts.push(`<div style="font-size:9pt; color:var(--t-muted);">${rows.map(escapeHtml).join("<br>")}</div>`);
-    }
-  }
-
-  if (showQris && wp?.qris_image_url) {
-    parts.push(`<div style="text-align:center; margin-top:8px;"><img src="${escapeHtml(wp.qris_image_url)}" style="max-width:120px;" alt="QRIS" /></div>`);
-  }
+  const qrisHtml =
+    showQris && wp?.qris_image_url
+      ? `<div style="text-align:center; margin-top:10px;"><img src="${escapeHtml(wp.qris_image_url)}" style="max-width:110px;" alt="QRIS" /></div>`
+      : "";
 
   const instructions = wp?.custom_instructions || blockInstructions;
-  if (instructions) {
-    parts.push(`<div>${resolvePlaceholders(instructions, data)}</div>`);
-  }
+  const instructionsHtml = instructions
+    ? `<div style="margin-top:8px; font-size:9pt; color:var(--t-muted);">${resolvePlaceholders(instructions, data)}</div>`
+    : "";
 
-  if (parts.length === 0) return "";
+  const cardBody = [bankGrid, qrisHtml, instructionsHtml].join("");
+  if (!termsHtml && !cardBody) return "";
 
-  return `<div><div style="font-size:8pt; text-transform:uppercase; color:var(--t-muted); margin-bottom:4px;">Payment Information</div>${parts.join("")}</div>`;
+  const card = cardBody
+    ? `<div style="font-size:8pt; text-transform:uppercase; letter-spacing:.4px; color:var(--t-muted); margin-bottom:6px;">Payment Information</div><div class="tpl-card" style="padding:12px 14px;">${bankGrid}${qrisHtml}${instructionsHtml}</div>`
+    : "";
+
+  return `<div>${termsHtml}${card}</div>`;
 }
 
 function renderPaymentSummary(block: TemplateBlock, data: DocumentRenderData): string {
@@ -394,13 +442,13 @@ function renderPaymentSummary(block: TemplateBlock, data: DocumentRenderData): s
   const currency = data.document.currency;
   const labelFor: Record<string, string> = { date: "Date", method: "Method", reference: "Reference", amount: "Amount" };
 
-  const header = columns.map((c) => `<th style="text-align:${c === "amount" ? "right" : "left"}; font-size:8pt; color:var(--t-muted); padding:4px;">${labelFor[c]}</th>`).join("");
+  const header = columns.map((c) => `<th style="text-align:${c === "amount" ? "right" : "left"}; font-size:8pt; text-transform:uppercase; letter-spacing:.4px; color:var(--t-muted); padding:8px 6px; border-bottom:1px solid var(--t-border);">${labelFor[c]}</th>`).join("");
   const rows = payments
     .map((p) => {
       const cells = columns
         .map((c) => {
           const v = c === "amount" ? formatCurrency(p.amount, currency) : c === "date" ? p.date : c === "method" ? p.method : p.reference ?? "";
-          return `<td style="padding:4px; text-align:${c === "amount" ? "right" : "left"};">${escapeHtml(v)}</td>`;
+          return `<td class="${c === "amount" ? "tpl-num" : ""}" style="padding:7px 6px; text-align:${c === "amount" ? "right" : "left"};">${escapeHtml(v)}</td>`;
         })
         .join("");
       return `<tr style="border-bottom:1px solid var(--t-border);">${cells}</tr>`;
@@ -408,7 +456,7 @@ function renderPaymentSummary(block: TemplateBlock, data: DocumentRenderData): s
     .join("");
 
   const total = showTotal
-    ? `<div style="text-align:right; font-weight:var(--t-heading-weight); margin-top:4px;">Total Paid: ${formatCurrency(payments.reduce((sum, p) => sum + p.amount, 0), currency)}</div>`
+    ? `<div class="tpl-num" style="text-align:right; font-family:var(--t-heading-font); font-weight:var(--t-heading-weight); margin-top:6px; color:var(--t-primary);">Total Paid: ${formatCurrency(payments.reduce((sum, p) => sum + p.amount, 0), currency)}</div>`
     : "";
 
   return `<table style="width:100%; border-collapse:collapse; font-size:9pt;"><thead><tr>${header}</tr></thead><tbody>${rows}</tbody></table>${total}`;

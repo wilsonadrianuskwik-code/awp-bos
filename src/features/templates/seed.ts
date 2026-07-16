@@ -1,4 +1,4 @@
-// Seeds the three preset themes and a default Invoice + Quotation design
+// Seeds the preset themes and a default Invoice + Quotation design
 // into a brand-new workspace, so a user opening Document Design for the
 // first time always finds ready-made starting points — never a blank
 // slate. Called once, from createWorkspace(), using the admin client

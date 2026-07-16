@@ -88,6 +88,14 @@ export type DocumentRenderData = {
   workspace_branding?: {
     tagline?: string;
   };
+  // Populated by renderDocumentFragment from the active theme, right
+  // before block rendering — the only bit of theme.borders block
+  // renderers need but can't get from CSS custom properties alone
+  // (table_style/header_border change markup structure, not just color).
+  theme_style?: {
+    table_style: "lined" | "bordered" | "striped" | "minimal" | "none";
+    header_border: boolean;
+  };
   meta: {
     current_date: string;
     current_year: number;

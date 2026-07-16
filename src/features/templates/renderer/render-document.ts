@@ -85,7 +85,11 @@ export function renderDocumentFragment(
 ): DocumentRenderFragment {
   const cssVars = themeToCssVariables(theme);
   const { widthMm, heightMm } = pageDimensions(pageSettings);
-  const html = renderBlockList(blocks, data, options);
+  const dataWithTheme: DocumentRenderData = {
+    ...data,
+    theme_style: { table_style: theme.borders.table_style, header_border: theme.borders.header_border },
+  };
+  const html = renderBlockList(blocks, dataWithTheme, options);
 
   const css = `
     :root { ${cssVars} }
@@ -107,6 +111,22 @@ export function renderDocumentFragment(
       font-family: var(--t-heading-font); font-weight: var(--t-heading-weight);
     }
     .tpl-document table { border-radius: var(--t-radius); }
+    .tpl-document .tpl-num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+    .tpl-document .tpl-card {
+      background: var(--t-surface);
+      border: var(--t-border-width) solid var(--t-border);
+      border-radius: var(--t-radius);
+    }
+    .tpl-document .tpl-badge {
+      display: inline-block;
+      font-size: 8pt;
+      font-weight: 600;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 999px;
+      line-height: 1.4;
+    }
     .tpl-document .tpl-block[data-block-id] { outline: 1px dashed transparent; cursor: pointer; }
     .tpl-document .tpl-block[data-block-id]:hover { outline-color: var(--t-primary); }
   `.trim();
