@@ -84,6 +84,8 @@ type QuotationBuilderProps = {
   templates: TemplateWithItems[];
   catalogItems: CatalogItem[];
   initialClientId?: string;
+  defaultTermsAndConditions?: string;
+  defaultNotes?: string;
 };
 
 export function QuotationBuilder({
@@ -92,6 +94,8 @@ export function QuotationBuilder({
   templates: initialTemplates,
   catalogItems,
   initialClientId,
+  defaultTermsAndConditions,
+  defaultNotes,
 }: QuotationBuilderProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
@@ -113,8 +117,10 @@ export function QuotationBuilder({
   );
   const [issueDate, setIssueDate] = useState(quotation?.issue_date ?? todayISO());
   const [expiryDate, setExpiryDate] = useState(quotation?.expiry_date ?? "");
-  const [terms, setTerms] = useState(quotation?.terms_and_conditions ?? "");
-  const [notes, setNotes] = useState(quotation?.notes ?? "");
+  const [terms, setTerms] = useState(
+    quotation?.terms_and_conditions ?? defaultTermsAndConditions ?? ""
+  );
+  const [notes, setNotes] = useState(quotation?.notes ?? defaultNotes ?? "");
   const [internalNotes, setInternalNotes] = useState(
     quotation?.internal_notes ?? ""
   );

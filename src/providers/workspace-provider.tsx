@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useCallback } from "react";
 import { hasMinRole, type Role } from "@/lib/constants/roles";
+import type { WorkspaceDocumentSettings } from "@/features/templates/types";
 
 type Workspace = {
   id: string;
@@ -9,7 +10,7 @@ type Workspace = {
   slug: string;
   logo_url: string | null;
   default_currency: string;
-  settings: Record<string, unknown>;
+  settings: WorkspaceDocumentSettings;
 };
 
 type WorkspaceContextType = {

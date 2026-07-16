@@ -108,3 +108,48 @@ export const companyProfileSchema = z.object({
 });
 
 export type CompanyProfileInput = z.infer<typeof companyProfileSchema>;
+
+// ---------------------------------------------------------------------
+// Branding
+// ---------------------------------------------------------------------
+
+export const brandingSchema = z.object({
+  tagline: z.string().max(255).optional().or(z.literal("")),
+});
+
+export type BrandingInput = z.infer<typeof brandingSchema>;
+
+// ---------------------------------------------------------------------
+// Payment details
+// ---------------------------------------------------------------------
+
+const bankAccountSchema = z.object({
+  id: z.string().min(1),
+  label: z.string().max(255).min(1, "Label is required"),
+  bank_name: z.string().max(255).min(1, "Bank name is required"),
+  account_name: z.string().max(255).min(1, "Account name is required"),
+  account_number: z.string().max(100).min(1, "Account number is required"),
+  swift_code: z.string().max(20).optional().or(z.literal("")),
+  is_primary: z.boolean(),
+});
+
+export const paymentDetailsSchema = z.object({
+  bank_accounts: z.array(bankAccountSchema).max(10),
+  qris_image_url: z.string().max(2000).optional().or(z.literal("")),
+  custom_instructions: z.string().max(2000).optional().or(z.literal("")),
+});
+
+export type PaymentDetailsInput = z.infer<typeof paymentDetailsSchema>;
+
+// ---------------------------------------------------------------------
+// Default terms
+// ---------------------------------------------------------------------
+
+export const defaultTermsSchema = z.object({
+  invoice_payment_terms: z.string().max(5000).optional().or(z.literal("")),
+  invoice_notes: z.string().max(5000).optional().or(z.literal("")),
+  quotation_terms_and_conditions: z.string().max(10000).optional().or(z.literal("")),
+  quotation_notes: z.string().max(5000).optional().or(z.literal("")),
+});
+
+export type DefaultTermsInput = z.infer<typeof defaultTermsSchema>;

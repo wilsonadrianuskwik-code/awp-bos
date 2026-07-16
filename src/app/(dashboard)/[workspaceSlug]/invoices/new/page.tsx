@@ -4,6 +4,7 @@ import { getClients } from "@/features/clients/queries";
 import { getLineItemTemplates } from "@/features/line-items/queries";
 import { getActiveCatalogItems } from "@/features/catalog/queries";
 import { InvoiceBuilder } from "@/features/invoices/components/invoice-builder";
+import type { DefaultTerms } from "@/features/templates/types";
 
 export default async function NewInvoicePage({
   params,
@@ -23,12 +24,16 @@ export default async function NewInvoicePage({
     getActiveCatalogItems(workspace.id),
   ]);
 
+  const defaultTerms = (workspace.settings?.default_terms ?? {}) as DefaultTerms;
+
   return (
     <InvoiceBuilder
       clients={clients}
       templates={templates}
       catalogItems={catalogItems}
       initialClientId={clientId}
+      defaultPaymentTerms={defaultTerms.invoice_payment_terms}
+      defaultNotes={defaultTerms.invoice_notes}
     />
   );
 }

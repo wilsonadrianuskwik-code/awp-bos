@@ -84,6 +84,8 @@ type InvoiceBuilderProps = {
   templates: TemplateWithItems[];
   catalogItems: CatalogItem[];
   initialClientId?: string;
+  defaultPaymentTerms?: string;
+  defaultNotes?: string;
 };
 
 export function InvoiceBuilder({
@@ -92,6 +94,8 @@ export function InvoiceBuilder({
   templates: initialTemplates,
   catalogItems,
   initialClientId,
+  defaultPaymentTerms,
+  defaultNotes,
 }: InvoiceBuilderProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
@@ -111,8 +115,10 @@ export function InvoiceBuilder({
   );
   const [issueDate, setIssueDate] = useState(invoice?.issue_date ?? todayISO());
   const [dueDate, setDueDate] = useState(invoice?.due_date ?? "");
-  const [paymentTerms, setPaymentTerms] = useState(invoice?.payment_terms ?? "");
-  const [notes, setNotes] = useState(invoice?.notes ?? "");
+  const [paymentTerms, setPaymentTerms] = useState(
+    invoice?.payment_terms ?? defaultPaymentTerms ?? ""
+  );
+  const [notes, setNotes] = useState(invoice?.notes ?? defaultNotes ?? "");
   const [activeCategory, setActiveCategory] =
     useState<LineItemCategory>("per_unit");
   const [lineItems, setLineItems] = useState<LineItemInput[]>(

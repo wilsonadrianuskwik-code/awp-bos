@@ -181,3 +181,53 @@ export type CompanyProfile = {
   registration_number?: string;
   address?: CompanyProfileAddress;
 };
+
+// ---------------------------------------------------------------------
+// Branding (stored in workspaces.settings.branding)
+// ---------------------------------------------------------------------
+
+export type BrandingSettings = {
+  tagline?: string;
+};
+
+// ---------------------------------------------------------------------
+// Payment details (stored in workspaces.settings.payment_details)
+// ---------------------------------------------------------------------
+
+export type BankAccount = {
+  id: string;
+  label: string;
+  bank_name: string;
+  account_name: string;
+  account_number: string;
+  swift_code?: string;
+  is_primary: boolean;
+};
+
+export type PaymentDetails = {
+  bank_accounts: BankAccount[];
+  qris_image_url?: string;
+  custom_instructions?: string;
+};
+
+// ---------------------------------------------------------------------
+// Default terms (stored in workspaces.settings.default_terms)
+// ---------------------------------------------------------------------
+
+export type DefaultTerms = {
+  invoice_payment_terms?: string;
+  invoice_notes?: string;
+  quotation_terms_and_conditions?: string;
+  quotation_notes?: string;
+};
+
+// ---------------------------------------------------------------------
+// Unified workspace document settings
+// ---------------------------------------------------------------------
+
+export type WorkspaceDocumentSettings = {
+  company_profile?: CompanyProfile;
+  branding?: BrandingSettings;
+  payment_details?: PaymentDetails;
+  default_terms?: DefaultTerms;
+};

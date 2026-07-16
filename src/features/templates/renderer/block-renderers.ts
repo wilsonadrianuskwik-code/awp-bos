@@ -73,10 +73,17 @@ function renderCompanyInfo(block: TemplateBlock, data: DocumentRenderData): stri
         value = data.company.registration_number ?? "";
         label = "Reg. No.";
         break;
+      case "tagline":
+        value = data.workspace_branding?.tagline ?? "";
+        break;
     }
     if (!value) continue;
     const text = showLabels && label ? `${label}: ${escapeHtml(value)}` : escapeHtml(value);
-    const style = field === "name" ? "font-weight:var(--t-heading-weight); color:var(--t-text);" : "color:var(--t-muted);";
+    const style = field === "name"
+      ? "font-weight:var(--t-heading-weight); color:var(--t-text);"
+      : field === "tagline"
+        ? "font-style:italic; color:var(--t-muted); font-size:9pt;"
+        : "color:var(--t-muted);";
     lines.push(`<div style="${style}">${text}</div>`);
   }
 
@@ -331,25 +338,48 @@ function renderTotals(block: TemplateBlock, data: DocumentRenderData): string {
 
 function renderPaymentInfo(block: TemplateBlock, data: DocumentRenderData): string {
   const showTerms = cfg(block.config, "show_payment_terms", true);
-  const bank = cfg<Record<string, string> | undefined>(block.config, "bank_details", undefined);
-  const customInstructions = cfg<string | undefined>(block.config, "custom_instructions", undefined);
+  const showBankDetails = cfg(block.config, "show_bank_details", true);
+  const showQris = cfg(block.config, "show_qris", true);
+  const blockBank = cfg<Record<string, string> | undefined>(block.config, "bank_details", undefined);
+  const blockInstructions = cfg<string | undefined>(block.config, "custom_instructions", undefined);
+  const wp = data.workspace_payment_details;
 
   const parts: string[] = [];
+
   if (showTerms && data.document.payment_terms) {
     parts.push(`<div style="margin-bottom:6px;">${nl2br(data.document.payment_terms)}</div>`);
   }
-  if (bank) {
-    const rows = [
-      bank.bank_name ? `Bank: ${bank.bank_name}` : "",
-      bank.account_name ? `Account Name: ${bank.account_name}` : "",
-      bank.account_number ? `Account No.: ${bank.account_number}` : "",
-      bank.swift_code ? `SWIFT: ${bank.swift_code}` : "",
-    ].filter(Boolean);
-    parts.push(`<div style="font-size:9pt; color:var(--t-muted);">${rows.map(escapeHtml).join("<br>")}</div>`);
+
+  if (showBankDetails) {
+    if (wp?.bank_accounts?.length) {
+      const account = wp.bank_accounts.find((a) => a.is_primary) ?? wp.bank_accounts[0];
+      const rows = [
+        `Bank: ${account.bank_name}`,
+        `Account Name: ${account.account_name}`,
+        `Account No.: ${account.account_number}`,
+        account.swift_code ? `SWIFT: ${account.swift_code}` : "",
+      ].filter(Boolean);
+      parts.push(`<div style="font-size:9pt; color:var(--t-muted);">${rows.map(escapeHtml).join("<br>")}</div>`);
+    } else if (blockBank) {
+      const rows = [
+        blockBank.bank_name ? `Bank: ${blockBank.bank_name}` : "",
+        blockBank.account_name ? `Account Name: ${blockBank.account_name}` : "",
+        blockBank.account_number ? `Account No.: ${blockBank.account_number}` : "",
+        blockBank.swift_code ? `SWIFT: ${blockBank.swift_code}` : "",
+      ].filter(Boolean);
+      parts.push(`<div style="font-size:9pt; color:var(--t-muted);">${rows.map(escapeHtml).join("<br>")}</div>`);
+    }
   }
-  if (customInstructions) {
-    parts.push(`<div>${resolvePlaceholders(customInstructions, data)}</div>`);
+
+  if (showQris && wp?.qris_image_url) {
+    parts.push(`<div style="text-align:center; margin-top:8px;"><img src="${escapeHtml(wp.qris_image_url)}" style="max-width:120px;" alt="QRIS" /></div>`);
   }
+
+  const instructions = wp?.custom_instructions || blockInstructions;
+  if (instructions) {
+    parts.push(`<div>${resolvePlaceholders(instructions, data)}</div>`);
+  }
+
   if (parts.length === 0) return "";
 
   return `<div><div style="font-size:8pt; text-transform:uppercase; color:var(--t-muted); margin-bottom:4px;">Payment Information</div>${parts.join("")}</div>`;
@@ -433,6 +463,10 @@ function renderNotes(block: TemplateBlock, data: DocumentRenderData): string {
       content = customContent ? resolvePlaceholders(customContent, data) : "";
       break;
   }
+  // Note: workspace default terms are NOT used as fallback here because
+  // they auto-populate into the document form at creation time (M4).
+  // By the time the renderer sees the document, the defaults have
+  // already been written into the document's own fields if applicable.
   if (!content) return "";
 
   const headingText = heading ?? NOTES_HEADING_DEFAULTS[source] ?? "";

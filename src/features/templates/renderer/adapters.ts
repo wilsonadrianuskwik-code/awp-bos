@@ -4,13 +4,17 @@
 // does the translation.
 import type { QuotationDetail } from "@/features/quotations/types";
 import type { InvoiceDetail } from "@/features/invoices/types";
-import type { CompanyProfile } from "@/features/templates/types";
+import type { CompanyProfile, PaymentDetails, BrandingSettings } from "@/features/templates/types";
 import type { DocumentRenderData, RenderAddress } from "@/features/templates/renderer/types";
 
 type WorkspaceForRender = {
   name: string;
   logo_url: string | null;
-  settings?: { company_profile?: CompanyProfile } | null;
+  settings?: {
+    company_profile?: CompanyProfile;
+    payment_details?: PaymentDetails;
+    branding?: BrandingSettings;
+  } | null;
 };
 
 function companyFromWorkspace(workspace: WorkspaceForRender): DocumentRenderData["company"] {
@@ -84,6 +88,8 @@ export function quotationToRenderData(
       tax_percent: item.tax_percent,
       line_total: item.line_total,
     })),
+    workspace_payment_details: workspace.settings?.payment_details ?? undefined,
+    workspace_branding: workspace.settings?.branding ?? undefined,
     meta: meta(),
   };
 }
@@ -129,6 +135,8 @@ export function invoiceToRenderData(
       reference: p.reference,
       amount: p.amount,
     })),
+    workspace_payment_details: workspace.settings?.payment_details ?? undefined,
+    workspace_branding: workspace.settings?.branding ?? undefined,
     meta: meta(),
   };
 }

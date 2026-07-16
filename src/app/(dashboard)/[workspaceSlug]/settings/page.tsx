@@ -3,7 +3,12 @@ import { getWorkspaceBySlug } from "@/lib/workspace";
 import { PageHeader } from "@/components/shared/page-header";
 import { getWorkspaceMembers, getWorkspaceInvites } from "@/features/workspace/queries";
 import { SettingsPage } from "@/features/workspace/components/settings-page";
-import type { CompanyProfile } from "@/features/templates/types";
+import type {
+  CompanyProfile,
+  PaymentDetails,
+  DefaultTerms,
+  BrandingSettings,
+} from "@/features/templates/types";
 
 export default async function WorkspaceSettingsRoute({
   params,
@@ -20,6 +25,9 @@ export default async function WorkspaceSettingsRoute({
   ]);
 
   const companyProfile = (workspace.settings?.company_profile ?? {}) as CompanyProfile;
+  const paymentDetails = (workspace.settings?.payment_details ?? { bank_accounts: [] }) as PaymentDetails;
+  const defaultTerms = (workspace.settings?.default_terms ?? {}) as DefaultTerms;
+  const branding = (workspace.settings?.branding ?? {}) as BrandingSettings;
 
   return (
     <div className="space-y-6">
@@ -32,6 +40,9 @@ export default async function WorkspaceSettingsRoute({
         members={members}
         invites={invites}
         companyProfile={companyProfile}
+        paymentDetails={paymentDetails}
+        defaultTerms={defaultTerms}
+        branding={branding}
       />
     </div>
   );

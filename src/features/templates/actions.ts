@@ -10,11 +10,17 @@ import {
   createTemplateSchema,
   updateTemplateSchema,
   companyProfileSchema,
+  paymentDetailsSchema,
+  defaultTermsSchema,
+  brandingSchema,
   type CreateThemeInput,
   type UpdateThemeInput,
   type CreateTemplateInput,
   type UpdateTemplateInput,
   type CompanyProfileInput,
+  type PaymentDetailsInput,
+  type DefaultTermsInput,
+  type BrandingInput,
 } from "@/features/templates/validators";
 
 // ---------------------------------------------------------------------
@@ -433,4 +439,47 @@ export async function updateCompanyProfile(workspaceId: string, input: CompanyPr
     revalidatePath(`/${ctx.workspaceId}`);
     return data;
   });
+}
+
+// ---------------------------------------------------------------------
+// Workspace settings (generic — payment details, default terms, branding)
+// ---------------------------------------------------------------------
+
+async function updateWorkspaceSettings(
+  workspaceId: string,
+  sectionKey: string,
+  sectionValue: unknown
+) {
+  return withWorkspace(workspaceId, "admin", async (ctx) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("update_workspace_settings", {
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+      p_section_key: sectionKey,
+      p_section_value: sectionValue,
+    });
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath(`/${ctx.workspaceId}`);
+    return data;
+  });
+}
+
+export async function updatePaymentDetails(workspaceId: string, input: PaymentDetailsInput) {
+  const parsed = paymentDetailsSchema.safeParse(input);
+  if (!parsed.success) throw new Error(parsed.error.issues[0].message);
+  return updateWorkspaceSettings(workspaceId, "payment_details", parsed.data);
+}
+
+export async function updateDefaultTerms(workspaceId: string, input: DefaultTermsInput) {
+  const parsed = defaultTermsSchema.safeParse(input);
+  if (!parsed.success) throw new Error(parsed.error.issues[0].message);
+  return updateWorkspaceSettings(workspaceId, "default_terms", parsed.data);
+}
+
+export async function updateBranding(workspaceId: string, input: BrandingInput) {
+  const parsed = brandingSchema.safeParse(input);
+  if (!parsed.success) throw new Error(parsed.error.issues[0].message);
+  return updateWorkspaceSettings(workspaceId, "branding", parsed.data);
 }

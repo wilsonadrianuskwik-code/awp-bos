@@ -53,6 +53,20 @@ export function getSampleRenderData(documentType: TemplateDocumentType): Documen
       { category: "per_unit", description: "Logo Design Package", quantity: 1, unit: null, unit_price: 1200, discount_percent: null, tax_percent: null, line_total: 1200 },
       { category: "per_unit", description: "Hosting Setup", quantity: 12, unit: "month", unit_price: 29, discount_percent: null, tax_percent: null, line_total: 348 },
     ],
+    workspace_payment_details: {
+      bank_accounts: [
+        {
+          label: "Primary Account",
+          bank_name: "First National Bank",
+          account_name: "Acme Design Studio",
+          account_number: "1234-5678-90",
+          swift_code: "FNBAUS33",
+          is_primary: true,
+        },
+      ],
+      custom_instructions: "Please include the invoice number as payment reference.",
+    },
+    workspace_branding: { tagline: "Design Studio | Creative Agency" },
     meta: { current_date: new Date().toISOString(), current_year: new Date().getFullYear() },
   };
 }

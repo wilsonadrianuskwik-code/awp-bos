@@ -4,6 +4,7 @@ import { getClients } from "@/features/clients/queries";
 import { getLineItemTemplates } from "@/features/line-items/queries";
 import { getActiveCatalogItems } from "@/features/catalog/queries";
 import { QuotationBuilder } from "@/features/quotations/components/quotation-builder";
+import type { DefaultTerms } from "@/features/templates/types";
 
 export default async function NewQuotationPage({
   params,
@@ -23,12 +24,16 @@ export default async function NewQuotationPage({
     getActiveCatalogItems(workspace.id),
   ]);
 
+  const defaultTerms = (workspace.settings?.default_terms ?? {}) as DefaultTerms;
+
   return (
     <QuotationBuilder
       clients={clients}
       templates={templates}
       catalogItems={catalogItems}
       initialClientId={clientId}
+      defaultTermsAndConditions={defaultTerms.quotation_terms_and_conditions}
+      defaultNotes={defaultTerms.quotation_notes}
     />
   );
 }

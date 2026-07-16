@@ -3,6 +3,7 @@ import { getWorkspaceBySlug, getWorkspaceContext } from "@/lib/workspace";
 import { WorkspaceProvider } from "@/providers/workspace-provider";
 import { WorkspaceShell } from "@/features/workspace/components/workspace-shell";
 import type { Role } from "@/lib/constants/roles";
+import type { WorkspaceDocumentSettings } from "@/features/templates/types";
 
 export default async function WorkspaceLayout({
   children,
@@ -24,7 +25,7 @@ export default async function WorkspaceLayout({
     <WorkspaceProvider
       workspace={{
         ...workspace,
-        settings: (workspace.settings ?? {}) as Record<string, unknown>,
+        settings: (workspace.settings ?? {}) as WorkspaceDocumentSettings,
       }}
       role={context.role as Role}
     >

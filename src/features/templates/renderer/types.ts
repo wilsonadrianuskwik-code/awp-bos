@@ -73,6 +73,21 @@ export type DocumentRenderData = {
   };
   line_items: RenderLineItem[];
   payments?: RenderPayment[];
+  workspace_payment_details?: {
+    bank_accounts: {
+      label: string;
+      bank_name: string;
+      account_name: string;
+      account_number: string;
+      swift_code?: string;
+      is_primary: boolean;
+    }[];
+    qris_image_url?: string;
+    custom_instructions?: string;
+  };
+  workspace_branding?: {
+    tagline?: string;
+  };
   meta: {
     current_date: string;
     current_year: number;
