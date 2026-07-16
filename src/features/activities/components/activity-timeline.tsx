@@ -66,7 +66,10 @@ export function ActivityTimeline({ activities }: ActivityTimelineProps) {
   }
 
   return (
-    <div className="space-y-4">
+    // The vertical rail connecting entries is what makes this read as a
+    // timeline instead of a list; each avatar wears a card-colored ring
+    // so the rail appears to pass behind it.
+    <div className="relative space-y-5 before:absolute before:bottom-3 before:left-4 before:top-3 before:w-px before:bg-border">
       {activities.map((activity) => {
         const initials =
           activity.actor?.full_name
@@ -81,11 +84,11 @@ export function ActivityTimeline({ activities }: ActivityTimelineProps) {
         return (
           <div key={activity.id} className="flex gap-3">
             {payment ? (
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+              <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 ring-2 ring-card dark:bg-emerald-950 dark:text-emerald-300">
                 <Receipt className="h-4 w-4" />
               </div>
             ) : (
-              <Avatar className="h-8 w-8 shrink-0">
+              <Avatar className="relative z-10 h-8 w-8 shrink-0 ring-2 ring-card">
                 <AvatarFallback className="text-xs">{initials}</AvatarFallback>
               </Avatar>
             )}

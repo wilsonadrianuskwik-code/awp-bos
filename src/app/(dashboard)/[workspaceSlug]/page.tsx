@@ -106,7 +106,7 @@ export default async function DashboardPage({
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Revenue Trend</CardTitle>
+            <CardTitle className="text-sm font-semibold">Revenue Trend</CardTitle>
           </CardHeader>
           <CardContent>
             <RevenueTrendWidget

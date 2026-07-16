@@ -10,7 +10,7 @@ export function RecentActivityCard({ activities }: RecentActivityCardProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm font-medium">Recent Activity</CardTitle>
+        <CardTitle className="text-sm font-semibold">Recent Activity</CardTitle>
       </CardHeader>
       <CardContent>
         <ActivityTimeline activities={activities} />

@@ -9,7 +9,7 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 import { useState, type KeyboardEvent } from "react";
-import { ChevronsUpDown } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 type DataTableProps<TData> = {
@@ -51,14 +51,26 @@ export function DataTable<TData>({
                 >
                   {header.isPlaceholder ? null : header.column.getCanSort() ? (
                     <button
-                      className="group inline-flex items-center gap-1 uppercase tracking-wider transition-colors hover:text-foreground"
+                      className={cn(
+                        "group inline-flex items-center gap-1 uppercase tracking-wider transition-colors hover:text-foreground",
+                        header.column.getIsSorted() && "text-foreground"
+                      )}
                       onClick={header.column.getToggleSortingHandler()}
                     >
                       {flexRender(
                         header.column.columnDef.header,
                         header.getContext()
                       )}
-                      <ChevronsUpDown className="h-3 w-3 opacity-50 transition-opacity group-hover:opacity-100" />
+                      {/* Direction-aware indicator: the ambiguous both-ways
+                          glyph only shows pre-sort; once sorted, the arrow
+                          states the actual order. */}
+                      {header.column.getIsSorted() === "asc" ? (
+                        <ArrowUp className="h-3 w-3" />
+                      ) : header.column.getIsSorted() === "desc" ? (
+                        <ArrowDown className="h-3 w-3" />
+                      ) : (
+                        <ChevronsUpDown className="h-3 w-3 opacity-50 transition-opacity group-hover:opacity-100" />
+                      )}
                     </button>
                   ) : (
                     flexRender(

@@ -110,7 +110,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
         {!collapsed && (
           <Link
             href={basePath}
-            className="flex min-w-0 items-center gap-2.5"
+            className="-ml-1 flex min-w-0 items-center gap-2.5 rounded-md py-1 pl-1 pr-2 transition-colors duration-100 hover:bg-sidebar-accent/60"
           >
             <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-gradient-to-br from-sidebar-primary to-indigo-500 text-[11px] font-semibold text-sidebar-primary-foreground shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]">
               {workspaceName.charAt(0).toUpperCase()}

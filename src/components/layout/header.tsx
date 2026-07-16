@@ -65,11 +65,11 @@ export function Header({ workspaceSlug, onMobileMenuToggle }: HeaderProps) {
         <button
           type="button"
           onClick={() => setPaletteOpen(true)}
-          className="hidden h-8 w-full max-w-64 items-center gap-2 rounded-md border bg-card px-2.5 text-[13px] text-muted-foreground shadow-2xs transition-colors duration-150 hover:border-input hover:text-foreground sm:flex"
+          className="hidden h-8 w-full max-w-64 items-center gap-2 rounded-lg border bg-muted/50 px-2.5 text-[13px] text-muted-foreground transition-all duration-150 hover:border-input hover:bg-card hover:text-foreground hover:shadow-2xs sm:flex"
         >
           <Search className="h-3.5 w-3.5 shrink-0" />
           <span className="flex-1 text-left">Search…</span>
-          <kbd className="rounded border bg-muted px-1.5 py-px font-sans text-[10px] font-medium">
+          <kbd className="rounded border bg-card px-1.5 py-px font-sans text-[10px] font-medium text-muted-foreground">
             ⌘K
           </kbd>
         </button>
@@ -88,7 +88,10 @@ export function Header({ workspaceSlug, onMobileMenuToggle }: HeaderProps) {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+            <Button
+              variant="ghost"
+              className="relative h-8 w-8 rounded-full ring-2 ring-transparent transition-shadow duration-150 hover:ring-border data-[state=open]:ring-primary/40"
+            >
               <Avatar className="h-7 w-7">
                 <AvatarImage
                   src={user?.user_metadata?.avatar_url}
