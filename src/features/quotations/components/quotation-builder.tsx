@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FileDown, FileUp, Loader2, Package, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BackButton } from "@/components/shared/back-button";
+import { SaveStatusPill } from "@/components/shared/save-status-pill";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -412,7 +413,7 @@ export function QuotationBuilder({
           <h1 className="text-xl font-semibold tracking-tight">
             {quotation ? `Edit ${quotation.quotation_number}` : "New Quotation"}
           </h1>
-          <SaveStatusIndicator status={saveStatus} isDirty={isDirty} />
+          <SaveStatusPill status={saveStatus} isDirty={isDirty} />
         </div>
 
         <Card>
@@ -673,24 +674,3 @@ export function QuotationBuilder({
   );
 }
 
-function SaveStatusIndicator({
-  status,
-  isDirty,
-}: {
-  status: "idle" | "saving" | "saved" | "error";
-  isDirty: boolean;
-}) {
-  if (status === "saving") {
-    return <span className="text-xs text-muted-foreground">Saving...</span>;
-  }
-  if (status === "error") {
-    return <span className="text-xs text-destructive">Save failed</span>;
-  }
-  if (isDirty) {
-    return <span className="text-xs text-muted-foreground">Unsaved changes</span>;
-  }
-  if (status === "saved") {
-    return <span className="text-xs text-muted-foreground">Saved</span>;
-  }
-  return null;
-}
