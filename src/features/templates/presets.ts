@@ -210,7 +210,7 @@ function defaultInvoiceBlocks(): TemplateBlock[] {
             id: blockId("title"),
             type: "document_meta",
             enabled: true,
-            config: { show_document_type_label: true, show_status_badge: true, fields: [], align: "left", title_size_pt: 30 },
+            config: { show_document_type_label: true, show_status_badge: false, fields: [], align: "left", title_size_pt: 30 },
           },
           { id: blockId("titlespacer"), type: "spacer", enabled: true, config: { height_mm: 6 } },
           {
