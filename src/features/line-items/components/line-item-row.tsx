@@ -56,7 +56,10 @@ export function LineItemRow({
   return (
     <div
       className={cn(
-        "grid grid-cols-2 gap-x-3 gap-y-3 rounded-lg border bg-background p-3 md:grid-cols-none md:items-center md:gap-x-2 md:gap-y-0 md:py-2.5",
+        // animate-in on mount: a freshly added row rises in instead of
+        // popping, so "Add line item" gives immediate spatial feedback.
+        // The focus-within tint marks which row is being edited.
+        "grid grid-cols-2 gap-x-3 gap-y-3 rounded-lg border bg-background p-3 transition-colors duration-150 animate-in fade-in slide-in-from-bottom-1 focus-within:border-primary/30 focus-within:bg-primary/[0.02] md:grid-cols-none md:items-center md:gap-x-2 md:gap-y-0 md:py-2.5",
         LINE_ITEM_GRID_COLS
       )}
     >

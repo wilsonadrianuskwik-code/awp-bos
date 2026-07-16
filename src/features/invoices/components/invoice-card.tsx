@@ -144,7 +144,7 @@ export function InvoiceCard({ invoice }: InvoiceCardProps) {
       <div
         role="button"
         tabIndex={0}
-        className="group relative flex cursor-pointer flex-col rounded-lg border bg-card p-5 shadow-2xs outline-none transition-all duration-150 hover:border-primary/40 hover:shadow-md focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-ring/30"
+        className="group relative flex cursor-pointer flex-col rounded-lg border bg-card p-5 shadow-2xs outline-none transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-ring/30"
         onClick={() => router.push(href)}
         onKeyDown={(e: KeyboardEvent) => {
           if (e.key === "Enter") router.push(href);

@@ -130,7 +130,7 @@ export function InvoiceListPage({ invoices, count }: InvoiceListPageProps) {
       {invoices.length === 0 ? (
         <ListEmpty message="No invoices match your filters." />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="stagger-rise grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {invoices.map((i) => (
             <InvoiceCard key={i.id} invoice={i} />
           ))}

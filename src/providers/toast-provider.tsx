@@ -14,6 +14,9 @@ type Toast = {
   message: string;
   type: "success" | "error" | "info";
   action?: ToastAction;
+  // Marks the exit phase: the toast stays mounted for the out-animation,
+  // then gets removed. Entering/leaving is presentation state only.
+  leaving?: boolean;
 };
 
 type ToastOptions = {
@@ -42,8 +45,21 @@ const TOAST_STYLES: Record<
   info: { icon: Info, iconClass: "text-primary" },
 };
 
+const EXIT_MS = 180;
+
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+
+  // Two-phase removal: flag `leaving` so the exit animation plays, then
+  // actually unmount after it finishes.
+  const startExit = useCallback((id: string) => {
+    setToasts((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, leaving: true } : t))
+    );
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, EXIT_MS);
+  }, []);
 
   const toast = useCallback(
     (
@@ -53,16 +69,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     ) => {
       const id = crypto.randomUUID();
       setToasts((prev) => [...prev, { id, message, type, action: options?.action }]);
-      setTimeout(() => {
-        setToasts((prev) => prev.filter((t) => t.id !== id));
-      }, options?.duration ?? 5000);
+      setTimeout(() => startExit(id), options?.duration ?? 5000);
     },
-    []
+    [startExit]
   );
 
-  const dismiss = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  }, []);
+  const dismiss = useCallback((id: string) => startExit(id), [startExit]);
 
   return (
     <Context.Provider value={{ toasts, toast, dismiss }}>
@@ -74,7 +86,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             <div
               key={t.id}
               role="status"
-              className="pointer-events-auto flex items-start gap-3 rounded-lg border bg-card p-3.5 text-card-foreground shadow-lg duration-150 animate-in fade-in slide-in-from-bottom-2"
+              className={cn(
+                "pointer-events-auto flex items-start gap-3 rounded-lg border bg-card p-3.5 text-card-foreground shadow-overlay",
+                t.leaving
+                  ? "duration-200 animate-out fade-out slide-out-to-right-4 fill-mode-forwards"
+                  : "duration-200 animate-in fade-in slide-in-from-bottom-2"
+              )}
             >
               <Icon className={cn("mt-0.5 h-4 w-4 shrink-0", iconClass)} />
               <p className="flex-1 text-[13px] leading-snug">{t.message}</p>

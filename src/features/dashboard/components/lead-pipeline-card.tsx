@@ -42,7 +42,7 @@ export function LeadPipelineCard({ summary }: LeadPipelineCardProps) {
                       without the reader doing division. */}
                   <span className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
                     <span
-                      className="block h-full rounded-full bg-primary/60"
+                      className="animate-grow-x block h-full rounded-full bg-primary/60"
                       style={{
                         width: `${Math.max(4, Math.round((summary.byStatus[status] / summary.total) * 100))}%`,
                       }}

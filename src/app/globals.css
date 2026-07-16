@@ -170,6 +170,84 @@
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* Motion vocabulary. Three reusable moves:                            */
+/*   page-enter    — route content fades/rises in (via template.tsx)   */
+/*   stagger-rise  — children cascade in with 40ms offsets (dashboards,*/
+/*                   card grids)                                       */
+/*   grow-x        — progress fills sweep from zero on mount           */
+/* All are entrance-only and under 400ms: the app should feel alive,   */
+/* never animated-at you. prefers-reduced-motion zeroes everything.    */
+/* ------------------------------------------------------------------ */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@layer utilities {
+  .animate-page-enter {
+    animation: page-enter 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .animate-grow-x {
+    transform-origin: left;
+    animation: grow-x 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: 0.1s;
+  }
+  .stagger-rise > * {
+    animation: rise-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .stagger-rise > *:nth-child(2) {
+    animation-delay: 40ms;
+  }
+  .stagger-rise > *:nth-child(3) {
+    animation-delay: 80ms;
+  }
+  .stagger-rise > *:nth-child(4) {
+    animation-delay: 120ms;
+  }
+  .stagger-rise > *:nth-child(5) {
+    animation-delay: 160ms;
+  }
+  .stagger-rise > *:nth-child(6) {
+    animation-delay: 200ms;
+  }
+  .stagger-rise > *:nth-child(n + 7) {
+    animation-delay: 240ms;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;
