@@ -134,31 +134,18 @@ export async function deleteTheme(workspaceId: string, themeId: string) {
   return withWorkspace(workspaceId, "staff", async (ctx) => {
     const supabase = await createClient();
 
-    const { count } = await supabase
-      .from("document_templates")
-      .select("id", { count: "exact", head: true })
-      .eq("theme_id", themeId)
-      .is("deleted_at", null);
-
-    if (count && count > 0) {
-      throw new Error("This theme is used by one or more designs. Remove it from those designs first.");
-    }
-
-    const { error } = await supabase
-      .from("template_themes")
-      .update({ deleted_at: new Date().toISOString() })
-      .eq("id", themeId)
-      .eq("workspace_id", ctx.workspaceId);
+    // Soft delete runs through a SECURITY DEFINER RPC (like every other
+    // privileged workspace mutation) — it enforces the role check, the
+    // is_preset / in-use guards, and the activity/audit logging, and
+    // sidesteps the RLS UPDATE WITH CHECK edge case that a direct
+    // deleted_at update hits.
+    const { error } = await supabase.rpc("soft_delete_template_theme", {
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+      p_theme_id: themeId,
+    });
 
     if (error) throw new Error(error.message);
-
-    await createAuditLog({
-      workspaceId: ctx.workspaceId,
-      actorId: ctx.userId,
-      action: "delete",
-      entityType: "template_theme",
-      entityId: themeId,
-    });
 
     revalidatePath(`/${ctx.workspaceId}`);
     return { success: true };
@@ -384,32 +371,17 @@ export async function deleteTemplate(workspaceId: string, templateId: string) {
   return withWorkspace(workspaceId, "staff", async (ctx) => {
     const supabase = await createClient();
 
-    const { data: existing } = await supabase
-      .from("document_templates")
-      .select("is_default")
-      .eq("id", templateId)
-      .eq("workspace_id", ctx.workspaceId)
-      .single();
-
-    if (existing?.is_default) {
-      throw new Error("Can't delete the default design. Set another design as default first.");
-    }
-
-    const { error } = await supabase
-      .from("document_templates")
-      .update({ deleted_at: new Date().toISOString() })
-      .eq("id", templateId)
-      .eq("workspace_id", ctx.workspaceId);
+    // Soft delete runs through a SECURITY DEFINER RPC (like every other
+    // privileged workspace mutation) — it enforces the role check, the
+    // is_default guard, and the activity/audit logging, and sidesteps the
+    // RLS UPDATE WITH CHECK edge case that a direct deleted_at update hits.
+    const { error } = await supabase.rpc("soft_delete_document_template", {
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+      p_template_id: templateId,
+    });
 
     if (error) throw new Error(error.message);
-
-    await createAuditLog({
-      workspaceId: ctx.workspaceId,
-      actorId: ctx.userId,
-      action: "delete",
-      entityType: "document_template",
-      entityId: templateId,
-    });
 
     revalidatePath(`/${ctx.workspaceId}`);
     return { success: true };
