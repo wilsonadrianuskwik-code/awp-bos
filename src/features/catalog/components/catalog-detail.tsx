@@ -11,7 +11,7 @@ import { ActivityTimeline } from "@/features/activities/components/activity-time
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { deleteCatalogItem } from "@/features/catalog/actions";
-import { BackButton } from "@/components/shared/back-button";
+import { DetailHeader } from "@/components/shared/detail-header";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { CatalogItem, ItemType } from "@/features/catalog/types";
 import type { LineItemCategory } from "@/features/line-items/types";
@@ -55,38 +55,38 @@ export function CatalogDetail({ item, activities }: CatalogDetailProps) {
 
   return (
     <div className="space-y-6">
-      <BackButton href={`/${workspace.slug}/catalog`} label="Back to Catalog" />
-
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-semibold tracking-tight">{item.name}</h1>
+      <DetailHeader
+        backHref={`/${workspace.slug}/catalog`}
+        backLabel="Back to Catalog"
+        title={item.name}
+        badges={
+          <>
             <Badge variant="secondary">{ITEM_TYPE_LABEL[item.item_type]}</Badge>
             {item.is_active ? (
               <Badge>Active</Badge>
             ) : (
               <Badge variant="secondary">Inactive</Badge>
             )}
-          </div>
-          {item.sku && (
-            <p className="mt-1 text-muted-foreground">SKU: {item.sku}</p>
-          )}
-        </div>
-        {can("staff") && (
-          <div className="flex gap-2">
-            <Button variant="outline" asChild>
-              <Link href={`/${workspace.slug}/catalog/${item.id}/edit`}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Edit
-              </Link>
-            </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete
-            </Button>
-          </div>
-        )}
-      </div>
+          </>
+        }
+        subtitle={item.sku ? `SKU: ${item.sku}` : undefined}
+        actions={
+          can("staff") ? (
+            <>
+              <Button variant="outline" asChild>
+                <Link href={`/${workspace.slug}/catalog/${item.id}/edit`}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit
+                </Link>
+              </Button>
+              <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </Button>
+            </>
+          ) : undefined
+        }
+      />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">

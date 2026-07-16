@@ -5,7 +5,7 @@ import { Copy, GitCompare, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { BackButton } from "@/components/shared/back-button";
+import { DetailHeader } from "@/components/shared/detail-header";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -68,22 +68,22 @@ export function QuotationDetail({
   return (
     <div>
       <div className="space-y-6 print:hidden">
-        <BackButton href={`/${workspace.slug}/quotations`} label="Back to Quotations" />
-
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-semibold tracking-tight">
-                {quotation.title || quotation.quotation_number}
-              </h1>
+        <DetailHeader
+          backHref={`/${workspace.slug}/quotations`}
+          backLabel="Back to Quotations"
+          title={quotation.title || quotation.quotation_number}
+          badges={
+            <>
               {quotation.version > 1 && (
                 <span className="rounded bg-muted px-2 py-0.5 font-mono text-xs font-medium text-muted-foreground">
                   V{quotation.version}
                 </span>
               )}
               <StatusBadge status={quotation.status} />
-            </div>
-            <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+            </>
+          }
+          subtitle={
+            <span className="flex items-center gap-1.5">
               {quotation.quotation_number} · {quotation.client.name}
               {quotation.client.company ? ` · ${quotation.client.company}` : ""}
               <button
@@ -94,22 +94,23 @@ export function QuotationDetail({
               >
                 <Copy className="h-3.5 w-3.5" />
               </button>
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {previousVersion && (
-              <Button variant="outline" size="sm" onClick={() => setDiffOpen(true)}>
-                <GitCompare className="mr-2 h-4 w-4" />
-                Compare with V{previousVersion.version}
+            </span>
+          }
+          actions={
+            <>
+              {previousVersion && (
+                <Button variant="outline" onClick={() => setDiffOpen(true)}>
+                  <GitCompare className="mr-2 h-4 w-4" />
+                  Compare with V{previousVersion.version}
+                </Button>
+              )}
+              <Button variant="outline" onClick={handlePrint}>
+                <Printer className="mr-2 h-4 w-4" />
+                Print
               </Button>
-            )}
-            <Button variant="outline" size="sm" onClick={handlePrint}>
-              <Printer className="mr-2 h-4 w-4" />
-              Print
-            </Button>
-          </div>
-        </div>
+            </>
+          }
+        />
 
         <QuotationStatusActions
           quotation={quotation}

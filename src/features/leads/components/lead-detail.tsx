@@ -11,7 +11,7 @@ import { ActivityTimeline } from "@/features/activities/components/activity-time
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { deleteLead } from "@/features/leads/actions";
-import { BackButton } from "@/components/shared/back-button";
+import { DetailHeader } from "@/components/shared/detail-header";
 import type { Lead } from "@/features/leads/types";
 import type { Activity } from "@/features/activities/types";
 
@@ -45,43 +45,37 @@ export function LeadDetail({ lead, activities, onConvert }: LeadDetailProps) {
 
   return (
     <div className="space-y-6">
-      <BackButton href={`/${workspace.slug}/leads`} label="Back to Leads" />
-
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight">{lead.name}</h1>
-          <div className="mt-1 flex items-center gap-2">
-            <StatusBadge status={lead.status} />
-            {lead.company && (
-              <span className="text-sm text-muted-foreground">
-                {lead.company}
-              </span>
+      <DetailHeader
+        backHref={`/${workspace.slug}/leads`}
+        backLabel="Back to Leads"
+        title={lead.name}
+        badges={<StatusBadge status={lead.status} />}
+        subtitle={lead.company || undefined}
+        actions={
+          <>
+            {canConvert && (
+              <Button variant="outline" onClick={onConvert}>
+                <ArrowRightLeft className="mr-2 h-4 w-4" />
+                Convert to Client
+              </Button>
             )}
-          </div>
-        </div>
-        <div className="flex gap-2">
-          {canConvert && (
-            <Button variant="outline" onClick={onConvert}>
-              <ArrowRightLeft className="mr-2 h-4 w-4" />
-              Convert to Client
+            <Button variant="outline" asChild>
+              <Link href={`/${workspace.slug}/leads/${lead.id}/edit`}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </Link>
             </Button>
-          )}
-          <Button variant="outline" asChild>
-            <Link href={`/${workspace.slug}/leads/${lead.id}/edit`}>
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit
-            </Link>
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={isPending}
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete
-          </Button>
-        </div>
-      </div>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isPending}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete
+            </Button>
+          </>
+        }
+      />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">

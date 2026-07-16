@@ -23,7 +23,7 @@ import { deleteClient } from "@/features/clients/actions";
 import { getOverdueDays } from "@/lib/utils/date";
 import { PAYMENT_METHOD_LABEL } from "@/features/invoices/helpers";
 import { FulfillmentProgress } from "@/features/fulfillment/components/fulfillment-progress";
-import { BackButton } from "@/components/shared/back-button";
+import { DetailHeader } from "@/components/shared/detail-header";
 import type { Client } from "@/features/clients/types";
 import type { PaymentMethod } from "@/features/invoices/types";
 import type { Activity } from "@/features/activities/types";
@@ -118,32 +118,30 @@ export function ClientDetail({
 
   return (
     <div className="space-y-6">
-      <BackButton href={`/${workspace.slug}/clients`} label="Back to Clients" />
-
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight">{client.name}</h1>
-          {client.company && (
-            <p className="mt-1 text-muted-foreground">{client.company}</p>
-          )}
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" asChild>
-            <Link href={`/${workspace.slug}/clients/${client.id}/edit`}>
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit
-            </Link>
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={isPending}
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete
-          </Button>
-        </div>
-      </div>
+      <DetailHeader
+        backHref={`/${workspace.slug}/clients`}
+        backLabel="Back to Clients"
+        title={client.name}
+        subtitle={client.company || undefined}
+        actions={
+          <>
+            <Button variant="outline" asChild>
+              <Link href={`/${workspace.slug}/clients/${client.id}/edit`}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </Link>
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isPending}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete
+            </Button>
+          </>
+        }
+      />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">

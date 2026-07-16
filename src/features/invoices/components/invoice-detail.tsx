@@ -5,7 +5,7 @@ import { Copy, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { BackButton } from "@/components/shared/back-button";
+import { DetailHeader } from "@/components/shared/detail-header";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -63,24 +63,22 @@ export function InvoiceDetail({
   return (
     <div>
       <div className="space-y-6 print:hidden">
-        <BackButton href={`/${workspace.slug}/invoices`} label="Back to Invoices" />
-
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-semibold tracking-tight">
-                {invoice.title || invoice.invoice_number}
-              </h1>
-              <StatusBadge
-                status={invoice.status}
-                label={
-                  invoice.status === "overdue" && invoice.due_date
-                    ? `Overdue • ${getOverdueDays(invoice.due_date)} days`
-                    : undefined
-                }
-              />
-            </div>
-            <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+        <DetailHeader
+          backHref={`/${workspace.slug}/invoices`}
+          backLabel="Back to Invoices"
+          title={invoice.title || invoice.invoice_number}
+          badges={
+            <StatusBadge
+              status={invoice.status}
+              label={
+                invoice.status === "overdue" && invoice.due_date
+                  ? `Overdue • ${getOverdueDays(invoice.due_date)} days`
+                  : undefined
+              }
+            />
+          }
+          subtitle={
+            <span className="flex items-center gap-1.5">
               {invoice.invoice_number} · {invoice.client.name}
               {invoice.client.company ? ` · ${invoice.client.company}` : ""}
               <button
@@ -91,16 +89,15 @@ export function InvoiceDetail({
               >
                 <Copy className="h-3.5 w-3.5" />
               </button>
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" onClick={handlePrint}>
+            </span>
+          }
+          actions={
+            <Button variant="outline" onClick={handlePrint}>
               <Printer className="mr-2 h-4 w-4" />
               Print
             </Button>
-          </div>
-        </div>
+          }
+        />
 
         <InvoiceStatusActions
           invoice={invoice}

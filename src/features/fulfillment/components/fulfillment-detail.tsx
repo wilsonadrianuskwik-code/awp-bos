@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { BackButton } from "@/components/shared/back-button";
+import { DetailHeader } from "@/components/shared/detail-header";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { FulfillmentItemContext } from "@/features/fulfillment/components/fulfillment-item-context";
 import { FulfillmentProgress } from "@/features/fulfillment/components/fulfillment-progress";
@@ -26,14 +26,12 @@ export function FulfillmentDetail({ item, events }: FulfillmentDetailProps) {
 
   return (
     <div className="space-y-6">
-      <BackButton href={`/${workspace.slug}/fulfillment`} label="Back to Fulfillment" />
-
-      <div className="flex items-center justify-between gap-4">
-        <p className="text-sm font-medium text-muted-foreground">
-          Fulfillment Tracker
-        </p>
-        <StatusBadge status={item.status} />
-      </div>
+      <DetailHeader
+        backHref={`/${workspace.slug}/fulfillment`}
+        backLabel="Back to Fulfillment"
+        title="Fulfillment Tracker"
+        badges={<StatusBadge status={item.status} />}
+      />
 
       {/* The single, unmissable answer to "what item am I fulfilling, for
           whom, and how much is left" — the redesign's core goal. */}
