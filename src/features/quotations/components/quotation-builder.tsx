@@ -2,19 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { FileDown, FileUp, Loader2, Package, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { BackButton } from "@/components/shared/back-button";
-import { SaveStatusPill } from "@/components/shared/save-status-pill";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -23,16 +12,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import { cn } from "@/lib/utils/cn";
+import { formatCurrency } from "@/lib/utils/format-currency";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { useConfirm } from "@/providers/confirm-provider";
 import { ClientSelector } from "@/features/line-items/components/client-selector";
-import {
-  LineItemRow,
-  LINE_ITEM_GRID_COLS,
-} from "@/features/line-items/components/line-item-row";
-import { PricingSummary } from "@/features/line-items/components/pricing-summary";
+import { BuilderCommandBar } from "@/features/documents/components/builder-command-bar";
+import { LineItemsEditor } from "@/features/documents/components/line-items-editor";
 import { TemplatePickerDialog } from "@/features/line-items/components/template-picker-dialog";
 import { SaveAsTemplateDialog } from "@/features/line-items/components/save-as-template-dialog";
 import { CatalogPickerDialog } from "@/features/line-items/components/catalog-picker-dialog";
@@ -47,22 +33,15 @@ import {
 } from "@/features/quotations/validators";
 import type { LineItemInput } from "@/features/line-items/validators";
 import { computeLineItemTotals } from "@/features/line-items/helpers";
-import {
-  LINE_ITEM_CATEGORIES,
-  type LineItemCategory,
-  type ClientSummary,
-  type TemplateWithItems,
+import type {
+  LineItemCategory,
+  ClientSummary,
+  TemplateWithItems,
 } from "@/features/line-items/types";
 import type { Quotation, QuotationDetail } from "@/features/quotations/types";
 import type { CatalogItem } from "@/features/catalog/types";
 
 const CURRENCIES = ["IDR", "USD", "EUR", "GBP", "SGD", "MYR", "AUD", "CAD"];
-
-const CATEGORY_LABEL: Record<LineItemCategory, string> = {
-  package: "Packages",
-  add_on: "Add-ons",
-  per_unit: "Per-unit",
-};
 
 function emptyItem(category: LineItemCategory): LineItemInput {
   return {
@@ -127,8 +106,6 @@ export function QuotationBuilder({
   const [internalNotes, setInternalNotes] = useState(
     quotation?.internal_notes ?? ""
   );
-  const [activeCategory, setActiveCategory] =
-    useState<LineItemCategory>("per_unit");
   const [lineItems, setLineItems] = useState<LineItemInput[]>(
     quotation?.line_items?.length
       ? quotation.line_items.map((li) => ({
@@ -404,48 +381,47 @@ export function QuotationBuilder({
   });
 
   return (
-    <div className="space-y-4">
+    <div className="mx-auto w-full max-w-5xl space-y-4">
       <BackButton onClick={handleCancel} label={quotation ? "Back to Quotation" : "Back to Quotations"} />
 
-      {/* Command bar: title, live save state, and the exit/save actions
-          stay pinned while the (long) form scrolls — no hunting for the
-          save button at the bottom of the page. */}
-      <div className="sticky top-3 z-20 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-background/85 px-4 py-3 shadow-2xs backdrop-blur">
-        <div className="flex min-w-0 items-center gap-3">
-          <h1 className="truncate text-lg font-semibold tracking-tight">
-            {quotation ? `Edit ${quotation.quotation_number}` : "New Quotation"}
-          </h1>
-          <SaveStatusPill status={saveStatus} isDirty={isDirty} />
-        </div>
-        <div className="flex items-center gap-2.5">
-          <span className="hidden text-xs text-muted-foreground xl:block">
-            <kbd className="rounded border px-1 py-0.5">⌘S</kbd> save ·{" "}
-            <kbd className="rounded border px-1 py-0.5">⌘⏎</kbd> send
-          </span>
-          <Button type="button" variant="outline" size="sm" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => startTransition(() => handleManualSave())}
-            disabled={isPending}
-          >
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Save Draft
-          </Button>
-        </div>
-      </div>
+      <BuilderCommandBar
+        docLabel={quotation ? `Edit ${quotation.quotation_number}` : "New Quotation"}
+        saveStatus={saveStatus}
+        isDirty={isDirty}
+        total={totals.total}
+        currency={currency}
+        isPending={isPending}
+        onCancel={handleCancel}
+        onSave={() => startTransition(() => handleManualSave())}
+        onSend={() => startTransition(() => handleSendShortcut())}
+      />
 
-      <div className="grid gap-6 lg:grid-cols-3">
-      <div className="space-y-6 lg:col-span-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Client &amp; Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Client *</Label>
+      {/* The document sheet: one continuous surface that reads like the
+          quotation it produces — masthead, recipient + properties, the
+          line-item ledger as the hero, then notes/terms and totals at the
+          foot. Hierarchy comes from type and whitespace, not card borders. */}
+      <div className="rounded-xl border bg-card px-6 py-8 shadow-2xs sm:px-10 sm:py-10">
+        {/* Masthead — the document names itself; no boxed inputs. */}
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Untitled quotation"
+          className="w-full border-none bg-transparent text-3xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/30"
+        />
+        <input
+          value={summary}
+          onChange={(e) => setSummary(e.target.value)}
+          placeholder="Add a one-line summary shown to the client…"
+          className="mt-1.5 w-full border-none bg-transparent text-sm text-muted-foreground outline-none placeholder:text-muted-foreground/40"
+        />
+
+        {/* Recipient + document properties */}
+        <div className="mt-8 grid gap-x-16 gap-y-8 border-t pt-8 md:grid-cols-2">
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              Prepared For
+            </p>
+            <div className="mt-2.5">
               <ClientSelector
                 clients={clients}
                 value={clientId}
@@ -455,220 +431,131 @@ export function QuotationBuilder({
                 }}
               />
             </div>
+          </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label>Title</Label>
-                <Input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Website Redesign Package"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Currency</Label>
-                <Select value={currency} onValueChange={setCurrency}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CURRENCIES.map((c) => (
-                      <SelectItem key={c} value={c}>
-                        {c}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Issue date</Label>
-                <Input
-                  type="date"
-                  value={issueDate}
-                  onChange={(e) => setIssueDate(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Expiry date</Label>
-                <Input
-                  type="date"
-                  value={expiryDate}
-                  onChange={(e) => setExpiryDate(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Summary</Label>
+          <div className="space-y-2.5">
+            <div className="grid grid-cols-[96px_1fr] items-center gap-3">
+              <span className="text-xs text-muted-foreground">Issue date</span>
               <Input
-                value={summary}
-                onChange={(e) => setSummary(e.target.value)}
-                placeholder="One-line summary shown to the client"
+                type="date"
+                value={issueDate}
+                onChange={(e) => setIssueDate(e.target.value)}
+                className="h-8"
               />
             </div>
-          </CardContent>
-        </Card>
+            <div className="grid grid-cols-[96px_1fr] items-center gap-3">
+              <span className="text-xs text-muted-foreground">Valid until</span>
+              <Input
+                type="date"
+                value={expiryDate}
+                onChange={(e) => setExpiryDate(e.target.value)}
+                className="h-8"
+              />
+            </div>
+            <div className="grid grid-cols-[96px_1fr] items-center gap-3">
+              <span className="text-xs text-muted-foreground">Currency</span>
+              <Select value={currency} onValueChange={setCurrency}>
+                <SelectTrigger className="h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CURRENCIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
-            <CardTitle className="text-base">Line Items</CardTitle>
-            {/* Quiet ghost toolbar — three affordances without three
-                competing boxed buttons next to the section title. */}
-            <div className="flex gap-1">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground hover:text-foreground"
-                onClick={() => setCatalogPickerOpen(true)}
-              >
-                <Package className="mr-1.5 h-4 w-4" />
-                Catalog
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground hover:text-foreground"
-                onClick={() => setTemplatePickerOpen(true)}
-              >
-                <FileDown className="mr-1.5 h-4 w-4" />
-                Template
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground hover:text-foreground"
-                onClick={() => setSaveTemplateOpen(true)}
-              >
-                <FileUp className="mr-1.5 h-4 w-4" />
-                Save as Template
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <Tabs
-              value={activeCategory}
-              onValueChange={(v) => setActiveCategory(v as LineItemCategory)}
-            >
-              <TabsList>
-                {LINE_ITEM_CATEGORIES.map((cat) => (
-                  <TabsTrigger key={cat} value={cat}>
-                    {CATEGORY_LABEL[cat]}
-                    {itemsByCategory[cat].length > 0 && (
-                      <span className="ml-1.5 text-xs text-muted-foreground">
-                        {itemsByCategory[cat].length}
-                      </span>
-                    )}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              {LINE_ITEM_CATEGORIES.map((cat) => (
-                <TabsContent key={cat} value={cat} className="space-y-2">
-                  {itemsByCategory[cat].length > 0 && (
-                    <div
-                      className={cn(
-                        "hidden gap-x-2 px-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground md:grid",
-                        LINE_ITEM_GRID_COLS
-                      )}
-                    >
-                      <span />
-                      <span>Description</span>
-                      <span>Qty</span>
-                      <span>Unit</span>
-                      <span>Unit Price</span>
-                      <span>Disc %</span>
-                      <span>Tax %</span>
-                      <span className="text-right">Total</span>
-                      <span />
-                    </div>
-                  )}
-                  {itemsByCategory[cat].length === 0 ? (
-                    // The empty tab IS the add affordance: one large
-                    // dashed target instead of a dead "nothing here" line
-                    // plus a small button below it.
-                    <button
-                      type="button"
-                      onClick={() => addLineItem(cat)}
-                      className="flex w-full flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed py-8 text-sm text-muted-foreground transition-colors duration-150 hover:border-primary/40 hover:bg-primary/[0.02] hover:text-foreground"
-                    >
-                      <Plus className="h-4 w-4" />
-                      Add your first {CATEGORY_LABEL[cat].toLowerCase().replace(/s$/, "")}
-                    </button>
-                  ) : (
-                    <>
-                      {itemsByCategory[cat].map(({ item, originalIndex }) => (
-                        <LineItemRow
-                          key={originalIndex}
-                          item={item}
-                          currency={currency}
-                          onChange={(patch) => updateLineItem(originalIndex, patch)}
-                          onRemove={() => removeLineItem(originalIndex)}
-                        />
-                      ))}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => addLineItem(cat)}
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add {CATEGORY_LABEL[cat].replace(/s$/, "")}
-                      </Button>
-                    </>
-                  )}
-                </TabsContent>
-              ))}
-            </Tabs>
-          </CardContent>
-        </Card>
+        {/* The hero: the full-width line-item ledger. */}
+        <div className="mt-10 border-t pt-8">
+          <LineItemsEditor
+            itemsByCategory={itemsByCategory}
+            currency={currency}
+            onAdd={addLineItem}
+            onUpdate={updateLineItem}
+            onRemove={removeLineItem}
+            onOpenCatalog={() => setCatalogPickerOpen(true)}
+            onOpenTemplate={() => setTemplatePickerOpen(true)}
+            onOpenSaveTemplate={() => setSaveTemplateOpen(true)}
+          />
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Notes &amp; Terms</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Notes (visible to client)</Label>
-              <RichTextEditor
-                value={notes}
-                onChange={setNotes}
-                placeholder="Add notes for your client..."
-              />
+        {/* Foot: client-facing notes and terms on the left, the
+            document-realistic totals block bottom-right. */}
+        <div className="mt-10 grid gap-x-16 gap-y-8 border-t pt-8 lg:grid-cols-[minmax(0,1fr)_280px]">
+          <div className="space-y-6">
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                Notes
+              </p>
+              <div className="mt-2.5">
+                <RichTextEditor
+                  value={notes}
+                  onChange={setNotes}
+                  placeholder="Add notes for your client..."
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label>Terms &amp; conditions</Label>
-              <RichTextEditor
-                value={terms}
-                onChange={setTerms}
-                placeholder="Payment terms, validity, etc."
-              />
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                Terms &amp; Conditions
+              </p>
+              <div className="mt-2.5">
+                <RichTextEditor
+                  value={terms}
+                  onChange={setTerms}
+                  placeholder="Payment terms, validity, etc."
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label className="flex items-center gap-1.5">
-                Internal notes
-                <span className="text-xs font-normal text-muted-foreground">
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                Internal Notes{" "}
+                <span className="normal-case tracking-normal text-muted-foreground/70">
                   (staff only)
                 </span>
-              </Label>
-              <RichTextEditor
-                value={internalNotes}
-                onChange={setInternalNotes}
-                placeholder="Not visible to the client..."
-              />
+              </p>
+              <div className="mt-2.5">
+                <RichTextEditor
+                  value={internalNotes}
+                  onChange={setInternalNotes}
+                  placeholder="Not visible to the client..."
+                />
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-      </div>
-
-      <div>
-        <PricingSummary
-          totals={totals}
-          currency={currency}
-          itemCount={lineItems.length}
-        />
+          <div className="space-y-2.5 self-end text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Subtotal</span>
+              <span className="tabular-nums">
+                {formatCurrency(totals.subtotal, currency)}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Discount</span>
+              <span className="tabular-nums text-red-600 dark:text-red-400">
+                −{formatCurrency(totals.discount_amount, currency)}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Tax</span>
+              <span className="tabular-nums">
+                {formatCurrency(totals.tax_amount, currency)}
+              </span>
+            </div>
+            <div className="flex items-baseline justify-between border-t pt-3">
+              <span className="font-medium">Total</span>
+              <span className="text-2xl font-semibold tabular-nums tracking-tight">
+                {formatCurrency(totals.total, currency)}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <TemplatePickerDialog
@@ -690,8 +577,6 @@ export function QuotationBuilder({
         documentCurrency={currency}
         onInsert={handleInsertCatalogItem}
       />
-      </div>
     </div>
   );
 }
-
