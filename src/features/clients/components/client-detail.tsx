@@ -26,6 +26,8 @@ import { PAYMENT_METHOD_LABEL } from "@/features/invoices/helpers";
 import { FulfillmentProgress } from "@/features/fulfillment/components/fulfillment-progress";
 import { DetailHeader } from "@/components/shared/detail-header";
 import { FieldList, DetailItem } from "@/components/shared/detail-item";
+import { SummaryHero } from "@/components/shared/summary-hero";
+import { formatCurrency } from "@/lib/utils/format-currency";
 import type { Client } from "@/features/clients/types";
 import type { PaymentMethod } from "@/features/invoices/types";
 import type { Activity } from "@/features/activities/types";
@@ -166,6 +168,27 @@ export function ClientDetail({
         }
       />
 
+      {(() => {
+        const currency = client.preferred_currency || workspace.default_currency;
+        const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
+        const totalOutstanding = invoices.reduce((sum, inv) => sum + inv.amount_due, 0);
+        if (totalPaid > 0 || totalOutstanding > 0 || invoices.length > 0) {
+          return (
+            <SummaryHero
+              primaryLabel="Lifetime Revenue"
+              primaryValue={formatCurrency(totalPaid, currency)}
+              primaryTone="success"
+              secondaryMetrics={[
+                { label: "Outstanding", value: formatCurrency(totalOutstanding, currency) },
+                { label: "Invoices", value: String(invoices.length) },
+                { label: "Quotations", value: String(quotations.length) },
+              ]}
+            />
+          );
+        }
+        return null;
+      })()}
+
       {/* The Stripe customer-page composition: the money story
           (quotations → invoices → payments → fulfillment) owns the main
           column; identity and billing facts live in the right rail where
@@ -219,10 +242,7 @@ export function ClientDetail({
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="tabular-nums">
-                          {new Intl.NumberFormat("en-US", {
-                            style: "currency",
-                            currency: q.currency,
-                          }).format(q.total)}
+                          {formatCurrency(q.total, q.currency)}
                         </span>
                         <StatusBadge status={q.status} />
                       </div>
@@ -281,17 +301,11 @@ export function ClientDetail({
                       <div className="flex items-center gap-2">
                         <div className="text-right">
                           <p className="font-semibold tabular-nums">
-                            {new Intl.NumberFormat("en-US", {
-                              style: "currency",
-                              currency: inv.currency,
-                            }).format(inv.amount_due)}
+                            {formatCurrency(inv.amount_due, inv.currency)}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             of{" "}
-                            {new Intl.NumberFormat("en-US", {
-                              style: "currency",
-                              currency: inv.currency,
-                            }).format(inv.total)}
+                            {formatCurrency(inv.total, inv.currency)}
                           </p>
                         </div>
                         <StatusBadge
@@ -351,10 +365,7 @@ export function ClientDetail({
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="tabular-nums">
-                          {new Intl.NumberFormat("en-US", {
-                            style: "currency",
-                            currency: p.currency,
-                          }).format(p.amount)}
+                          {formatCurrency(p.amount, p.currency)}
                         </span>
                         <Badge variant="secondary">
                           {PAYMENT_METHOD_LABEL[p.payment_method]}

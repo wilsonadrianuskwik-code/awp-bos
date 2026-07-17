@@ -14,6 +14,7 @@ import { useConfirm } from "@/providers/confirm-provider";
 import { deleteCatalogItem } from "@/features/catalog/actions";
 import { DetailHeader } from "@/components/shared/detail-header";
 import { FieldList, DetailItem } from "@/components/shared/detail-item";
+import { SummaryHero } from "@/components/shared/summary-hero";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { CatalogItem, ItemType } from "@/features/catalog/types";
 import type { LineItemCategory } from "@/features/line-items/types";
@@ -95,6 +96,16 @@ export function CatalogDetail({ item, activities }: CatalogDetailProps) {
             </>
           ) : undefined
         }
+      />
+
+      <SummaryHero
+        primaryLabel="Default Price"
+        primaryValue={formatCurrency(item.default_unit_price, item.currency)}
+        secondaryMetrics={[
+          { label: "Type", value: ITEM_TYPE_LABEL[item.item_type] },
+          { label: "Category", value: CATEGORY_LABEL[item.default_category] },
+          ...(item.default_unit ? [{ label: "Unit", value: item.default_unit }] : []),
+        ]}
       />
 
       <div className="grid gap-6 lg:grid-cols-3">

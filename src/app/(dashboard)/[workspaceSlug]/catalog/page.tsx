@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Plus, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
+import { MetricsRibbon, type RibbonMetric } from "@/components/shared/metrics-ribbon";
 import { PageHeader } from "@/components/shared/page-header";
 import { CatalogList } from "@/features/catalog/components/catalog-list";
 import { getCatalogItems } from "@/features/catalog/queries";
@@ -23,6 +24,26 @@ export default async function CatalogPage({
     getWorkspaceContext(workspaceSlug),
   ]);
   const canManage = !!context && hasMinRole(context.role as Role, "staff");
+
+  const activeCount = items.filter((i) => i.is_active).length;
+  const productCount = items.filter((i) => i.item_type === "product").length;
+  const serviceCount = items.filter((i) => i.item_type === "service").length;
+
+  const metrics: RibbonMetric[] = [
+    {
+      label: "Total Items",
+      value: String(items.length),
+      description: `${activeCount} active`,
+    },
+    {
+      label: "Products",
+      value: String(productCount),
+    },
+    {
+      label: "Services",
+      value: String(serviceCount),
+    },
+  ];
 
   const newItemButton = (
     <Button asChild>
@@ -49,7 +70,10 @@ export default async function CatalogPage({
           action={canManage ? newItemButton : undefined}
         />
       ) : (
-        <CatalogList items={items} />
+        <>
+          <MetricsRibbon metrics={metrics} />
+          <CatalogList items={items} />
+        </>
       )}
     </div>
   );

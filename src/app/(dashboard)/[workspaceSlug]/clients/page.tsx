@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Plus, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
+import { MetricsRibbon, type RibbonMetric } from "@/components/shared/metrics-ribbon";
 import { PageHeader } from "@/components/shared/page-header";
 import { ClientList } from "@/features/clients/components/client-list";
 import { getClients } from "@/features/clients/queries";
@@ -18,6 +19,26 @@ export default async function ClientsPage({
   if (!workspace) notFound();
 
   const clients = await getClients(workspace.id);
+
+  const now = new Date();
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const newThisMonth = clients.filter(
+    (c) => new Date(c.created_at) >= thirtyDaysAgo
+  ).length;
+
+  const metrics: RibbonMetric[] = [
+    {
+      label: "Total Clients",
+      value: String(clients.length),
+      description: "All time",
+    },
+    {
+      label: "New This Month",
+      value: String(newThisMonth),
+      description: "Last 30 days",
+      tone: newThisMonth > 0 ? "success" : "default",
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -49,7 +70,10 @@ export default async function ClientsPage({
           }
         />
       ) : (
-        <ClientList clients={clients} />
+        <>
+          <MetricsRibbon metrics={metrics} />
+          <ClientList clients={clients} />
+        </>
       )}
     </div>
   );

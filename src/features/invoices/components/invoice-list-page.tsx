@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils/cn";
+import { StatusTabs } from "@/components/shared/status-tabs";
 import { InvoiceCard } from "@/features/invoices/components/invoice-card";
 import type { InvoiceWithClient } from "@/features/invoices/types";
 
@@ -105,27 +105,13 @@ export function InvoiceListPage({ invoices, count }: InvoiceListPageProps) {
         </Select>
       </div>
 
-      <div className="flex gap-1 overflow-x-auto pb-1">
-        {STATUS_TABS.map((tab) => (
-          <button
-            key={tab.value}
-            onClick={() =>
-              setParams({
-                status: tab.value === "all" ? null : tab.value,
-                page: null,
-              })
-            }
-            className={cn(
-              "shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors duration-100",
-              status === tab.value
-                ? "bg-primary/10 text-primary ring-1 ring-inset ring-primary/20"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <StatusTabs
+        tabs={STATUS_TABS}
+        value={status}
+        onValueChange={(v) =>
+          setParams({ status: v === "all" ? null : v, page: null })
+        }
+      />
 
       {invoices.length === 0 ? (
         <ListEmpty message="No invoices match your filters." />

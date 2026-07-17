@@ -79,7 +79,7 @@ export default async function DashboardPage({
 
   return (
     <div className="space-y-6">
-      <GreetingHeader firstName={firstName} workspaceSlug={workspaceSlug} />
+      <GreetingHeader firstName={firstName} />
 
       {/* One unified metrics strip — every top-line number in a single
           divided card instead of a scatter of tiles. */}

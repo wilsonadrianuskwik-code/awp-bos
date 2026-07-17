@@ -5,6 +5,7 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/shared/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useWorkspace } from "@/providers/workspace-provider";
+import { formatCurrency } from "@/lib/utils/format-currency";
 import type { Lead } from "@/features/leads/types";
 
 const columns: ColumnDef<Lead, unknown>[] = [
@@ -44,10 +45,7 @@ const columns: ColumnDef<Lead, unknown>[] = [
     cell: ({ row }) => {
       const value = row.getValue("expected_value") as number | null;
       return value != null
-        ? new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: "USD",
-          }).format(value)
+        ? formatCurrency(value, row.original.expected_currency)
         : "-";
     },
   },

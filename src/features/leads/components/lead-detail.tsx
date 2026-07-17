@@ -7,6 +7,7 @@ import { Pencil, Trash2, ArrowRightLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { SummaryHero } from "@/components/shared/summary-hero";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -14,6 +15,7 @@ import { useConfirm } from "@/providers/confirm-provider";
 import { deleteLead } from "@/features/leads/actions";
 import { DetailHeader } from "@/components/shared/detail-header";
 import { FieldList, DetailItem } from "@/components/shared/detail-item";
+import { formatCurrency } from "@/lib/utils/format-currency";
 import type { Lead } from "@/features/leads/types";
 import type { Activity } from "@/features/activities/types";
 
@@ -86,6 +88,19 @@ export function LeadDetail({ lead, activities, onConvert }: LeadDetailProps) {
         }
       />
 
+      {lead.expected_value != null && (
+        <SummaryHero
+          primaryLabel="Expected Value"
+          primaryValue={formatCurrency(lead.expected_value, lead.expected_currency)}
+          secondaryMetrics={[
+            ...(lead.conversion_probability != null
+              ? [{ label: "Conversion Probability", value: `${lead.conversion_probability}%` }]
+              : []),
+            { label: "Source", value: lead.source?.replace(/_/g, " ") ?? "—" },
+          ]}
+        />
+      )}
+
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
           <Card>
@@ -105,10 +120,7 @@ export function LeadDetail({ lead, activities, onConvert }: LeadDetailProps) {
                   label="Expected Value"
                   value={
                     lead.expected_value != null
-                      ? new Intl.NumberFormat("en-US", {
-                          style: "currency",
-                          currency: lead.expected_currency || "USD",
-                        }).format(lead.expected_value)
+                      ? formatCurrency(lead.expected_value, lead.expected_currency)
                       : null
                   }
                 />
@@ -174,4 +186,3 @@ export function LeadDetail({ lead, activities, onConvert }: LeadDetailProps) {
     </div>
   );
 }
-
