@@ -91,13 +91,13 @@
      convention): the dark rail against a light canvas is the strongest
      single "enterprise product" signal, and it makes the content area
      read as the bright, focused workspace. */
-  --sidebar-background: 227 30% 10%;
-  --sidebar-foreground: 222 12% 72%;
+  --sidebar-background: 228 28% 12%;
+  --sidebar-foreground: 222 12% 68%;
   --sidebar-primary: 228 88% 66%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 226 22% 17%;
+  --sidebar-accent: 226 22% 18%;
   --sidebar-accent-foreground: 220 25% 96%;
-  --sidebar-border: 226 20% 16%;
+  --sidebar-border: 226 18% 18%;
   --sidebar-ring: 228 88% 66%;
 }
 
@@ -133,13 +133,13 @@
 
   /* In dark mode the rail sits a step deeper than the canvas so the
      content area still reads as the raised, focused surface. */
-  --sidebar-background: 225 18% 5%;
-  --sidebar-foreground: 220 12% 70%;
+  --sidebar-background: 226 20% 7%;
+  --sidebar-foreground: 220 12% 66%;
   --sidebar-primary: 228 84% 66%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 224 14% 12%;
+  --sidebar-accent: 224 14% 13%;
   --sidebar-accent-foreground: 220 14% 92%;
-  --sidebar-border: 224 12% 11%;
+  --sidebar-border: 224 12% 12%;
   --sidebar-ring: 228 84% 66%;
 }
 
