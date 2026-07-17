@@ -19,9 +19,9 @@ import { useConfirm } from "@/providers/confirm-provider";
 import { ClientSelector } from "@/features/line-items/components/client-selector";
 import { BuilderCommandBar } from "@/features/documents/components/builder-command-bar";
 import { LineItemsEditor } from "@/features/documents/components/line-items-editor";
-import { TemplatePickerDialog } from "@/features/line-items/components/template-picker-dialog";
 import { SaveAsTemplateDialog } from "@/features/line-items/components/save-as-template-dialog";
-import { CatalogPickerDialog } from "@/features/line-items/components/catalog-picker-dialog";
+import { InsertPalette } from "@/features/documents/components/insert-palette";
+import { ReviewSendOverlay } from "@/features/documents/components/review-send-overlay";
 import {
   createQuotation,
   updateQuotation,
@@ -57,6 +57,13 @@ function emptyItem(category: LineItemCategory): LineItemInput {
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
+}
+
+// The uniform value across a set of percentages, or null when they
+// genuinely differ (the document-defaults control shows "mixed").
+function inferUniform(values: number[]): number | null {
+  if (values.length === 0) return 0;
+  return values.every((v) => v === values[0]) ? values[0] : null;
 }
 
 type QuotationBuilderProps = {
@@ -121,9 +128,8 @@ export function QuotationBuilder({
       : []
   );
   const [templates, setTemplates] = useState(initialTemplates);
-  const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
+  const [insertPaletteOpen, setInsertPaletteOpen] = useState(false);
   const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
-  const [catalogPickerOpen, setCatalogPickerOpen] = useState(false);
 
   const [isDirty, setIsDirty] = useState(false);
   const [saveStatus, setSaveStatus] = useState<
@@ -310,14 +316,114 @@ export function QuotationBuilder({
     return () => window.removeEventListener("keydown", handler);
   }, [handleManualSave, handleSendShortcut]);
 
+  // The builder is compose-only: statuses beyond draft/revision_requested
+  // read on the detail page. Redirect instead of rendering dead inputs.
+  useEffect(() => {
+    if (
+      quotation &&
+      quotation.status !== "draft" &&
+      quotation.status !== "revision_requested"
+    ) {
+      router.replace(`/${workspace.slug}/quotations/${quotation.id}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Enter-to-compose focus plumbing (pure presentation state).
+  const [focusRequest, setFocusRequest] = useState<number | null>(null);
+  const handleFocusHandled = useCallback(() => setFocusRequest(null), []);
+
+  // Prepared For presentation: chosen client reads as a recipient block.
+  const [changingClient, setChangingClient] = useState(false);
+  const selectedClient = clients.find((c) => c.id === clientId) ?? null;
+
+  // Disclosure chips: notes/terms/internal editors are opt-in; documents
+  // that already carry a value open with it expanded.
+  const [showNotes, setShowNotes] = useState(
+    () => (quotation?.notes ?? defaultNotes ?? "") !== ""
+  );
+  const [showTerms, setShowTerms] = useState(
+    () =>
+      (quotation?.terms_and_conditions ?? defaultTermsAndConditions ?? "") !==
+      ""
+  );
+  const [showInternalNotes, setShowInternalNotes] = useState(
+    () => (quotation?.internal_notes ?? "") !== ""
+  );
+
+  // Document-level tax/discount defaults (following/pinned semantics —
+  // see the invoice builder; identical mechanics, no schema involvement).
+  const [docTax, setDocTax] = useState<number | null>(() =>
+    inferUniform((quotation?.line_items ?? []).map((li) => li.tax_percent ?? 0))
+  );
+  const [docDiscount, setDocDiscount] = useState<number | null>(() =>
+    inferUniform(
+      (quotation?.line_items ?? []).map((li) => li.discount_percent ?? 0)
+    )
+  );
+
+  function applyDocDefaults(nextTax: number, nextDiscount: number) {
+    setLineItems((prev) =>
+      prev.map((item) => {
+        const patch: Partial<LineItemInput> = {};
+        if (docTax === null || (item.tax_percent ?? 0) === docTax) {
+          patch.tax_percent = nextTax;
+        }
+        if (
+          docDiscount === null ||
+          (item.discount_percent ?? 0) === docDiscount
+        ) {
+          patch.discount_percent = nextDiscount;
+        }
+        return { ...item, ...patch };
+      })
+    );
+    setDocTax(nextTax);
+    setDocDiscount(nextDiscount);
+  }
+
+  // Send-readiness + the review moment.
+  const readyReasons: string[] = [];
+  if (!clientId) readyReasons.push("Choose a client");
+  if (submittableLineItems.length === 0)
+    readyReasons.push("Add at least one item");
+  const [reviewOpen, setReviewOpen] = useState(false);
+
   function updateLineItem(index: number, patch: Partial<LineItemInput>) {
     setLineItems((prev) =>
       prev.map((it, i) => (i === index ? { ...it, ...patch } : it))
     );
   }
 
+  // New rows follow the document defaults — that's what "following" means.
+  function newFollowingItem(category: LineItemCategory): LineItemInput {
+    return {
+      ...emptyItem(category),
+      tax_percent: docTax ?? 0,
+      discount_percent: docDiscount ?? 0,
+    };
+  }
+
   function addLineItem(category: LineItemCategory) {
-    setLineItems((prev) => [...prev, emptyItem(category)]);
+    setFocusRequest(lineItems.length);
+    setLineItems((prev) => [...prev, newFollowingItem(category)]);
+  }
+
+  // Enter in a row: commit it and compose the next line directly below.
+  function composeLineItemAfter(index: number) {
+    setLineItems((prev) => {
+      const category = prev[index]?.category ?? "per_unit";
+      const next = [...prev];
+      next.splice(index + 1, 0, newFollowingItem(category));
+      return next;
+    });
+    setFocusRequest(index + 1);
+  }
+
+  // Backspace on an already-empty row: remove silently, caret to previous.
+  function deleteEmptyLineItem(index: number) {
+    setLineItems((prev) => prev.filter((_, i) => i !== index));
+    setFocusRequest(index > 0 ? index - 1 : null);
   }
 
   function removeLineItem(index: number) {
@@ -342,16 +448,17 @@ export function QuotationBuilder({
     });
   }
 
+  // Palette inserts keep the palette open (its inline flash is the
+  // feedback); catalog lines are born following the document defaults.
   function handleInsertTemplate(items: LineItemInput[]) {
     setLineItems((prev) => [...prev, ...items]);
-    setTemplatePickerOpen(false);
-    toast("Template items inserted", "success");
   }
 
   function handleInsertCatalogItem(item: LineItemInput) {
-    setLineItems((prev) => [...prev, item]);
-    setCatalogPickerOpen(false);
-    toast("Catalog item inserted", "success");
+    setLineItems((prev) => [
+      ...prev,
+      { ...item, tax_percent: docTax ?? 0, discount_percent: docDiscount ?? 0 },
+    ]);
   }
 
   async function handleCancel() {
@@ -393,7 +500,9 @@ export function QuotationBuilder({
         isPending={isPending}
         onCancel={handleCancel}
         onSave={() => startTransition(() => handleManualSave())}
-        onSend={() => startTransition(() => handleSendShortcut())}
+        onSend={() => setReviewOpen(true)}
+        readyReasons={readyReasons}
+        sendLabel="Review & Send"
       />
 
       {/* The document sheet: one continuous surface that reads like the
@@ -401,12 +510,38 @@ export function QuotationBuilder({
           line-item ledger as the hero, then notes/terms and totals at the
           foot. Hierarchy comes from type and whitespace, not card borders. */}
       <div className="rounded-xl border bg-card px-5 py-8 shadow-2xs sm:px-14 sm:py-12">
+        {/* Letterhead — whose document this is. */}
+        <div className="flex items-start justify-between gap-6">
+          <div className="min-w-0">
+            {workspace.logo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={workspace.logo_url}
+                alt={workspace.name}
+                className="h-7 w-auto"
+              />
+            ) : (
+              <p className="text-[15px] font-semibold tracking-tight">
+                {workspace.name}
+              </p>
+            )}
+            {workspace.settings?.branding?.tagline && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {workspace.settings.branding.tagline}
+              </p>
+            )}
+          </div>
+          <span className="shrink-0 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            Quotation
+          </span>
+        </div>
+
         {/* Masthead — the document names itself; no boxed inputs. */}
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Untitled quotation"
-          className="w-full border-none bg-transparent text-3xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/30"
+          className="mt-9 w-full border-none bg-transparent text-3xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/30"
         />
         <input
           value={summary}
@@ -422,14 +557,43 @@ export function QuotationBuilder({
               Prepared For
             </p>
             <div className="mt-2.5">
-              <ClientSelector
-                clients={clients}
-                value={clientId}
-                onChange={(id, client) => {
-                  setClientId(id);
-                  setCurrency(client.preferred_currency ?? workspace.default_currency);
-                }}
-              />
+              {selectedClient && !changingClient ? (
+                <div className="group/billto">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[15px] font-semibold">
+                        {selectedClient.name}
+                      </p>
+                      {(selectedClient.company || selectedClient.email) && (
+                        <p className="mt-0.5 truncate text-[13px] text-muted-foreground">
+                          {[selectedClient.company, selectedClient.email]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setChangingClient(true)}
+                      className="shrink-0 rounded-md px-2 py-1 text-[13px] text-muted-foreground opacity-0 transition-all duration-100 hover:bg-muted hover:text-foreground focus-visible:opacity-100 group-hover/billto:opacity-100"
+                    >
+                      change
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <ClientSelector
+                  clients={clients}
+                  value={clientId}
+                  onChange={(id, client) => {
+                    setClientId(id);
+                    setCurrency(
+                      client.preferred_currency ?? workspace.default_currency
+                    );
+                    setChangingClient(false);
+                  }}
+                />
+              )}
             </div>
           </div>
 
@@ -478,9 +642,15 @@ export function QuotationBuilder({
             onAdd={addLineItem}
             onUpdate={updateLineItem}
             onRemove={removeLineItem}
-            onOpenCatalog={() => setCatalogPickerOpen(true)}
-            onOpenTemplate={() => setTemplatePickerOpen(true)}
             onOpenSaveTemplate={() => setSaveTemplateOpen(true)}
+            onOpenInsertPalette={() => setInsertPaletteOpen(true)}
+            onComposeAfter={composeLineItemAfter}
+            onDeleteEmpty={deleteEmptyLineItem}
+            focusIndex={focusRequest}
+            onFocusHandled={handleFocusHandled}
+            docTax={docTax}
+            docDiscount={docDiscount}
+            onApplyDefaults={applyDocDefaults}
           />
         </div>
 
@@ -488,45 +658,82 @@ export function QuotationBuilder({
             document-realistic totals block bottom-right. */}
         <div className="mt-10 grid gap-x-16 gap-y-8 border-t pt-8 lg:grid-cols-[minmax(0,1fr)_280px]">
           <div className="space-y-6">
-            <div>
-              <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                Notes
-              </p>
-              <div className="mt-2.5">
-                <RichTextEditor
-                  value={notes}
-                  onChange={setNotes}
-                  placeholder="Add notes for your client..."
-                />
+            {showNotes && (
+              <div className="duration-200 animate-in fade-in slide-in-from-bottom-1">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Note to Client
+                </p>
+                <div className="mt-2.5">
+                  <RichTextEditor
+                    value={notes}
+                    onChange={setNotes}
+                    placeholder="Add notes for your client..."
+                  />
+                </div>
               </div>
-            </div>
-            <div>
-              <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                Terms &amp; Conditions
-              </p>
-              <div className="mt-2.5">
-                <RichTextEditor
-                  value={terms}
-                  onChange={setTerms}
-                  placeholder="Payment terms, validity, etc."
-                />
+            )}
+            {showTerms && (
+              <div className="duration-200 animate-in fade-in slide-in-from-bottom-1">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Terms &amp; Conditions
+                </p>
+                <div className="mt-2.5">
+                  <RichTextEditor
+                    value={terms}
+                    onChange={setTerms}
+                    placeholder="Payment terms, validity, etc."
+                  />
+                </div>
               </div>
-            </div>
-            <div>
-              <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                Internal Notes{" "}
-                <span className="normal-case tracking-normal text-muted-foreground/70">
-                  (staff only)
-                </span>
-              </p>
-              <div className="mt-2.5">
-                <RichTextEditor
-                  value={internalNotes}
-                  onChange={setInternalNotes}
-                  placeholder="Not visible to the client..."
-                />
+            )}
+            {showInternalNotes && (
+              <div className="duration-200 animate-in fade-in slide-in-from-bottom-1">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Internal Notes{" "}
+                  <span className="normal-case tracking-normal text-muted-foreground/70">
+                    (staff only)
+                  </span>
+                </p>
+                <div className="mt-2.5">
+                  <RichTextEditor
+                    value={internalNotes}
+                    onChange={setInternalNotes}
+                    placeholder="Not visible to the client..."
+                  />
+                </div>
               </div>
-            </div>
+            )}
+            {(!showNotes || !showTerms || !showInternalNotes) && (
+              <div className="flex flex-wrap gap-2">
+                {!showNotes && (
+                  <button
+                    type="button"
+                    onClick={() => setShowNotes(true)}
+                    className="rounded-full border border-dashed px-3 py-1 text-[13px] text-muted-foreground transition-colors duration-100 hover:border-primary/40 hover:text-foreground"
+                  >
+                    + Note to client
+                  </button>
+                )}
+                {!showTerms && (
+                  <button
+                    type="button"
+                    onClick={() => setShowTerms(true)}
+                    className="rounded-full border border-dashed px-3 py-1 text-[13px] text-muted-foreground transition-colors duration-100 hover:border-primary/40 hover:text-foreground"
+                  >
+                    + Terms &amp; conditions
+                  </button>
+                )}
+                {!showInternalNotes && (
+                  <button
+                    type="button"
+                    onClick={() => setShowInternalNotes(true)}
+                    className="rounded-full border border-dashed px-3 py-1 text-[13px] text-muted-foreground transition-colors duration-100 hover:border-primary/40 hover:text-foreground"
+                  >
+                    + Internal note
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="space-y-2.5 self-end text-sm">
@@ -536,21 +743,25 @@ export function QuotationBuilder({
                 {formatCurrency(totals.subtotal, currency)}
               </span>
             </div>
+            {totals.discount_amount > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Discount</span>
+                <span className="tabular-nums text-red-600 dark:text-red-400">
+                  −{formatCurrency(totals.discount_amount, currency)}
+                </span>
+              </div>
+            )}
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Discount</span>
-              <span className="tabular-nums text-red-600 dark:text-red-400">
-                −{formatCurrency(totals.discount_amount, currency)}
+              <span className="text-muted-foreground">
+                Tax{docTax !== null && docTax > 0 ? ` (${docTax}%)` : ""}
               </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Tax</span>
               <span className="tabular-nums">
                 {formatCurrency(totals.tax_amount, currency)}
               </span>
             </div>
             <div className="flex items-baseline justify-between border-t pt-3">
-              <span className="font-medium">Total</span>
-              <span className="text-2xl font-semibold tabular-nums tracking-tight">
+              <span className="text-[15px] font-medium">Total</span>
+              <span className="text-3xl font-semibold tabular-nums tracking-tight">
                 {formatCurrency(totals.total, currency)}
               </span>
             </div>
@@ -558,24 +769,40 @@ export function QuotationBuilder({
         </div>
       </div>
 
-      <TemplatePickerDialog
-        open={templatePickerOpen}
-        onOpenChange={setTemplatePickerOpen}
+      <ReviewSendOverlay
+        open={reviewOpen}
+        onOpenChange={setReviewOpen}
+        docNoun="quotation"
+        workspaceName={workspace.name}
+        title={title}
+        recipientName={selectedClient?.name ?? "—"}
+        recipientDetail={[selectedClient?.company, selectedClient?.email]
+          .filter(Boolean)
+          .join(" · ")}
+        meta={[
+          { label: "Issue date", value: issueDate || "—" },
+          { label: "Valid until", value: expiryDate || "—" },
+        ]}
+        items={submittableLineItems}
+        totals={totals}
+        currency={currency}
+        sending={isPending}
+        onSend={() => startTransition(() => handleSendShortcut())}
+      />
+      <InsertPalette
+        open={insertPaletteOpen}
+        onOpenChange={setInsertPaletteOpen}
+        catalogItems={catalogItems}
         templates={templates}
-        onInsert={handleInsertTemplate}
+        documentCurrency={currency}
+        onInsertCatalog={handleInsertCatalogItem}
+        onInsertTemplate={handleInsertTemplate}
       />
       <SaveAsTemplateDialog
         open={saveTemplateOpen}
         onOpenChange={setSaveTemplateOpen}
         items={submittableLineItems}
         onSaved={(t) => setTemplates((prev) => [t, ...prev])}
-      />
-      <CatalogPickerDialog
-        open={catalogPickerOpen}
-        onOpenChange={setCatalogPickerOpen}
-        catalogItems={catalogItems}
-        documentCurrency={currency}
-        onInsert={handleInsertCatalogItem}
       />
     </div>
   );
