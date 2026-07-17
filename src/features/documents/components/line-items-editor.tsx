@@ -28,6 +28,13 @@ type LineItemsEditorProps = {
   onOpenCatalog: () => void;
   onOpenTemplate: () => void;
   onOpenSaveTemplate: () => void;
+  /** Enter-to-compose: commit row `index`, insert the next line after it. */
+  onComposeAfter?: (index: number) => void;
+  /** Backspace on an empty row: delete it, caret to the previous line. */
+  onDeleteEmpty?: (index: number) => void;
+  /** Which row (by original index) should take the caret, if any. */
+  focusIndex?: number | null;
+  onFocusHandled?: () => void;
 };
 
 // The hero of the document editor: a ledger of DisclosureRows read
@@ -46,6 +53,10 @@ export function LineItemsEditor({
   onOpenCatalog,
   onOpenTemplate,
   onOpenSaveTemplate,
+  onComposeAfter,
+  onDeleteEmpty,
+  focusIndex,
+  onFocusHandled,
 }: LineItemsEditorProps) {
   const nonEmpty = CATEGORY_ORDER.filter(
     (cat) => itemsByCategory[cat].length > 0
@@ -137,6 +148,18 @@ export function LineItemsEditor({
                     docTaxDefault={docTaxDefault}
                     onChange={(patch) => onUpdate(originalIndex, patch)}
                     onRemove={() => onRemove(originalIndex)}
+                    onEnter={
+                      onComposeAfter
+                        ? () => onComposeAfter(originalIndex)
+                        : undefined
+                    }
+                    onBackspaceEmpty={
+                      onDeleteEmpty
+                        ? () => onDeleteEmpty(originalIndex)
+                        : undefined
+                    }
+                    requestFocus={focusIndex === originalIndex}
+                    onFocusHandled={onFocusHandled}
                   />
                 ))}
               </div>

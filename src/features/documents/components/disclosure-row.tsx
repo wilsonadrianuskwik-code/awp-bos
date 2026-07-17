@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Trash2 } from "lucide-react";
 import {
   Select,
@@ -32,6 +32,13 @@ type DisclosureRowProps = {
   docTaxDefault?: number;
   onChange: (patch: Partial<LineItemInput>) => void;
   onRemove: () => void;
+  /** Enter in the description: commit this line, compose the next. */
+  onEnter?: () => void;
+  /** Backspace in an already-empty description: delete this line. */
+  onBackspaceEmpty?: () => void;
+  /** Parent asks this row to take the caret (newly composed rows). */
+  requestFocus?: boolean;
+  onFocusHandled?: () => void;
 };
 
 // The line-item atom of the document editor. At rest it reads as
@@ -46,9 +53,28 @@ export function DisclosureRow({
   docTaxDefault = 0,
   onChange,
   onRemove,
+  onEnter,
+  onBackspaceEmpty,
+  requestFocus,
+  onFocusHandled,
 }: DisclosureRowProps) {
   const [expanded, setExpanded] = useState(false);
+  const descRef = useRef<HTMLInputElement>(null);
   const currencyPrefix = getCurrencyPrefix(currency);
+
+  // Focus request from the parent (Enter-to-compose landed a new row, or
+  // Backspace-delete moved the caret here). Caret goes to the end so
+  // continuing to type feels like continuing the document.
+  useEffect(() => {
+    if (!requestFocus) return;
+    const el = descRef.current;
+    if (el) {
+      el.focus();
+      const len = el.value.length;
+      el.setSelectionRange(len, len);
+    }
+    onFocusHandled?.();
+  }, [requestFocus, onFocusHandled]);
 
   const itemSubtotal = item.quantity * item.unit_price;
   const discount = itemSubtotal * ((item.discount_percent ?? 0) / 100);
@@ -69,10 +95,29 @@ export function DisclosureRow({
       )}
     >
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 px-2 py-1.5">
-        {/* Description — the row's voice; document reading size. */}
+        {/* Description — the row's voice; document reading size. Enter
+            composes the next line; Backspace on an empty line deletes it
+            (the Notion editing grammar). */}
         <input
+          ref={descRef}
           value={item.description}
           onChange={(e) => onChange({ description: e.target.value })}
+          onKeyDown={(e) => {
+            // Plain Enter only — ⌘/Ctrl+Enter belongs to the builder's
+            // global save-and-send shortcut and must pass through.
+            if (
+              e.key === "Enter" &&
+              !e.metaKey &&
+              !e.ctrlKey &&
+              item.description.trim() !== ""
+            ) {
+              e.preventDefault();
+              onEnter?.();
+            } else if (e.key === "Backspace" && item.description === "") {
+              e.preventDefault();
+              onBackspaceEmpty?.();
+            }
+          }}
           placeholder="What are you charging for?"
           className="min-w-0 basis-full border-none bg-transparent py-1 text-[15px] outline-none placeholder:text-muted-foreground/40 md:basis-auto md:flex-1"
         />

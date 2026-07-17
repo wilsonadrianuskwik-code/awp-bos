@@ -300,6 +300,13 @@ export function InvoiceBuilder({
     return () => window.removeEventListener("keydown", handler);
   }, [handleManualSave, handleSendShortcut]);
 
+  // Enter-to-compose focus plumbing: when a row is created (Enter, or the
+  // Add-item affordance) the new row's index lands here and the row takes
+  // the caret, then reports back so the request doesn't re-fire. Pure
+  // presentation state — never serialized, never saved.
+  const [focusRequest, setFocusRequest] = useState<number | null>(null);
+  const handleFocusHandled = useCallback(() => setFocusRequest(null), []);
+
   function updateLineItem(index: number, patch: Partial<LineItemInput>) {
     setLineItems((prev) =>
       prev.map((it, i) => (i === index ? { ...it, ...patch } : it))
@@ -307,7 +314,27 @@ export function InvoiceBuilder({
   }
 
   function addLineItem(category: LineItemCategory) {
+    setFocusRequest(lineItems.length);
     setLineItems((prev) => [...prev, emptyItem(category)]);
+  }
+
+  // Enter in a row: commit it and compose the next line directly below,
+  // same category — the type-an-invoice flow.
+  function composeLineItemAfter(index: number) {
+    setLineItems((prev) => {
+      const category = prev[index]?.category ?? "per_unit";
+      const next = [...prev];
+      next.splice(index + 1, 0, emptyItem(category));
+      return next;
+    });
+    setFocusRequest(index + 1);
+  }
+
+  // Backspace on an already-empty row: remove it silently (no undo toast —
+  // there is nothing to undo) and hand the caret to the previous row.
+  function deleteEmptyLineItem(index: number) {
+    setLineItems((prev) => prev.filter((_, i) => i !== index));
+    setFocusRequest(index > 0 ? index - 1 : null);
   }
 
   function removeLineItem(index: number) {
@@ -471,6 +498,10 @@ export function InvoiceBuilder({
             onOpenCatalog={() => setCatalogPickerOpen(true)}
             onOpenTemplate={() => setTemplatePickerOpen(true)}
             onOpenSaveTemplate={() => setSaveTemplateOpen(true)}
+            onComposeAfter={composeLineItemAfter}
+            onDeleteEmpty={deleteEmptyLineItem}
+            focusIndex={focusRequest}
+            onFocusHandled={handleFocusHandled}
           />
         </div>
 
