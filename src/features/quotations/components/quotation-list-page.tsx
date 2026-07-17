@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useOptimistic, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Copy, Download, Send, Trash2 } from "lucide-react";
 import { Pagination } from "@/components/shared/pagination";
@@ -74,6 +74,15 @@ export function QuotationListPage({ quotations, count }: QuotationListPageProps)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Deleted rows disappear immediately (optimistic), reconciled once
+  // router.refresh() brings back the authoritative list — if a delete
+  // actually failed server-side, the refreshed list still has that row
+  // and it simply reappears rather than staying gone.
+  const [optimisticQuotations, removeOptimisticQuotations] = useOptimistic(
+    quotations,
+    (state, idsToRemove: Set<string>) => state.filter((q) => !idsToRemove.has(q.id))
+  );
+
   // Adjusted during render (not an effect), per React's "you might not
   // need an effect" guidance for resetting state when a prop changes.
   const [prevQuotations, setPrevQuotations] = useState(quotations);
@@ -106,7 +115,7 @@ export function QuotationListPage({ quotations, count }: QuotationListPageProps)
   }, [search, urlSearch, setParams]);
 
   const totalPages = Math.max(1, Math.ceil(count / PAGE_SIZE));
-  const selected = quotations.filter((q) => selectedIds.has(q.id));
+  const selected = optimisticQuotations.filter((q) => selectedIds.has(q.id));
 
   function clearSelection() {
     setSelectedIds(new Set());
@@ -121,9 +130,14 @@ export function QuotationListPage({ quotations, count }: QuotationListPageProps)
     });
     if (!ok) return;
 
+    const idsToDelete = new Set(selected.map((q) => q.id));
+    const toDelete = selected;
+    clearSelection();
+
     startTransition(async () => {
+      removeOptimisticQuotations(idsToDelete);
       const results = await Promise.all(
-        selected.map((q) => deleteQuotation(workspace.id, q.id))
+        toDelete.map((q) => deleteQuotation(workspace.id, q.id))
       );
       const failed = results.filter((r) => r.error).length;
       const succeeded = results.length - failed;
@@ -133,7 +147,6 @@ export function QuotationListPage({ quotations, count }: QuotationListPageProps)
           : `Deleted ${succeeded} quotation${succeeded === 1 ? "" : "s"}`,
         failed > 0 ? "error" : "success"
       );
-      clearSelection();
       router.refresh();
     });
   }
@@ -240,17 +253,17 @@ export function QuotationListPage({ quotations, count }: QuotationListPageProps)
         }
       />
 
-      {quotations.length === 0 ? (
+      {optimisticQuotations.length === 0 ? (
         <ListEmpty message="No quotations match your filters." />
       ) : view === "table" ? (
         <QuotationTable
-          quotations={quotations}
+          quotations={optimisticQuotations}
           selectedIds={selectedIds}
           onSelectedIdsChange={setSelectedIds}
         />
       ) : (
         <QuotationKanbanBoard
-          quotations={quotations}
+          quotations={optimisticQuotations}
           selectedIds={selectedIds}
           onSelectedIdsChange={setSelectedIds}
         />

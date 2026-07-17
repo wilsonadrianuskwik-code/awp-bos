@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useOptimistic, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Copy, Download, Send, Trash2 } from "lucide-react";
 import { Pagination } from "@/components/shared/pagination";
@@ -73,6 +73,15 @@ export function InvoiceListPage({ invoices, count }: InvoiceListPageProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Deleted rows disappear immediately (optimistic), reconciled once
+  // router.refresh() brings back the authoritative list — if a delete
+  // actually failed server-side, the refreshed list still has that row
+  // and it simply reappears rather than staying gone.
+  const [optimisticInvoices, removeOptimisticInvoices] = useOptimistic(
+    invoices,
+    (state, idsToRemove: Set<string>) => state.filter((i) => !idsToRemove.has(i.id))
+  );
+
   // Selection is scoped to what's currently loaded — a fresh page load or
   // filter change invalidates it rather than pointing at rows that are no
   // longer visible. Adjusted during render (not an effect) per React's
@@ -108,7 +117,7 @@ export function InvoiceListPage({ invoices, count }: InvoiceListPageProps) {
   }, [search, urlSearch, setParams]);
 
   const totalPages = Math.max(1, Math.ceil(count / PAGE_SIZE));
-  const selected = invoices.filter((i) => selectedIds.has(i.id));
+  const selected = optimisticInvoices.filter((i) => selectedIds.has(i.id));
 
   function clearSelection() {
     setSelectedIds(new Set());
@@ -123,9 +132,14 @@ export function InvoiceListPage({ invoices, count }: InvoiceListPageProps) {
     });
     if (!ok) return;
 
+    const idsToDelete = new Set(selected.map((i) => i.id));
+    const toDelete = selected;
+    clearSelection();
+
     startTransition(async () => {
+      removeOptimisticInvoices(idsToDelete);
       const results = await Promise.all(
-        selected.map((i) => deleteInvoice(workspace.id, i.id))
+        toDelete.map((i) => deleteInvoice(workspace.id, i.id))
       );
       const failed = results.filter((r) => r.error).length;
       const succeeded = results.length - failed;
@@ -135,7 +149,6 @@ export function InvoiceListPage({ invoices, count }: InvoiceListPageProps) {
           : `Deleted ${succeeded} invoice${succeeded === 1 ? "" : "s"}`,
         failed > 0 ? "error" : "success"
       );
-      clearSelection();
       router.refresh();
     });
   }
@@ -240,17 +253,17 @@ export function InvoiceListPage({ invoices, count }: InvoiceListPageProps) {
         }
       />
 
-      {invoices.length === 0 ? (
+      {optimisticInvoices.length === 0 ? (
         <ListEmpty message="No invoices match your filters." />
       ) : view === "table" ? (
         <InvoiceTable
-          invoices={invoices}
+          invoices={optimisticInvoices}
           selectedIds={selectedIds}
           onSelectedIdsChange={setSelectedIds}
         />
       ) : (
         <InvoiceKanbanBoard
-          invoices={invoices}
+          invoices={optimisticInvoices}
           selectedIds={selectedIds}
           onSelectedIdsChange={setSelectedIds}
         />

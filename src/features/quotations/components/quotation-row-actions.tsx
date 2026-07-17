@@ -51,7 +51,7 @@ type QuotationRowActionsProps = {
 export function QuotationRowActions({ quotation }: QuotationRowActionsProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  const { workspace } = useWorkspace();
+  const { workspace, can } = useWorkspace();
   const { toast } = useToast();
   const confirm = useConfirm();
 
@@ -65,7 +65,6 @@ export function QuotationRowActions({ quotation }: QuotationRowActionsProps) {
     quotation.status === "sent" ||
     quotation.status === "viewed" ||
     quotation.status === "revision_requested";
-  const canDelete = quotation.status === "draft" || quotation.status === "cancelled";
 
   function handleDuplicate() {
     startTransition(async () => {
@@ -133,8 +132,8 @@ export function QuotationRowActions({ quotation }: QuotationRowActionsProps) {
 
   async function handleDelete() {
     const ok = await confirm({
-      title: `Delete ${quotation.quotation_number}?`,
-      description: "It will move to trash.",
+      title: "Delete this quotation?",
+      description: "This action cannot be undone.",
       confirmLabel: "Delete",
       destructive: true,
     });
@@ -247,7 +246,7 @@ export function QuotationRowActions({ quotation }: QuotationRowActionsProps) {
           </>
         )}
 
-        {canDelete && (
+        {can("staff") && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -255,7 +254,7 @@ export function QuotationRowActions({ quotation }: QuotationRowActionsProps) {
               className="text-destructive focus:text-destructive"
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              {quotation.status === "draft" ? "Delete Draft" : "Delete"}
+              Delete
             </DropdownMenuItem>
           </>
         )}

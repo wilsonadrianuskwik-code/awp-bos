@@ -51,7 +51,7 @@ export function InvoiceRowActions({ invoice }: InvoiceRowActionsProps) {
   const [isPending, startTransition] = useTransition();
   const [recordPaymentOpen, setRecordPaymentOpen] = useState(false);
   const router = useRouter();
-  const { workspace } = useWorkspace();
+  const { workspace, can } = useWorkspace();
   const { toast } = useToast();
   const confirm = useConfirm();
 
@@ -102,8 +102,8 @@ export function InvoiceRowActions({ invoice }: InvoiceRowActionsProps) {
 
   async function handleDelete() {
     const ok = await confirm({
-      title: `Delete ${invoice.invoice_number}?`,
-      description: "It will move to trash.",
+      title: "Delete this invoice?",
+      description: "This action cannot be undone.",
       confirmLabel: "Delete",
       destructive: true,
     });
@@ -216,7 +216,7 @@ export function InvoiceRowActions({ invoice }: InvoiceRowActionsProps) {
             </>
           )}
 
-          {editable && (
+          {can("staff") && (
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -224,7 +224,7 @@ export function InvoiceRowActions({ invoice }: InvoiceRowActionsProps) {
                 className="text-destructive focus:text-destructive"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Delete Draft
+                Delete
               </DropdownMenuItem>
             </>
           )}
