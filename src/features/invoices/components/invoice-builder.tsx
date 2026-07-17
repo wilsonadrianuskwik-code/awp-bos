@@ -19,9 +19,8 @@ import { useConfirm } from "@/providers/confirm-provider";
 import { ClientSelector } from "@/features/line-items/components/client-selector";
 import { BuilderCommandBar } from "@/features/documents/components/builder-command-bar";
 import { LineItemsEditor } from "@/features/documents/components/line-items-editor";
-import { TemplatePickerDialog } from "@/features/line-items/components/template-picker-dialog";
 import { SaveAsTemplateDialog } from "@/features/line-items/components/save-as-template-dialog";
-import { CatalogPickerDialog } from "@/features/line-items/components/catalog-picker-dialog";
+import { InsertPalette } from "@/features/documents/components/insert-palette";
 import {
   createInvoice,
   updateInvoice,
@@ -123,9 +122,8 @@ export function InvoiceBuilder({
       : []
   );
   const [templates, setTemplates] = useState(initialTemplates);
-  const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
+  const [insertPaletteOpen, setInsertPaletteOpen] = useState(false);
   const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
-  const [catalogPickerOpen, setCatalogPickerOpen] = useState(false);
 
   const [isDirty, setIsDirty] = useState(false);
   const [saveStatus, setSaveStatus] = useState<
@@ -418,16 +416,23 @@ export function InvoiceBuilder({
     });
   }
 
+  // Palette inserts keep the palette open (its inline "Inserted" flash is
+  // the feedback). Template bundles keep their saved per-line values —
+  // they are deliberate; catalog lines are born following the document
+  // defaults like any other new line.
   function handleInsertTemplate(items: LineItemInput[]) {
     setLineItems((prev) => [...prev, ...items]);
-    setTemplatePickerOpen(false);
-    toast("Template items inserted", "success");
   }
 
   function handleInsertCatalogItem(item: LineItemInput) {
-    setLineItems((prev) => [...prev, item]);
-    setCatalogPickerOpen(false);
-    toast("Catalog item inserted", "success");
+    setLineItems((prev) => [
+      ...prev,
+      {
+        ...item,
+        tax_percent: docTax ?? 0,
+        discount_percent: docDiscount ?? 0,
+      },
+    ]);
   }
 
   async function handleCancel() {
@@ -554,9 +559,8 @@ export function InvoiceBuilder({
             onAdd={addLineItem}
             onUpdate={updateLineItem}
             onRemove={removeLineItem}
-            onOpenCatalog={() => setCatalogPickerOpen(true)}
-            onOpenTemplate={() => setTemplatePickerOpen(true)}
             onOpenSaveTemplate={() => setSaveTemplateOpen(true)}
+            onOpenInsertPalette={() => setInsertPaletteOpen(true)}
             onComposeAfter={composeLineItemAfter}
             onDeleteEmpty={deleteEmptyLineItem}
             focusIndex={focusRequest}
@@ -625,24 +629,20 @@ export function InvoiceBuilder({
         </div>
       </div>
 
-      <TemplatePickerDialog
-        open={templatePickerOpen}
-        onOpenChange={setTemplatePickerOpen}
+      <InsertPalette
+        open={insertPaletteOpen}
+        onOpenChange={setInsertPaletteOpen}
+        catalogItems={catalogItems}
         templates={templates}
-        onInsert={handleInsertTemplate}
+        documentCurrency={currency}
+        onInsertCatalog={handleInsertCatalogItem}
+        onInsertTemplate={handleInsertTemplate}
       />
       <SaveAsTemplateDialog
         open={saveTemplateOpen}
         onOpenChange={setSaveTemplateOpen}
         items={submittableLineItems}
         onSaved={(t) => setTemplates((prev) => [t, ...prev])}
-      />
-      <CatalogPickerDialog
-        open={catalogPickerOpen}
-        onOpenChange={setCatalogPickerOpen}
-        catalogItems={catalogItems}
-        documentCurrency={currency}
-        onInsert={handleInsertCatalogItem}
       />
     </div>
   );

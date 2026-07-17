@@ -1,13 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { FileDown, FileUp, Package, Plus } from "lucide-react";
+import { FileDown, FileUp, MoreHorizontal, Package, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { DisclosureRow } from "@/features/documents/components/disclosure-row";
 import { cn } from "@/lib/utils/cn";
 import type { LineItemInput } from "@/features/line-items/validators";
@@ -30,9 +36,13 @@ type LineItemsEditorProps = {
   onAdd: (category: LineItemCategory) => void;
   onUpdate: (index: number, patch: Partial<LineItemInput>) => void;
   onRemove: (index: number) => void;
-  onOpenCatalog: () => void;
-  onOpenTemplate: () => void;
+  onOpenCatalog?: () => void;
+  onOpenTemplate?: () => void;
   onOpenSaveTemplate: () => void;
+  /** Unified ⌘K insert palette — when provided, replaces the separate
+      Catalog/Template buttons and claims ⌘K while focus is in the items
+      zone. */
+  onOpenInsertPalette?: () => void;
   /** Enter-to-compose: commit row `index`, insert the next line after it. */
   onComposeAfter?: (index: number) => void;
   /** Backspace on an empty row: delete it, caret to the previous line. */
@@ -170,6 +180,7 @@ export function LineItemsEditor({
   onOpenCatalog,
   onOpenTemplate,
   onOpenSaveTemplate,
+  onOpenInsertPalette,
   onComposeAfter,
   onDeleteEmpty,
   focusIndex,
@@ -200,7 +211,19 @@ export function LineItemsEditor({
     ).cat;
 
   return (
-    <div>
+    <div
+      onKeyDown={
+        onOpenInsertPalette
+          ? (e) => {
+              if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+                e.preventDefault();
+                e.stopPropagation();
+                onOpenInsertPalette();
+              }
+            }
+          : undefined
+      }
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           Items{totalCount > 0 && <span className="ml-1.5 normal-case tracking-normal">· {totalCount}</span>}
@@ -213,36 +236,78 @@ export function LineItemsEditor({
               onApply={onApplyDefaults}
             />
           )}
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-7 text-muted-foreground hover:text-foreground"
-            onClick={onOpenCatalog}
-          >
-            <Package className="mr-1.5 h-3.5 w-3.5" />
-            Catalog
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-7 text-muted-foreground hover:text-foreground"
-            onClick={onOpenTemplate}
-          >
-            <FileDown className="mr-1.5 h-3.5 w-3.5" />
-            Template
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-7 text-muted-foreground hover:text-foreground"
-            onClick={onOpenSaveTemplate}
-          >
-            <FileUp className="mr-1.5 h-3.5 w-3.5" />
-            Save as Template
-          </Button>
+          {onOpenInsertPalette ? (
+            <>
+              {/* Palette mode: one Insert affordance; Save-as-Template is
+                  an export verb, exiled to the ⋯ menu out of the compose
+                  flow. */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-muted-foreground hover:text-foreground"
+                onClick={onOpenInsertPalette}
+              >
+                <Package className="mr-1.5 h-3.5 w-3.5" />
+                Insert
+                <kbd className="ml-1.5 rounded border bg-muted px-1 text-[10px] font-medium">
+                  ⌘K
+                </kbd>
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                    aria-label="More item actions"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={onOpenSaveTemplate}>
+                    <FileUp className="mr-2 h-4 w-4" />
+                    Save items as Template
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-muted-foreground hover:text-foreground"
+                onClick={onOpenCatalog}
+              >
+                <Package className="mr-1.5 h-3.5 w-3.5" />
+                Catalog
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-muted-foreground hover:text-foreground"
+                onClick={onOpenTemplate}
+              >
+                <FileDown className="mr-1.5 h-3.5 w-3.5" />
+                Template
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-muted-foreground hover:text-foreground"
+                onClick={onOpenSaveTemplate}
+              >
+                <FileUp className="mr-1.5 h-3.5 w-3.5" />
+                Save as Template
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -255,7 +320,7 @@ export function LineItemsEditor({
           className="mt-4 flex w-full items-center gap-2 rounded-md px-2 py-3 text-left text-[15px] text-muted-foreground/60 transition-colors duration-150 hover:bg-muted/40 hover:text-muted-foreground"
         >
           <Plus className="h-4 w-4 shrink-0" />
-          Add your first item — type a description, or pull from your catalog
+          Add your first item — type a description, or press ⌘K to pull from your catalog
         </button>
       ) : (
         <div className="mt-3">
@@ -287,6 +352,7 @@ export function LineItemsEditor({
                     }
                     requestFocus={focusIndex === originalIndex}
                     onFocusHandled={onFocusHandled}
+                    onSlashInsert={onOpenInsertPalette}
                   />
                 ))}
               </div>
@@ -300,6 +366,11 @@ export function LineItemsEditor({
           >
             <Plus className="h-3.5 w-3.5 shrink-0" />
             Add item
+            {onOpenInsertPalette && (
+              <span className="ml-auto text-[11px] text-muted-foreground/50">
+                ⌘K catalog / template
+              </span>
+            )}
           </button>
         </div>
       )}

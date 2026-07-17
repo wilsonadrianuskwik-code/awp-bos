@@ -40,6 +40,8 @@ type DisclosureRowProps = {
   /** Parent asks this row to take the caret (newly composed rows). */
   requestFocus?: boolean;
   onFocusHandled?: () => void;
+  /** "/" typed in an empty description: open the insert palette. */
+  onSlashInsert?: () => void;
 };
 
 // The line-item atom of the document editor. At rest it reads as
@@ -58,6 +60,7 @@ export function DisclosureRow({
   onBackspaceEmpty,
   requestFocus,
   onFocusHandled,
+  onSlashInsert,
 }: DisclosureRowProps) {
   const [expanded, setExpanded] = useState(false);
   const descRef = useRef<HTMLInputElement>(null);
@@ -120,6 +123,13 @@ export function DisclosureRow({
             } else if (e.key === "Backspace" && item.description === "") {
               e.preventDefault();
               onBackspaceEmpty?.();
+            } else if (
+              e.key === "/" &&
+              item.description === "" &&
+              onSlashInsert
+            ) {
+              e.preventDefault();
+              onSlashInsert();
             }
           }}
           placeholder="What are you charging for?"
