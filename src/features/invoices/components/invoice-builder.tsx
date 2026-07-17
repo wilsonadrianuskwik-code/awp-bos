@@ -312,6 +312,21 @@ export function InvoiceBuilder({
   const [focusRequest, setFocusRequest] = useState<number | null>(null);
   const handleFocusHandled = useCallback(() => setFocusRequest(null), []);
 
+  // Bill To presentation: once a client is chosen the block reads as a
+  // document recipient; "change" reopens the selector. Pure UI state.
+  const [changingClient, setChangingClient] = useState(false);
+  const selectedClient = clients.find((c) => c.id === clientId) ?? null;
+
+  // Disclosure chips: notes/terms editors are opt-in; documents that
+  // already carry a value open with it expanded. Once opened they stay
+  // open for the session — closing would read as losing the text.
+  const [showNotes, setShowNotes] = useState(
+    () => (invoice?.notes ?? defaultNotes ?? "") !== ""
+  );
+  const [showPaymentTerms, setShowPaymentTerms] = useState(
+    () => (invoice?.payment_terms ?? defaultPaymentTerms ?? "") !== ""
+  );
+
   // Document-level tax/discount defaults. Pure UI convenience over the
   // existing per-line fields: applying a default writes tax_percent /
   // discount_percent onto every line still *following* the previous
@@ -482,12 +497,40 @@ export function InvoiceBuilder({
           line-item ledger as the hero, then notes and totals at the foot.
           Hierarchy comes from type and whitespace, not card borders. */}
       <div className="rounded-xl border bg-card px-5 py-8 shadow-2xs sm:px-14 sm:py-12">
+        {/* Letterhead — whose document this is. Ownership, not chrome:
+            the workspace's own mark (name if no logo — never a broken
+            frame) opposite the document type eyebrow. */}
+        <div className="flex items-start justify-between gap-6">
+          <div className="min-w-0">
+            {workspace.logo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={workspace.logo_url}
+                alt={workspace.name}
+                className="h-7 w-auto"
+              />
+            ) : (
+              <p className="text-[15px] font-semibold tracking-tight">
+                {workspace.name}
+              </p>
+            )}
+            {workspace.settings?.branding?.tagline && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {workspace.settings.branding.tagline}
+              </p>
+            )}
+          </div>
+          <span className="shrink-0 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            Invoice
+          </span>
+        </div>
+
         {/* Masthead — the document names itself; no boxed inputs. */}
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Untitled invoice"
-          className="w-full border-none bg-transparent text-3xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/30"
+          className="mt-9 w-full border-none bg-transparent text-3xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/30"
         />
         <input
           value={summary}
@@ -503,14 +546,45 @@ export function InvoiceBuilder({
               Bill To
             </p>
             <div className="mt-2.5">
-              <ClientSelector
-                clients={clients}
-                value={clientId}
-                onChange={(id, client) => {
-                  setClientId(id);
-                  setCurrency(client.preferred_currency ?? workspace.default_currency);
-                }}
-              />
+              {selectedClient && !changingClient ? (
+                // The chosen recipient reads as a document address block,
+                // not a form control; "change" whispers in on hover.
+                <div className="group/billto">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[15px] font-semibold">
+                        {selectedClient.name}
+                      </p>
+                      {(selectedClient.company || selectedClient.email) && (
+                        <p className="mt-0.5 truncate text-[13px] text-muted-foreground">
+                          {[selectedClient.company, selectedClient.email]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setChangingClient(true)}
+                      className="shrink-0 rounded-md px-2 py-1 text-[13px] text-muted-foreground opacity-0 transition-all duration-100 hover:bg-muted hover:text-foreground focus-visible:opacity-100 group-hover/billto:opacity-100"
+                    >
+                      change
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <ClientSelector
+                  clients={clients}
+                  value={clientId}
+                  onChange={(id, client) => {
+                    setClientId(id);
+                    setCurrency(
+                      client.preferred_currency ?? workspace.default_currency
+                    );
+                    setChangingClient(false);
+                  }}
+                />
+              )}
             </div>
           </div>
 
@@ -571,33 +645,60 @@ export function InvoiceBuilder({
           />
         </div>
 
-        {/* Foot: client-facing notes on the left, the document-realistic
-            totals block bottom-right — where an invoice keeps them. */}
+        {/* Foot: opt-in notes/terms as disclosure chips on the left (the
+            80% of invoices that omit them pay no visual tax), the
+            document-realistic totals block bottom-right. */}
         <div className="mt-10 grid gap-x-16 gap-y-8 border-t pt-8 lg:grid-cols-[minmax(0,1fr)_280px]">
           <div className="space-y-6">
-            <div>
-              <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                Notes
-              </p>
-              <div className="mt-2.5">
-                <RichTextEditor
-                  value={notes}
-                  onChange={setNotes}
-                  placeholder="Add notes for your client..."
+            {showNotes ? (
+              <div className="duration-200 animate-in fade-in slide-in-from-bottom-1">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Note to Client
+                </p>
+                <div className="mt-2.5">
+                  <RichTextEditor
+                    value={notes}
+                    onChange={setNotes}
+                    placeholder="Add notes for your client..."
+                  />
+                </div>
+              </div>
+            ) : null}
+            {showPaymentTerms ? (
+              <div className="duration-200 animate-in fade-in slide-in-from-bottom-1">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Payment Terms
+                </p>
+                <Input
+                  value={paymentTerms}
+                  onChange={(e) => setPaymentTerms(e.target.value)}
+                  placeholder="e.g. Net 30, due upon receipt"
+                  className="mt-2.5"
                 />
               </div>
-            </div>
-            <div>
-              <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                Payment Terms
-              </p>
-              <Input
-                value={paymentTerms}
-                onChange={(e) => setPaymentTerms(e.target.value)}
-                placeholder="e.g. Net 30, due upon receipt"
-                className="mt-2.5"
-              />
-            </div>
+            ) : null}
+            {(!showNotes || !showPaymentTerms) && (
+              <div className="flex flex-wrap gap-2">
+                {!showNotes && (
+                  <button
+                    type="button"
+                    onClick={() => setShowNotes(true)}
+                    className="rounded-full border border-dashed px-3 py-1 text-[13px] text-muted-foreground transition-colors duration-100 hover:border-primary/40 hover:text-foreground"
+                  >
+                    + Note to client
+                  </button>
+                )}
+                {!showPaymentTerms && (
+                  <button
+                    type="button"
+                    onClick={() => setShowPaymentTerms(true)}
+                    className="rounded-full border border-dashed px-3 py-1 text-[13px] text-muted-foreground transition-colors duration-100 hover:border-primary/40 hover:text-foreground"
+                  >
+                    + Payment terms
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="space-y-2.5 self-end text-sm">
@@ -607,21 +708,25 @@ export function InvoiceBuilder({
                 {formatCurrency(totals.subtotal, currency)}
               </span>
             </div>
+            {totals.discount_amount > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Discount</span>
+                <span className="tabular-nums text-red-600 dark:text-red-400">
+                  −{formatCurrency(totals.discount_amount, currency)}
+                </span>
+              </div>
+            )}
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Discount</span>
-              <span className="tabular-nums text-red-600 dark:text-red-400">
-                −{formatCurrency(totals.discount_amount, currency)}
+              <span className="text-muted-foreground">
+                Tax{docTax !== null && docTax > 0 ? ` (${docTax}%)` : ""}
               </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Tax</span>
               <span className="tabular-nums">
                 {formatCurrency(totals.tax_amount, currency)}
               </span>
             </div>
             <div className="flex items-baseline justify-between border-t pt-3">
-              <span className="font-medium">Total</span>
-              <span className="text-2xl font-semibold tabular-nums tracking-tight">
+              <span className="text-[15px] font-medium">Total</span>
+              <span className="text-3xl font-semibold tabular-nums tracking-tight">
                 {formatCurrency(totals.total, currency)}
               </span>
             </div>
