@@ -19,7 +19,11 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
+
+function navColorVar(color: string): CSSProperties {
+  return { "--nav-color": color } as CSSProperties;
+}
 
 type SidebarProps = {
   workspaceSlug: string;
@@ -79,7 +83,8 @@ function NavIcon({
       <span
         className={cn(
           "grid h-8 w-8 place-items-center rounded-lg transition-all duration-150",
-          !active && "text-sidebar-foreground/70 group-hover:bg-sidebar-accent group-hover:text-sidebar-accent-foreground"
+          !active &&
+            "text-sidebar-foreground/70 group-hover:text-[var(--nav-color)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_16%,transparent)] group-hover:shadow-[0_0_0_1px_color-mix(in_srgb,var(--nav-color)_28%,transparent),0_0_10px_2px_color-mix(in_srgb,var(--nav-color)_38%,transparent)]"
         )}
         style={
           active
@@ -144,6 +149,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
                   href={`${basePath}${item.href}`}
                   className="group flex w-full justify-center py-1"
                   title={item.label}
+                  style={navColorVar(item.color)}
                 >
                   <NavIcon
                     icon={item.icon}
@@ -166,6 +172,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
               href={`${basePath}${item.href}`}
               className="group flex w-full justify-center py-1"
               title={item.label}
+              style={navColorVar(item.color)}
             >
               <NavIcon
                 icon={item.icon}
@@ -201,10 +208,11 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
   const navIconClass = (href: string) =>
     cn(
       "grid h-7 w-7 shrink-0 place-items-center rounded-md transition-all duration-100",
-      !isActive(href) && "text-sidebar-foreground/70 group-hover:text-sidebar-accent-foreground"
+      !isActive(href) &&
+        "text-sidebar-foreground/70 group-hover:text-[var(--nav-color)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_16%,transparent)] group-hover:shadow-[0_0_0_1px_color-mix(in_srgb,var(--nav-color)_28%,transparent),0_0_10px_2px_color-mix(in_srgb,var(--nav-color)_38%,transparent)]"
     );
 
-  const navIconStyle = (href: string, color: string): React.CSSProperties | undefined =>
+  const navIconStyle = (href: string, color: string): CSSProperties | undefined =>
     isActive(href)
       ? {
           backgroundColor: `${color}2e`,
@@ -253,6 +261,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
                   key={item.label}
                   href={`${basePath}${item.href}`}
                   className={navItemClass(item.href)}
+                  style={navColorVar(item.color)}
                 >
                   <span
                     className={navIconClass(item.href)}
@@ -274,6 +283,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
             key={item.label}
             href={`${basePath}${item.href}`}
             className={navItemClass(item.href)}
+            style={navColorVar(item.color)}
           >
             <span
               className={navIconClass(item.href)}
