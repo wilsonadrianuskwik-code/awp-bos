@@ -82,12 +82,13 @@ export function DisclosureRow({
 
   const itemSubtotal = item.quantity * item.unit_price;
   const discount = itemSubtotal * ((item.discount_percent ?? 0) / 100);
+  // The row answers "what am I billing?" — tax is a document-level
+  // concept the totals block explains, never the row. The amount shown
+  // here is always the pre-tax line subtotal (post-discount); it rolls
+  // when quantity/rate/discount change, but never moves when only the
+  // document tax rate changes.
   const lineTotal = itemSubtotal - discount;
-  const tax = lineTotal * ((item.tax_percent ?? 0) / 100);
-  const total = lineTotal + tax;
-  // Rolls when anything recomputes this line — a direct edit, or the
-  // document-level tax/discount cascading through. Motion = math.
-  const rollingTotal = useRollingAmount(total);
+  const rollingLineTotal = useRollingAmount(lineTotal);
 
   const discountPct = item.discount_percent ?? 0;
   const taxPct = item.tax_percent ?? 0;
@@ -149,7 +150,8 @@ export function DisclosureRow({
         )}
 
         <div className="flex min-w-0 flex-1 items-center justify-end gap-x-2 md:flex-none">
-          {/* The math: qty × rate. */}
+          {/* Quantity and Unit travel together — "how much" of what — so
+              the eye never has to jump across the row to connect them. */}
           <input
             type="number"
             value={item.quantity}
@@ -158,6 +160,13 @@ export function DisclosureRow({
             step="0.01"
             className={cn(quietField, "w-14 text-right")}
             aria-label="Quantity"
+          />
+          <input
+            value={item.unit ?? ""}
+            onChange={(e) => onChange({ unit: e.target.value })}
+            placeholder="unit"
+            className={cn(quietField, "w-14 text-left")}
+            aria-label="Unit"
           />
           <span className="shrink-0 text-[13px] text-muted-foreground/60">×</span>
           <div className="relative">
@@ -183,9 +192,12 @@ export function DisclosureRow({
             />
           </div>
 
-          {/* The amount: computed, never an input. */}
+          {/* The amount: computed, never an input — and always the
+              pre-tax line subtotal. Tax is a document concept; it only
+              ever appears in the doc-level control and the totals block
+              below, never here. */}
           <span className="w-28 shrink-0 text-right text-[15px] font-medium tabular-nums tracking-tight">
-            {formatCurrency(rollingTotal, currency)}
+            {formatCurrency(rollingLineTotal, currency)}
           </span>
 
           {/* Row controls — whisper until hovered (always visible on touch). */}
@@ -219,19 +231,12 @@ export function DisclosureRow({
         </div>
       </div>
 
-      {/* The exception line: unit, discount, tax, category — only when a
-          row needs to deviate from the document defaults. */}
+      {/* The exception line: discount, tax, category — only when a row
+          needs to deviate from the document defaults. Unit lives up in
+          the main row beside Quantity; it's a billing fact, not an
+          exception. */}
       {expanded && (
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-2 pb-2.5 pt-0.5 text-[13px] text-muted-foreground duration-150 animate-in fade-in">
-          <label className="flex items-center gap-1.5">
-            Unit
-            <input
-              value={item.unit ?? ""}
-              onChange={(e) => onChange({ unit: e.target.value })}
-              placeholder="hr, pc…"
-              className={cn(quietField, "w-16 border-input/60 text-left")}
-            />
-          </label>
           <label className="flex items-center gap-1.5">
             Discount
             <input

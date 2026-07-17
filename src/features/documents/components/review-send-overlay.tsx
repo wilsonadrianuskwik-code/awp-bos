@@ -79,10 +79,12 @@ export function ReviewSendOverlay({
             </div>
             <div className="mt-6 space-y-2">
               {items.map((item, i) => {
+                // Pre-tax line subtotal — same rule as the editor row:
+                // tax is a document concept, explained only in the
+                // totals block below, never mixed into the row figure.
                 const sub = item.quantity * item.unit_price;
                 const disc = sub * ((item.discount_percent ?? 0) / 100);
-                const line = sub - disc;
-                const amount = line + line * ((item.tax_percent ?? 0) / 100);
+                const amount = sub - disc;
                 return (
                   <div
                     key={i}
