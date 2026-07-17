@@ -4,6 +4,226 @@ This file exists so a fresh session can become productive on this codebase
 in minutes instead of hours. Read this first; it links to the deeper docs
 (`docs/design-system.md`) rather than duplicating them.
 
+**Current branch: `claude/session-coq5f0`** (not `main`). Working tree is
+clean as of this writing — everything described below is committed and
+pushed. Check `git log --oneline -15` on session start to confirm nothing
+has moved since.
+
+**Files to read first, in order**: this file → `docs/design-system.md`
+(visual language) → `src/features/invoices/components/invoice-builder.tsx`
+(the reference implementation everything else is measured against) →
+whichever feature's `queries.ts`/`actions.ts` you're about to touch.
+
+---
+
+## The redesign program (what happened this session)
+
+The product had complete business logic but read as a generic admin panel.
+The work was a full presentation-layer redesign — **zero schema, RPC,
+route, validation, or business-logic changes anywhere** — done in two
+phases: (1) a whole-app visual/compositional pass, then (2) a from-scratch
+rebuild of the Invoice/Quotation Builder as the flagship reference
+implementation of a new design language.
+
+### Phase 1 — completed milestones (whole app)
+
+- **Design tokens & shell**: ink sidebar in both light/dark themes, accent
+  rail on active nav, tactile button press physics, elevation tokens
+  (`--shadow-overlay`, `--shadow-modal`), motion doctrine in `globals.css`
+  (150ms micro-interactions, 250–350ms entrances, `prefers-reduced-motion`
+  zeroes all of it).
+- **Dashboard**: recomposed from scattered KPI tiles into a unified metrics
+  ribbon + a revenue hero (chart + headline figure) + a persistent activity
+  rail. KPI values count up on mount; ribbon tiles link into their module.
+- **Detail pages** (invoice, quotation, client — the "Record" archetype):
+  rebuilt around a hero band (headline value + primary actions) with a
+  subject-left / context-rail-right body. This predates and directly
+  informed the Focus-archetype builder work below.
+- **Fulfillment cockpit**: animated progress bars, panel transitions, KPI
+  styling brought in line with the rest of the app.
+- **Lists, tables, forms**: consistent toolbar/filter patterns, save-status
+  pill, tinted totals footers — the groundwork the builder redesign then
+  built on top of.
+
+### Phase 2 — the Invoice/Quotation Builder rebuild (the reference implementation)
+
+This was **not an incremental redesign** — the old form (a 9-column input
+grid: type/desc/qty/unit/price/disc%/tax%/total/delete, every field always
+visible, categories behind tabs) was rebuilt from first principles as a
+**document editor**. Full design rationale and the build-ready redline
+(exact type scale, spacing, motion timings, keyboard map) is preserved in
+`/root/.claude/plans/i-want-to-build-glittery-pascal.md` if you need the
+"why" behind any specific number — the sections below are the "what."
+
+**Milestones M1–M8, all shipped and mirrored to both builders:**
+
+| # | What shipped |
+|---|---|
+| M1 | `DisclosureRow` — the line-item atom, reads as typography at rest, not a form grid |
+| M2 | Enter-to-compose (commit line → spawn next, caret follows) + Backspace-to-delete-empty |
+| M3 | Document-level Tax & Discount control with following/pinned semantics |
+| M4 | Unified `InsertPalette` (⌘K) replacing two separate catalog/template picker dialogs |
+| M5 | Letterhead + Bill To recipient-as-address-block + property rows |
+| M6 | Totals redline + Notes/Terms as opt-in disclosure chips |
+| M7 | Readiness dot + `ReviewSendOverlay` (the send moment) + draft-only redirect |
+| M8 | Full language mirrored to the Quotation Builder |
+
+**Then, after first real use, two interaction-design corrections** (the
+most recent commits): the row amount was showing a tax-inclusive figure —
+fixed to always show the **pre-tax, post-discount line subtotal** (tax is a
+document-level concept, shown only in the Tax/Discount control and the
+totals block, never in a row). And **Unit was relocated** from the
+row-expand into the always-visible row, beside Quantity (they describe
+"how much of what" together); Discount/Tax/Category remain true per-line
+exceptions behind the expand (⌄).
+
+### Design philosophy established this session
+
+Three named principles that now govern every surface, stated explicitly so
+they don't erode over time:
+
+1. **The row/field answers one question; the totals/summary answer a
+   different one.** Line-level UI answers *"what am I billing/looking
+   at?"*; document-level UI (totals, tax) answers *"what does this add up
+   to?"* Never blend the two into one number.
+2. **The honesty rule.** Anything hidden behind progressive disclosure that
+   still affects a total must leave a visible trace at rest (the discount/
+   tax "honesty badges" on a collapsed row) — hiding a value is fine,
+   hiding its *effect* is not.
+3. **Motion means something or it doesn't exist.** Rolling numbers signal
+   *recomputation*, stagger signals *arrival*, entrance signals *a new
+   surface*. There is no decorative/ambient motion anywhere in the app —
+   this was a deliberate, repeated design decision, not an oversight.
+
+### Three-archetype page language ("Meridian" extends to layout, not just tokens)
+
+Every page in the app is now one of three shapes — a new page should pick
+one, not invent a fourth:
+
+- **Overview** (lists/dashboards): toolbar → metrics → content → optional
+  rail.
+- **Record** (detail pages): hero band (headline value + actions) → subject
+  (left) + context/history rail (right). *Shipped*: invoice/quotation/
+  client detail.
+- **Focus** (compose & commit): sticky command bar (live answer + actions)
+  → centered "sheet" (the artifact) → progressive disclosure. *Shipped*:
+  the two document builders. This is the newest archetype and the one most
+  likely to need a fourth example (a settings/edit form) to prove it
+  generalizes beyond documents.
+
+### Shared primitives created this session
+
+New, reusable, and **not yet used anywhere they could be** (see roadmap):
+
+| Primitive | File | Reused by |
+|---|---|---|
+| `BuilderCommandBar` | `src/features/documents/components/builder-command-bar.tsx` | Invoice + Quotation builders |
+| `DisclosureRow` | `src/features/documents/components/disclosure-row.tsx` | Invoice + Quotation builders (via `LineItemsEditor`) |
+| `InsertPalette` | `src/features/documents/components/insert-palette.tsx` | Invoice + Quotation builders |
+| `ReviewSendOverlay` | `src/features/documents/components/review-send-overlay.tsx` | Invoice + Quotation builders |
+| `useRollingAmount` | `src/features/documents/hooks/use-rolling-amount.ts` | Command bar total, every row amount |
+
+None of these are extracted into `src/components/shared/` yet — they're
+still living under `src/features/documents/` because they were purpose-
+built for the builders first. If you generalize any of them for reuse
+outside quotations/invoices (e.g. a fulfillment line-item list, a payment
+allocation editor), that's the point they should move.
+
+### Business rules that must never change
+
+These survived the entire redesign untouched, verified by diff at every
+milestone. Any future UI work must preserve them exactly:
+
+- Autosave: 2.5s debounce after the last edit + a 30s safety-net interval,
+  both gated on `isDirty`/`isEditable`.
+- `beforeunload` warns on navigating away with unsaved changes (native
+  browser confirm — the one place that isn't the app's own dialog, on
+  purpose, since it must fire even if React has unmounted).
+- Keyboard: `⌘S`/`Ctrl+S` saves, `⌘⏎`/`Ctrl+Enter` sends — global,
+  independent of whatever's focused.
+- `createInvoiceSchema`/`createQuotationSchema` (Zod) is the only
+  validation gate before a save reaches the server.
+- Blank line-item rows (empty description) are filtered out of what's
+  submitted/validated — `submittableLineItems`, not `lineItems` — so a
+  half-typed row never fails validation or gets persisted.
+- `isEditable` gating: only `draft` (and, for quotations,
+  `revision_requested`) may be edited; anything else redirects to the
+  detail page (see "draft-only" below).
+- Create-vs-update branching and the exact `router.push`/`router.replace`
+  targets after each action.
+- Currency follows the selected client (`client.preferred_currency`, falls
+  back to `workspace.default_currency`) — never asked for independently
+  until after a client is chosen.
+- `computeLineItemTotals()` in `src/features/line-items/helpers.ts` is the
+  **single** source of truth for subtotal/discount/tax/total math — client
+  live-preview and server persistence must never diverge from it.
+
+### Known compromises / technical debt (be honest about these)
+
+- **`ReviewSendOverlay` does not use the real themed `DocumentRenderView`.**
+  It shows a document-styled preview built from live builder state
+  instead, because the themed renderer needs template/theme data
+  (`src/features/templates/`) that the builder pages don't currently fetch.
+  Follow-up: thread the workspace's default template + theme into
+  `invoice-builder.tsx`/`quotation-builder.tsx` and swap the overlay to
+  render the actual `DocumentRenderView`. This is the single biggest gap
+  between the shipped builder and the original design spec.
+- **The apply-tax cascade rolls simultaneously, not staggered.** The
+  original spec called for each affected line to roll in sequence
+  (`index * 40ms` stagger) when a document-level tax/discount default is
+  applied, as a "consent" animation. Implemented as a simultaneous roll
+  instead — staggering would have meant staggering the underlying state
+  writes too, which risked leaking partially-applied payloads into
+  autosave mid-cascade. Revisit only with a non-state-driven animation
+  approach (e.g. animate a visual overlay, not the committed value).
+  Nothing is wrong today; the visual "all lines just changed" signal is
+  just less pronounced than originally specced.
+- **`DisclosureRow`'s expand state is keyed by array index, not a stable
+  row id.** `LineItemInput` has no client-side stable id. A mid-list
+  insert (rare — Enter-to-compose always inserts at the end of a category
+  group) can hand a still-expanded row's `expanded` state to whatever row
+  slides into that index. Cosmetic only (never affects saved data); fix by
+  giving `LineItemInput` a client-only `_key` (not persisted) if it starts
+  to matter.
+- **`src/features/audit-log/` has no UI.** `log_audit_entry(...)` writes
+  structured before/after diffs from every mutation RPC, but there's no
+  query layer or component surfacing them. Pre-existing gap, not touched
+  this session, but worth knowing before someone assumes there's an audit
+  trail view somewhere.
+- **New builder primitives aren't extracted to `src/components/shared/`
+  yet** — see the primitives table above. Deliberate: the plan
+  (`i-want-to-build-glittery-pascal.md`) calls for extracting reusable
+  primitives *after* the reference implementation is proven exceptional in
+  real use, not preemptively. Don't generalize them speculatively.
+
+### Remaining redesign roadmap
+
+In the order the design-language plan lays out (see the plan file for full
+rationale), **not started yet**:
+
+1. **Propagate the Focus archetype's primitives** to any other
+   create/edit forms in the app (settings forms, catalog item forms, etc.)
+   — right now only the two document builders use `BuilderCommandBar` /
+   `DisclosureRow`-style patterns.
+2. **Extract shared primitives** from `src/features/documents/` into
+   `src/components/shared/` once a second non-document use case proves
+   they generalize (see technical debt above).
+3. **Write the formal design-language doc** (principles, three archetypes,
+   token table, governance rules — "if the accent appears outside these
+   three places, that's a bug") as a companion to `docs/design-system.md`.
+   Right now that knowledge lives only in this file and the plan file.
+4. **Wire the themed `DocumentRenderView` into `ReviewSendOverlay`** (see
+   technical debt above) — the most concrete next fix.
+5. Optional/lower priority per the plan: a builder "focus mode" that
+   collapses the app sidebar while composing (Linear-style), a real
+   staggered apply-tax cascade via a non-state-driven animation approach.
+
+Nothing in the Overview archetype (lists, reports, payments, leads,
+catalog) was touched by the Focus-archetype rebuild — those pages reflect
+Phase 1 only.
+
+---
+
 ## What this is
 
 **CRM-tracker** — a multi-tenant Business Operating System for small
