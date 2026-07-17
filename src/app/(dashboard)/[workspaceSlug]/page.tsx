@@ -14,7 +14,7 @@ import {
 } from "@/features/dashboard/queries";
 import { syncFulfillmentItemsAction } from "@/features/fulfillment/actions";
 import { GreetingHeader } from "@/features/dashboard/components/greeting-header";
-import { StatCard } from "@/features/dashboard/components/stat-card";
+import { StatRibbon } from "@/features/dashboard/components/stat-ribbon";
 import { RevenueHeroCard } from "@/features/dashboard/components/revenue-hero-card";
 import { LeadPipelineCard } from "@/features/dashboard/components/lead-pipeline-card";
 import { RecentActivityCard } from "@/features/dashboard/components/recent-activity-card";
@@ -81,29 +81,58 @@ export default async function DashboardPage({
     <div className="space-y-6">
       <GreetingHeader firstName={firstName} workspaceSlug={workspaceSlug} />
 
-      {/* Hero band: the revenue story owns two thirds; the right rail
-          carries the two "needs attention / worth knowing" tiles. */}
-      <div className="stagger-rise grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+      {/* One unified metrics strip — every top-line number in a single
+          divided card instead of a scatter of tiles. */}
+      <StatRibbon
+        metrics={[
+          {
+            label: "Open Invoices",
+            value: formatCurrencyAmounts(invoiceSummary.amountDueByCurrency),
+            description: `${invoiceSummary.openCount} outstanding`,
+            href: `/${workspaceSlug}/invoices`,
+          },
+          {
+            label: "Overdue",
+            value: formatCurrencyAmounts(overdueSummary.amountOverdueByCurrency),
+            description: hasOverdue
+              ? `${overdueSummary.overdueCount} need chasing`
+              : "All clear",
+            href: `/${workspaceSlug}/invoices?status=overdue`,
+            tone: hasOverdue ? "danger" : "default",
+          },
+          {
+            label: "Total Leads",
+            value: String(leadSummary.total),
+            description: "In pipeline",
+            href: `/${workspaceSlug}/leads`,
+          },
+          {
+            label: "Active Clients",
+            value: String(clientSummary.activeCount),
+            description: "With ongoing work",
+            href: `/${workspaceSlug}/clients`,
+          },
+          {
+            label: "Fulfillments",
+            value: String(activeFulfillmentSummary.activeCount),
+            description: "Pending or in progress",
+            href: `/${workspaceSlug}/fulfillment`,
+          },
+        ]}
+      />
+
+      {/* Two-column working surface: the revenue centerpiece and the
+          operational cards stack in the wide left column; Activity runs
+          as a persistent, self-scrolling rail on the right. */}
+      <div className="grid gap-6 lg:grid-cols-12 lg:items-start">
+        <div className="stagger-rise space-y-6 lg:col-span-8">
           <RevenueHeroCard
             value={formatCurrencyAmounts(revenueSummary.totalByCurrency)}
             points={revenueTrend}
             currency={workspace.default_currency}
           />
-        </div>
-        <div className="flex flex-col gap-4">
-          <StatCard
-            title="Overdue"
-            value={formatCurrencyAmounts(overdueSummary.amountOverdueByCurrency)}
-            description={
-              hasOverdue
-                ? `${overdueSummary.overdueCount} invoice${overdueSummary.overdueCount === 1 ? "" : "s"} need chasing`
-                : "Nothing overdue — all clear"
-            }
-            href={`/${workspaceSlug}/invoices?status=overdue`}
-            tone={hasOverdue ? "danger" : "default"}
-          />
-          <div className="flex-1">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <LeadPipelineCard summary={leadSummary} />
             <TopCatalogItemCard
               item={topCatalogItem}
               currency={workspace.default_currency}
@@ -111,42 +140,11 @@ export default async function DashboardPage({
             />
           </div>
         </div>
-      </div>
 
-      {/* Secondary KPIs — each links into its module, so the dashboard
-          doubles as navigation. */}
-      <div className="stagger-rise grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Open Invoices"
-          value={formatCurrencyAmounts(invoiceSummary.amountDueByCurrency)}
-          description={`${invoiceSummary.openCount} outstanding`}
-          href={`/${workspaceSlug}/invoices`}
+        <RecentActivityCard
+          activities={activities}
+          className="lg:sticky lg:top-4 lg:col-span-4 lg:max-h-[calc(100vh-6rem)]"
         />
-        <StatCard
-          title="Total Leads"
-          value={String(leadSummary.total)}
-          description="Active leads in pipeline"
-          href={`/${workspaceSlug}/leads`}
-        />
-        <StatCard
-          title="Active Clients"
-          value={String(clientSummary.activeCount)}
-          description="Clients with ongoing work"
-          href={`/${workspaceSlug}/clients`}
-        />
-        <StatCard
-          title="Active Fulfillments"
-          value={String(activeFulfillmentSummary.activeCount)}
-          description="Trackers pending or in progress"
-          href={`/${workspaceSlug}/fulfillment`}
-        />
-      </div>
-
-      <div className="stagger-rise grid gap-4 lg:grid-cols-3">
-        <LeadPipelineCard summary={leadSummary} />
-        <div className="lg:col-span-2">
-          <RecentActivityCard activities={activities} />
-        </div>
       </div>
     </div>
   );
