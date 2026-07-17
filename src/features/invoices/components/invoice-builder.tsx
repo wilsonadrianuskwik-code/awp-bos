@@ -371,7 +371,7 @@ export function InvoiceBuilder({
   });
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-4">
+    <div className="mx-auto w-full max-w-[880px] space-y-4">
       <BackButton onClick={handleCancel} label={invoice ? "Back to Invoice" : "Back to Invoices"} />
 
       <BuilderCommandBar
@@ -390,7 +390,7 @@ export function InvoiceBuilder({
           invoice it produces — masthead, recipient + properties, the
           line-item ledger as the hero, then notes and totals at the foot.
           Hierarchy comes from type and whitespace, not card borders. */}
-      <div className="rounded-xl border bg-card px-6 py-8 shadow-2xs sm:px-10 sm:py-10">
+      <div className="rounded-xl border bg-card px-5 py-8 shadow-2xs sm:px-14 sm:py-12">
         {/* Masthead — the document names itself; no boxed inputs. */}
         <input
           value={title}

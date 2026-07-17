@@ -2,15 +2,11 @@
 
 import { FileDown, FileUp, Package, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  LineItemRow,
-  LINE_ITEM_GRID_COLS,
-} from "@/features/line-items/components/line-item-row";
-import { cn } from "@/lib/utils/cn";
+import { DisclosureRow } from "@/features/documents/components/disclosure-row";
 import type { LineItemInput } from "@/features/line-items/validators";
 import type { LineItemCategory } from "@/features/line-items/types";
 
-const CATEGORY_LABEL: Record<LineItemCategory, string> = {
+const GROUP_LABEL: Record<LineItemCategory, string> = {
   package: "Packages",
   add_on: "Add-ons",
   per_unit: "Per-unit",
@@ -24,6 +20,8 @@ type LineItemsEditorProps = {
     { item: LineItemInput; originalIndex: number }[]
   >;
   currency: string;
+  /** Document-level tax default — rows matching it carry no badge. */
+  docTaxDefault?: number;
   onAdd: (category: LineItemCategory) => void;
   onUpdate: (index: number, patch: Partial<LineItemInput>) => void;
   onRemove: (index: number) => void;
@@ -32,15 +30,16 @@ type LineItemsEditorProps = {
   onOpenSaveTemplate: () => void;
 };
 
-// The hero of the document editor: every category visible at once as
-// stacked labeled groups — a ledger you read top-to-bottom, not tabs
-// that hide two-thirds of the document. Groups with items get the full
-// column-header + rows treatment; empty groups collapse to one slim
-// dashed add-target so they suggest rather than shout. Pure
-// presentation: all mutation handlers are injected by the builder.
+// The hero of the document editor: a ledger of DisclosureRows read
+// top-to-bottom. Grouping is automatic, never imposed — an invoice whose
+// items share one category renders as a flat list with no headers; only
+// a genuinely mixed document gets quiet eyebrow group markers. One add
+// affordance (continuing the last-used category) instead of three
+// per-category buttons.
 export function LineItemsEditor({
   itemsByCategory,
   currency,
+  docTaxDefault = 0,
   onAdd,
   onUpdate,
   onRemove,
@@ -48,14 +47,33 @@ export function LineItemsEditor({
   onOpenTemplate,
   onOpenSaveTemplate,
 }: LineItemsEditorProps) {
+  const nonEmpty = CATEGORY_ORDER.filter(
+    (cat) => itemsByCategory[cat].length > 0
+  );
+  const totalCount = nonEmpty.reduce(
+    (n, cat) => n + itemsByCategory[cat].length,
+    0
+  );
+  const isMixed = nonEmpty.length > 1;
+
+  // "Add item" continues whatever the user was last doing: the category
+  // of the newest row (highest original index), or per-unit on a blank
+  // document.
+  const lastCategory: LineItemCategory =
+    CATEGORY_ORDER.flatMap((cat) => itemsByCategory[cat]).reduce(
+      (latest, row) =>
+        row.originalIndex > latest.index
+          ? { index: row.originalIndex, cat: row.item.category }
+          : latest,
+      { index: -1, cat: "per_unit" as LineItemCategory }
+    ).cat;
+
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-          Line Items
+          Items{totalCount > 0 && <span className="ml-1.5 normal-case tracking-normal">· {totalCount}</span>}
         </h2>
-        {/* Quiet ghost toolbar: insertion sources + save-as-template,
-            present without competing with the ledger itself. */}
         <div className="flex gap-1">
           <Button
             type="button"
@@ -90,76 +108,51 @@ export function LineItemsEditor({
         </div>
       </div>
 
-      <div className="mt-4 space-y-8">
-        {CATEGORY_ORDER.map((cat) => {
-          const rows = itemsByCategory[cat];
-          const singular = CATEGORY_LABEL[cat].toLowerCase().replace(/s$/, "");
-
-          if (rows.length === 0) {
-            // Empty group: one slim inline target — enough to invite,
-            // not enough to clutter a document that doesn't use it.
-            return (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => onAdd(cat)}
-                className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed py-3.5 text-[13px] text-muted-foreground/70 transition-colors duration-150 hover:border-primary/40 hover:bg-primary/[0.02] hover:text-foreground"
-              >
-                <Plus className="h-3.5 w-3.5" />
-                Add {singular}
-              </button>
-            );
-          }
-
-          return (
-            <div key={cat}>
-              <div className="mb-2 flex items-baseline gap-2">
-                <h3 className="text-sm font-semibold">{CATEGORY_LABEL[cat]}</h3>
-                <span className="text-xs tabular-nums text-muted-foreground">
-                  {rows.length}
-                </span>
-              </div>
-              <div
-                className={cn(
-                  "hidden gap-x-2 px-3 pb-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground md:grid",
-                  LINE_ITEM_GRID_COLS
-                )}
-              >
-                <span />
-                <span>Description</span>
-                <span>Qty</span>
-                <span>Unit</span>
-                <span>Unit Price</span>
-                <span>Disc %</span>
-                <span>Tax %</span>
-                <span className="text-right">Total</span>
-                <span />
-              </div>
-              <div className="space-y-2">
-                {rows.map(({ item, originalIndex }) => (
-                  <LineItemRow
+      {totalCount === 0 ? (
+        // The empty state teaches the path — one caret-ready line, not a
+        // dead placeholder box.
+        <button
+          type="button"
+          onClick={() => onAdd(lastCategory)}
+          className="mt-4 flex w-full items-center gap-2 rounded-md px-2 py-3 text-left text-[15px] text-muted-foreground/60 transition-colors duration-150 hover:bg-muted/40 hover:text-muted-foreground"
+        >
+          <Plus className="h-4 w-4 shrink-0" />
+          Add your first item — type a description, or pull from your catalog
+        </button>
+      ) : (
+        <div className="mt-3">
+          {nonEmpty.map((cat) => (
+            <div key={cat} className={isMixed ? "mb-6 last:mb-0" : undefined}>
+              {isMixed && (
+                <h3 className="mb-1.5 mt-4 px-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70 first:mt-0">
+                  {GROUP_LABEL[cat]}
+                </h3>
+              )}
+              <div className="space-y-0.5">
+                {itemsByCategory[cat].map(({ item, originalIndex }) => (
+                  <DisclosureRow
                     key={originalIndex}
                     item={item}
                     currency={currency}
+                    docTaxDefault={docTaxDefault}
                     onChange={(patch) => onUpdate(originalIndex, patch)}
                     onRemove={() => onRemove(originalIndex)}
                   />
                 ))}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="text-muted-foreground hover:text-foreground"
-                  onClick={() => onAdd(cat)}
-                >
-                  <Plus className="mr-1.5 h-3.5 w-3.5" />
-                  Add {singular}
-                </Button>
               </div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={() => onAdd(lastCategory)}
+            className="mt-2 flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[13px] text-muted-foreground/70 transition-colors duration-150 hover:bg-muted/40 hover:text-foreground"
+          >
+            <Plus className="h-3.5 w-3.5 shrink-0" />
+            Add item
+          </button>
+        </div>
+      )}
     </div>
   );
 }
