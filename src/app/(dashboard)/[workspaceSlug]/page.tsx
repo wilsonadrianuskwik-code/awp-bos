@@ -19,16 +19,7 @@ import { RevenueHeroCard } from "@/features/dashboard/components/revenue-hero-ca
 import { LeadPipelineCard } from "@/features/dashboard/components/lead-pipeline-card";
 import { RecentActivityCard } from "@/features/dashboard/components/recent-activity-card";
 import { TopCatalogItemCard } from "@/features/dashboard/components/top-catalog-item-card";
-import { formatCurrency } from "@/lib/utils/format-currency";
-import type { CurrencyAmount } from "@/features/dashboard/types";
-
-// Multi-currency amounts are never summed together (no exchange-rate table
-// exists yet) — a single currency renders as one line, more than one
-// renders each on its own line rather than picking one to show.
-function formatCurrencyAmounts(amounts: CurrencyAmount[]): string {
-  if (amounts.length === 0) return formatCurrency(0, "USD");
-  return amounts.map((a) => formatCurrency(a.amount, a.currency)).join(" · ");
-}
+import { formatCurrencyAmounts } from "@/lib/utils/format-currency";
 
 export default async function DashboardPage({
   params,
@@ -87,13 +78,19 @@ export default async function DashboardPage({
         metrics={[
           {
             label: "Open Invoices",
-            value: formatCurrencyAmounts(invoiceSummary.amountDueByCurrency),
+            value: formatCurrencyAmounts(
+              invoiceSummary.amountDueByCurrency,
+              workspace.default_currency
+            ),
             description: `${invoiceSummary.openCount} outstanding`,
             href: `/${workspaceSlug}/invoices`,
           },
           {
             label: "Overdue",
-            value: formatCurrencyAmounts(overdueSummary.amountOverdueByCurrency),
+            value: formatCurrencyAmounts(
+              overdueSummary.amountOverdueByCurrency,
+              workspace.default_currency
+            ),
             description: hasOverdue
               ? `${overdueSummary.overdueCount} need chasing`
               : "All clear",
@@ -127,7 +124,10 @@ export default async function DashboardPage({
       <div className="grid gap-6 lg:grid-cols-12 lg:items-start">
         <div className="stagger-rise space-y-6 lg:col-span-8">
           <RevenueHeroCard
-            value={formatCurrencyAmounts(revenueSummary.totalByCurrency)}
+            value={formatCurrencyAmounts(
+              revenueSummary.totalByCurrency,
+              workspace.default_currency
+            )}
             points={revenueTrend}
             currency={workspace.default_currency}
           />

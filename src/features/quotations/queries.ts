@@ -5,10 +5,19 @@ import type {
   QuotationDetail,
   QuotationFilters,
   QuotationListResult,
+  QuotationStats,
   QuotationWithClient,
 } from "@/features/quotations/types";
 
+const AWAITING_APPROVAL_STATUSES = ["sent", "viewed"];
+
 const CLIENT_JOIN = "client:clients(id,name,company,email,payment_terms,phone,address,tax_id)";
+// Read-only embed of the invoice generated from this quotation, if any —
+// quotations.generated_invoice_id has a real FK to invoices(id)
+// (fk_quotations_generated_invoice), so this embed is safe for PostgREST
+// to traverse directly, unlike the auth.users-referencing columns
+// elsewhere in this file.
+const CONVERTED_INVOICE_JOIN = "converted_invoice:invoices!generated_invoice_id(id,invoice_number)";
 
 export async function getQuotations(
   workspaceId: string,
@@ -18,7 +27,7 @@ export async function getQuotations(
 
   let query = supabase
     .from("quotations")
-    .select(`*, ${CLIENT_JOIN}`, { count: "exact" })
+    .select(`*, ${CLIENT_JOIN}, ${CONVERTED_INVOICE_JOIN}`, { count: "exact" })
     .eq("workspace_id", workspaceId)
     .is("deleted_at", null);
 
@@ -43,7 +52,11 @@ export async function getQuotations(
 
     const clientIds = (matchingClients ?? []).map((c) => c.id);
 
-    const orClauses = [`title.ilike.${like}`, `quotation_number.ilike.${like}`];
+    const orClauses = [
+      `title.ilike.${like}`,
+      `quotation_number.ilike.${like}`,
+      `internal_id.ilike.${like}`,
+    ];
     if (clientIds.length > 0) {
       orClauses.push(`client_id.in.(${clientIds.join(",")})`);
     }
@@ -83,7 +96,7 @@ export async function getQuotation(
   // fetched separately instead, same as line_items below.
   const { data: quotation, error } = await supabase
     .from("quotations")
-    .select(`*, ${CLIENT_JOIN}`)
+    .select(`*, ${CLIENT_JOIN}, ${CONVERTED_INVOICE_JOIN}`)
     .eq("id", quotationId)
     .eq("workspace_id", workspaceId)
     .is("deleted_at", null)
@@ -149,7 +162,7 @@ export async function getQuotationVersions(
 
   const { data } = await supabase
     .from("quotations")
-    .select(`*, ${CLIENT_JOIN}`)
+    .select(`*, ${CLIENT_JOIN}, ${CONVERTED_INVOICE_JOIN}`)
     .eq("workspace_id", workspaceId)
     .is("deleted_at", null)
     .or(`id.eq.${rootId},parent_quotation_id.eq.${rootId}`)
@@ -228,5 +241,42 @@ export async function getQuotationByShareToken(
         : null,
     } as unknown as QuotationDetail,
     workspaceName: workspace?.name ?? "",
+  };
+}
+
+/**
+ * Workspace-wide quotation stats for the module's KPI ribbon — deliberately
+ * unfiltered by the list page's current search/status/page so the numbers
+ * mean "the whole module," not "what's on screen." Selects only
+ * status/total/currency and reduces in JS, same technique as the
+ * dashboard's getInvoiceSummary/getRevenueSummary.
+ */
+export async function getQuotationStats(workspaceId: string): Promise<QuotationStats> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("quotations")
+    .select("status, total, currency")
+    .eq("workspace_id", workspaceId)
+    .is("deleted_at", null);
+
+  const rows = data ?? [];
+  const totals = new Map<string, number>();
+  let draftCount = 0;
+  let awaitingApprovalCount = 0;
+  let approvedCount = 0;
+
+  for (const row of rows) {
+    totals.set(row.currency, (totals.get(row.currency) ?? 0) + row.total);
+    if (row.status === "draft") draftCount++;
+    else if (AWAITING_APPROVAL_STATUSES.includes(row.status)) awaitingApprovalCount++;
+    else if (row.status === "approved") approvedCount++;
+  }
+
+  return {
+    totalCount: rows.length,
+    draftCount,
+    awaitingApprovalCount,
+    approvedCount,
+    totalValueByCurrency: Array.from(totals, ([currency, amount]) => ({ currency, amount })),
   };
 }

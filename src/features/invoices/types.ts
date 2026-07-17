@@ -30,6 +30,7 @@ export type Invoice = {
   workspace_id: string;
   client_id: string;
   invoice_number: string;
+  internal_id: string | null;
   source_quotation_id: string | null;
   status: InvoiceStatus;
   subtotal: number;
@@ -76,8 +77,14 @@ export type Payment = {
   deleted_at: string | null;
 };
 
+export type SourceQuotationSummary = {
+  id: string;
+  quotation_number: string;
+};
+
 export type InvoiceWithClient = Invoice & {
   client: ClientSummary;
+  source_quotation: SourceQuotationSummary | null;
 };
 
 export type InvoiceProfileSummary = {
@@ -91,6 +98,7 @@ export type PaymentWithRecorder = Payment & {
 
 export type InvoiceDetail = Invoice & {
   client: ClientSummary;
+  source_quotation: SourceQuotationSummary | null;
   line_items: LineItem[];
   payments: PaymentWithRecorder[];
   created_by_profile: InvoiceProfileSummary | null;
@@ -109,4 +117,15 @@ export type InvoiceFilters = {
 export type InvoiceListResult = {
   invoices: InvoiceWithClient[];
   count: number;
+};
+
+// Workspace-wide (unfiltered by the current list-page filters) — mirrors
+// how the dashboard's own summaries are computed, so the KPI ribbon
+// reflects the whole module, not just the current page/search/status.
+export type InvoiceStats = {
+  totalCount: number;
+  draftCount: number;
+  outstandingCount: number;
+  paidCount: number;
+  totalValueByCurrency: { currency: string; amount: number }[];
 };

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useWorkspace } from "@/providers/workspace-provider";
+import { formatCurrency } from "@/lib/utils/format-currency";
 import { LEAD_STATUSES, type Lead, type LeadStatus } from "@/features/leads/types";
 
 type LeadPipelineProps = {
@@ -68,10 +69,7 @@ export function LeadPipeline({ leads }: LeadPipelineProps) {
                     <div className="mt-2 flex items-center justify-between">
                       {lead.expected_value != null ? (
                         <span className="text-xs font-medium">
-                          {new Intl.NumberFormat("en-US", {
-                            style: "currency",
-                            currency: "USD",
-                          }).format(lead.expected_value)}
+                          {formatCurrency(lead.expected_value, lead.expected_currency)}
                         </span>
                       ) : (
                         <span />

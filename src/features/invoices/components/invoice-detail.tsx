@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Copy, Printer } from "lucide-react";
+import Link from "next/link";
+import { Copy, FileText, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -95,8 +96,14 @@ export function InvoiceDetail({
             />
           }
           subtitle={
-            <span className="flex items-center gap-1.5">
-              {invoice.invoice_number} · {invoice.client.name}
+            <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+              {invoice.invoice_number}
+              {invoice.internal_id && (
+                <span className="text-muted-foreground/70">
+                  · Internal ID {invoice.internal_id}
+                </span>
+              )}
+              · {invoice.client.name}
               {invoice.client.company ? ` · ${invoice.client.company}` : ""}
               <button
                 type="button"
@@ -106,6 +113,15 @@ export function InvoiceDetail({
               >
                 <Copy className="h-3.5 w-3.5" />
               </button>
+              {invoice.source_quotation && (
+                <Link
+                  href={`/${workspace.slug}/quotations/${invoice.source_quotation.id}`}
+                  className="ml-1 inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
+                >
+                  <FileText className="h-3 w-3" />
+                  Converted from {invoice.source_quotation.quotation_number}
+                </Link>
+              )}
             </span>
           }
           actions={

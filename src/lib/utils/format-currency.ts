@@ -43,3 +43,32 @@ export function formatCurrency(amount: number, currency: string): string {
 export function getCurrencyPrefix(currency: string): string {
   return getFormat(currency).prefix.trim();
 }
+
+/** Groups rows by currency and sums each group — no cross-currency
+ * conversion, matching the app's no-FX stance everywhere else. */
+export function sumByCurrency(
+  rows: { currency: string; amount: number }[]
+): { currency: string; amount: number }[] {
+  const totals = new Map<string, number>();
+  for (const row of rows) {
+    totals.set(row.currency, (totals.get(row.currency) ?? 0) + row.amount);
+  }
+  return Array.from(totals, ([currency, amount]) => ({ currency, amount }));
+}
+
+/**
+ * Formats a list of per-currency amounts (as produced by grouping rows by
+ * their own `currency` column, with no cross-currency conversion) into a
+ * single display string — one currency renders as one line, more than one
+ * renders each on its own line rather than picking one to show. When the
+ * list is empty, falls back to zero in `fallbackCurrency` (the workspace's
+ * default) rather than a hardcoded currency, so an empty state still shows
+ * the correct symbol.
+ */
+export function formatCurrencyAmounts(
+  amounts: { amount: number; currency: string }[],
+  fallbackCurrency: string
+): string {
+  if (amounts.length === 0) return formatCurrency(0, fallbackCurrency);
+  return amounts.map((a) => formatCurrency(a.amount, a.currency)).join(" · ");
+}

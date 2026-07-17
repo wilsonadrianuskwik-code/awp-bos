@@ -5,11 +5,19 @@ import type {
   InvoiceDetail,
   InvoiceFilters,
   InvoiceListResult,
+  InvoiceStats,
   InvoiceWithClient,
   Payment,
 } from "@/features/invoices/types";
 
+const OUTSTANDING_STATUSES = ["sent", "viewed", "partial", "overdue"];
+
 const CLIENT_JOIN = "client:clients(id,name,company,email,payment_terms,phone,address,tax_id)";
+// Read-only embed of the quotation this invoice was generated from, if
+// any — invoices.source_quotation_id is a real FK to quotations(id), so
+// (unlike the auth.users-referencing columns elsewhere in this file) this
+// embed is safe for PostgREST to traverse directly.
+const SOURCE_QUOTATION_JOIN = "source_quotation:quotations!source_quotation_id(id,quotation_number)";
 
 export async function getInvoices(
   workspaceId: string,
@@ -19,7 +27,7 @@ export async function getInvoices(
 
   let query = supabase
     .from("invoices")
-    .select(`*, ${CLIENT_JOIN}`, { count: "exact" })
+    .select(`*, ${CLIENT_JOIN}, ${SOURCE_QUOTATION_JOIN}`, { count: "exact" })
     .eq("workspace_id", workspaceId)
     .is("deleted_at", null);
 
@@ -44,7 +52,11 @@ export async function getInvoices(
 
     const clientIds = (matchingClients ?? []).map((c) => c.id);
 
-    const orClauses = [`title.ilike.${like}`, `invoice_number.ilike.${like}`];
+    const orClauses = [
+      `title.ilike.${like}`,
+      `invoice_number.ilike.${like}`,
+      `internal_id.ilike.${like}`,
+    ];
     if (clientIds.length > 0) {
       orClauses.push(`client_id.in.(${clientIds.join(",")})`);
     }
@@ -84,7 +96,7 @@ export async function getInvoice(
   // separately instead, same as line_items/payments below.
   const { data: invoice, error } = await supabase
     .from("invoices")
-    .select(`*, ${CLIENT_JOIN}`)
+    .select(`*, ${CLIENT_JOIN}, ${SOURCE_QUOTATION_JOIN}`)
     .eq("id", invoiceId)
     .eq("workspace_id", workspaceId)
     .is("deleted_at", null)
@@ -236,5 +248,42 @@ export async function getInvoiceByShareToken(
       created_by_profile: profileById.get(invoice.created_by) ?? null,
     } as unknown as InvoiceDetail,
     workspaceName: workspace?.name ?? "",
+  };
+}
+
+/**
+ * Workspace-wide invoice stats for the module's KPI ribbon — deliberately
+ * unfiltered by the list page's current search/status/page so the numbers
+ * mean "the whole module," not "what's on screen." Selects only
+ * status/total/currency and reduces in JS, same technique as the
+ * dashboard's getInvoiceSummary/getRevenueSummary.
+ */
+export async function getInvoiceStats(workspaceId: string): Promise<InvoiceStats> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("invoices")
+    .select("status, total, currency")
+    .eq("workspace_id", workspaceId)
+    .is("deleted_at", null);
+
+  const rows = data ?? [];
+  const totals = new Map<string, number>();
+  let draftCount = 0;
+  let outstandingCount = 0;
+  let paidCount = 0;
+
+  for (const row of rows) {
+    totals.set(row.currency, (totals.get(row.currency) ?? 0) + row.total);
+    if (row.status === "draft") draftCount++;
+    else if (OUTSTANDING_STATUSES.includes(row.status)) outstandingCount++;
+    else if (row.status === "paid") paidCount++;
+  }
+
+  return {
+    totalCount: rows.length,
+    draftCount,
+    outstandingCount,
+    paidCount,
+    totalValueByCurrency: Array.from(totals, ([currency, amount]) => ({ currency, amount })),
   };
 }

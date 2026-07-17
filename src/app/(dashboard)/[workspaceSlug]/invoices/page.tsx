@@ -4,10 +4,12 @@ import { Receipt, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
+import { MetricsRibbon } from "@/components/shared/metrics-ribbon";
 import { InvoiceListPage } from "@/features/invoices/components/invoice-list-page";
-import { getInvoices } from "@/features/invoices/queries";
+import { getInvoices, getInvoiceStats } from "@/features/invoices/queries";
 import { checkOverdueInvoices } from "@/features/invoices/actions";
 import { getWorkspaceBySlug } from "@/lib/workspace";
+import { formatCurrencyAmounts } from "@/lib/utils/format-currency";
 import {
   INVOICE_STATUSES,
   type InvoiceFilters,
@@ -60,7 +62,10 @@ export default async function InvoicesPage({
   await checkOverdueInvoices(workspace.id);
 
   const filters = parseFilters(search);
-  const { invoices, count } = await getInvoices(workspace.id, filters);
+  const [{ invoices, count }, stats] = await Promise.all([
+    getInvoices(workspace.id, filters),
+    getInvoiceStats(workspace.id),
+  ]);
 
   const hasAnyFilters =
     !!filters.search ||
@@ -97,7 +102,28 @@ export default async function InvoicesPage({
           }
         />
       ) : (
-        <InvoiceListPage invoices={invoices} count={count} />
+        <>
+          <MetricsRibbon
+            metrics={[
+              { label: "Total Invoices", value: String(stats.totalCount) },
+              { label: "Draft", value: String(stats.draftCount) },
+              {
+                label: "Outstanding",
+                value: String(stats.outstandingCount),
+                description: "Awaiting payment",
+              },
+              { label: "Paid", value: String(stats.paidCount) },
+              {
+                label: "Total Value",
+                value: formatCurrencyAmounts(
+                  stats.totalValueByCurrency,
+                  workspace.default_currency
+                ),
+              },
+            ]}
+          />
+          <InvoiceListPage invoices={invoices} count={count} />
+        </>
       )}
     </div>
   );

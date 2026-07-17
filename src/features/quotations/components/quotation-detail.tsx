@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Copy, GitCompare, Printer } from "lucide-react";
+import Link from "next/link";
+import { Copy, GitCompare, Printer, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -101,8 +102,14 @@ export function QuotationDetail({
             </>
           }
           subtitle={
-            <span className="flex items-center gap-1.5">
-              {quotation.quotation_number} · {quotation.client.name}
+            <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+              {quotation.quotation_number}
+              {quotation.internal_id && (
+                <span className="text-muted-foreground/70">
+                  · Internal ID {quotation.internal_id}
+                </span>
+              )}
+              · {quotation.client.name}
               {quotation.client.company ? ` · ${quotation.client.company}` : ""}
               <button
                 type="button"
@@ -112,6 +119,15 @@ export function QuotationDetail({
               >
                 <Copy className="h-3.5 w-3.5" />
               </button>
+              {quotation.converted_invoice && (
+                <Link
+                  href={`/${workspace.slug}/invoices/${quotation.converted_invoice.id}`}
+                  className="ml-1 inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
+                >
+                  <Receipt className="h-3 w-3" />
+                  Generated {quotation.converted_invoice.invoice_number}
+                </Link>
+              )}
             </span>
           }
           actions={

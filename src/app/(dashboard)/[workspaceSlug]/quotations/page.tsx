@@ -4,9 +4,11 @@ import { FileText, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
+import { MetricsRibbon } from "@/components/shared/metrics-ribbon";
 import { QuotationListPage } from "@/features/quotations/components/quotation-list-page";
-import { getQuotations } from "@/features/quotations/queries";
+import { getQuotations, getQuotationStats } from "@/features/quotations/queries";
 import { getWorkspaceBySlug } from "@/lib/workspace";
+import { formatCurrencyAmounts } from "@/lib/utils/format-currency";
 import {
   QUOTATION_STATUSES,
   type QuotationFilters,
@@ -57,7 +59,10 @@ export default async function QuotationsPage({
   if (!workspace) notFound();
 
   const filters = parseFilters(search);
-  const { quotations, count } = await getQuotations(workspace.id, filters);
+  const [{ quotations, count }, stats] = await Promise.all([
+    getQuotations(workspace.id, filters),
+    getQuotationStats(workspace.id),
+  ]);
 
   const hasAnyFilters =
     !!filters.search ||
@@ -94,7 +99,28 @@ export default async function QuotationsPage({
           }
         />
       ) : (
-        <QuotationListPage quotations={quotations} count={count} />
+        <>
+          <MetricsRibbon
+            metrics={[
+              { label: "Total Quotations", value: String(stats.totalCount) },
+              { label: "Draft", value: String(stats.draftCount) },
+              {
+                label: "Awaiting Approval",
+                value: String(stats.awaitingApprovalCount),
+                description: "Sent or viewed",
+              },
+              { label: "Approved", value: String(stats.approvedCount) },
+              {
+                label: "Total Value",
+                value: formatCurrencyAmounts(
+                  stats.totalValueByCurrency,
+                  workspace.default_currency
+                ),
+              },
+            ]}
+          />
+          <QuotationListPage quotations={quotations} count={count} />
+        </>
       )}
     </div>
   );

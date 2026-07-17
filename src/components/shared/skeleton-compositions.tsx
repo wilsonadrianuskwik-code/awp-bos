@@ -92,6 +92,33 @@ export function TableSkeleton({ rows = 5, columns = 5 }: { rows?: number; column
   );
 }
 
+export function KanbanBoardSkeleton({ columns = 4 }: { columns?: number }) {
+  return (
+    <div className="flex gap-4 overflow-x-auto pb-2">
+      {Array.from({ length: columns }).map((_, i) => (
+        <div key={i} className="flex w-72 shrink-0 flex-col rounded-lg border bg-muted/30">
+          <div className="flex items-center justify-between border-b px-3 py-2.5">
+            <Skeleton className="h-3.5 w-20" />
+            <Skeleton className="h-3.5 w-5" />
+          </div>
+          <div className="flex flex-1 flex-col gap-2 p-2">
+            {Array.from({ length: 3 }).map((_, j) => (
+              <div key={j} className="rounded-lg border bg-card p-4">
+                <Skeleton className="h-3.5 w-24" />
+                <Skeleton className="mt-2 h-4 w-32" />
+                <div className="mt-3 flex items-center justify-between">
+                  <Skeleton className="h-5 w-20" />
+                  <Skeleton className="h-4 w-14 rounded-full" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function DetailSkeleton() {
   return (
     <div className="space-y-6">

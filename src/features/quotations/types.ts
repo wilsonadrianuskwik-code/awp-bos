@@ -18,6 +18,7 @@ export type Quotation = {
   workspace_id: string;
   client_id: string;
   quotation_number: string;
+  internal_id: string | null;
   status: QuotationStatus;
   subtotal: number;
   tax_amount: number;
@@ -48,8 +49,14 @@ export type Quotation = {
   deleted_at: string | null;
 };
 
+export type ConvertedInvoiceSummary = {
+  id: string;
+  invoice_number: string;
+};
+
 export type QuotationWithClient = Quotation & {
   client: ClientSummary;
+  converted_invoice: ConvertedInvoiceSummary | null;
 };
 
 export type QuotationWithLineItems = Quotation & {
@@ -63,6 +70,7 @@ export type QuotationProfileSummary = {
 
 export type QuotationDetail = Quotation & {
   client: ClientSummary;
+  converted_invoice: ConvertedInvoiceSummary | null;
   line_items: LineItem[];
   created_by_profile: QuotationProfileSummary | null;
   approved_by_profile: QuotationProfileSummary | null;
@@ -81,4 +89,15 @@ export type QuotationFilters = {
 export type QuotationListResult = {
   quotations: QuotationWithClient[];
   count: number;
+};
+
+// Workspace-wide (unfiltered by the current list-page filters) — mirrors
+// how the dashboard's own summaries are computed, so the KPI ribbon
+// reflects the whole module, not just the current page/search/status.
+export type QuotationStats = {
+  totalCount: number;
+  draftCount: number;
+  awaitingApprovalCount: number;
+  approvedCount: number;
+  totalValueByCurrency: { currency: string; amount: number }[];
 };
