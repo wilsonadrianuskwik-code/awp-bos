@@ -29,36 +29,36 @@ type SidebarProps = {
 export const NAV_GROUPS = [
   {
     label: null,
-    items: [{ label: "Dashboard", href: "", icon: LayoutDashboard }],
+    items: [{ label: "Dashboard", href: "", icon: LayoutDashboard, color: "#6366f1" }],
   },
   {
     label: "CRM",
     items: [
-      { label: "Leads", href: "/leads", icon: Users },
-      { label: "Clients", href: "/clients", icon: UserCheck },
+      { label: "Leads", href: "/leads", icon: Users, color: "#a855f7" },
+      { label: "Clients", href: "/clients", icon: UserCheck, color: "#ec4899" },
     ],
   },
   {
     label: "Sales",
     items: [
-      { label: "Catalog", href: "/catalog", icon: Package },
-      { label: "Quotations", href: "/quotations", icon: FileText },
-      { label: "Invoices", href: "/invoices", icon: Receipt },
-      { label: "Payments", href: "/payments", icon: CreditCard },
+      { label: "Catalog", href: "/catalog", icon: Package, color: "#f59e0b" },
+      { label: "Quotations", href: "/quotations", icon: FileText, color: "#06b6d4" },
+      { label: "Invoices", href: "/invoices", icon: Receipt, color: "#10b981" },
+      { label: "Payments", href: "/payments", icon: CreditCard, color: "#14b8a6" },
     ],
   },
   {
     label: "Operations",
-    items: [{ label: "Fulfillment", href: "/fulfillment", icon: PackageCheck }],
+    items: [{ label: "Fulfillment", href: "/fulfillment", icon: PackageCheck, color: "#f97316" }],
   },
   {
     label: "Insights",
-    items: [{ label: "Reports", href: "/reports", icon: BarChart3 }],
+    items: [{ label: "Reports", href: "/reports", icon: BarChart3, color: "#f43f5e" }],
   },
 ] as const;
 
 export const BOTTOM_ITEMS = [
-  { label: "Settings", href: "/settings", icon: Settings },
+  { label: "Settings", href: "/settings", icon: Settings, color: "#64748b" },
 ] as const;
 
 function NavIcon({
@@ -66,21 +66,30 @@ function NavIcon({
   active,
   label,
   collapsed,
+  color,
 }: {
   icon: LucideIcon;
   active: boolean;
   label: string;
   collapsed: boolean;
+  color: string;
 }) {
   return (
     <span className="relative flex flex-col items-center gap-0.5">
       <span
         className={cn(
           "grid h-8 w-8 place-items-center rounded-lg transition-all duration-150",
-          active
-            ? "bg-sidebar-primary/20 text-sidebar-primary-foreground shadow-[0_0_12px_3px_rgba(255,255,255,0.12)]"
-            : "text-sidebar-foreground/70 group-hover:bg-sidebar-accent group-hover:text-sidebar-accent-foreground"
+          !active && "text-sidebar-foreground/70 group-hover:bg-sidebar-accent group-hover:text-sidebar-accent-foreground"
         )}
+        style={
+          active
+            ? {
+                backgroundColor: `${color}2e`,
+                color,
+                boxShadow: `0 0 0 1px ${color}40, 0 0 14px 2px ${color}66, 0 0 28px 8px ${color}33`,
+              }
+            : undefined
+        }
       >
         <Icon className="h-[18px] w-[18px]" />
       </span>
@@ -88,7 +97,7 @@ function NavIcon({
         <span
           className={cn(
             "text-[10px] leading-tight transition-colors duration-100",
-            active ? "text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground/60"
+            active ? "font-medium text-sidebar-accent-foreground" : "text-sidebar-foreground/60"
           )}
         >
           {label}
@@ -140,6 +149,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
                     icon={item.icon}
                     active={isActive(item.href)}
                     label={item.label}
+                    color={item.color}
                     collapsed
                   />
                 </Link>
@@ -161,6 +171,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
                 icon={item.icon}
                 active={isActive(item.href)}
                 label={item.label}
+                color={item.color}
                 collapsed
               />
             </Link>
@@ -183,17 +194,24 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
     cn(
       "group relative flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-all duration-100",
       isActive(href)
-        ? "bg-sidebar-primary/15 text-sidebar-accent-foreground shadow-[0_0_10px_2px_rgba(255,255,255,0.06)]"
+        ? "text-sidebar-accent-foreground"
         : "text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
     );
 
   const navIconClass = (href: string) =>
     cn(
       "grid h-7 w-7 shrink-0 place-items-center rounded-md transition-all duration-100",
-      isActive(href)
-        ? "bg-sidebar-primary/20 text-sidebar-primary-foreground shadow-[0_0_8px_2px_rgba(255,255,255,0.08)]"
-        : "text-sidebar-foreground/70 group-hover:text-sidebar-accent-foreground"
+      !isActive(href) && "text-sidebar-foreground/70 group-hover:text-sidebar-accent-foreground"
     );
+
+  const navIconStyle = (href: string, color: string): React.CSSProperties | undefined =>
+    isActive(href)
+      ? {
+          backgroundColor: `${color}2e`,
+          color,
+          boxShadow: `0 0 0 1px ${color}40, 0 0 14px 2px ${color}66, 0 0 28px 8px ${color}33`,
+        }
+      : undefined;
 
   return (
     <aside className="flex h-full w-60 flex-col border-r bg-sidebar text-sidebar-foreground transition-all duration-200">
@@ -236,7 +254,10 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
                   href={`${basePath}${item.href}`}
                   className={navItemClass(item.href)}
                 >
-                  <span className={navIconClass(item.href)}>
+                  <span
+                    className={navIconClass(item.href)}
+                    style={navIconStyle(item.href, item.color)}
+                  >
                     <item.icon className="h-4 w-4" />
                   </span>
                   <span className="truncate">{item.label}</span>
@@ -254,7 +275,10 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
             href={`${basePath}${item.href}`}
             className={navItemClass(item.href)}
           >
-            <span className={navIconClass(item.href)}>
+            <span
+              className={navIconClass(item.href)}
+              style={navIconStyle(item.href, item.color)}
+            >
               <item.icon className="h-4 w-4" />
             </span>
             <span className="truncate">{item.label}</span>
