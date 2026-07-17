@@ -13,6 +13,7 @@ import { useToast } from "@/providers/toast-provider";
 import { QuotationLifecycleTimeline } from "./quotation-lifecycle-timeline";
 import { LineItemsTable } from "@/features/line-items/components/line-items-table";
 import { QuotationStatusActions } from "./quotation-status-actions";
+import { QuotationSummaryHero } from "./quotation-summary-hero";
 import { QuotationVersionHistory } from "./quotation-version-history";
 import { QuotationVersionDiffDialog } from "./quotation-version-diff-dialog";
 import { GenerateInvoiceDialog } from "./generate-invoice-dialog";
@@ -129,9 +130,14 @@ export function QuotationDetail({
           }
         />
 
-        <QuotationStatusActions
+        <QuotationSummaryHero
           quotation={quotation}
-          onGenerateInvoice={() => setGenerateInvoiceOpen(true)}
+          actions={
+            <QuotationStatusActions
+              quotation={quotation}
+              onGenerateInvoice={() => setGenerateInvoiceOpen(true)}
+            />
+          }
         />
 
         <div className="grid gap-6 lg:grid-cols-3">
@@ -208,14 +214,6 @@ export function QuotationDetail({
               </Card>
             )}
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ActivityTimeline activities={activities} />
-              </CardContent>
-            </Card>
           </div>
 
           <div className="space-y-6">
@@ -254,6 +252,15 @@ export function QuotationDetail({
                   versions={versions}
                   currentId={quotation.id}
                 />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Activity</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ActivityTimeline activities={activities} />
               </CardContent>
             </Card>
           </div>
