@@ -21,6 +21,7 @@ import { BuilderCommandBar } from "@/features/documents/components/builder-comma
 import { LineItemsEditor } from "@/features/documents/components/line-items-editor";
 import { SaveAsTemplateDialog } from "@/features/line-items/components/save-as-template-dialog";
 import { InsertPalette } from "@/features/documents/components/insert-palette";
+import { ReviewSendOverlay } from "@/features/documents/components/review-send-overlay";
 import {
   createInvoice,
   updateInvoice,
@@ -312,6 +313,26 @@ export function InvoiceBuilder({
   const [focusRequest, setFocusRequest] = useState<number | null>(null);
   const handleFocusHandled = useCallback(() => setFocusRequest(null), []);
 
+  // The builder is draft-only: a sent/paid/cancelled invoice reads on the
+  // (already redesigned) detail page. Redirect instead of rendering dead
+  // inputs — no viewer-mode to maintain.
+  useEffect(() => {
+    if (invoice && invoice.status !== "draft") {
+      router.replace(`/${workspace.slug}/invoices/${invoice.id}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Send-readiness: what still stands between this draft and the client.
+  const readyReasons: string[] = [];
+  if (!clientId) readyReasons.push("Choose a client");
+  if (submittableLineItems.length === 0)
+    readyReasons.push("Add at least one item");
+
+  // The send moment: Review & Send opens the overlay; the actual send
+  // reuses the existing validate → save → mark-sent → route path.
+  const [reviewOpen, setReviewOpen] = useState(false);
+
   // Bill To presentation: once a client is chosen the block reads as a
   // document recipient; "change" reopens the selector. Pure UI state.
   const [changingClient, setChangingClient] = useState(false);
@@ -489,7 +510,9 @@ export function InvoiceBuilder({
         isPending={isPending}
         onCancel={handleCancel}
         onSave={() => startTransition(() => handleManualSave())}
-        onSend={() => startTransition(() => handleSendShortcut())}
+        onSend={() => setReviewOpen(true)}
+        readyReasons={readyReasons}
+        sendLabel="Review & Send"
       />
 
       {/* The document sheet: one continuous surface that reads like the
@@ -734,6 +757,26 @@ export function InvoiceBuilder({
         </div>
       </div>
 
+      <ReviewSendOverlay
+        open={reviewOpen}
+        onOpenChange={setReviewOpen}
+        docNoun="invoice"
+        workspaceName={workspace.name}
+        title={title}
+        recipientName={selectedClient?.name ?? "—"}
+        recipientDetail={[selectedClient?.company, selectedClient?.email]
+          .filter(Boolean)
+          .join(" · ")}
+        meta={[
+          { label: "Issue date", value: issueDate || "—" },
+          { label: "Due date", value: dueDate || "—" },
+        ]}
+        items={submittableLineItems}
+        totals={totals}
+        currency={currency}
+        sending={isPending}
+        onSend={() => startTransition(() => handleSendShortcut())}
+      />
       <InsertPalette
         open={insertPaletteOpen}
         onOpenChange={setInsertPaletteOpen}
