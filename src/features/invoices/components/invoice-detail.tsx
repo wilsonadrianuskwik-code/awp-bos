@@ -14,7 +14,7 @@ import { LineItemsTable } from "@/features/line-items/components/line-items-tabl
 import { InvoiceStatusActions } from "@/features/invoices/components/invoice-status-actions";
 import { RecordPaymentDialog } from "@/features/invoices/components/record-payment-dialog";
 import { PaymentHistory } from "@/features/invoices/components/payment-history";
-import { OutstandingBalanceCard } from "@/features/invoices/components/outstanding-balance-card";
+import { InvoiceSummaryHero } from "@/features/invoices/components/invoice-summary-hero";
 import { InvoicePortalAccessCard } from "@/features/invoices/components/invoice-portal-access-card";
 import { InvoicePrintView } from "@/features/invoices/components/invoice-print-view";
 import { InvoiceFulfillmentSection } from "@/features/fulfillment/components/invoice-fulfillment-section";
@@ -116,12 +116,19 @@ export function InvoiceDetail({
           }
         />
 
-        <InvoiceStatusActions
+        <InvoiceSummaryHero
           invoice={invoice}
-          onRecordPayment={() => setRecordPaymentOpen(true)}
+          actions={
+            <InvoiceStatusActions
+              invoice={invoice}
+              onRecordPayment={() => setRecordPaymentOpen(true)}
+            />
+          }
         />
 
         <div className="grid gap-6 lg:grid-cols-3">
+          {/* Left: the document itself — line items, its notes and terms,
+              and the fulfillment tied to them. */}
           <div className="space-y-6 lg:col-span-2">
             <Card>
               <CardHeader>
@@ -135,42 +142,29 @@ export function InvoiceDetail({
               </CardContent>
             </Card>
 
-            {invoice.notes && (
+            {(invoice.notes || invoice.payment_terms) && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Notes</CardTitle>
+                  <CardTitle className="text-base">Notes &amp; Terms</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div
-                    className="text-sm [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
-                    dangerouslySetInnerHTML={{ __html: invoice.notes }}
-                  />
+                <CardContent className="space-y-5">
+                  {invoice.notes && (
+                    <div
+                      className="text-sm [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
+                      dangerouslySetInnerHTML={{ __html: invoice.notes }}
+                    />
+                  )}
+                  {invoice.payment_terms && (
+                    <div className={invoice.notes ? "border-t pt-4" : undefined}>
+                      <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                        Payment Terms
+                      </p>
+                      <p className="mt-1 text-sm">{invoice.payment_terms}</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
-
-            {invoice.payment_terms && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Payment Terms</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm">{invoice.payment_terms}</p>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* scroll-mt gives the anchor breathing room above the fold when
-                the invoice card's "View Payment History" quick action links
-                here as #payments. */}
-            <Card id="payments" className="scroll-mt-6">
-              <CardHeader>
-                <CardTitle className="text-base">Payments</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <PaymentHistory payments={invoice.payments} />
-              </CardContent>
-            </Card>
 
             <Card id="fulfillment" className="scroll-mt-6">
               <CardHeader>
@@ -184,6 +178,24 @@ export function InvoiceDetail({
                 />
               </CardContent>
             </Card>
+          </div>
+
+          {/* Right rail: everything that happened to the invoice —
+              payment history, the client portal link, and the audit
+              trail — kept out of the document column. */}
+          <div className="space-y-6">
+            {/* scroll-mt gives the anchor breathing room when the invoice
+                card's "View Payment History" quick action links here. */}
+            <Card id="payments" className="scroll-mt-6">
+              <CardHeader>
+                <CardTitle className="text-base">Payments</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <PaymentHistory payments={invoice.payments} />
+              </CardContent>
+            </Card>
+
+            <InvoicePortalAccessCard invoice={invoice} />
 
             <Card>
               <CardHeader>
@@ -193,12 +205,6 @@ export function InvoiceDetail({
                 <ActivityTimeline activities={activities} />
               </CardContent>
             </Card>
-          </div>
-
-          <div className="space-y-6">
-            <OutstandingBalanceCard invoice={invoice} />
-
-            <InvoicePortalAccessCard invoice={invoice} />
           </div>
         </div>
       </div>
