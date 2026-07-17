@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils/cn";
 import { formatCurrency, getCurrencyPrefix } from "@/lib/utils/format-currency";
+import { useRollingAmount } from "@/features/documents/hooks/use-rolling-amount";
 import type { LineItemInput } from "@/features/line-items/validators";
 import type { LineItemCategory } from "@/features/line-items/types";
 
@@ -81,6 +82,9 @@ export function DisclosureRow({
   const lineTotal = itemSubtotal - discount;
   const tax = lineTotal * ((item.tax_percent ?? 0) / 100);
   const total = lineTotal + tax;
+  // Rolls when anything recomputes this line — a direct edit, or the
+  // document-level tax/discount cascading through. Motion = math.
+  const rollingTotal = useRollingAmount(total);
 
   const discountPct = item.discount_percent ?? 0;
   const taxPct = item.tax_percent ?? 0;
@@ -171,7 +175,7 @@ export function DisclosureRow({
 
           {/* The amount: computed, never an input. */}
           <span className="w-28 shrink-0 text-right text-[15px] font-medium tabular-nums tracking-tight">
-            {formatCurrency(total, currency)}
+            {formatCurrency(rollingTotal, currency)}
           </span>
 
           {/* Row controls — whisper until hovered (always visible on touch). */}

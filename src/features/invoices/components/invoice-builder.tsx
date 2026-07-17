@@ -59,6 +59,13 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
+// The uniform value across a set of percentages, or null when they
+// genuinely differ (the document-defaults control shows "mixed").
+function inferUniform(values: number[]): number | null {
+  if (values.length === 0) return 0;
+  return values.every((v) => v === values[0]) ? values[0] : null;
+}
+
 type InvoiceBuilderProps = {
   invoice?: InvoiceDetail;
   clients: ClientSummary[];
@@ -307,15 +314,67 @@ export function InvoiceBuilder({
   const [focusRequest, setFocusRequest] = useState<number | null>(null);
   const handleFocusHandled = useCallback(() => setFocusRequest(null), []);
 
+  // Document-level tax/discount defaults. Pure UI convenience over the
+  // existing per-line fields: applying a default writes tax_percent /
+  // discount_percent onto every line still *following* the previous
+  // default; lines the user overrode ("pinned") keep their value and
+  // their honesty badge. null = the document's lines are mixed. Initial
+  // value is inferred from the loaded lines, so an existing uniform
+  // draft reads back correctly. No schema involvement.
+  const [docTax, setDocTax] = useState<number | null>(() =>
+    inferUniform(
+      (invoice?.line_items ?? []).map((li) => li.tax_percent ?? 0)
+    )
+  );
+  const [docDiscount, setDocDiscount] = useState<number | null>(() =>
+    inferUniform(
+      (invoice?.line_items ?? []).map((li) => li.discount_percent ?? 0)
+    )
+  );
+
+  // Applying defaults cascades through following lines in one state
+  // update; the per-row rolling amounts + the rolling command-bar total
+  // make the recomputation visible (the consent signal).
+  function applyDocDefaults(nextTax: number, nextDiscount: number) {
+    setLineItems((prev) =>
+      prev.map((item) => {
+        const patch: Partial<LineItemInput> = {};
+        // docTax === null means "mixed" — applying from a mixed state
+        // intentionally sets every line (the popover says so).
+        if (docTax === null || (item.tax_percent ?? 0) === docTax) {
+          patch.tax_percent = nextTax;
+        }
+        if (
+          docDiscount === null ||
+          (item.discount_percent ?? 0) === docDiscount
+        ) {
+          patch.discount_percent = nextDiscount;
+        }
+        return { ...item, ...patch };
+      })
+    );
+    setDocTax(nextTax);
+    setDocDiscount(nextDiscount);
+  }
+
   function updateLineItem(index: number, patch: Partial<LineItemInput>) {
     setLineItems((prev) =>
       prev.map((it, i) => (i === index ? { ...it, ...patch } : it))
     );
   }
 
+  // New rows follow the document defaults — that's what "following" means.
+  function newFollowingItem(category: LineItemCategory): LineItemInput {
+    return {
+      ...emptyItem(category),
+      tax_percent: docTax ?? 0,
+      discount_percent: docDiscount ?? 0,
+    };
+  }
+
   function addLineItem(category: LineItemCategory) {
     setFocusRequest(lineItems.length);
-    setLineItems((prev) => [...prev, emptyItem(category)]);
+    setLineItems((prev) => [...prev, newFollowingItem(category)]);
   }
 
   // Enter in a row: commit it and compose the next line directly below,
@@ -324,7 +383,7 @@ export function InvoiceBuilder({
     setLineItems((prev) => {
       const category = prev[index]?.category ?? "per_unit";
       const next = [...prev];
-      next.splice(index + 1, 0, emptyItem(category));
+      next.splice(index + 1, 0, newFollowingItem(category));
       return next;
     });
     setFocusRequest(index + 1);
@@ -502,6 +561,9 @@ export function InvoiceBuilder({
             onDeleteEmpty={deleteEmptyLineItem}
             focusIndex={focusRequest}
             onFocusHandled={handleFocusHandled}
+            docTax={docTax}
+            docDiscount={docDiscount}
+            onApplyDefaults={applyDocDefaults}
           />
         </div>
 

@@ -1,8 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { FileDown, FileUp, Package, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { DisclosureRow } from "@/features/documents/components/disclosure-row";
+import { cn } from "@/lib/utils/cn";
 import type { LineItemInput } from "@/features/line-items/validators";
 import type { LineItemCategory } from "@/features/line-items/types";
 
@@ -20,8 +27,6 @@ type LineItemsEditorProps = {
     { item: LineItemInput; originalIndex: number }[]
   >;
   currency: string;
-  /** Document-level tax default — rows matching it carry no badge. */
-  docTaxDefault?: number;
   onAdd: (category: LineItemCategory) => void;
   onUpdate: (index: number, patch: Partial<LineItemInput>) => void;
   onRemove: (index: number) => void;
@@ -35,7 +40,120 @@ type LineItemsEditorProps = {
   /** Which row (by original index) should take the caret, if any. */
   focusIndex?: number | null;
   onFocusHandled?: () => void;
+  /** Document-level defaults — null means the lines are mixed. */
+  docTax?: number | null;
+  docDiscount?: number | null;
+  /** Apply new document defaults (parent decides following vs. pinned). */
+  onApplyDefaults?: (tax: number, discount: number) => void;
 };
+
+// The document-defaults control: quiet text on the Items header that
+// opens a small popover. Setting tax once here is what kills the
+// type-11%-into-every-row ERP chore; per-line overrides stay possible
+// via row expand and keep their honesty badge.
+function DocDefaultsControl({
+  docTax,
+  docDiscount,
+  onApply,
+}: {
+  docTax: number | null;
+  docDiscount: number | null;
+  onApply: (tax: number, discount: number) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [taxInput, setTaxInput] = useState("");
+  const [discountInput, setDiscountInput] = useState("");
+
+  function handleOpenChange(next: boolean) {
+    if (next) {
+      setTaxInput(docTax === null ? "" : String(docTax));
+      setDiscountInput(docDiscount === null ? "" : String(docDiscount));
+    }
+    setOpen(next);
+  }
+
+  function apply() {
+    onApply(Number(taxInput) || 0, Number(discountInput) || 0);
+    setOpen(false);
+  }
+
+  const fieldClass =
+    "h-8 w-16 rounded-md border border-input bg-card px-2 text-right text-sm tabular-nums focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/25 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none";
+
+  return (
+    <Popover open={open} onOpenChange={handleOpenChange}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="rounded-md px-2 py-1 text-[13px] tabular-nums text-muted-foreground transition-colors duration-100 hover:bg-muted/60 hover:text-foreground"
+        >
+          Tax {docTax === null ? "· mixed" : `${docTax}%`}
+          <span className="mx-1.5 text-muted-foreground/40">·</span>
+          Discount {docDiscount === null ? "· mixed" : `${docDiscount}%`}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-72 p-4">
+        <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          Document defaults
+        </p>
+        <div className="mt-3 space-y-2.5">
+          <label className="flex items-center justify-between gap-3 text-sm">
+            <span className="flex items-center gap-2">
+              Tax
+              <button
+                type="button"
+                onClick={() => setTaxInput("11")}
+                className={cn(
+                  "rounded-full border px-2 py-0.5 text-[11px] font-medium transition-colors duration-100",
+                  taxInput === "11"
+                    ? "border-primary/30 bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-muted"
+                )}
+              >
+                PPN 11%
+              </button>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <input
+                type="number"
+                min={0}
+                max={100}
+                value={taxInput}
+                onChange={(e) => setTaxInput(e.target.value)}
+                placeholder={docTax === null ? "mixed" : "0"}
+                className={fieldClass}
+              />
+              %
+            </span>
+          </label>
+          <label className="flex items-center justify-between gap-3 text-sm">
+            Discount
+            <span className="flex items-center gap-1.5">
+              <input
+                type="number"
+                min={0}
+                max={100}
+                value={discountInput}
+                onChange={(e) => setDiscountInput(e.target.value)}
+                placeholder={docDiscount === null ? "mixed" : "0"}
+                className={fieldClass}
+              />
+              %
+            </span>
+          </label>
+        </div>
+        <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+          {docTax === null || docDiscount === null
+            ? "Lines currently differ — applying sets every line to these values."
+            : "Applies to lines following the document default; lines you've overridden keep their value."}
+        </p>
+        <Button type="button" size="sm" className="mt-3 w-full" onClick={apply}>
+          Apply to document
+        </Button>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 // The hero of the document editor: a ledger of DisclosureRows read
 // top-to-bottom. Grouping is automatic, never imposed — an invoice whose
@@ -46,7 +164,6 @@ type LineItemsEditorProps = {
 export function LineItemsEditor({
   itemsByCategory,
   currency,
-  docTaxDefault = 0,
   onAdd,
   onUpdate,
   onRemove,
@@ -57,6 +174,9 @@ export function LineItemsEditor({
   onDeleteEmpty,
   focusIndex,
   onFocusHandled,
+  docTax,
+  docDiscount,
+  onApplyDefaults,
 }: LineItemsEditorProps) {
   const nonEmpty = CATEGORY_ORDER.filter(
     (cat) => itemsByCategory[cat].length > 0
@@ -85,7 +205,14 @@ export function LineItemsEditor({
         <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           Items{totalCount > 0 && <span className="ml-1.5 normal-case tracking-normal">· {totalCount}</span>}
         </h2>
-        <div className="flex gap-1">
+        <div className="flex items-center gap-1">
+          {onApplyDefaults && (
+            <DocDefaultsControl
+              docTax={docTax === undefined ? 0 : docTax}
+              docDiscount={docDiscount === undefined ? 0 : docDiscount}
+              onApply={onApplyDefaults}
+            />
+          )}
           <Button
             type="button"
             variant="ghost"
@@ -145,7 +272,7 @@ export function LineItemsEditor({
                     key={originalIndex}
                     item={item}
                     currency={currency}
-                    docTaxDefault={docTaxDefault}
+                    docTaxDefault={docTax ?? 0}
                     onChange={(patch) => onUpdate(originalIndex, patch)}
                     onRemove={() => onRemove(originalIndex)}
                     onEnter={
