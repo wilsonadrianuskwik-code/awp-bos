@@ -6,7 +6,23 @@ import { cn } from "@/lib/utils/cn";
 // is what makes states legible at a glance. Rendering is a soft tint +
 // hairline ring + leading dot (GitHub/Linear convention), never a solid
 // saturated fill.
-type Tone = "neutral" | "info" | "attention" | "success" | "danger" | "special";
+export type Tone = "neutral" | "info" | "attention" | "success" | "danger" | "special";
+
+// Fixed hex equivalents of the Tailwind tone classes below, for contexts
+// that can't use Tailwind (the generated-PDF renderer, which emits raw
+// inline `style="..."` HTML). Keeping this next to TONE_CLASSES/
+// STATUS_TONE means a print doc and the app UI always agree on what color
+// a given status is — previously the renderer hardcoded its own
+// independent status->hex map that could (and did) silently drift from
+// this one.
+export const TONE_HEX: Record<Tone, { bg: string; text: string }> = {
+  neutral: { bg: "#f1f5f9", text: "#475569" },
+  info: { bg: "#dbeafe", text: "#1d4ed8" },
+  attention: { bg: "#fef3c7", text: "#b45309" },
+  success: { bg: "#dcfce7", text: "#15803d" },
+  danger: { bg: "#fee2e2", text: "#b91c1c" },
+  special: { bg: "#ede9fe", text: "#6d28d9" },
+};
 
 const TONE_CLASSES: Record<Tone, string> = {
   neutral:
@@ -23,7 +39,7 @@ const TONE_CLASSES: Record<Tone, string> = {
     "bg-violet-50 text-violet-700 ring-violet-600/20 dark:bg-violet-400/10 dark:text-violet-400 dark:ring-violet-400/20",
 };
 
-const STATUS_TONE: Record<string, Tone> = {
+export const STATUS_TONE: Record<string, Tone> = {
   // Leads
   new: "info",
   contacted: "attention",

@@ -10,6 +10,7 @@ import { resolvePlaceholders } from "@/features/templates/renderer/placeholders"
 import { escapeHtml, nl2br } from "@/features/templates/renderer/html-utils";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import { evaluateVisibility } from "@/features/templates/renderer/visibility";
+import { STATUS_TONE, TONE_HEX } from "@/components/shared/status-badge";
 
 type Config = Record<string, unknown>;
 
@@ -29,20 +30,12 @@ const DOCUMENT_TYPE_LABEL: Record<string, string> = {
 // Semantic status colors, deliberately fixed (not theme-driven) — a
 // "paid" badge should read as unambiguously green regardless of which
 // brand accent a workspace has chosen, the same convention Xero/Zoho use.
-const STATUS_BADGE: Record<string, { bg: string; text: string }> = {
-  draft: { bg: "#f1f5f9", text: "#475569" },
-  sent: { bg: "#dbeafe", text: "#1d4ed8" },
-  viewed: { bg: "#dbeafe", text: "#1d4ed8" },
-  partial: { bg: "#fef3c7", text: "#b45309" },
-  paid: { bg: "#dcfce7", text: "#15803d" },
-  approved: { bg: "#dcfce7", text: "#15803d" },
-  overdue: { bg: "#fee2e2", text: "#b91c1c" },
-  rejected: { bg: "#fee2e2", text: "#b91c1c" },
-  expired: { bg: "#fee2e2", text: "#b91c1c" },
-  cancelled: { bg: "#f1f5f9", text: "#64748b" },
-  refunded: { bg: "#f1f5f9", text: "#64748b" },
-  revision_requested: { bg: "#fef3c7", text: "#b45309" },
-};
+// Derived from the app's own STATUS_TONE/TONE_HEX (status-badge.tsx)
+// instead of a second hardcoded map, so a print doc and the app UI can
+// never disagree on what color a status is.
+const STATUS_BADGE: Record<string, { bg: string; text: string }> = Object.fromEntries(
+  Object.entries(STATUS_TONE).map(([status, tone]) => [status, TONE_HEX[tone]])
+);
 
 function renderLogo(block: TemplateBlock, data: DocumentRenderData): string {
   const alignment = cfg<string>(block.config, "alignment", "left");
