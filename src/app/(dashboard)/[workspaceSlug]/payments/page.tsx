@@ -3,7 +3,7 @@ import { CreditCard } from "lucide-react";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { PaymentsList } from "@/features/payments/components/payments-list";
-import { getPayments } from "@/features/payments/queries";
+import { getPayments, getPaymentCurrencies } from "@/features/payments/queries";
 import { getWorkspaceBySlug } from "@/lib/workspace";
 import { PAYMENT_METHODS, type PaymentMethod } from "@/features/invoices/types";
 import type { PaymentFilters } from "@/features/payments/types";
@@ -48,7 +48,10 @@ export default async function PaymentsPage({
   if (!workspace) notFound();
 
   const filters = parseFilters(search);
-  const { payments, count } = await getPayments(workspace.id, filters);
+  const [{ payments, count }, currencies] = await Promise.all([
+    getPayments(workspace.id, filters),
+    getPaymentCurrencies(workspace.id),
+  ]);
 
   const hasAnyFilters =
     !!filters.search || !!filters.from || !!filters.to || !!filters.currency ||
@@ -68,7 +71,7 @@ export default async function PaymentsPage({
           description="Payments recorded against an invoice will show up here."
         />
       ) : (
-        <PaymentsList payments={payments} count={count} />
+        <PaymentsList payments={payments} count={count} currencies={currencies} />
       )}
     </div>
   );

@@ -23,8 +23,6 @@ import { PAYMENT_METHOD_LABEL } from "@/features/invoices/helpers";
 import { PAYMENT_METHODS, type PaymentMethod } from "@/features/invoices/types";
 import type { PaymentWithContext } from "@/features/payments/types";
 
-const CURRENCIES = ["USD", "EUR", "GBP", "SGD", "MYR", "IDR", "AUD", "CAD"];
-
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString("en-US", {
     month: "short",
@@ -38,9 +36,10 @@ const PAGE_SIZE = 20;
 type PaymentsListProps = {
   payments: PaymentWithContext[];
   count: number;
+  currencies: string[];
 };
 
-export function PaymentsList({ payments, count }: PaymentsListProps) {
+export function PaymentsList({ payments, count, currencies }: PaymentsListProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -173,7 +172,7 @@ export function PaymentsList({ payments, count }: PaymentsListProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All currencies</SelectItem>
-            {CURRENCIES.map((c) => (
+            {currencies.map((c) => (
               <SelectItem key={c} value={c}>
                 {c}
               </SelectItem>

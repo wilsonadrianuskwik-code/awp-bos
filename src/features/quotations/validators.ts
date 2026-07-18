@@ -5,7 +5,7 @@ export const createQuotationSchema = z.object({
   client_id: z.string().min(1, "Client is required"),
   title: z.string().max(255).optional().or(z.literal("")),
   summary: z.string().optional().or(z.literal("")),
-  currency: z.string().length(3).default("USD"),
+  currency: z.string().length(3),
   issue_date: z.string().min(1, "Issue date is required"),
   expiry_date: z.string().optional().or(z.literal("")),
   terms_and_conditions: z.string().optional().or(z.literal("")),
