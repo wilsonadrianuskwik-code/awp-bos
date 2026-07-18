@@ -147,6 +147,112 @@ export async function updateCatalogItem(
   });
 }
 
+export async function duplicateCatalogItem(workspaceId: string, itemId: string) {
+  return withWorkspace(workspaceId, "staff", async (ctx) => {
+    const supabase = await createClient();
+
+    const { data: existing } = await supabase
+      .from("catalog_items")
+      .select("*")
+      .eq("id", itemId)
+      .eq("workspace_id", ctx.workspaceId)
+      .single();
+
+    if (!existing) throw new Error("Catalog item not found");
+
+    const { data: copy, error } = await supabase
+      .from("catalog_items")
+      .insert({
+        workspace_id: ctx.workspaceId,
+        name: `${existing.name} (Copy)`,
+        description: existing.description,
+        sku: null, // SKU is unique per workspace — a copy can't inherit it
+        item_type: existing.item_type,
+        default_category: existing.default_category,
+        default_unit_price: existing.default_unit_price,
+        default_unit: existing.default_unit,
+        currency: existing.currency,
+        is_active: existing.is_active,
+        created_by: ctx.userId,
+      })
+      .select("id, name")
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    await Promise.all([
+      createActivity(supabase, {
+        workspaceId: ctx.workspaceId,
+        actorId: ctx.userId,
+        action: "created",
+        description: `duplicated catalog item "${existing.name}" as "${copy.name}"`,
+        entityType: "catalog_item",
+        entityId: copy.id,
+      }),
+      createAuditLog({
+        workspaceId: ctx.workspaceId,
+        actorId: ctx.userId,
+        action: "create",
+        entityType: "catalog_item",
+        entityId: copy.id,
+      }),
+    ]);
+
+    revalidatePath(`/${ctx.workspaceId}`);
+    return copy;
+  });
+}
+
+export async function setCatalogItemActive(
+  workspaceId: string,
+  itemId: string,
+  isActive: boolean
+) {
+  return withWorkspace(workspaceId, "staff", async (ctx) => {
+    const supabase = await createClient();
+
+    const { data: existing } = await supabase
+      .from("catalog_items")
+      .select("name, is_active")
+      .eq("id", itemId)
+      .eq("workspace_id", ctx.workspaceId)
+      .single();
+
+    if (!existing) throw new Error("Catalog item not found");
+    if (existing.is_active === isActive) return { success: true };
+
+    const { error } = await supabase
+      .from("catalog_items")
+      .update({ is_active: isActive, updated_at: new Date().toISOString() })
+      .eq("id", itemId)
+      .eq("workspace_id", ctx.workspaceId);
+
+    if (error) throw new Error(error.message);
+
+    await Promise.all([
+      createActivity(supabase, {
+        workspaceId: ctx.workspaceId,
+        actorId: ctx.userId,
+        action: "updated",
+        description: `marked catalog item "${existing.name}" as ${isActive ? "active" : "inactive"}`,
+        entityType: "catalog_item",
+        entityId: itemId,
+      }),
+      createAuditLog({
+        workspaceId: ctx.workspaceId,
+        actorId: ctx.userId,
+        action: "update",
+        entityType: "catalog_item",
+        entityId: itemId,
+        changes: { is_active: { old: existing.is_active, new: isActive } },
+      }),
+    ]);
+
+    revalidatePath(`/${ctx.workspaceId}`);
+    return { success: true };
+  });
+}
+
 export async function deleteCatalogItem(workspaceId: string, itemId: string) {
   return withWorkspace(workspaceId, "staff", async (ctx) => {
     const supabase = await createClient();

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2 } from "lucide-react";
+import { Copy, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,12 +11,12 @@ import { ActivityTimeline } from "@/features/activities/components/activity-time
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { useConfirm } from "@/providers/confirm-provider";
-import { deleteCatalogItem } from "@/features/catalog/actions";
+import { deleteCatalogItem, duplicateCatalogItem } from "@/features/catalog/actions";
 import { DetailHeader } from "@/components/shared/detail-header";
 import { FieldList, DetailItem } from "@/components/shared/detail-item";
 import { SummaryHero } from "@/components/shared/summary-hero";
 import { formatCurrency } from "@/lib/utils/format-currency";
-import type { CatalogItem, ItemType } from "@/features/catalog/types";
+import type { CatalogItem, CatalogItemUsage, ItemType } from "@/features/catalog/types";
 import type { LineItemCategory } from "@/features/line-items/types";
 import type { Activity } from "@/features/activities/types";
 
@@ -34,14 +34,27 @@ const CATEGORY_LABEL: Record<LineItemCategory, string> = {
 type CatalogDetailProps = {
   item: CatalogItem;
   activities: Activity[];
+  usage: CatalogItemUsage;
 };
 
-export function CatalogDetail({ item, activities }: CatalogDetailProps) {
+export function CatalogDetail({ item, activities, usage }: CatalogDetailProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const { workspace, can } = useWorkspace();
   const { toast } = useToast();
   const confirm = useConfirm();
+
+  function handleDuplicate() {
+    startTransition(async () => {
+      const result = await duplicateCatalogItem(workspace.id, item.id);
+      if (result.error) {
+        toast(result.error, "error");
+        return;
+      }
+      toast(`Duplicated as "${result.data!.name}"`, "success");
+      router.push(`/${workspace.slug}/catalog/${result.data!.id}`);
+    });
+  }
 
   async function handleDelete() {
     const ok = await confirm({
@@ -83,6 +96,10 @@ export function CatalogDetail({ item, activities }: CatalogDetailProps) {
         actions={
           can("staff") ? (
             <>
+              <Button variant="outline" onClick={handleDuplicate} disabled={isPending}>
+                <Copy className="mr-2 h-4 w-4" />
+                Duplicate
+              </Button>
               <Button variant="outline" asChild>
                 <Link href={`/${workspace.slug}/catalog/${item.id}/edit`}>
                   <Pencil className="mr-2 h-4 w-4" />
@@ -105,6 +122,8 @@ export function CatalogDetail({ item, activities }: CatalogDetailProps) {
           { label: "Type", value: ITEM_TYPE_LABEL[item.item_type] },
           { label: "Category", value: CATEGORY_LABEL[item.default_category] },
           ...(item.default_unit ? [{ label: "Unit", value: item.default_unit }] : []),
+          { label: "Used In", value: `${usage.documentCount} document${usage.documentCount === 1 ? "" : "s"}` },
+          { label: "Total Quantity Sold", value: String(usage.totalQuantity) },
         ]}
       />
 

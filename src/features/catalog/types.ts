@@ -21,3 +21,40 @@ export type CatalogItem = {
   updated_at: string;
   deleted_at: string | null;
 };
+
+export type CatalogFilters = {
+  search?: string;
+  itemType?: ItemType | "all";
+  status?: "active" | "inactive" | "all";
+  category?: LineItemCategory | "all";
+  sortBy?: "created_at" | "name" | "default_unit_price";
+  sortDir?: "asc" | "desc";
+  page?: number;
+  pageSize?: number;
+};
+
+export type CatalogListResult = {
+  items: CatalogItem[];
+  count: number;
+};
+
+// Workspace-wide (unfiltered by the current list-page filters), mirroring
+// how getInvoiceStats/getQuotationStats compute their KPI ribbons.
+export type CatalogStats = {
+  totalCount: number;
+  activeCount: number;
+  inactiveCount: number;
+  productCount: number;
+  serviceCount: number;
+  totalValueByCurrency: { currency: string; amount: number }[];
+};
+
+// Lightweight "where is this used" signal for the detail page — how many
+// issued line items were copied from this catalog item, and how many
+// units in total. Traceability only (catalog_item_id on line_items is
+// snapshot-at-insert, never a live reference), so this is informational,
+// not a live rollup of current pricing.
+export type CatalogItemUsage = {
+  documentCount: number;
+  totalQuantity: number;
+};
