@@ -65,7 +65,7 @@ export async function createClientAction(
       }),
     ]);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return client;
   });
 }
@@ -152,7 +152,7 @@ export async function updateClient(
       }),
     ]);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return { ...existing, ...updates };
   });
 }
@@ -177,7 +177,7 @@ export async function deleteClient(workspaceId: string, clientId: string) {
       entityId: clientId,
     });
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return { success: true };
   });
 }

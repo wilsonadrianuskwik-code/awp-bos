@@ -35,7 +35,7 @@ export async function createLineItemTemplate(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as unknown as TemplateWithItems;
   });
 }
@@ -63,7 +63,7 @@ export async function updateLineItemTemplate(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as unknown as TemplateWithItems;
   });
 }
@@ -82,7 +82,7 @@ export async function deleteLineItemTemplate(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as { success: true; id: string };
   });
 }

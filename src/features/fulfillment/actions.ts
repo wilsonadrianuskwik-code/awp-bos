@@ -66,7 +66,7 @@ export async function createFulfillmentItemAction(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as unknown as FulfillmentItem;
   });
 }
@@ -94,7 +94,7 @@ export async function recordFulfillmentEventAction(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as unknown as FulfillmentItem;
   });
 }
@@ -113,7 +113,7 @@ export async function deleteFulfillmentEventAction(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as { success: true; id: string };
   });
 }
@@ -139,7 +139,7 @@ export async function updateFulfillmentStatusAction(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as unknown as FulfillmentItem;
   });
 }

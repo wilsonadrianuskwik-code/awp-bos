@@ -64,7 +64,7 @@ export async function createCatalogItem(
       }),
     ]);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return item;
   });
 }
@@ -142,7 +142,7 @@ export async function updateCatalogItem(
       }),
     ]);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return { ...existing, ...updates };
   });
 }
@@ -198,7 +198,7 @@ export async function duplicateCatalogItem(workspaceId: string, itemId: string) 
       }),
     ]);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return copy;
   });
 }
@@ -248,7 +248,7 @@ export async function setCatalogItemActive(
       }),
     ]);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return { success: true };
   });
 }
@@ -273,7 +273,7 @@ export async function deleteCatalogItem(workspaceId: string, itemId: string) {
       entityId: itemId,
     });
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return { success: true };
   });
 }

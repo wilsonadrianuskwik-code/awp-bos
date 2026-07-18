@@ -33,8 +33,17 @@ export async function withWorkspace<T>(
     return { data: null, error: "Insufficient permissions" };
   }
 
+  const { data: workspace } = await supabase
+    .from("workspaces")
+    .select("slug")
+    .eq("id", workspaceId)
+    .single();
+
+  const workspaceSlug = workspace?.slug;
+  if (!workspaceSlug) return { data: null, error: "Workspace not found" };
+
   try {
-    const result = await action({ workspaceId, userId: user.id, role });
+    const result = await action({ workspaceId, workspaceSlug, userId: user.id, role });
     return { data: result, error: null };
   } catch (err) {
     const message = err instanceof Error ? err.message : "An error occurred";

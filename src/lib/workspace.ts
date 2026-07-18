@@ -27,7 +27,7 @@ export async function getWorkspaceContext(
 
   const { data: workspace } = await supabase
     .from("workspaces")
-    .select("id")
+    .select("id, slug")
     .eq("slug", workspaceSlug)
     .is("deleted_at", null)
     .single();
@@ -46,6 +46,7 @@ export async function getWorkspaceContext(
 
   return {
     workspaceId: workspace.id,
+    workspaceSlug: workspace.slug,
     userId: user.id,
     role: member.role as Role,
   };

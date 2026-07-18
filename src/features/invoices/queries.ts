@@ -10,8 +10,6 @@ import type {
   Payment,
 } from "@/features/invoices/types";
 
-const OUTSTANDING_STATUSES = ["sent", "viewed", "partial", "overdue"];
-
 const CLIENT_JOIN = "client:clients(id,name,company,email,payment_terms,phone,address,tax_id)";
 // Read-only embed of the quotation this invoice was generated from, if
 // any — invoices.source_quotation_id is a real FK to quotations(id), so
@@ -260,30 +258,15 @@ export async function getInvoiceByShareToken(
  */
 export async function getInvoiceStats(workspaceId: string): Promise<InvoiceStats> {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("invoices")
-    .select("status, total, currency")
-    .eq("workspace_id", workspaceId)
-    .is("deleted_at", null);
+  const { data } = await supabase.rpc("get_invoice_stats", { p_workspace_id: workspaceId });
 
-  const rows = data ?? [];
-  const totals = new Map<string, number>();
-  let draftCount = 0;
-  let outstandingCount = 0;
-  let paidCount = 0;
-
-  for (const row of rows) {
-    totals.set(row.currency, (totals.get(row.currency) ?? 0) + row.total);
-    if (row.status === "draft") draftCount++;
-    else if (OUTSTANDING_STATUSES.includes(row.status)) outstandingCount++;
-    else if (row.status === "paid") paidCount++;
-  }
-
-  return {
-    totalCount: rows.length,
-    draftCount,
-    outstandingCount,
-    paidCount,
-    totalValueByCurrency: Array.from(totals, ([currency, amount]) => ({ currency, amount })),
-  };
+  return (
+    (data as InvoiceStats | null) ?? {
+      totalCount: 0,
+      draftCount: 0,
+      outstandingCount: 0,
+      paidCount: 0,
+      totalValueByCurrency: [],
+    }
+  );
 }

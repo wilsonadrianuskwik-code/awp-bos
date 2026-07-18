@@ -68,7 +68,7 @@ export async function createTheme(workspaceId: string, input: CreateThemeInput) 
       }),
     ]);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return theme;
   });
 }
@@ -125,7 +125,7 @@ export async function updateTheme(
       }),
     ]);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return { ...existing, ...updates };
   });
 }
@@ -147,7 +147,7 @@ export async function deleteTheme(workspaceId: string, themeId: string) {
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return { success: true };
   });
 }
@@ -209,7 +209,7 @@ export async function createTemplate(workspaceId: string, input: CreateTemplateI
       }),
     ]);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return template;
   });
 }
@@ -278,7 +278,7 @@ export async function updateTemplate(
       }),
     ]);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return { ...existing, ...updates };
   });
 }
@@ -319,7 +319,7 @@ export async function setDefaultTemplate(workspaceId: string, templateId: string
       entityId: templateId,
     });
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return { success: true };
   });
 }
@@ -362,7 +362,7 @@ export async function duplicateTemplate(workspaceId: string, templateId: string)
       entityId: copy.id,
     });
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return copy;
   });
 }
@@ -383,7 +383,7 @@ export async function deleteTemplate(workspaceId: string, templateId: string) {
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return { success: true };
   });
 }
@@ -408,7 +408,7 @@ export async function updateCompanyProfile(workspaceId: string, input: CompanyPr
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data;
   });
 }
@@ -433,7 +433,7 @@ async function updateWorkspaceSettings(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data;
   });
 }

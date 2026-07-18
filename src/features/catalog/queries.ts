@@ -58,38 +58,18 @@ export async function getCatalogItems(
 // current page's filters, matching getInvoiceStats/getQuotationStats.
 export async function getCatalogStats(workspaceId: string): Promise<CatalogStats> {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("catalog_items")
-    .select("item_type, is_active, default_unit_price, currency")
-    .eq("workspace_id", workspaceId)
-    .is("deleted_at", null);
+  const { data } = await supabase.rpc("get_catalog_stats", { p_workspace_id: workspaceId });
 
-  const rows = data ?? [];
-  const totals = new Map<string, number>();
-  let activeCount = 0;
-  let productCount = 0;
-  let serviceCount = 0;
-
-  for (const row of rows) {
-    if (row.is_active) {
-      activeCount++;
-      totals.set(
-        row.currency,
-        (totals.get(row.currency) ?? 0) + row.default_unit_price
-      );
+  return (
+    (data as CatalogStats | null) ?? {
+      totalCount: 0,
+      activeCount: 0,
+      inactiveCount: 0,
+      productCount: 0,
+      serviceCount: 0,
+      totalValueByCurrency: [],
     }
-    if (row.item_type === "product") productCount++;
-    else if (row.item_type === "service") serviceCount++;
-  }
-
-  return {
-    totalCount: rows.length,
-    activeCount,
-    inactiveCount: rows.length - activeCount,
-    productCount,
-    serviceCount,
-    totalValueByCurrency: Array.from(totals, ([currency, amount]) => ({ currency, amount })),
-  };
+  );
 }
 
 // How much this catalog item is actually used across issued documents —

@@ -51,7 +51,7 @@ export async function createLead(workspaceId: string, formData: FormData) {
       }),
     ]);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return lead;
   });
 }
@@ -122,7 +122,7 @@ export async function updateLead(
       }),
     ]);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return { ...existing, ...updates };
   });
 }
@@ -147,7 +147,7 @@ export async function deleteLead(workspaceId: string, leadId: string) {
       entityId: leadId,
     });
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return { success: true };
   });
 }
@@ -227,7 +227,7 @@ export async function convertLeadToClient(
       }),
     ]);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return client;
   });
 }

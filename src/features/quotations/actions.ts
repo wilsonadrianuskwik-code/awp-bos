@@ -54,7 +54,7 @@ export async function createQuotation(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as unknown as Quotation;
   });
 }
@@ -89,7 +89,7 @@ export async function updateQuotation(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as unknown as Quotation;
   });
 }
@@ -110,7 +110,7 @@ export async function updateQuotationStatus(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as unknown as Quotation;
   });
 }
@@ -129,7 +129,7 @@ export async function duplicateQuotation(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as unknown as Quotation;
   });
 }
@@ -151,7 +151,7 @@ export async function regenerateShareToken(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as { id: string; share_token: string };
   });
 }
@@ -170,7 +170,7 @@ export async function createQuotationVersion(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as unknown as Quotation;
   });
 }
@@ -189,7 +189,7 @@ export async function deleteQuotation(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as { success: true; id: string };
   });
 }
@@ -220,7 +220,7 @@ export async function generateInvoiceFromQuotation(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data;
   });
 }

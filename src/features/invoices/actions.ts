@@ -53,7 +53,7 @@ export async function createInvoice(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as unknown as Invoice;
   });
 }
@@ -87,7 +87,7 @@ export async function updateInvoice(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as unknown as Invoice;
   });
 }
@@ -108,7 +108,7 @@ export async function updateInvoiceStatus(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as unknown as Invoice;
   });
 }
@@ -124,7 +124,7 @@ export async function duplicateInvoice(workspaceId: string, invoiceId: string) {
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as unknown as Invoice;
   });
 }
@@ -146,7 +146,7 @@ export async function regenerateInvoiceShareToken(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as { id: string; share_token: string };
   });
 }
@@ -180,7 +180,7 @@ export async function deleteInvoice(workspaceId: string, invoiceId: string) {
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as { success: true; id: string };
   });
 }
@@ -213,7 +213,7 @@ export async function recordPayment(
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as unknown as { invoice: Invoice; payment: Payment };
   });
 }
@@ -229,7 +229,7 @@ export async function deletePayment(workspaceId: string, paymentId: string) {
 
     if (error) throw new Error(error.message);
 
-    revalidatePath(`/${ctx.workspaceId}`);
+    revalidatePath(`/${ctx.workspaceSlug}`);
     return data as { success: true; id: string };
   });
 }
