@@ -61,9 +61,11 @@ const columns: ColumnDef<Lead, unknown>[] = [
 
 type LeadListProps = {
   leads: Lead[];
+  selectedIds?: Set<string>;
+  onSelectedIdsChange?: (ids: Set<string>) => void;
 };
 
-export function LeadList({ leads }: LeadListProps) {
+export function LeadList({ leads, selectedIds, onSelectedIdsChange }: LeadListProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
 
@@ -72,6 +74,11 @@ export function LeadList({ leads }: LeadListProps) {
       columns={columns}
       data={leads}
       onRowClick={(lead) => router.push(`/${workspace.slug}/leads/${lead.id}`)}
+      selection={
+        selectedIds && onSelectedIdsChange
+          ? { selectedIds, onSelectedIdsChange, getId: (l) => l.id }
+          : undefined
+      }
     />
   );
 }

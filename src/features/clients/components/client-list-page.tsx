@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useOptimistic, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { type ColumnDef } from "@tanstack/react-table";
 import { Trash2 } from "lucide-react";
+import { DataTable } from "@/components/shared/data-table";
 import { Pagination } from "@/components/shared/pagination";
 import { ListEmpty } from "@/components/shared/list-empty";
 import { SearchInput } from "@/components/shared/search-input";
@@ -14,42 +16,62 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { StatusTabs } from "@/components/shared/status-tabs";
-import { ViewToggle, type ListView } from "@/components/shared/view-toggle";
-import { LeadList } from "@/features/leads/components/lead-list";
-import { LeadPipeline } from "@/features/leads/components/lead-pipeline";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { useConfirm } from "@/providers/confirm-provider";
-import { deleteLead } from "@/features/leads/actions";
-import type { Lead } from "@/features/leads/types";
-
-const STATUS_TABS = [
-  { value: "all", label: "All" },
-  { value: "new", label: "New" },
-  { value: "contacted", label: "Contacted" },
-  { value: "qualified", label: "Qualified" },
-  { value: "proposal", label: "Proposal" },
-  { value: "negotiation", label: "Negotiation" },
-  { value: "won", label: "Won" },
-  { value: "lost", label: "Lost" },
-] as const;
+import { deleteClient } from "@/features/clients/actions";
+import type { Client } from "@/features/clients/types";
 
 const SORT_OPTIONS = [
   { value: "created_at:desc", label: "Newest first" },
   { value: "created_at:asc", label: "Oldest first" },
-  { value: "expected_value:desc", label: "Highest value" },
-  { value: "expected_value:asc", label: "Lowest value" },
+  { value: "name:asc", label: "Name A-Z" },
+  { value: "name:desc", label: "Name Z-A" },
 ] as const;
 
 const PAGE_SIZE = 20;
 
-type LeadListPageProps = {
-  leads: Lead[];
+const columns: ColumnDef<Client, unknown>[] = [
+  {
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ row }) => (
+      <span className="font-medium">{row.getValue("name")}</span>
+    ),
+  },
+  {
+    accessorKey: "company",
+    header: "Company",
+    cell: ({ row }) => row.getValue("company") || "—",
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
+    cell: ({ row }) => row.getValue("email") || "—",
+  },
+  {
+    accessorKey: "phone",
+    header: "Phone",
+    cell: ({ row }) => row.getValue("phone") || "—",
+  },
+  {
+    accessorKey: "payment_terms",
+    header: "Payment Terms",
+    cell: ({ row }) => `${row.getValue("payment_terms")} days`,
+  },
+  {
+    accessorKey: "created_at",
+    header: "Created",
+    cell: ({ row }) => new Date(row.getValue("created_at") as string).toLocaleDateString(),
+  },
+];
+
+type ClientListPageProps = {
+  clients: Client[];
   count: number;
 };
 
-export function LeadListPage({ leads, count }: LeadListPageProps) {
+export function ClientListPage({ clients, count }: ClientListPageProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -58,24 +80,22 @@ export function LeadListPage({ leads, count }: LeadListPageProps) {
   const confirm = useConfirm();
   const [, startTransition] = useTransition();
 
-  const status = searchParams.get("status") ?? "all";
   const sort = searchParams.get("sort") ?? "created_at:desc";
   const page = Math.max(1, Number(searchParams.get("page") ?? "1"));
   const urlSearch = searchParams.get("q") ?? "";
-  const view = (searchParams.get("view") === "kanban" ? "kanban" : "table") as ListView;
 
   const [search, setSearch] = useState(urlSearch);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [optimisticLeads, removeOptimisticLeads] = useOptimistic(
-    leads,
-    (state, idsToRemove: Set<string>) => state.filter((l) => !idsToRemove.has(l.id))
+  const [optimisticClients, removeOptimisticClients] = useOptimistic(
+    clients,
+    (state, idsToRemove: Set<string>) => state.filter((c) => !idsToRemove.has(c.id))
   );
 
-  const [prevLeads, setPrevLeads] = useState(leads);
-  if (leads !== prevLeads) {
-    setPrevLeads(leads);
+  const [prevClients, setPrevClients] = useState(clients);
+  if (clients !== prevClients) {
+    setPrevClients(clients);
     setSelectedIds(new Set());
   }
 
@@ -103,7 +123,7 @@ export function LeadListPage({ leads, count }: LeadListPageProps) {
   }, [search, urlSearch, setParams]);
 
   const totalPages = Math.max(1, Math.ceil(count / PAGE_SIZE));
-  const selected = optimisticLeads.filter((l) => selectedIds.has(l.id));
+  const selected = optimisticClients.filter((c) => selectedIds.has(c.id));
 
   function clearSelection() {
     setSelectedIds(new Set());
@@ -111,28 +131,28 @@ export function LeadListPage({ leads, count }: LeadListPageProps) {
 
   async function handleBulkDelete() {
     const ok = await confirm({
-      title: `Delete ${selected.length} lead${selected.length === 1 ? "" : "s"}?`,
+      title: `Delete ${selected.length} client${selected.length === 1 ? "" : "s"}?`,
       description: "This action cannot be undone.",
       confirmLabel: "Delete",
       destructive: true,
     });
     if (!ok) return;
 
-    const idsToDelete = new Set(selected.map((l) => l.id));
+    const idsToDelete = new Set(selected.map((c) => c.id));
     const toDelete = selected;
     clearSelection();
 
     startTransition(async () => {
-      removeOptimisticLeads(idsToDelete);
+      removeOptimisticClients(idsToDelete);
       const results = await Promise.all(
-        toDelete.map((l) => deleteLead(workspace.id, l.id))
+        toDelete.map((c) => deleteClient(workspace.id, c.id))
       );
       const failed = results.filter((r) => r.error).length;
       const succeeded = results.length - failed;
       toast(
         failed > 0
           ? `Deleted ${succeeded}, ${failed} failed`
-          : `Deleted ${succeeded} lead${succeeded === 1 ? "" : "s"}`,
+          : `Deleted ${succeeded} client${succeeded === 1 ? "" : "s"}`,
         failed > 0 ? "error" : "success"
       );
       router.refresh();
@@ -152,53 +172,51 @@ export function LeadListPage({ leads, count }: LeadListPageProps) {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <SearchInput value={search} onChange={setSearch} placeholder="Search name, company, email…" />
-        <div className="flex flex-wrap items-center gap-2">
-          <ViewToggle value={view} onChange={(v) => setParams({ view: v === "table" ? null : v })} />
-          <Select value={sort} onValueChange={(v) => setParams({ sort: v, page: null })}>
-            <SelectTrigger className="h-9 w-full sm:w-44">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {SORT_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder="Search name, company, email, phone…"
+        />
+        <Select value={sort} onValueChange={(v) => setParams({ sort: v, page: null })}>
+          <SelectTrigger className="h-9 w-full sm:w-44">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SORT_OPTIONS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      <StatusTabs
-        tabs={STATUS_TABS}
-        value={status}
-        onValueChange={(v) => setParams({ status: v === "all" ? null : v, page: null })}
-      />
-
-      {optimisticLeads.length === 0 ? (
-        <ListEmpty message="No leads match your filters." />
-      ) : view === "table" ? (
-        <LeadList
-          leads={optimisticLeads}
-          selectedIds={can("staff") ? selectedIds : undefined}
-          onSelectedIdsChange={can("staff") ? setSelectedIds : undefined}
-        />
+      {optimisticClients.length === 0 ? (
+        <ListEmpty message="No clients match your filters." />
       ) : (
-        <LeadPipeline leads={optimisticLeads} />
+        <DataTable
+          columns={columns}
+          data={optimisticClients}
+          onRowClick={(client) => router.push(`/${workspace.slug}/clients/${client.id}`)}
+          selection={
+            can("staff")
+              ? { selectedIds, onSelectedIdsChange: setSelectedIds, getId: (c) => c.id }
+              : undefined
+          }
+        />
       )}
 
       <Pagination
         page={page}
         totalPages={totalPages}
         count={count}
-        noun="lead"
+        noun="client"
         onPageChange={(p) => setParams({ page: String(p) })}
       />
 
       <BulkActionToolbar
         count={selected.length}
-        noun="lead"
+        noun="client"
         actions={bulkActions}
         onClear={clearSelection}
       />

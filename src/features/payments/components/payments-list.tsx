@@ -6,6 +6,7 @@ import Link from "next/link";
 import { type ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/shared/data-table";
 import { ListEmpty } from "@/components/shared/list-empty";
+import { Pagination } from "@/components/shared/pagination";
 import { SearchInput } from "@/components/shared/search-input";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -32,11 +33,14 @@ function formatDate(date: string) {
   });
 }
 
+const PAGE_SIZE = 20;
+
 type PaymentsListProps = {
   payments: PaymentWithContext[];
+  count: number;
 };
 
-export function PaymentsList({ payments }: PaymentsListProps) {
+export function PaymentsList({ payments, count }: PaymentsListProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -45,6 +49,7 @@ export function PaymentsList({ payments }: PaymentsListProps) {
   const urlSearch = searchParams.get("q") ?? "";
   const currency = searchParams.get("currency") ?? "all";
   const method = searchParams.get("method") ?? "all";
+  const page = Math.max(1, Number(searchParams.get("page") ?? "1"));
   const dateRange: DateRange = {
     from: searchParams.get("from") ?? "",
     to: searchParams.get("to") ?? "",
@@ -69,12 +74,14 @@ export function PaymentsList({ payments }: PaymentsListProps) {
     if (search === urlSearch) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      setParams({ q: search || null });
+      setParams({ q: search || null, page: null });
     }, 300);
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, [search, urlSearch, setParams]);
+
+  const totalPages = Math.max(1, Math.ceil(count / PAGE_SIZE));
 
   const columns: ColumnDef<PaymentWithContext, unknown>[] = [
     {
@@ -153,13 +160,13 @@ export function PaymentsList({ payments }: PaymentsListProps) {
         <DateRangePicker
           value={dateRange}
           onChange={(range) =>
-            setParams({ from: range.from || null, to: range.to || null })
+            setParams({ from: range.from || null, to: range.to || null, page: null })
           }
         />
 
         <Select
           value={currency}
-          onValueChange={(v) => setParams({ currency: v === "all" ? null : v })}
+          onValueChange={(v) => setParams({ currency: v === "all" ? null : v, page: null })}
         >
           <SelectTrigger className="h-9 w-full sm:w-36">
             <SelectValue placeholder="Currency" />
@@ -176,7 +183,7 @@ export function PaymentsList({ payments }: PaymentsListProps) {
 
         <Select
           value={method}
-          onValueChange={(v) => setParams({ method: v === "all" ? null : v })}
+          onValueChange={(v) => setParams({ method: v === "all" ? null : v, page: null })}
         >
           <SelectTrigger className="h-9 w-full sm:w-40">
             <SelectValue placeholder="Method" />
@@ -197,6 +204,14 @@ export function PaymentsList({ payments }: PaymentsListProps) {
       ) : (
         <DataTable columns={columns} data={payments} />
       )}
+
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        count={count}
+        noun="payment"
+        onPageChange={(p) => setParams({ page: String(p) })}
+      />
     </div>
   );
 }

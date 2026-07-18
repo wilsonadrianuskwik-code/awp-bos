@@ -43,3 +43,17 @@ export type Lead = {
   updated_at: string;
   deleted_at: string | null;
 };
+
+export type LeadFilters = {
+  search?: string;
+  status?: LeadStatus | "all";
+  sortBy?: string;
+  sortDir?: "asc" | "desc";
+  page?: number;
+  pageSize?: number;
+};
+
+export type LeadListResult = {
+  leads: Lead[];
+  count: number;
+};

@@ -19,4 +19,11 @@ export type PaymentFilters = {
   currency?: string;
   method?: PaymentMethod | "all";
   clientId?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+export type PaymentListResult = {
+  payments: PaymentWithContext[];
+  count: number;
 };

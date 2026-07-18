@@ -14,6 +14,7 @@ function parseFilters(params: {
   to?: string;
   currency?: string;
   method?: string;
+  page?: string;
 }): PaymentFilters {
   return {
     search: params.q || undefined,
@@ -23,6 +24,8 @@ function parseFilters(params: {
     method: PAYMENT_METHODS.includes(params.method as PaymentMethod)
       ? (params.method as PaymentMethod)
       : "all",
+    page: Math.max(1, Number(params.page ?? "1") || 1),
+    pageSize: 20,
   };
 }
 
@@ -37,6 +40,7 @@ export default async function PaymentsPage({
     to?: string;
     currency?: string;
     method?: string;
+    page?: string;
   }>;
 }) {
   const [{ workspaceSlug }, search] = await Promise.all([params, searchParams]);
@@ -44,7 +48,7 @@ export default async function PaymentsPage({
   if (!workspace) notFound();
 
   const filters = parseFilters(search);
-  const payments = await getPayments(workspace.id, filters);
+  const { payments, count } = await getPayments(workspace.id, filters);
 
   const hasAnyFilters =
     !!filters.search || !!filters.from || !!filters.to || !!filters.currency ||
@@ -57,14 +61,14 @@ export default async function PaymentsPage({
         description="Every payment recorded across your workspace"
       />
 
-      {payments.length === 0 && !hasAnyFilters ? (
+      {count === 0 && !hasAnyFilters ? (
         <EmptyState
           icon={CreditCard}
           title="No payments recorded yet"
           description="Payments recorded against an invoice will show up here."
         />
       ) : (
-        <PaymentsList payments={payments} />
+        <PaymentsList payments={payments} count={count} />
       )}
     </div>
   );

@@ -1,44 +1,49 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Plus, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
-import { MetricsRibbon, type RibbonMetric } from "@/components/shared/metrics-ribbon";
+import { MetricsRibbon } from "@/components/shared/metrics-ribbon";
 import { PageHeader } from "@/components/shared/page-header";
-import { ClientList } from "@/features/clients/components/client-list";
-import { getClients } from "@/features/clients/queries";
+import { ClientListPage } from "@/features/clients/components/client-list-page";
+import { getClients, getClientStats } from "@/features/clients/queries";
 import { getWorkspaceBySlug } from "@/lib/workspace";
-import { notFound } from "next/navigation";
+import type { ClientFilters } from "@/features/clients/types";
+
+const SORT_FIELDS = ["created_at", "name"] as const;
+
+function parseFilters(params: { q?: string; sort?: string; page?: string }): ClientFilters {
+  const [sortBy, sortDir] = (params.sort ?? "created_at:desc").split(":");
+
+  return {
+    search: params.q || undefined,
+    sortBy: SORT_FIELDS.includes(sortBy as (typeof SORT_FIELDS)[number])
+      ? (sortBy as ClientFilters["sortBy"])
+      : "created_at",
+    sortDir: sortDir === "asc" ? "asc" : "desc",
+    page: Math.max(1, Number(params.page ?? "1") || 1),
+    pageSize: 20,
+  };
+}
 
 export default async function ClientsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ workspaceSlug: string }>;
+  searchParams: Promise<{ q?: string; sort?: string; page?: string }>;
 }) {
-  const { workspaceSlug } = await params;
+  const [{ workspaceSlug }, search] = await Promise.all([params, searchParams]);
   const workspace = await getWorkspaceBySlug(workspaceSlug);
   if (!workspace) notFound();
 
-  const clients = await getClients(workspace.id);
+  const filters = parseFilters(search);
+  const [{ clients, count }, stats] = await Promise.all([
+    getClients(workspace.id, filters),
+    getClientStats(workspace.id),
+  ]);
 
-  const now = new Date();
-  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-  const newThisMonth = clients.filter(
-    (c) => new Date(c.created_at) >= thirtyDaysAgo
-  ).length;
-
-  const metrics: RibbonMetric[] = [
-    {
-      label: "Total Clients",
-      value: String(clients.length),
-      description: "All time",
-    },
-    {
-      label: "New This Month",
-      value: String(newThisMonth),
-      description: "Last 30 days",
-      tone: newThisMonth > 0 ? "success" : "default",
-    },
-  ];
+  const hasAnyFilters = !!filters.search;
 
   return (
     <div className="space-y-6">
@@ -55,7 +60,7 @@ export default async function ClientsPage({
         }
       />
 
-      {clients.length === 0 ? (
+      {count === 0 && !hasAnyFilters ? (
         <EmptyState
           icon={Building2}
           title="No clients yet"
@@ -71,8 +76,18 @@ export default async function ClientsPage({
         />
       ) : (
         <>
-          <MetricsRibbon metrics={metrics} />
-          <ClientList clients={clients} />
+          <MetricsRibbon
+            metrics={[
+              { label: "Total Clients", value: String(stats.totalCount), description: "All time" },
+              {
+                label: "New This Month",
+                value: String(stats.newThisMonthCount),
+                description: "Last 30 days",
+                tone: stats.newThisMonthCount > 0 ? "success" : "default",
+              },
+            ]}
+          />
+          <ClientListPage clients={clients} count={count} />
         </>
       )}
     </div>

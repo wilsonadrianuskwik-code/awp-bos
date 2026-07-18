@@ -29,3 +29,16 @@ export type Client = {
   updated_at: string;
   deleted_at: string | null;
 };
+
+export type ClientFilters = {
+  search?: string;
+  sortBy?: string;
+  sortDir?: "asc" | "desc";
+  page?: number;
+  pageSize?: number;
+};
+
+export type ClientListResult = {
+  clients: Client[];
+  count: number;
+};

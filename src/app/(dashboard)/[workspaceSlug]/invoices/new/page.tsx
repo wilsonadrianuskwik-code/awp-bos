@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getWorkspaceBySlug } from "@/lib/workspace";
-import { getClients } from "@/features/clients/queries";
+import { getAllClients } from "@/features/clients/queries";
 import { getLineItemTemplates } from "@/features/line-items/queries";
 import { getActiveCatalogItems } from "@/features/catalog/queries";
 import { InvoiceBuilder } from "@/features/invoices/components/invoice-builder";
@@ -19,7 +19,7 @@ export default async function NewInvoicePage({
   if (!workspace) notFound();
 
   const [clients, templates, catalogItems] = await Promise.all([
-    getClients(workspace.id),
+    getAllClients(workspace.id),
     getLineItemTemplates(workspace.id),
     getActiveCatalogItems(workspace.id),
   ]);

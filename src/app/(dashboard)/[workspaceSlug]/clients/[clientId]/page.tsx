@@ -19,13 +19,13 @@ export default async function ClientDetailPage({
   const workspace = await getWorkspaceBySlug(workspaceSlug);
   if (!workspace) notFound();
 
-  const [client, activities, quotations, invoices, payments, { items: fulfillmentItems }] =
+  const [client, activities, quotations, invoices, { payments }, { items: fulfillmentItems }] =
     await Promise.all([
       getClient(clientId, workspace.id),
       getClientActivities(clientId),
       getQuotationsByClient(clientId, workspace.id),
       getInvoicesByClient(clientId, workspace.id),
-      getPayments(workspace.id, { clientId }),
+      getPayments(workspace.id, { clientId, pageSize: 500 }),
       getFulfillmentItems(workspace.id, { clientId }),
     ]);
 

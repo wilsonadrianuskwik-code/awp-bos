@@ -1,5 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
-import type { PaymentWithContext, PaymentFilters } from "@/features/payments/types";
+import type {
+  PaymentWithContext,
+  PaymentFilters,
+  PaymentListResult,
+} from "@/features/payments/types";
 
 const INVOICE_JOIN =
   "invoice:invoices(id,invoice_number,status,client:clients(id,name))";
@@ -22,7 +26,7 @@ const INVOICE_JOIN =
 export async function getPayments(
   workspaceId: string,
   filters: PaymentFilters = {}
-): Promise<PaymentWithContext[]> {
+): Promise<PaymentListResult> {
   const supabase = await createClient();
 
   // Hard scope: only this client's invoices. Resolved eagerly so an
@@ -36,7 +40,7 @@ export async function getPayments(
       .eq("client_id", filters.clientId);
 
     const clientInvoiceIds = (clientInvoices ?? []).map((r) => r.id);
-    if (clientInvoiceIds.length === 0) return [];
+    if (clientInvoiceIds.length === 0) return { payments: [], count: 0 };
 
     return getPaymentsForInvoiceIds(supabase, workspaceId, filters, clientInvoiceIds);
   }
@@ -49,7 +53,7 @@ async function getPaymentsForInvoiceIds(
   workspaceId: string,
   filters: PaymentFilters,
   restrictToInvoiceIds: string[] | null
-): Promise<PaymentWithContext[]> {
+): Promise<PaymentListResult> {
   let searchInvoiceIds: string[] = [];
   if (filters.search) {
     const like = `%${sanitizeLike(filters.search)}%`;
@@ -73,7 +77,7 @@ async function getPaymentsForInvoiceIds(
 
   let query = supabase
     .from("payments")
-    .select(`*, ${INVOICE_JOIN}`)
+    .select(`*, ${INVOICE_JOIN}`, { count: "exact" })
     .eq("workspace_id", workspaceId)
     .is("deleted_at", null);
 
@@ -97,9 +101,20 @@ async function getPaymentsForInvoiceIds(
         : query.ilike("payment_number", like);
   }
 
-  const { data, error } = await query.order("payment_date", { ascending: false });
+  query = query.order("payment_date", { ascending: false });
+
+  const page = filters.page ?? 1;
+  const pageSize = filters.pageSize ?? 20;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+  query = query.range(from, to);
+
+  const { data, error, count } = await query;
   if (error) throw error;
-  return (data ?? []) as unknown as PaymentWithContext[];
+  return {
+    payments: (data ?? []) as unknown as PaymentWithContext[],
+    count: count ?? 0,
+  };
 }
 
 function sanitizeLike(term: string): string {
