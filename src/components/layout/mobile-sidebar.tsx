@@ -46,6 +46,7 @@ export function MobileSidebar({
             size="icon"
             onClick={onClose}
             className="h-8 w-8 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            aria-label="Close navigation menu"
           >
             <X className="h-4 w-4" />
           </Button>

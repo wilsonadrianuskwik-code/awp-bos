@@ -156,7 +156,13 @@ export function TemplateGallery({ workspaceId, templates, themes }: TemplateGall
               {canEdit && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" disabled={isPending}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0"
+                      disabled={isPending}
+                      aria-label="More actions"
+                    >
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>

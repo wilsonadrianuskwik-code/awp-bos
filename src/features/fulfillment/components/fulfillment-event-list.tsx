@@ -90,6 +90,7 @@ export function FulfillmentEventList({ events, unitLabel }: FulfillmentEventList
             className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive"
             onClick={() => handleDelete(event)}
             disabled={isPending}
+            aria-label="Delete fulfillment event"
           >
             <Trash2 className="h-4 w-4" />
           </Button>

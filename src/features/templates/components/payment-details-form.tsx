@@ -143,6 +143,7 @@ export function PaymentDetailsForm({ workspaceId, paymentDetails }: PaymentDetai
                     size="icon"
                     className="h-7 w-7 text-destructive"
                     onClick={() => removeAccount(account.id)}
+                    aria-label="Remove bank account"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>

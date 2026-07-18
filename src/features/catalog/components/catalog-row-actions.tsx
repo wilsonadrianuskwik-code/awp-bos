@@ -87,6 +87,7 @@ export function CatalogRowActions({ item }: CatalogRowActionsProps) {
           size="icon"
           className="h-7 w-7 opacity-0 transition-opacity group-hover:opacity-100 data-[state=open]:opacity-100"
           disabled={isPending}
+          aria-label="More actions"
         >
           <MoreHorizontal className="h-4 w-4" />
         </Button>

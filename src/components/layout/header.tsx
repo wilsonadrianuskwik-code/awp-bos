@@ -58,6 +58,7 @@ export function Header({ workspaceSlug, onMobileMenuToggle }: HeaderProps) {
           size="icon"
           className="h-8 w-8 md:hidden"
           onClick={onMobileMenuToggle}
+          aria-label="Open navigation menu"
         >
           <Menu className="h-5 w-5" />
         </Button>
@@ -78,6 +79,7 @@ export function Header({ workspaceSlug, onMobileMenuToggle }: HeaderProps) {
           size="icon"
           className="h-8 w-8 sm:hidden"
           onClick={() => setPaletteOpen(true)}
+          aria-label="Search"
         >
           <Search className="h-4 w-4" />
         </Button>

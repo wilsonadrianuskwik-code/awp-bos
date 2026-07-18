@@ -188,6 +188,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
             size="icon"
             onClick={() => setCollapsed(false)}
             className="mt-1 h-7 w-7 text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            aria-label="Expand sidebar"
           >
             <PanelLeftOpen className="h-3.5 w-3.5" />
           </Button>
@@ -240,6 +241,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
           size="icon"
           onClick={() => setCollapsed(true)}
           className="h-7 w-7 shrink-0 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          aria-label="Collapse sidebar"
         >
           <PanelLeftClose className="h-4 w-4" />
         </Button>
