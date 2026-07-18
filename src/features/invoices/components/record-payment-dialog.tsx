@@ -23,10 +23,12 @@ import {
 } from "@/components/ui/select";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
+import { useConfirm } from "@/providers/confirm-provider";
 import { recordPayment } from "@/features/invoices/actions";
 import { recordPaymentSchema } from "@/features/invoices/validators";
 import { BANK_OPTIONS, PAYMENT_METHOD_LABEL } from "@/features/invoices/helpers";
 import { PAYMENT_METHODS, type Invoice, type PaymentMethod } from "@/features/invoices/types";
+import { formatCurrency } from "@/lib/utils/format-currency";
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -46,6 +48,7 @@ export function RecordPaymentDialog({
   const router = useRouter();
   const { workspace } = useWorkspace();
   const { toast } = useToast();
+  const confirm = useConfirm();
   const [isPending, startTransition] = useTransition();
 
   const [amount, setAmount] = useState(String(invoice.amount_due));
@@ -68,7 +71,7 @@ export function RecordPaymentDialog({
     setReceiverAccountName("");
   }
 
-  function handleSave() {
+  async function handleSave() {
     const resolvedBankName = bankName === "Other" ? customBankName : bankName;
 
     const payload = {
@@ -87,6 +90,16 @@ export function RecordPaymentDialog({
     if (!parsed.success) {
       toast(parsed.error.issues[0].message, "error");
       return;
+    }
+
+    if (parsed.data.amount > invoice.amount_due) {
+      const overage = parsed.data.amount - invoice.amount_due;
+      const ok = await confirm({
+        title: "Payment exceeds the outstanding balance",
+        description: `This payment is ${formatCurrency(overage, invoice.currency)} more than the ${formatCurrency(invoice.amount_due, invoice.currency)} still owed on ${invoice.invoice_number}. Record it anyway?`,
+        confirmLabel: "Record Payment",
+      });
+      if (!ok) return;
     }
 
     startTransition(async () => {
