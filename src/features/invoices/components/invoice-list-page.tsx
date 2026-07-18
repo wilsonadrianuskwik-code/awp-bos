@@ -22,7 +22,7 @@ import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { useConfirm } from "@/providers/confirm-provider";
 import {
-  deleteInvoice,
+  bulkDeleteInvoices,
   duplicateInvoice,
   updateInvoiceStatus,
 } from "@/features/invoices/actions";
@@ -138,17 +138,19 @@ export function InvoiceListPage({ invoices, count }: InvoiceListPageProps) {
 
     startTransition(async () => {
       removeOptimisticInvoices(idsToDelete);
-      const results = await Promise.all(
-        toDelete.map((i) => deleteInvoice(workspace.id, i.id))
-      );
-      const failed = results.filter((r) => r.error).length;
-      const succeeded = results.length - failed;
-      toast(
-        failed > 0
-          ? `Deleted ${succeeded}, ${failed} failed`
-          : `Deleted ${succeeded} invoice${succeeded === 1 ? "" : "s"}`,
-        failed > 0 ? "error" : "success"
-      );
+      const result = await bulkDeleteInvoices(workspace.id, toDelete.map((i) => i.id));
+      if (result.error !== null) {
+        toast(result.error, "error");
+      } else {
+        const succeeded = result.data.deleted_count;
+        const failed = toDelete.length - succeeded;
+        toast(
+          failed > 0
+            ? `Deleted ${succeeded}, ${failed} failed`
+            : `Deleted ${succeeded} invoice${succeeded === 1 ? "" : "s"}`,
+          failed > 0 ? "error" : "success"
+        );
+      }
       router.refresh();
     });
   }

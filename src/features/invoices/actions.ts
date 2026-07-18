@@ -185,6 +185,22 @@ export async function deleteInvoice(workspaceId: string, invoiceId: string) {
   });
 }
 
+export async function bulkDeleteInvoices(workspaceId: string, invoiceIds: string[]) {
+  return withWorkspace(workspaceId, "staff", async (ctx) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("bulk_delete_invoices", {
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+      p_invoice_ids: invoiceIds,
+    });
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath(`/${ctx.workspaceSlug}`);
+    return data as { deleted_count: number; deleted_ids: string[] };
+  });
+}
+
 export async function recordPayment(
   workspaceId: string,
   invoiceId: string,

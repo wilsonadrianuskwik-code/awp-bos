@@ -277,3 +277,19 @@ export async function deleteCatalogItem(workspaceId: string, itemId: string) {
     return { success: true };
   });
 }
+
+export async function bulkDeleteCatalogItems(workspaceId: string, itemIds: string[]) {
+  return withWorkspace(workspaceId, "staff", async (ctx) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("bulk_delete_catalog_items", {
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+      p_catalog_item_ids: itemIds,
+    });
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath(`/${ctx.workspaceSlug}`);
+    return data as { deleted_count: number; deleted_ids: string[] };
+  });
+}

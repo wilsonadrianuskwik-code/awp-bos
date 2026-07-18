@@ -194,6 +194,22 @@ export async function deleteQuotation(
   });
 }
 
+export async function bulkDeleteQuotations(workspaceId: string, quotationIds: string[]) {
+  return withWorkspace(workspaceId, "staff", async (ctx) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("bulk_delete_quotations", {
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+      p_quotation_ids: quotationIds,
+    });
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath(`/${ctx.workspaceSlug}`);
+    return data as { deleted_count: number; deleted_ids: string[] };
+  });
+}
+
 export async function generateInvoiceFromQuotation(
   workspaceId: string,
   quotationId: string,
