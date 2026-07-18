@@ -3,7 +3,8 @@
 import {
   DndContext,
   DragOverlay,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   useDraggable,
@@ -73,7 +74,7 @@ function DraggableCard({ id, children }: { id: string; children: ReactNode }) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className={cn("touch-none", isDragging && "opacity-0")}
+      className={cn(isDragging && "touch-none opacity-0")}
     >
       {children}
     </div>
@@ -85,6 +86,17 @@ function DraggableCard({ id, children }: { id: string; children: ReactNode }) {
 // opens the record (via the card's own onClick) instead of always starting
 // a drag. The dragged card is hidden in place and rendered via DragOverlay
 // so it floats above column scroll containers instead of being clipped.
+//
+// Mouse and touch use separate sensors (not one PointerSensor, which
+// would otherwise double-handle touch input) so each can have the
+// activation behavior that actually fits the input: mouse just needs a
+// small drag distance before a click becomes a drag, while touch needs a
+// delay-based TouchSensor instead of touch-action: none on every card —
+// that CSS property would otherwise block the lane's native vertical
+// scroll on any touch that starts on a card (most of a lane's surface),
+// turning "flick to scroll" into "card doesn't move". TouchSensor's
+// delay+tolerance instead lets a quick touch-and-move register as a
+// normal scroll; only a touch held still past the delay activates a drag.
 export function KanbanBoard<TItem>({
   columns,
   getItemId,
@@ -92,7 +104,8 @@ export function KanbanBoard<TItem>({
   onDrop,
 }: KanbanBoardProps<TItem>) {
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
   );
   const [activeId, setActiveId] = useState<string | null>(null);
 
