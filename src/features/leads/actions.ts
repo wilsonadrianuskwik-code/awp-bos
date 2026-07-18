@@ -16,43 +16,24 @@ export async function createLead(workspaceId: string, formData: FormData) {
     }
 
     const supabase = await createClient();
-    const { data: lead, error } = await supabase
-      .from("leads")
-      .insert({
-        workspace_id: ctx.workspaceId,
-        ...parsed.data,
-        email: parsed.data.email || null,
-        phone: parsed.data.phone || null,
-        company: parsed.data.company || null,
-        source: parsed.data.source || null,
-        notes_text: parsed.data.notes_text || null,
-        created_by: ctx.userId,
-      })
-      .select("id")
-      .single();
+    const { data, error } = await supabase.rpc("create_lead", {
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+      p_name: parsed.data.name,
+      p_email: parsed.data.email ?? null,
+      p_phone: parsed.data.phone ?? null,
+      p_company: parsed.data.company ?? null,
+      p_source: parsed.data.source ?? null,
+      p_status: parsed.data.status ?? "new",
+      p_conversion_probability: parsed.data.conversion_probability ?? null,
+      p_expected_value: parsed.data.expected_value ?? null,
+      p_notes_text: parsed.data.notes_text ?? null,
+    });
 
     if (error) throw new Error(error.message);
 
-    await Promise.all([
-      createActivity(supabase, {
-        workspaceId: ctx.workspaceId,
-        actorId: ctx.userId,
-        action: "created",
-        description: `created lead "${parsed.data.name}"`,
-        entityType: "lead",
-        entityId: lead.id,
-      }),
-      createAuditLog({
-        workspaceId: ctx.workspaceId,
-        actorId: ctx.userId,
-        action: "create",
-        entityType: "lead",
-        entityId: lead.id,
-      }),
-    ]);
-
     revalidatePath(`/${ctx.workspaceSlug}`);
-    return lead;
+    return data;
   });
 }
 
@@ -69,83 +50,38 @@ export async function updateLead(
     }
 
     const supabase = await createClient();
-
-    const { data: existing } = await supabase
-      .from("leads")
-      .select("*")
-      .eq("id", leadId)
-      .eq("workspace_id", ctx.workspaceId)
-      .single();
-
-    if (!existing) throw new Error("Lead not found");
-
-    const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
-    const changes: Record<string, { old: unknown; new: unknown }> = {};
-
-    for (const [key, value] of Object.entries(parsed.data)) {
-      const newVal = value === "" ? null : value;
-      if (existing[key as keyof typeof existing] !== newVal) {
-        updates[key] = newVal;
-        changes[key] = {
-          old: existing[key as keyof typeof existing],
-          new: newVal,
-        };
-      }
-    }
-
-    if (Object.keys(changes).length === 0) return existing;
-
-    const { error } = await supabase
-      .from("leads")
-      .update(updates)
-      .eq("id", leadId)
-      .eq("workspace_id", ctx.workspaceId);
+    const { data, error } = await supabase.rpc("update_lead", {
+      p_lead_id: leadId,
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+      p_name: parsed.data.name,
+      p_email: parsed.data.email ?? null,
+      p_phone: parsed.data.phone ?? null,
+      p_company: parsed.data.company ?? null,
+      p_source: parsed.data.source ?? null,
+      p_status: parsed.data.status ?? null,
+      p_conversion_probability: parsed.data.conversion_probability ?? null,
+      p_expected_value: parsed.data.expected_value ?? null,
+      p_notes_text: parsed.data.notes_text ?? null,
+    });
 
     if (error) throw new Error(error.message);
 
-    await Promise.all([
-      createActivity(supabase, {
-        workspaceId: ctx.workspaceId,
-        actorId: ctx.userId,
-        action: "updated",
-        description: `updated lead "${existing.name}"`,
-        entityType: "lead",
-        entityId: leadId,
-      }),
-      createAuditLog({
-        workspaceId: ctx.workspaceId,
-        actorId: ctx.userId,
-        action: "update",
-        entityType: "lead",
-        entityId: leadId,
-        changes,
-      }),
-    ]);
-
     revalidatePath(`/${ctx.workspaceSlug}`);
-    return { ...existing, ...updates };
+    return data;
   });
 }
 
 export async function deleteLead(workspaceId: string, leadId: string) {
   return withWorkspace(workspaceId, "staff", async (ctx) => {
     const supabase = await createClient();
-
-    const { error } = await supabase
-      .from("leads")
-      .update({ deleted_at: new Date().toISOString() })
-      .eq("id", leadId)
-      .eq("workspace_id", ctx.workspaceId);
+    const { error } = await supabase.rpc("delete_lead", {
+      p_lead_id: leadId,
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+    });
 
     if (error) throw new Error(error.message);
-
-    await createAuditLog({
-      workspaceId: ctx.workspaceId,
-      actorId: ctx.userId,
-      action: "delete",
-      entityType: "lead",
-      entityId: leadId,
-    });
 
     revalidatePath(`/${ctx.workspaceSlug}`);
     return { success: true };

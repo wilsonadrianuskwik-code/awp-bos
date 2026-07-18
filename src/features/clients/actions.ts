@@ -2,8 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { withWorkspace, createAuditLog } from "@/lib/with-workspace";
-import { createActivity } from "@/features/activities/helpers";
+import { withWorkspace } from "@/lib/with-workspace";
 import {
   createClientSchema,
   updateClientSchema,
@@ -24,49 +23,27 @@ export async function createClientAction(
       throw new Error("Select a preferred currency");
     }
     const preferredCurrency =
-      parsed.data.currency_mode === "custom" ? parsed.data.preferred_currency : null;
+      parsed.data.currency_mode === "custom" ? parsed.data.preferred_currency ?? null : null;
 
     const supabase = await createClient();
-    const { data: client, error } = await supabase
-      .from("clients")
-      .insert({
-        workspace_id: ctx.workspaceId,
-        name: parsed.data.name,
-        email: parsed.data.email || null,
-        phone: parsed.data.phone || null,
-        company: parsed.data.company || null,
-        website: parsed.data.website || null,
-        billing_email: parsed.data.billing_email || null,
-        tax_id: parsed.data.tax_id || null,
-        payment_terms: parsed.data.payment_terms ?? 30,
-        preferred_currency: preferredCurrency,
-        created_by: ctx.userId,
-      })
-      .select("id")
-      .single();
+    const { data, error } = await supabase.rpc("create_client", {
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+      p_name: parsed.data.name,
+      p_email: parsed.data.email ?? null,
+      p_phone: parsed.data.phone ?? null,
+      p_company: parsed.data.company ?? null,
+      p_website: parsed.data.website ?? null,
+      p_billing_email: parsed.data.billing_email ?? null,
+      p_tax_id: parsed.data.tax_id ?? null,
+      p_payment_terms: parsed.data.payment_terms ?? null,
+      p_preferred_currency: preferredCurrency,
+    });
 
     if (error) throw new Error(error.message);
 
-    await Promise.all([
-      createActivity(supabase, {
-        workspaceId: ctx.workspaceId,
-        actorId: ctx.userId,
-        action: "created",
-        description: `created client "${parsed.data.name}"`,
-        entityType: "client",
-        entityId: client.id,
-      }),
-      createAuditLog({
-        workspaceId: ctx.workspaceId,
-        actorId: ctx.userId,
-        action: "create",
-        entityType: "client",
-        entityId: client.id,
-      }),
-    ]);
-
     revalidatePath(`/${ctx.workspaceSlug}`);
-    return client;
+    return data;
   });
 }
 
@@ -82,100 +59,45 @@ export async function updateClient(
       throw new Error(parsed.error.issues[0].message);
     }
 
-    const supabase = await createClient();
-
-    const { data: existing } = await supabase
-      .from("clients")
-      .select("*")
-      .eq("id", clientId)
-      .eq("workspace_id", ctx.workspaceId)
-      .single();
-
-    if (!existing) throw new Error("Client not found");
-
     if (parsed.data.currency_mode === "custom" && !parsed.data.preferred_currency) {
       throw new Error("Select a preferred currency");
     }
+    const preferredCurrency =
+      parsed.data.currency_mode === "custom" ? parsed.data.preferred_currency ?? null : null;
 
-    // currency_mode is a form-only concept (not a clients column) — resolve
-    // it together with preferred_currency into that one column's final
-    // value before the generic diff loop below.
-    const { currency_mode, ...rest } = parsed.data;
-    const formValues: Record<string, unknown> = { ...rest };
-    if (currency_mode !== undefined) {
-      formValues.preferred_currency =
-        currency_mode === "custom" ? parsed.data.preferred_currency : null;
-    }
-
-    const updates: Record<string, unknown> = {
-      updated_at: new Date().toISOString(),
-    };
-    const changes: Record<string, { old: unknown; new: unknown }> = {};
-
-    for (const [key, value] of Object.entries(formValues)) {
-      const newVal = value === "" ? null : value;
-      if (existing[key as keyof typeof existing] !== newVal) {
-        updates[key] = newVal;
-        changes[key] = {
-          old: existing[key as keyof typeof existing],
-          new: newVal,
-        };
-      }
-    }
-
-    if (Object.keys(changes).length === 0) return existing;
-
-    const { error } = await supabase
-      .from("clients")
-      .update(updates)
-      .eq("id", clientId)
-      .eq("workspace_id", ctx.workspaceId);
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("update_client", {
+      p_client_id: clientId,
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+      p_name: parsed.data.name,
+      p_email: parsed.data.email ?? null,
+      p_phone: parsed.data.phone ?? null,
+      p_company: parsed.data.company ?? null,
+      p_website: parsed.data.website ?? null,
+      p_billing_email: parsed.data.billing_email ?? null,
+      p_tax_id: parsed.data.tax_id ?? null,
+      p_payment_terms: parsed.data.payment_terms ?? null,
+      p_preferred_currency: preferredCurrency,
+    });
 
     if (error) throw new Error(error.message);
 
-    await Promise.all([
-      createActivity(supabase, {
-        workspaceId: ctx.workspaceId,
-        actorId: ctx.userId,
-        action: "updated",
-        description: `updated client "${existing.name}"`,
-        entityType: "client",
-        entityId: clientId,
-      }),
-      createAuditLog({
-        workspaceId: ctx.workspaceId,
-        actorId: ctx.userId,
-        action: "update",
-        entityType: "client",
-        entityId: clientId,
-        changes,
-      }),
-    ]);
-
     revalidatePath(`/${ctx.workspaceSlug}`);
-    return { ...existing, ...updates };
+    return data;
   });
 }
 
 export async function deleteClient(workspaceId: string, clientId: string) {
   return withWorkspace(workspaceId, "staff", async (ctx) => {
     const supabase = await createClient();
-
-    const { error } = await supabase
-      .from("clients")
-      .update({ deleted_at: new Date().toISOString() })
-      .eq("id", clientId)
-      .eq("workspace_id", ctx.workspaceId);
+    const { error } = await supabase.rpc("delete_client", {
+      p_client_id: clientId,
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+    });
 
     if (error) throw new Error(error.message);
-
-    await createAuditLog({
-      workspaceId: ctx.workspaceId,
-      actorId: ctx.userId,
-      action: "delete",
-      entityType: "client",
-      entityId: clientId,
-    });
 
     revalidatePath(`/${ctx.workspaceSlug}`);
     return { success: true };
