@@ -46,15 +46,23 @@ export function CatalogPickerDialog({
           ) : (
             catalogItems.map((item) => {
               const mismatched = item.currency !== documentCurrency;
+              const price = item.is_package ? (item.package_price ?? 0) : item.default_unit_price;
               return (
                 <div
                   key={item.id}
                   className="flex items-center justify-between rounded-lg border p-3"
                 >
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium">{item.name}</p>
+                    <p className="flex items-center gap-1.5 truncate text-sm font-medium">
+                      {item.name}
+                      {item.is_package && (
+                        <Badge variant="secondary" className="shrink-0">
+                          Paket
+                        </Badge>
+                      )}
+                    </p>
                     <p className="truncate text-xs text-muted-foreground">
-                      {formatCurrency(item.default_unit_price, item.currency)}
+                      {formatCurrency(price, item.currency)}
                       {item.default_unit ? ` / ${item.default_unit}` : ""}
                     </p>
                     {mismatched && (
@@ -70,12 +78,12 @@ export function CatalogPickerDialog({
                     disabled={mismatched}
                     onClick={() =>
                       onInsert({
-                        category: item.default_category,
+                        category: item.is_package ? "package" : item.default_category,
                         description: item.description
                           ? `${item.name} — ${item.description}`
                           : item.name,
                         quantity: 1,
-                        unit_price: item.default_unit_price,
+                        unit_price: price,
                         unit: item.default_unit ?? "",
                         discount_percent: 0,
                         tax_percent: 0,

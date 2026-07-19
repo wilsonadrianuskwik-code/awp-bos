@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Copy, Pencil, Trash2 } from "lucide-react";
+import { Copy, Package, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +15,7 @@ import { deleteCatalogItem, duplicateCatalogItem } from "@/features/catalog/acti
 import { DetailHeader } from "@/components/shared/detail-header";
 import { FieldList, DetailItem } from "@/components/shared/detail-item";
 import { SummaryHero } from "@/components/shared/summary-hero";
+import { PackageBreakdown } from "@/features/catalog/components/package-breakdown";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { CatalogItem, CatalogItemUsage, ItemType } from "@/features/catalog/types";
 import type { LineItemCategory } from "@/features/line-items/types";
@@ -84,6 +85,12 @@ export function CatalogDetail({ item, activities, usage }: CatalogDetailProps) {
         title={item.name}
         badges={
           <>
+            {item.is_package && (
+              <Badge variant="secondary">
+                <Package className="mr-1 h-3 w-3" />
+                Paket
+              </Badge>
+            )}
             <Badge variant="secondary">{ITEM_TYPE_LABEL[item.item_type]}</Badge>
             {item.is_active ? (
               <Badge>Active</Badge>
@@ -116,11 +123,16 @@ export function CatalogDetail({ item, activities, usage }: CatalogDetailProps) {
       />
 
       <SummaryHero
-        primaryLabel="Default Price"
-        primaryValue={formatCurrency(item.default_unit_price, item.currency)}
+        primaryLabel={item.is_package ? "Package Price" : "Default Price"}
+        primaryValue={formatCurrency(
+          item.is_package ? (item.package_price ?? 0) : item.default_unit_price,
+          item.currency
+        )}
         secondaryMetrics={[
           { label: "Type", value: ITEM_TYPE_LABEL[item.item_type] },
-          { label: "Category", value: CATEGORY_LABEL[item.default_category] },
+          ...(item.is_package
+            ? [{ label: "Items", value: String(item.package_items.length) }]
+            : [{ label: "Category", value: CATEGORY_LABEL[item.default_category] }]),
           ...(item.default_unit ? [{ label: "Unit", value: item.default_unit }] : []),
           { label: "Used In", value: `${usage.documentCount} document${usage.documentCount === 1 ? "" : "s"}` },
           { label: "Total Quantity Sold", value: String(usage.totalQuantity) },
@@ -136,14 +148,19 @@ export function CatalogDetail({ item, activities, usage }: CatalogDetailProps) {
             <CardContent>
               <FieldList>
                 <DetailItem
-                  label="Default Price"
-                  value={formatCurrency(item.default_unit_price, item.currency)}
+                  label={item.is_package ? "Package Price" : "Default Price"}
+                  value={formatCurrency(
+                    item.is_package ? (item.package_price ?? 0) : item.default_unit_price,
+                    item.currency
+                  )}
                 />
                 <DetailItem label="Currency" value={item.currency} />
-                <DetailItem
-                  label="Billing Category"
-                  value={CATEGORY_LABEL[item.default_category]}
-                />
+                {!item.is_package && (
+                  <DetailItem
+                    label="Billing Category"
+                    value={CATEGORY_LABEL[item.default_category]}
+                  />
+                )}
                 <DetailItem label="Unit" value={item.default_unit} />
               </FieldList>
               {item.description && (
@@ -158,6 +175,17 @@ export function CatalogDetail({ item, activities, usage }: CatalogDetailProps) {
               )}
             </CardContent>
           </Card>
+
+          {item.is_package && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Package Items</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <PackageBreakdown items={item.package_items} />
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         <div>

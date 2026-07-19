@@ -1,4 +1,7 @@
+import { Fragment } from "react";
 import type { LineItem, LineItemCategory } from "@/features/line-items/types";
+import type { PackageItem } from "@/features/catalog/types";
+import { PackageBreakdown } from "@/features/catalog/components/package-breakdown";
 import { formatCurrency } from "@/lib/utils/format-currency";
 
 const CATEGORY_LABEL: Record<LineItemCategory, string> = {
@@ -12,9 +15,14 @@ const CATEGORIES: LineItemCategory[] = ["package", "add_on", "per_unit"];
 type LineItemsTableProps = {
   lineItems: LineItem[];
   currency: string;
+  /** Live package contents by catalog_item_id — see getPackageBreakdowns.
+      A line item whose catalog_item_id has an entry here renders its
+      breakdown beneath the row, for internal staff visibility (the same
+      breakdown the client sees on the printed document). */
+  packageBreakdowns?: Record<string, PackageItem[]>;
 };
 
-export function LineItemsTable({ lineItems, currency }: LineItemsTableProps) {
+export function LineItemsTable({ lineItems, currency, packageBreakdowns = {} }: LineItemsTableProps) {
   const fmt = (value: number) => formatCurrency(value, currency);
 
   return (
@@ -41,31 +49,45 @@ export function LineItemsTable({ lineItems, currency }: LineItemsTableProps) {
                 </tr>
               </thead>
               <tbody>
-                {items.map((item) => (
-                  <tr key={item.id} className="border-b last:border-0">
-                    <td className="py-2 pr-2">
-                      {item.description}
-                      {item.unit && (
-                        <span className="text-muted-foreground"> / {item.unit}</span>
+                {items.map((item) => {
+                  const breakdown = item.catalog_item_id
+                    ? packageBreakdowns[item.catalog_item_id]
+                    : undefined;
+                  return (
+                    <Fragment key={item.id}>
+                      <tr className={breakdown ? "border-0" : "border-b last:border-0"}>
+                        <td className="py-2 pr-2">
+                          {item.description}
+                          {item.unit && (
+                            <span className="text-muted-foreground"> / {item.unit}</span>
+                          )}
+                        </td>
+                        <td className="py-2 text-right tabular-nums">
+                          {item.quantity}
+                        </td>
+                        <td className="py-2 text-right tabular-nums">
+                          {fmt(item.unit_price)}
+                        </td>
+                        <td className="py-2 text-right tabular-nums">
+                          {item.discount_percent ? `${item.discount_percent}%` : "-"}
+                        </td>
+                        <td className="py-2 text-right tabular-nums">
+                          {item.tax_percent ? `${item.tax_percent}%` : "-"}
+                        </td>
+                        <td className="py-2 text-right font-medium tabular-nums">
+                          {fmt(item.line_total)}
+                        </td>
+                      </tr>
+                      {breakdown && breakdown.length > 0 && (
+                        <tr key={`${item.id}-breakdown`} className="border-b last:border-0">
+                          <td colSpan={6} className="pb-2.5 pl-4 pt-0">
+                            <PackageBreakdown items={breakdown} dense />
+                          </td>
+                        </tr>
                       )}
-                    </td>
-                    <td className="py-2 text-right tabular-nums">
-                      {item.quantity}
-                    </td>
-                    <td className="py-2 text-right tabular-nums">
-                      {fmt(item.unit_price)}
-                    </td>
-                    <td className="py-2 text-right tabular-nums">
-                      {item.discount_percent ? `${item.discount_percent}%` : "-"}
-                    </td>
-                    <td className="py-2 text-right tabular-nums">
-                      {item.tax_percent ? `${item.tax_percent}%` : "-"}
-                    </td>
-                    <td className="py-2 text-right font-medium tabular-nums">
-                      {fmt(item.line_total)}
-                    </td>
-                  </tr>
-                ))}
+                    </Fragment>
+                  );
+                })}
               </tbody>
             </table>
             <p className="mt-1 text-right text-xs text-muted-foreground">

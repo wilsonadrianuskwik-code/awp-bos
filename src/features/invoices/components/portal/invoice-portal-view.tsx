@@ -9,6 +9,7 @@ import { recordInvoiceFirstView } from "@/features/invoices/actions";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { LineItem } from "@/features/line-items/types";
 import type { InvoiceStatus, PaymentMethod } from "@/features/invoices/types";
+import type { PackageItem } from "@/features/catalog/types";
 
 // A deliberately narrow, customer-safe projection of InvoiceDetail/Payment —
 // built by the portal page (a server component) before this client
@@ -44,6 +45,9 @@ export type PortalInvoice = {
   payments: PortalInvoicePayment[];
   notes: string | null;
   payment_terms: string | null;
+  // Live package contents by catalog_item_id, for any package line items —
+  // see getPackageBreakdownsForPortal.
+  packageBreakdowns: Record<string, PackageItem[]>;
 };
 
 const PAYMENT_METHOD_LABEL: Record<string, string> = {
@@ -148,6 +152,7 @@ export function InvoicePortalView({
           <LineItemsTable
             lineItems={invoice.line_items}
             currency={invoice.currency}
+            packageBreakdowns={invoice.packageBreakdowns}
           />
         </CardContent>
       </Card>

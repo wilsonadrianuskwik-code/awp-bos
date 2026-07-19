@@ -50,7 +50,14 @@ export function CatalogTable({
       header: "Name",
       cell: ({ row }) => (
         <div className="min-w-0">
-          <p className="truncate text-[13px] font-medium">{row.original.name}</p>
+          <p className="flex items-center gap-1.5 truncate text-[13px] font-medium">
+            {row.original.name}
+            {row.original.is_package && (
+              <Badge variant="secondary" className="shrink-0">
+                Paket
+              </Badge>
+            )}
+          </p>
           {row.original.description && (
             <p className="truncate text-xs text-muted-foreground">
               {row.original.description}
@@ -87,11 +94,16 @@ export function CatalogTable({
     {
       id: "default_unit_price",
       header: "Price",
-      accessorFn: (row) => row.default_unit_price,
+      accessorFn: (row) => (row.is_package ? (row.package_price ?? 0) : row.default_unit_price),
       enableSorting: true,
       cell: ({ row }) => (
         <span className="text-[13px] font-medium tabular-nums">
-          {formatCurrency(row.original.default_unit_price, row.original.currency)}
+          {formatCurrency(
+            row.original.is_package
+              ? (row.original.package_price ?? 0)
+              : row.original.default_unit_price,
+            row.original.currency
+          )}
           {row.original.default_unit && (
             <span className="ml-1 font-normal text-muted-foreground">
               / {row.original.default_unit}

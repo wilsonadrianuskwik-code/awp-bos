@@ -6,6 +6,12 @@ import type { QuotationDetail } from "@/features/quotations/types";
 import type { InvoiceDetail } from "@/features/invoices/types";
 import type { CompanyProfile, PaymentDetails, BrandingSettings } from "@/features/templates/types";
 import type { DocumentRenderData, RenderAddress } from "@/features/templates/renderer/types";
+import type { PackageItem } from "@/features/catalog/types";
+
+// Live package breakdowns keyed by catalog_item_id (see
+// getPackageBreakdowns/getPackageBreakdownsForPortal) — a line item whose
+// catalog_item_id has an entry here is a package line; entries carry that
+// package's *current* contents, not what existed when the line was added.
 
 type WorkspaceForRender = {
   name: string;
@@ -56,7 +62,8 @@ function meta(): DocumentRenderData["meta"] {
 
 export function quotationToRenderData(
   quotation: QuotationDetail,
-  workspace: WorkspaceForRender
+  workspace: WorkspaceForRender,
+  packageBreakdowns: Record<string, PackageItem[]> = {}
 ): DocumentRenderData {
   return {
     document_type: "quotation",
@@ -87,6 +94,9 @@ export function quotationToRenderData(
       discount_percent: item.discount_percent,
       tax_percent: item.tax_percent,
       line_total: item.line_total,
+      package_breakdown: item.catalog_item_id
+        ? (packageBreakdowns[item.catalog_item_id] ?? null)
+        : null,
     })),
     workspace_payment_details: workspace.settings?.payment_details ?? undefined,
     workspace_branding: workspace.settings?.branding ?? undefined,
@@ -96,7 +106,8 @@ export function quotationToRenderData(
 
 export function invoiceToRenderData(
   invoice: InvoiceDetail,
-  workspace: WorkspaceForRender
+  workspace: WorkspaceForRender,
+  packageBreakdowns: Record<string, PackageItem[]> = {}
 ): DocumentRenderData {
   return {
     document_type: "invoice",
@@ -128,6 +139,9 @@ export function invoiceToRenderData(
       discount_percent: item.discount_percent,
       tax_percent: item.tax_percent,
       line_total: item.line_total,
+      package_breakdown: item.catalog_item_id
+        ? (packageBreakdowns[item.catalog_item_id] ?? null)
+        : null,
     })),
     payments: invoice.payments.map((p) => ({
       date: p.payment_date,

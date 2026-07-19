@@ -33,15 +33,18 @@ function pushRecent(id: string) {
   }
 }
 
-// Same field mapping the catalog picker dialog has always used.
+// Same field mapping the catalog picker dialog has always used. A package
+// inserts at its package_price (not the sum of its items) with quantity 1 —
+// the breakdown itself is resolved live from catalog_item_id at render
+// time (DisclosureRow), not stored here.
 function catalogToLineItem(item: CatalogItem): LineItemInput {
   return {
-    category: item.default_category,
+    category: item.is_package ? "package" : item.default_category,
     description: item.description
       ? `${item.name} — ${item.description}`
       : item.name,
     quantity: 1,
-    unit_price: item.default_unit_price,
+    unit_price: item.is_package ? (item.package_price ?? 0) : item.default_unit_price,
     unit: item.default_unit ?? "",
     discount_percent: 0,
     tax_percent: 0,
@@ -274,6 +277,11 @@ export function InsertPalette({
                     )}
                     <span className="min-w-0 flex-1 truncate">
                       {row.kind === "catalog" ? row.item.name : row.template.name}
+                      {row.kind === "catalog" && row.item.is_package && (
+                        <span className="ml-1.5 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                          Paket
+                        </span>
+                      )}
                       {row.kind === "template" && (
                         <span className="ml-1.5 text-muted-foreground">
                           · {row.template.items.length} item
@@ -286,7 +294,9 @@ export function InsertPalette({
                         {disabled
                           ? `${row.item.currency} — this document is ${documentCurrency}`
                           : formatCurrency(
-                              row.item.default_unit_price,
+                              row.item.is_package
+                                ? (row.item.package_price ?? 0)
+                                : row.item.default_unit_price,
                               row.item.currency
                             )}
                       </span>

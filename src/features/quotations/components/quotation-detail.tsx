@@ -30,6 +30,7 @@ import type {
 } from "@/features/quotations/types";
 import type { Activity } from "@/features/activities/types";
 import type { DocumentTemplateWithTheme, CompanyProfile } from "@/features/templates/types";
+import type { PackageItem } from "@/features/catalog/types";
 
 type QuotationDetailProps = {
   quotation: QuotationDetailType;
@@ -38,6 +39,9 @@ type QuotationDetailProps = {
   previousVersion: QuotationDetailType | null;
   workspace: { name: string; logo_url: string | null; settings?: { company_profile?: CompanyProfile } | null };
   template: DocumentTemplateWithTheme | null;
+  /** Live package contents by catalog_item_id, for any package line items
+      on this quotation — see getPackageBreakdowns. */
+  packageBreakdowns?: Record<string, PackageItem[]>;
 };
 
 export function QuotationDetail({
@@ -47,6 +51,7 @@ export function QuotationDetail({
   previousVersion,
   workspace: workspaceInfo,
   template,
+  packageBreakdowns = {},
 }: QuotationDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
@@ -166,6 +171,7 @@ export function QuotationDetail({
                 <LineItemsTable
                   lineItems={quotation.line_items}
                   currency={quotation.currency}
+                  packageBreakdowns={packageBreakdowns}
                 />
               </CardContent>
             </Card>
@@ -285,7 +291,7 @@ export function QuotationDetail({
 
       <DocumentRenderView
         template={template}
-        data={quotationToRenderData(quotation, workspaceInfo)}
+        data={quotationToRenderData(quotation, workspaceInfo, packageBreakdowns)}
         fallback={<QuotationPrintView quotation={quotation} workspaceName={workspaceInfo.name} />}
       />
 

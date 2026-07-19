@@ -5,6 +5,7 @@ import { getFulfillmentItems } from "@/features/fulfillment/queries";
 import { syncFulfillmentItemsAction } from "@/features/fulfillment/actions";
 import { InvoiceDetail } from "@/features/invoices/components/invoice-detail";
 import { getDefaultTemplate } from "@/features/templates/queries";
+import { getPackageBreakdowns } from "@/features/catalog/queries";
 
 export default async function InvoiceDetailRoute({
   params,
@@ -28,6 +29,11 @@ export default async function InvoiceDetailRoute({
 
   if (!invoice) notFound();
 
+  const catalogItemIds = invoice.line_items
+    .map((li) => li.catalog_item_id)
+    .filter((id): id is string => !!id);
+  const packageBreakdowns = await getPackageBreakdowns(workspace.id, catalogItemIds);
+
   return (
     <InvoiceDetail
       invoice={invoice}
@@ -35,6 +41,7 @@ export default async function InvoiceDetailRoute({
       workspace={workspace}
       fulfillmentItems={fulfillmentItems}
       template={template}
+      packageBreakdowns={packageBreakdowns}
     />
   );
 }

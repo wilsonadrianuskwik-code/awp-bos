@@ -1,10 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   CatalogFilters,
   CatalogItem,
   CatalogItemUsage,
   CatalogListResult,
   CatalogStats,
+  PackageItem,
 } from "@/features/catalog/types";
 
 export async function getCatalogItems(
@@ -125,6 +127,71 @@ export async function getCatalogItem(
 
   if (error) return null;
   return data;
+}
+
+// Active standalone (non-package) items, for the package builder's "add
+// item" product picker. Excludes packages so a package can't nest another
+// package, and returns the full list (no pagination) since it feeds a
+// searchable in-form picker. Optionally excludes one item id (the package
+// being edited, though a package is already filtered out by is_package).
+export async function getStandaloneCatalogItems(
+  workspaceId: string
+): Promise<CatalogItem[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("catalog_items")
+    .select("*")
+    .eq("workspace_id", workspaceId)
+    .eq("is_package", false)
+    .is("deleted_at", null)
+    .order("name", { ascending: true });
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+// Live package breakdowns for a set of catalog_item_ids referenced by a
+// document's line items (their catalog_item_id) — keyed by catalog item id,
+// values are that package's *current* package_items. Per the product
+// decision the breakdown is resolved live (not snapshotted onto the line
+// item), so editing a package's contents later restyles how it renders on
+// every document that referenced it, past or present; only the price
+// captured on each line item at insert time stays fixed. A deleted or
+// non-package id is simply absent from the result — the caller falls back
+// to showing just the line item with no breakdown.
+export async function getPackageBreakdowns(
+  workspaceId: string,
+  catalogItemIds: string[]
+): Promise<Record<string, PackageItem[]>> {
+  if (catalogItemIds.length === 0) return {};
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("catalog_items")
+    .select("id, package_items")
+    .eq("workspace_id", workspaceId)
+    .eq("is_package", true)
+    .in("id", catalogItemIds);
+
+  return Object.fromEntries((data ?? []).map((row) => [row.id, row.package_items]));
+}
+
+// Admin-client counterpart for the unauthenticated customer portal (share
+// -token access, no workspace membership/session) — same query, mirrors
+// the getInvoiceByShareToken/getQuotationByShareToken split elsewhere.
+export async function getPackageBreakdownsForPortal(
+  workspaceId: string,
+  catalogItemIds: string[]
+): Promise<Record<string, PackageItem[]>> {
+  if (catalogItemIds.length === 0) return {};
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("catalog_items")
+    .select("id, package_items")
+    .eq("workspace_id", workspaceId)
+    .eq("is_package", true)
+    .in("id", catalogItemIds);
+
+  return Object.fromEntries((data ?? []).map((row) => [row.id, row.package_items]));
 }
 
 export async function getCatalogItemActivities(itemId: string) {

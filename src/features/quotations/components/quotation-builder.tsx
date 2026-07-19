@@ -487,6 +487,14 @@ export function QuotationBuilder({
     itemsByCategory[item.category].push({ item, originalIndex });
   });
 
+  // Looked up by DisclosureRow to detect a package line (via its
+  // catalog_item_id) and render the live breakdown underneath — same
+  // live-breakdown/frozen-price posture as the invoice builder.
+  const catalogItemsById: Record<string, CatalogItem> = {};
+  catalogItems.forEach((item) => {
+    catalogItemsById[item.id] = item;
+  });
+
   return (
     <div className="mx-auto w-full max-w-[880px] space-y-4">
       <BackButton onClick={handleCancel} label={quotation ? "Back to Quotation" : "Back to Quotations"} />
@@ -639,6 +647,7 @@ export function QuotationBuilder({
           <LineItemsEditor
             itemsByCategory={itemsByCategory}
             currency={currency}
+            catalogItemsById={catalogItemsById}
             onAdd={addLineItem}
             onUpdate={updateLineItem}
             onRemove={removeLineItem}

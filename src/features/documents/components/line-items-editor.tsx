@@ -18,6 +18,7 @@ import { DisclosureRow } from "@/features/documents/components/disclosure-row";
 import { cn } from "@/lib/utils/cn";
 import type { LineItemInput } from "@/features/line-items/validators";
 import type { LineItemCategory } from "@/features/line-items/types";
+import type { CatalogItem } from "@/features/catalog/types";
 
 const GROUP_LABEL: Record<LineItemCategory, string> = {
   package: "Packages",
@@ -33,6 +34,9 @@ type LineItemsEditorProps = {
     { item: LineItemInput; originalIndex: number }[]
   >;
   currency: string;
+  /** Catalog items by id, so a package line (via item.catalog_item_id) can
+      show its live breakdown. Omit if the caller has no catalog context. */
+  catalogItemsById?: Record<string, CatalogItem>;
   onAdd: (category: LineItemCategory) => void;
   onUpdate: (index: number, patch: Partial<LineItemInput>) => void;
   onRemove: (index: number) => void;
@@ -174,6 +178,7 @@ function DocDefaultsControl({
 export function LineItemsEditor({
   itemsByCategory,
   currency,
+  catalogItemsById,
   onAdd,
   onUpdate,
   onRemove,
@@ -332,29 +337,35 @@ export function LineItemsEditor({
                 </h3>
               )}
               <div className="space-y-0.5">
-                {itemsByCategory[cat].map(({ item, originalIndex }) => (
-                  <DisclosureRow
-                    key={originalIndex}
-                    item={item}
-                    currency={currency}
-                    docTaxDefault={docTax ?? 0}
-                    onChange={(patch) => onUpdate(originalIndex, patch)}
-                    onRemove={() => onRemove(originalIndex)}
-                    onEnter={
-                      onComposeAfter
-                        ? () => onComposeAfter(originalIndex)
-                        : undefined
-                    }
-                    onBackspaceEmpty={
-                      onDeleteEmpty
-                        ? () => onDeleteEmpty(originalIndex)
-                        : undefined
-                    }
-                    requestFocus={focusIndex === originalIndex}
-                    onFocusHandled={onFocusHandled}
-                    onSlashInsert={onOpenInsertPalette}
-                  />
-                ))}
+                {itemsByCategory[cat].map(({ item, originalIndex }) => {
+                  const catalogItem = item.catalog_item_id
+                    ? catalogItemsById?.[item.catalog_item_id]
+                    : undefined;
+                  return (
+                    <DisclosureRow
+                      key={originalIndex}
+                      item={item}
+                      currency={currency}
+                      docTaxDefault={docTax ?? 0}
+                      packageInfo={catalogItem?.is_package ? catalogItem : null}
+                      onChange={(patch) => onUpdate(originalIndex, patch)}
+                      onRemove={() => onRemove(originalIndex)}
+                      onEnter={
+                        onComposeAfter
+                          ? () => onComposeAfter(originalIndex)
+                          : undefined
+                      }
+                      onBackspaceEmpty={
+                        onDeleteEmpty
+                          ? () => onDeleteEmpty(originalIndex)
+                          : undefined
+                      }
+                      requestFocus={focusIndex === originalIndex}
+                      onFocusHandled={onFocusHandled}
+                      onSlashInsert={onOpenInsertPalette}
+                    />
+                  );
+                })}
               </div>
             </div>
           ))}

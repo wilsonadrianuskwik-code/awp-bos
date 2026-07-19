@@ -27,6 +27,7 @@ import type { InvoiceDetail as InvoiceDetailType } from "@/features/invoices/typ
 import type { Activity } from "@/features/activities/types";
 import type { FulfillmentItemWithProgress } from "@/features/fulfillment/types";
 import type { DocumentTemplateWithTheme, CompanyProfile } from "@/features/templates/types";
+import type { PackageItem } from "@/features/catalog/types";
 
 type InvoiceDetailProps = {
   invoice: InvoiceDetailType;
@@ -34,6 +35,9 @@ type InvoiceDetailProps = {
   workspace: { name: string; logo_url: string | null; settings?: { company_profile?: CompanyProfile } | null };
   fulfillmentItems: FulfillmentItemWithProgress[];
   template: DocumentTemplateWithTheme | null;
+  /** Live package contents by catalog_item_id, for any package line items
+      on this invoice — see getPackageBreakdowns. */
+  packageBreakdowns?: Record<string, PackageItem[]>;
 };
 
 export function InvoiceDetail({
@@ -42,6 +46,7 @@ export function InvoiceDetail({
   workspace: workspaceInfo,
   fulfillmentItems,
   template,
+  packageBreakdowns = {},
 }: InvoiceDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
@@ -154,6 +159,7 @@ export function InvoiceDetail({
                 <LineItemsTable
                   lineItems={invoice.line_items}
                   currency={invoice.currency}
+                  packageBreakdowns={packageBreakdowns}
                 />
               </CardContent>
             </Card>
@@ -227,7 +233,7 @@ export function InvoiceDetail({
 
       <DocumentRenderView
         template={template}
-        data={invoiceToRenderData(invoice, workspaceInfo)}
+        data={invoiceToRenderData(invoice, workspaceInfo, packageBreakdowns)}
         fallback={<InvoicePrintView invoice={invoice} workspaceName={workspaceInfo.name} />}
       />
 

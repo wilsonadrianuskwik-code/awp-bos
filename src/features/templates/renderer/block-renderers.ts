@@ -363,6 +363,32 @@ function renderLineItemsTable(block: TemplateBlock, data: DocumentRenderData): s
     ),
   ].join("");
 
+  const colCount = (showRowNumbers ? 1 : 0) + columns.length;
+
+  // Package breakdown: indented sub-rows under a package's own line,
+  // read-only and priced entirely via the package line above — per the
+  // product decision only "Termasuk dalam paket" (included) shows, never a
+  // per-item price, so this never affects the total column above it.
+  const breakdownRow = (item: RenderLineItem): string => {
+    if (!item.package_breakdown || item.package_breakdown.length === 0) return "";
+    const rows = item.package_breakdown
+      .map((b) => {
+        const noteHtml = b.note ? ` <span style="color:var(--t-muted);">— ${escapeHtml(b.note)}</span>` : "";
+        return `
+          <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:3px 0;">
+            <span style="color:var(--t-text); opacity:.85;">↳ ${b.quantity}x ${escapeHtml(b.name)}${noteHtml}</span>
+            <span style="flex-shrink:0; font-style:italic; font-size:8pt; color:var(--t-muted);">Termasuk dalam paket</span>
+          </div>`;
+      })
+      .join("");
+    return `
+      <tr style="${rowBorderBottom}">
+        <td colspan="${colCount}" style="padding:2px ${cellPadding.split(" ")[1]} 8px calc(${cellPadding.split(" ")[1]} + 14px); ${cellBorder}">
+          <div style="font-size:8.5pt; line-height:1.5;">${rows}</div>
+        </td>
+      </tr>`;
+  };
+
   const bodyRows = data.line_items
     .map((item, index) => {
       const rowBg = alternateShading && index % 2 === 1 ? "background:var(--t-surface);" : "";
@@ -373,7 +399,7 @@ function renderLineItemsTable(block: TemplateBlock, data: DocumentRenderData): s
             `<td class="${isNumeric.has(c) ? "tpl-num" : ""}" style="padding:${cellPadding}; text-align:${alignRight.has(c) ? "right" : "left"}; vertical-align:top; ${cellBorder}">${cellValue(item, c)}</td>`
         ),
       ].join("");
-      return `<tr style="${rowBorderBottom} ${rowBg}">${cells}</tr>`;
+      return `<tr style="${rowBorderBottom} ${rowBg}">${cells}</tr>` + breakdownRow(item);
     })
     .join("");
 

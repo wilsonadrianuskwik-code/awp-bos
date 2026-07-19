@@ -28,11 +28,15 @@ import {
   requestQuotationRevision,
 } from "@/features/quotations/actions";
 import type { QuotationDetail, QuotationStatus } from "@/features/quotations/types";
+import type { PackageItem } from "@/features/catalog/types";
 
 type QuotationPortalViewProps = {
   shareToken: string;
   quotation: QuotationDetail;
   workspaceName: string;
+  /** Live package contents by catalog_item_id, for any package line items —
+      see getPackageBreakdownsForPortal. */
+  packageBreakdowns?: Record<string, PackageItem[]>;
 };
 
 const STATUS_MESSAGE: Partial<Record<QuotationStatus, { icon: typeof CheckCircle2; text: string; tone: string }>> = {
@@ -67,6 +71,7 @@ export function QuotationPortalView({
   shareToken,
   quotation: initialQuotation,
   workspaceName,
+  packageBreakdowns = {},
 }: QuotationPortalViewProps) {
   const { toast } = useToast();
   const [quotation, setQuotation] = useState(initialQuotation);
@@ -175,6 +180,7 @@ export function QuotationPortalView({
           <LineItemsTable
             lineItems={quotation.line_items}
             currency={quotation.currency}
+            packageBreakdowns={packageBreakdowns}
           />
         </CardContent>
       </Card>

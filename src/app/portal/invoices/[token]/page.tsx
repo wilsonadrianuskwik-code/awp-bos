@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getInvoiceByShareToken } from "@/features/invoices/queries";
+import { getPackageBreakdownsForPortal } from "@/features/catalog/queries";
 import {
   InvoicePortalView,
   type PortalInvoice,
@@ -15,6 +16,14 @@ export default async function InvoicePortalPage({
   if (!result) notFound();
 
   const { invoice } = result;
+
+  const catalogItemIds = invoice.line_items
+    .map((li) => li.catalog_item_id)
+    .filter((id): id is string => !!id);
+  const packageBreakdowns = await getPackageBreakdownsForPortal(
+    invoice.workspace_id,
+    catalogItemIds
+  );
 
   // Project onto a customer-safe shape before handing off to the client
   // component — props passed to a "use client" component are serialized
@@ -50,6 +59,7 @@ export default async function InvoicePortalPage({
     })),
     notes: invoice.notes,
     payment_terms: invoice.payment_terms,
+    packageBreakdowns,
   };
 
   return (

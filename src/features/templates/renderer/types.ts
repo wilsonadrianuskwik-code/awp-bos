@@ -13,6 +13,13 @@ export type RenderAddress = {
   country?: string;
 };
 
+export type RenderPackageBreakdownItem = {
+  name: string;
+  quantity: number;
+  unit: string | null;
+  note: string | null;
+};
+
 export type RenderLineItem = {
   category: string;
   description: string;
@@ -22,6 +29,11 @@ export type RenderLineItem = {
   discount_percent: number | null;
   tax_percent: number | null;
   line_total: number;
+  // Present only for a package line item, resolved live from the catalog
+  // at render time (see adapters.ts) — null/absent for an ordinary line.
+  // Never contributes to totals; only unit_price/line_total (the package's
+  // own price, captured when the line was added) do.
+  package_breakdown?: RenderPackageBreakdownItem[] | null;
 };
 
 export type RenderPayment = {

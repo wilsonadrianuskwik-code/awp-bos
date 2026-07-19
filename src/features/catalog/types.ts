@@ -4,6 +4,22 @@ export const ITEM_TYPES = ["product", "service"] as const;
 
 export type ItemType = (typeof ITEM_TYPES)[number];
 
+// One entry inside a package's breakdown (catalog_items.package_items).
+// A PackageItem may reference a standalone catalog product (product_id,
+// which autofills name/unit at build time and links for traceability) or
+// be a free-form "included" line with no product of its own — e.g.
+// "Caption & Hashtag", "Posting Schedule PDF". Only name + quantity are
+// required; note is optional descriptive text. There is no price here —
+// per the product decision, breakdown lines render as "Termasuk dalam
+// paket" (included), and only the package's own package_price counts.
+export type PackageItem = {
+  product_id: string | null;
+  name: string;
+  quantity: number;
+  unit: string | null;
+  note: string | null;
+};
+
 export type CatalogItem = {
   id: string;
   workspace_id: string;
@@ -16,6 +32,13 @@ export type CatalogItem = {
   default_unit: string | null;
   currency: string;
   is_active: boolean;
+  // Package support (migration 00050). is_package=false → a standalone
+  // item priced at default_unit_price (every pre-package row). is_package
+  // =true → a bundle priced as a whole at package_price, whose breakdown
+  // is package_items.
+  is_package: boolean;
+  package_price: number | null;
+  package_items: PackageItem[];
   created_by: string;
   created_at: string;
   updated_at: string;

@@ -7,6 +7,7 @@ import {
 } from "@/features/quotations/queries";
 import { QuotationDetail } from "@/features/quotations/components/quotation-detail";
 import { getDefaultTemplate } from "@/features/templates/queries";
+import { getPackageBreakdowns } from "@/features/catalog/queries";
 
 export default async function QuotationDetailRoute({
   params,
@@ -34,6 +35,11 @@ export default async function QuotationDetailRoute({
     ? await getQuotation(previousVersionSummary.id, workspace.id)
     : null;
 
+  const catalogItemIds = quotation.line_items
+    .map((li) => li.catalog_item_id)
+    .filter((id): id is string => !!id);
+  const packageBreakdowns = await getPackageBreakdowns(workspace.id, catalogItemIds);
+
   return (
     <QuotationDetail
       quotation={quotation}
@@ -42,6 +48,7 @@ export default async function QuotationDetailRoute({
       previousVersion={previousVersion}
       workspace={workspace}
       template={template}
+      packageBreakdowns={packageBreakdowns}
     />
   );
 }

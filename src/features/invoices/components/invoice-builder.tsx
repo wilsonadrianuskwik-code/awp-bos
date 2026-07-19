@@ -497,6 +497,16 @@ export function InvoiceBuilder({
     itemsByCategory[item.category].push({ item, originalIndex });
   });
 
+  // Looked up by DisclosureRow to detect a package line (via its
+  // catalog_item_id) and render the live breakdown underneath — "live"
+  // per the product decision: editing a package's contents later restyles
+  // how it displays here and on past documents, while the price already
+  // captured on this line item never changes retroactively.
+  const catalogItemsById: Record<string, CatalogItem> = {};
+  catalogItems.forEach((item) => {
+    catalogItemsById[item.id] = item;
+  });
+
   return (
     <div className="mx-auto w-full max-w-[880px] space-y-4">
       <BackButton onClick={handleCancel} label={invoice ? "Back to Invoice" : "Back to Invoices"} />
@@ -653,6 +663,7 @@ export function InvoiceBuilder({
           <LineItemsEditor
             itemsByCategory={itemsByCategory}
             currency={currency}
+            catalogItemsById={catalogItemsById}
             onAdd={addLineItem}
             onUpdate={updateLineItem}
             onRemove={removeLineItem}

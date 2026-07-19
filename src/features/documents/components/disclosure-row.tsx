@@ -12,8 +12,10 @@ import {
 import { cn } from "@/lib/utils/cn";
 import { formatCurrency, getCurrencyPrefix } from "@/lib/utils/format-currency";
 import { useRollingAmount } from "@/features/documents/hooks/use-rolling-amount";
+import { PackageBreakdown } from "@/features/catalog/components/package-breakdown";
 import type { LineItemInput } from "@/features/line-items/validators";
 import type { LineItemCategory } from "@/features/line-items/types";
+import type { CatalogItem } from "@/features/catalog/types";
 
 const CATEGORY_LABEL: Record<LineItemCategory, string> = {
   package: "Package",
@@ -31,6 +33,14 @@ type DisclosureRowProps = {
   currency: string;
   /** The document-level tax default — a line matching it needs no badge. */
   docTaxDefault?: number;
+  /** The live catalog package this line was inserted from, if it's a
+      package line — null/undefined for an ordinary line. Its price locks
+      the row's unit-price field (the package's own price is the only
+      figure that counts) and its package_items render as a read-only
+      breakdown beneath the row. Resolved live from the catalog by the
+      caller (LineItemsEditor), so editing the package later updates what
+      renders here without touching this document's saved data. */
+  packageInfo?: CatalogItem | null;
   onChange: (patch: Partial<LineItemInput>) => void;
   onRemove: () => void;
   /** Enter in the description: commit this line, compose the next. */
@@ -54,6 +64,7 @@ export function DisclosureRow({
   item,
   currency,
   docTaxDefault = 0,
+  packageInfo,
   onChange,
   onRemove,
   onEnter,
@@ -65,6 +76,7 @@ export function DisclosureRow({
   const [expanded, setExpanded] = useState(false);
   const descRef = useRef<HTMLInputElement>(null);
   const currencyPrefix = getCurrencyPrefix(currency);
+  const isPackageLine = !!packageInfo;
 
   // Focus request from the parent (Enter-to-compose landed a new row, or
   // Backspace-delete moved the caret here). Caret goes to the end so
@@ -183,10 +195,13 @@ export function DisclosureRow({
               }
               min={0}
               step="0.01"
+              disabled={isPackageLine}
+              title={isPackageLine ? "Package price — set from the catalog" : undefined}
               className={cn(
                 quietField,
                 "w-32 text-right",
-                currencyPrefix && "pl-8"
+                currencyPrefix && "pl-8",
+                isPackageLine && "cursor-not-allowed text-muted-foreground"
               )}
               aria-label="Unit price"
             />
@@ -230,6 +245,17 @@ export function DisclosureRow({
           </button>
         </div>
       </div>
+
+      {/* Package breakdown — auto-expanded (not gated behind ⌄) since it's
+          read-only, client-relevant information: what's actually inside
+          the package price above, not an editing exception. Resolved live
+          from the catalog by the parent, so it always reflects the
+          package's current contents even if this line was added earlier. */}
+      {isPackageLine && packageInfo && (
+        <div className="px-2 pb-2 pl-8">
+          <PackageBreakdown items={packageInfo.package_items} dense />
+        </div>
+      )}
 
       {/* The exception line: discount, tax, category — only when a row
           needs to deviate from the document defaults. Unit lives up in

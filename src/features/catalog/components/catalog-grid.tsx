@@ -83,7 +83,14 @@ export function CatalogGrid({ items, selectedIds, onSelectedIdsChange }: Catalog
             </div>
 
             <div className="mt-3 min-w-0">
-              <h3 className="truncate text-sm font-semibold">{item.name}</h3>
+              <h3 className="flex items-center gap-1.5 truncate text-sm font-semibold">
+                {item.name}
+                {item.is_package && (
+                  <span className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                    Paket
+                  </span>
+                )}
+              </h3>
               {item.sku && (
                 <p className="truncate font-mono text-xs text-muted-foreground">{item.sku}</p>
               )}
@@ -92,7 +99,10 @@ export function CatalogGrid({ items, selectedIds, onSelectedIdsChange }: Catalog
             <div className="mt-3 flex items-end justify-between">
               <div>
                 <span className="text-lg font-semibold tabular-nums tracking-tight">
-                  {formatCurrency(item.default_unit_price, item.currency)}
+                  {formatCurrency(
+                    item.is_package ? (item.package_price ?? 0) : item.default_unit_price,
+                    item.currency
+                  )}
                 </span>
                 {item.default_unit && (
                   <span className="ml-1 text-xs text-muted-foreground">
@@ -104,7 +114,11 @@ export function CatalogGrid({ items, selectedIds, onSelectedIdsChange }: Catalog
             </div>
 
             <div className="mt-3 flex items-center justify-between border-t pt-3 text-xs text-muted-foreground">
-              <span>{CATEGORY_LABEL[item.default_category]}</span>
+              <span>
+                {item.is_package
+                  ? `${item.package_items.length} item${item.package_items.length === 1 ? "" : "s"}`
+                  : CATEGORY_LABEL[item.default_category]}
+              </span>
             </div>
           </div>
         );

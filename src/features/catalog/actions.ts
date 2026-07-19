@@ -20,6 +20,8 @@ export async function createCatalogItem(
       throw new Error(parsed.error.issues[0].message);
     }
 
+    const isPackage = parsed.data.is_package;
+
     const supabase = await createClient();
     const { data: item, error } = await supabase
       .from("catalog_items")
@@ -29,11 +31,16 @@ export async function createCatalogItem(
         description: parsed.data.description || null,
         sku: parsed.data.sku || null,
         item_type: parsed.data.item_type,
-        default_category: parsed.data.default_category,
-        default_unit_price: parsed.data.default_unit_price,
+        default_category: isPackage ? "package" : parsed.data.default_category,
+        // A package prices as a whole (package_price); its default_unit_price
+        // stays 0 so nothing double-counts if it's ever read as a standalone.
+        default_unit_price: isPackage ? 0 : parsed.data.default_unit_price,
         default_unit: parsed.data.default_unit || null,
         currency: parsed.data.currency,
         is_active: parsed.data.is_active,
+        is_package: isPackage,
+        package_price: isPackage ? (parsed.data.package_price ?? null) : null,
+        package_items: isPackage ? parsed.data.package_items : [],
         created_by: ctx.userId,
       })
       .select("id")
@@ -97,7 +104,19 @@ export async function updateCatalogItem(
     };
     const changes: Record<string, { old: unknown; new: unknown }> = {};
 
+    // Package fields are handled explicitly below — arrays/booleans don't
+    // survive the scalar diff loop's `value === "" ? null` normalization or
+    // its identity comparison. Everything else goes through the loop.
+    const PACKAGE_KEYS = new Set([
+      "is_package",
+      "package_price",
+      "package_items",
+      "default_category",
+      "default_unit_price",
+    ]);
+
     for (const [key, value] of Object.entries(parsed.data)) {
+      if (PACKAGE_KEYS.has(key) || value === undefined) continue;
       const newVal = value === "" ? null : value;
       if (existing[key as keyof typeof existing] !== newVal) {
         updates[key] = newVal;
@@ -108,7 +127,28 @@ export async function updateCatalogItem(
       }
     }
 
-    if (Object.keys(changes).length === 0) return existing;
+    // Resolve the package shape. If is_package wasn't submitted, keep the
+    // item's current mode; otherwise apply the new mode and normalize the
+    // dependent columns so the two states never leave stale data behind.
+    const nextIsPackage =
+      parsed.data.is_package === undefined ? existing.is_package : parsed.data.is_package;
+    const nextPackagePrice = nextIsPackage ? (parsed.data.package_price ?? null) : null;
+    const nextPackageItems = nextIsPackage ? (parsed.data.package_items ?? []) : [];
+    const nextDefaultCategory = nextIsPackage
+      ? "package"
+      : (parsed.data.default_category ?? existing.default_category);
+    const nextDefaultUnitPrice = nextIsPackage
+      ? 0
+      : (parsed.data.default_unit_price ?? existing.default_unit_price);
+
+    if (existing.is_package !== nextIsPackage) {
+      changes.is_package = { old: existing.is_package, new: nextIsPackage };
+    }
+    updates.is_package = nextIsPackage;
+    updates.package_price = nextPackagePrice;
+    updates.package_items = nextPackageItems;
+    updates.default_category = nextDefaultCategory;
+    updates.default_unit_price = nextDefaultUnitPrice;
 
     const { error } = await supabase
       .from("catalog_items")
@@ -173,6 +213,9 @@ export async function duplicateCatalogItem(workspaceId: string, itemId: string) 
         default_unit: existing.default_unit,
         currency: existing.currency,
         is_active: existing.is_active,
+        is_package: existing.is_package,
+        package_price: existing.package_price,
+        package_items: existing.package_items,
         created_by: ctx.userId,
       })
       .select("id, name")
