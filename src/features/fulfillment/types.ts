@@ -22,6 +22,16 @@ export type FulfillmentItem = {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+  // -1 when this tracker covers a whole (non-package) line item. >= 0 when
+  // it covers one sub-item of a package line, with name/quantity/unit/note
+  // snapshotted at creation time (see 00051_package_fulfillment_tracking.sql)
+  // so an operational delivery target doesn't shift if the package is
+  // edited later while work is partially delivered.
+  package_item_index: number;
+  package_item_name: string | null;
+  package_item_quantity: number | null;
+  package_item_unit: string | null;
+  package_item_note: string | null;
 };
 
 export type FulfillmentEvent = {
@@ -57,6 +67,8 @@ export type FulfillmentItemWithProgress = {
   client_id: string;
   client_name: string;
   line_item_id: string;
+  // For a package sub-item tracker, prefixed with the parent line's own
+  // description (e.g. "Paket Bisnis — Single Post Foto").
   description: string;
   unit: string | null;
   category: LineItemCategory;
@@ -70,6 +82,9 @@ export type FulfillmentItemWithProgress = {
   remaining: number;
   progress_percent: number;
   is_over_delivered: boolean;
+  // True when this tracker covers one sub-item of a package line rather
+  // than a whole (non-package) line item.
+  is_package_item: boolean;
 };
 
 // Fulfillment only begins once an invoice has actually started being paid
