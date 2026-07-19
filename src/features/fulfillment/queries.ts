@@ -25,6 +25,7 @@ export async function getFulfillmentItems(
     p_client_id: filters.clientId ?? null,
     p_fulfillment_item_id: null,
     p_invoice_id: filters.invoiceId ?? null,
+    p_project_id: filters.projectId ?? null,
     p_limit: pageSize,
     p_offset: (page - 1) * pageSize,
   });
@@ -53,6 +54,7 @@ export async function getFulfillmentItem(
     p_client_id: null,
     p_fulfillment_item_id: fulfillmentItemId,
     p_invoice_id: null,
+    p_project_id: null,
     p_limit: 1,
     p_offset: 0,
   });

@@ -1,4 +1,5 @@
 import type { LineItemCategory } from "@/features/line-items/types";
+import type { FulfillmentProjectStatus } from "@/features/fulfillment-projects/types";
 
 export const FULFILLMENT_STATUSES = [
   "pending",
@@ -32,6 +33,10 @@ export type FulfillmentItem = {
   package_item_quantity: number | null;
   package_item_unit: string | null;
   package_item_note: string | null;
+  // Nullable: set once this invoice reaches its Finance -> Operations
+  // handoff (see 00053_fulfillment_projects_wiring_and_backfill.sql);
+  // null for trackers on an invoice that hasn't been paid yet.
+  project_id: string | null;
 };
 
 export type FulfillmentEvent = {
@@ -85,6 +90,12 @@ export type FulfillmentItemWithProgress = {
   // True when this tracker covers one sub-item of a package line rather
   // than a whole (non-package) line item.
   is_package_item: boolean;
+  // The Fulfilment Project this tracker is nested under (see
+  // src/features/fulfillment-projects/) — null until the invoice reaches
+  // its first payment.
+  project_id: string | null;
+  project_name: string | null;
+  project_status: FulfillmentProjectStatus | null;
 };
 
 // Fulfillment only begins once an invoice has actually started being paid
@@ -99,6 +110,7 @@ export type FulfillmentItemFilters = {
   status?: FulfillmentStatus;
   clientId?: string;
   invoiceId?: string;
+  projectId?: string;
 };
 
 export type PaginatedFulfillmentItems = {
