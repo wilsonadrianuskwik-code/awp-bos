@@ -53,14 +53,14 @@ export function CatalogPickerDialog({
                   className="flex items-center justify-between rounded-lg border p-3"
                 >
                   <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 truncate text-sm font-medium">
+                    <div className="flex items-center gap-1.5 truncate text-sm font-medium">
                       {item.name}
                       {item.is_package && (
                         <Badge variant="secondary" className="shrink-0">
                           Paket
                         </Badge>
                       )}
-                    </p>
+                    </div>
                     <p className="truncate text-xs text-muted-foreground">
                       {formatCurrency(price, item.currency)}
                       {item.default_unit ? ` / ${item.default_unit}` : ""}

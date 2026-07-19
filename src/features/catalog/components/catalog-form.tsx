@@ -200,6 +200,7 @@ export function CatalogForm({ item, products = [] }: CatalogFormProps) {
           {isPackage ? (
             <FieldGroup label="Package Price" htmlFor="package_price" required>
               <Input
+                key="package_price"
                 id="package_price"
                 name="package_price"
                 type="number"
@@ -213,6 +214,7 @@ export function CatalogForm({ item, products = [] }: CatalogFormProps) {
           ) : (
             <FieldGroup label="Default Price" htmlFor="default_unit_price" required>
               <Input
+                key="default_unit_price"
                 id="default_unit_price"
                 name="default_unit_price"
                 type="number"

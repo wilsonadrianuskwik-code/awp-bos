@@ -50,14 +50,14 @@ export function CatalogTable({
       header: "Name",
       cell: ({ row }) => (
         <div className="min-w-0">
-          <p className="flex items-center gap-1.5 truncate text-[13px] font-medium">
+          <div className="flex items-center gap-1.5 truncate text-[13px] font-medium">
             {row.original.name}
             {row.original.is_package && (
               <Badge variant="secondary" className="shrink-0">
                 Paket
               </Badge>
             )}
-          </p>
+          </div>
           {row.original.description && (
             <p className="truncate text-xs text-muted-foreground">
               {row.original.description}
