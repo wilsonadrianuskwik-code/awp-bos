@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import { ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useWorkspace } from "@/providers/workspace-provider";
@@ -22,6 +23,7 @@ type EligibleLineItem = {
 };
 
 type InvoiceFulfillmentSectionProps = {
+  invoiceId: string;
   invoiceStatus: string;
   lineItems: EligibleLineItem[];
   fulfillmentItems: FulfillmentItemWithProgress[];
@@ -33,6 +35,7 @@ type InvoiceFulfillmentSectionProps = {
 // never writes to invoices/line_items, and the invoice detail page needs
 // zero new RPC/action of its own to support it.
 export function InvoiceFulfillmentSection({
+  invoiceId,
   invoiceStatus,
   lineItems,
   fulfillmentItems,
@@ -52,6 +55,14 @@ export function InvoiceFulfillmentSection({
     : [];
 
   const recordingItem = fulfillmentItems.find((fi) => fi.id === recordingId) ?? null;
+
+  // All trackers on an invoice share the same project (one project per
+  // invoice, see 00052_fulfillment_projects.sql) — read it off the first
+  // one rather than fetching/passing a separate prop.
+  const projectItem = fulfillmentItems.find((fi) => fi.project_id);
+  const project = projectItem
+    ? { id: projectItem.project_id!, name: projectItem.project_name, status: projectItem.project_status! }
+    : null;
 
   function handleTrack(lineItemId: string) {
     startTransition(async () => {
@@ -75,6 +86,22 @@ export function InvoiceFulfillmentSection({
 
   return (
     <div className="space-y-3">
+      {project && (
+        <Link
+          href={`/${workspace.slug}/fulfillment-projects/${invoiceId}`}
+          className="flex items-center justify-between gap-3 rounded-lg border bg-muted/30 p-3 text-sm transition-colors hover:bg-muted/50"
+        >
+          <span className="min-w-0 truncate">
+            Fulfilment Project:{" "}
+            <span className="font-medium text-primary">
+              {project.name || "Untitled Project"}
+            </span>
+            <StatusBadge status={project.status} className="ml-2" />
+          </span>
+          <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+        </Link>
+      )}
+
       {fulfillmentItems.map((item) => (
         <div key={item.id} className="rounded-lg border p-3">
           <div className="flex items-start justify-between gap-3">

@@ -194,6 +194,7 @@ export function InvoiceDetail({
               </CardHeader>
               <CardContent>
                 <InvoiceFulfillmentSection
+                  invoiceId={invoice.id}
                   invoiceStatus={invoice.status}
                   lineItems={invoice.line_items}
                   fulfillmentItems={fulfillmentItems}

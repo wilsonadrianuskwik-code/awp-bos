@@ -152,6 +152,14 @@ export function FulfillmentProgressCard({
                   · no delivery in {idleDays}d
                 </span>
               )}
+              {tracker.project_id && (
+                <Link
+                  href={`/${workspace.slug}/fulfillment-projects/${tracker.invoice_id}`}
+                  className="hover:text-primary hover:underline"
+                >
+                  · Project: {tracker.project_name || "Untitled"}
+                </Link>
+              )}
             </div>
           </div>
           <span

@@ -69,6 +69,11 @@ export const STATUS_TONE: Record<string, Tone> = {
   pending: "neutral",
   in_progress: "info",
   completed: "success",
+  // Fulfilment Project lifecycle
+  not_started: "neutral",
+  // Deliverable (posting schedule) lifecycle
+  scheduled: "neutral",
+  posted: "success",
 };
 
 type StatusBadgeProps = {
