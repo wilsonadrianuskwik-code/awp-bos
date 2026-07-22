@@ -3,8 +3,10 @@ import { PackageCheck } from "lucide-react";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { FulfillmentCockpit } from "@/features/fulfillment/components/fulfillment-cockpit";
+import { ClientInvoicePicker } from "@/features/fulfillment/components/client-invoice-picker";
 import { getFulfillmentItems } from "@/features/fulfillment/queries";
 import { syncFulfillmentItemsAction } from "@/features/fulfillment/actions";
+import { getAllClients } from "@/features/clients/queries";
 import { getWorkspaceBySlug } from "@/lib/workspace";
 import {
   FULFILLMENT_COCKPIT_BATCH_SIZE,
@@ -24,19 +26,22 @@ export default async function FulfillmentPage({
   // line item on load (see sync_fulfillment_items).
   await syncFulfillmentItemsAction(workspace.id);
 
-  const { items, totalCount } = await getFulfillmentItems(
-    workspace.id,
-    {},
-    1,
-    FULFILLMENT_COCKPIT_BATCH_SIZE
-  );
+  const [{ items, totalCount }, clients] = await Promise.all([
+    getFulfillmentItems(workspace.id, {}, 1, FULFILLMENT_COCKPIT_BATCH_SIZE),
+    getAllClients(workspace.id),
+  ]);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Fulfillment"
-        description="Deliver outstanding work and record progress, client by client"
+        title="Fulfilment"
+        description="Deliver outstanding work and manage every project's schedule, client by client"
       />
+
+      {/* Jump straight into a specific project's workspace without
+          triaging the queue below — the primary "I know what I want"
+          escape hatch out of the cross-client cockpit. */}
+      <ClientInvoicePicker clients={clients} />
 
       {totalCount === 0 ? (
         <EmptyState

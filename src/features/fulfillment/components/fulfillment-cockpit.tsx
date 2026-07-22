@@ -474,6 +474,20 @@ function ClientWorkPanel({
   const outstanding = client.trackers.filter((t) => t.status !== "completed");
   const completed = client.trackers.filter((t) => t.status === "completed");
 
+  // A client can have more than one paid invoice, and a Fulfilment Project
+  // is scoped per invoice, not per client — so trackers here can belong to
+  // several distinct projects. Show one pill per project rather than a
+  // single "Open Project" button that would silently pick just one.
+  const projects = useMemo(() => {
+    const map = new Map<string, { invoiceId: string; name: string | null; status: string | null }>();
+    for (const t of client.trackers) {
+      if (t.project_id && !map.has(t.project_id)) {
+        map.set(t.project_id, { invoiceId: t.invoice_id, name: t.project_name, status: t.project_status });
+      }
+    }
+    return [...map.values()];
+  }, [client.trackers]);
+
   return (
     // Keyed by clientId in the parent, so switching clients remounts and
     // replays this entrance — the panel visibly answers the selection.
@@ -499,6 +513,21 @@ function ClientWorkPanel({
             <Link href={`/${workspace.slug}/clients/${client.clientId}`}>View client</Link>
           </Button>
         </div>
+
+        {projects.length > 0 && (
+          <div className="mt-3 flex flex-wrap items-center gap-1.5">
+            {projects.map((p) => (
+              <Link
+                key={p.invoiceId}
+                href={`/${workspace.slug}/fulfillment/${p.invoiceId}`}
+                className="inline-flex items-center gap-1.5 rounded-full border bg-muted/30 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
+              >
+                Project: {p.name || "Untitled"}
+                {p.status && <span className="text-[10px] uppercase tracking-wide opacity-70">· {p.status.replace("_", " ")}</span>}
+              </Link>
+            ))}
+          </div>
+        )}
 
         <div className="mt-4 grid grid-cols-[1fr_auto] items-center gap-4 rounded-lg border bg-muted/30 p-3.5">
           <div className="min-w-0">

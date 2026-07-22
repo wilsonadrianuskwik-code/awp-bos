@@ -12,14 +12,14 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useWorkspace } from "@/providers/workspace-provider";
-import { getInvoicesForClientAction } from "@/features/fulfillment-projects/actions";
+import { getInvoicesForClientAction } from "@/features/fulfillment/actions-projects";
 import type { ClientSummary } from "@/features/line-items/types";
 import type { Invoice } from "@/features/invoices/types";
 
 type ClientInvoicePickerProps = {
   clients: ClientSummary[];
-  // Pre-selected when arriving at /fulfillment-projects/[invoiceId] — used
-  // to seed both dropdowns without an extra round trip.
+  // Pre-selected when arriving at /fulfillment/[invoiceId] — used to seed
+  // both dropdowns without an extra round trip.
   initialClientId?: string;
   initialInvoiceId?: string;
 };
@@ -56,7 +56,7 @@ export function ClientInvoicePicker({
 
   function handleInvoiceChange(invoiceId: string) {
     startTransition(() => {
-      router.push(`/${workspace.slug}/fulfillment-projects/${invoiceId}`);
+      router.push(`/${workspace.slug}/fulfillment/${invoiceId}`);
     });
   }
 

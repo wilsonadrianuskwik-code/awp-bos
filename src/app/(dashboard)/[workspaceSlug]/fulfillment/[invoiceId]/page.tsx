@@ -8,8 +8,8 @@ import {
   getFulfillmentProjectByInvoice,
   getFulfillmentDeliverables,
   getFulfillmentProjectActivities,
-} from "@/features/fulfillment-projects/queries";
-import { FulfillmentWorkspace } from "@/features/fulfillment-projects/components/fulfillment-workspace";
+} from "@/features/fulfillment/queries-projects";
+import { FulfillmentWorkspace } from "@/features/fulfillment/components/fulfillment-workspace";
 import { FULFILLMENT_COCKPIT_BATCH_SIZE } from "@/features/fulfillment/config";
 
 export default async function FulfillmentProjectByInvoicePage({

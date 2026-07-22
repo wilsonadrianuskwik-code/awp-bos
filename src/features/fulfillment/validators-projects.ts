@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { FULFILLMENT_PROJECT_STATUSES, DELIVERABLE_STATUSES } from "@/features/fulfillment-projects/types";
+import { FULFILLMENT_PROJECT_STATUSES, DELIVERABLE_STATUSES } from "@/features/fulfillment/types-projects";
 
 export const updateFulfillmentProjectSchema = z
   .object({
@@ -44,22 +44,6 @@ export const createDeliverableSchema = z.object({
 
 export type CreateDeliverableInput = z.infer<typeof createDeliverableSchema>;
 
-// Bounds match the server-side guard in bulk_generate_fulfillment_deliverables
-// (00054_fulfillment_deliverables.sql) — a row that passes here always
-// passes there too.
-export const bulkGenerateDeliverablesSchema = z.object({
-  start_date: z.string().min(1, "Start date is required"),
-  frequency_days: z.coerce.number().int().min(1).max(365),
-  count: z.coerce.number().int().min(1).max(200),
-  title_template: z.string().max(200).optional().or(z.literal("")),
-  fulfillment_item_id: z.string().uuid().optional().nullable(),
-  assigned_to: z.string().uuid().optional().nullable(),
-});
-
-export type BulkGenerateDeliverablesInput = z.infer<
-  typeof bulkGenerateDeliverablesSchema
->;
-
 export const rescheduleDeliverableSchema = z.object({
   scheduled_date: z.string().min(1, "Scheduled date is required"),
 });
@@ -74,4 +58,50 @@ export const updateDeliverableStatusSchema = z.object({
 
 export type UpdateDeliverableStatusInput = z.infer<
   typeof updateDeliverableStatusSchema
+>;
+
+export const assignDeliverableSchema = z.object({
+  assigned_to: z.string().uuid().nullable(),
+});
+
+export type AssignDeliverableInput = z.infer<typeof assignDeliverableSchema>;
+
+// Bulk actions (List view multi-select toolbar) — one RPC call per batch,
+// not an N-way fan-out (P7-13 convention).
+export const bulkUpdateDeliverableStatusSchema = z.object({
+  deliverable_ids: z.array(z.string().uuid()).min(1, "Select at least one deliverable"),
+  status: z.enum(DELIVERABLE_STATUSES),
+});
+
+export type BulkUpdateDeliverableStatusInput = z.infer<
+  typeof bulkUpdateDeliverableStatusSchema
+>;
+
+export const bulkRescheduleDeliverablesSchema = z.object({
+  deliverable_ids: z.array(z.string().uuid()).min(1, "Select at least one deliverable"),
+  scheduled_date: z.string().min(1, "Scheduled date is required"),
+});
+
+export type BulkRescheduleDeliverablesInput = z.infer<
+  typeof bulkRescheduleDeliverablesSchema
+>;
+
+// Backs the Generate Schedule wizard — an explicit, already-computed (and
+// possibly hand-edited) list of rows, unlike bulkGenerateDeliverablesSchema's
+// fixed frequency/count which can't represent an edited preview or the
+// "Custom" method.
+export const bulkCreateDeliverableItemSchema = z.object({
+  title: z.string().min(1, "Title is required").max(200),
+  scheduled_date: z.string().min(1, "Scheduled date is required"),
+  description: z.string().max(2000).optional().or(z.literal("")),
+  fulfillment_item_id: z.string().uuid().optional().nullable(),
+  assigned_to: z.string().uuid().optional().nullable(),
+});
+
+export const bulkCreateDeliverablesSchema = z.object({
+  items: z.array(bulkCreateDeliverableItemSchema).min(1).max(200),
+});
+
+export type BulkCreateDeliverablesInput = z.infer<
+  typeof bulkCreateDeliverablesSchema
 >;

@@ -11,7 +11,6 @@ import {
   CreditCard,
   Package,
   PackageCheck,
-  FolderKanban,
   BarChart3,
   Settings,
   PanelLeftClose,
@@ -56,7 +55,6 @@ export const NAV_GROUPS = [
     label: "Operations",
     items: [
       { label: "Fulfillment", href: "/fulfillment", icon: PackageCheck, color: "#f97316" },
-      { label: "Projects", href: "/fulfillment-projects", icon: FolderKanban, color: "#0ea5e9" },
     ],
   },
   {

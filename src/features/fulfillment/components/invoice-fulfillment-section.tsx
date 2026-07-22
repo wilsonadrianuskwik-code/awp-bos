@@ -88,7 +88,7 @@ export function InvoiceFulfillmentSection({
     <div className="space-y-3">
       {project && (
         <Link
-          href={`/${workspace.slug}/fulfillment-projects/${invoiceId}`}
+          href={`/${workspace.slug}/fulfillment/${invoiceId}`}
           className="flex items-center justify-between gap-3 rounded-lg border bg-muted/30 p-3 text-sm transition-colors hover:bg-muted/50"
         >
           <span className="min-w-0 truncate">
@@ -108,7 +108,7 @@ export function InvoiceFulfillmentSection({
             <div className="min-w-0 flex-1 space-y-1">
               <div className="flex items-center gap-2">
                 <Link
-                  href={`/${workspace.slug}/fulfillment/${item.id}`}
+                  href={`/${workspace.slug}/fulfillment/tracker/${item.id}`}
                   className="font-medium text-primary hover:underline"
                 >
                   {item.description}

@@ -3,7 +3,7 @@ import type {
   FulfillmentDeliverable,
   FulfillmentDeliverableFilters,
   FulfillmentProjectWithRollup,
-} from "@/features/fulfillment-projects/types";
+} from "@/features/fulfillment/types-projects";
 
 // Thin wrapper around get_fulfillment_project_by_invoice
 // (00052_fulfillment_projects.sql, extended in 00054 with deliverable
@@ -36,6 +36,26 @@ export async function getFulfillmentProjectActivities(projectId: string) {
     .select("*, actor:profiles!actor_id(full_name, avatar_url)")
     .eq("entity_type", "fulfillment_project")
     .eq("entity_id", projectId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  return data ?? [];
+}
+
+// Per-deliverable history for the contextual right sidebar (Section 9 of
+// the UNIFY plan). create_fulfillment_deliverable, reschedule_..., and
+// update_..._status (00054/00055) all log activity against the
+// deliverable's own entity_id, so this filters cleanly without any schema
+// change. Known gaps, accepted rather than special-cased: deletions only
+// write to audit_logs (no activities row), and bulk-generated/bulk-created
+// deliverables get one summarized project-level entry, not a per-item one.
+export async function getFulfillmentDeliverableActivities(deliverableId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("activities")
+    .select("*, actor:profiles!actor_id(full_name, avatar_url)")
+    .eq("entity_type", "fulfillment_deliverable")
+    .eq("entity_id", deliverableId)
     .order("created_at", { ascending: false })
     .limit(50);
 

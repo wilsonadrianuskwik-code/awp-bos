@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
-import { createFulfillmentDeliverableAction } from "@/features/fulfillment-projects/actions";
+import { createFulfillmentDeliverableAction } from "@/features/fulfillment/actions-projects";
 import type { FulfillmentItemWithProgress } from "@/features/fulfillment/types";
 
 type AddDeliverableDialogProps = {

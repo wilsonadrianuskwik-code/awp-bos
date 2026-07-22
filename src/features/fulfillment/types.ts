@@ -1,5 +1,5 @@
 import type { LineItemCategory } from "@/features/line-items/types";
-import type { FulfillmentProjectStatus } from "@/features/fulfillment-projects/types";
+import type { FulfillmentProjectStatus } from "@/features/fulfillment/types-projects";
 
 export const FULFILLMENT_STATUSES = [
   "pending",
@@ -91,8 +91,7 @@ export type FulfillmentItemWithProgress = {
   // than a whole (non-package) line item.
   is_package_item: boolean;
   // The Fulfilment Project this tracker is nested under (see
-  // src/features/fulfillment-projects/) — null until the invoice reaches
-  // its first payment.
+  // types-projects.ts) — null until the invoice reaches its first payment.
   project_id: string | null;
   project_name: string | null;
   project_status: FulfillmentProjectStatus | null;

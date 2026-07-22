@@ -154,7 +154,7 @@ export function FulfillmentProgressCard({
               )}
               {tracker.project_id && (
                 <Link
-                  href={`/${workspace.slug}/fulfillment-projects/${tracker.invoice_id}`}
+                  href={`/${workspace.slug}/fulfillment/${tracker.invoice_id}`}
                   className="hover:text-primary hover:underline"
                 >
                   · Project: {tracker.project_name || "Untitled"}
@@ -255,7 +255,7 @@ export function FulfillmentProgressCard({
             </Button>
           )}
           <Button size="sm" variant="ghost" asChild>
-            <Link href={`/${workspace.slug}/fulfillment/${tracker.id}`}>
+            <Link href={`/${workspace.slug}/fulfillment/tracker/${tracker.id}`}>
               Open record
               <ChevronRight className="ml-0.5 h-4 w-4" />
             </Link>
