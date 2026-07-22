@@ -12,16 +12,16 @@ import {
   CheckCircle2,
   CalendarClock,
   PackageCheck,
+  ChevronsUpDown,
+  Check,
+  FileText,
+  Users,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { AnimatedValue } from "@/components/shared/animated-value";
 import { cn } from "@/lib/utils/cn";
 import { useWorkspace } from "@/providers/workspace-provider";
@@ -334,6 +334,7 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
           selectedClientId={selectedInvoiceClientId}
           selectedInvoiceId={selectedInvoiceId}
           onSelectInvoice={openInvoice}
+          onClearInvoice={backToQueue}
         />
         {/* Subtle, non-blocking signal for a background refresh (e.g. after
             a Kanban drop) — the workspace itself stays mounted and
@@ -907,21 +908,52 @@ function SectionLabel({ text, count }: { text: string; count: number }) {
   );
 }
 
-// The mockup's persistent Client▼/Invoice▼ selector — always visible at
-// the top of the page, in both queue and workspace modes, as the direct
-// route to a specific project. Built from `enriched` (already loaded for
-// the queue), so picking a project needs no extra query; only opening it
-// does (getFulfillmentWorkspaceDataAction, fired by the parent).
+// A small fixed on-brand palette (reusing the same hue families
+// StatusBadge already draws its tones from) cycled by a stable hash of the
+// client id, so each client reads as a distinct color at a glance without
+// storing/choosing a color anywhere — purely a presentational function of
+// the id, same client always gets the same tone.
+const AVATAR_TONES = [
+  "bg-blue-500/15 text-blue-700 dark:bg-blue-400/15 dark:text-blue-400",
+  "bg-violet-500/15 text-violet-700 dark:bg-violet-400/15 dark:text-violet-400",
+  "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-400",
+  "bg-amber-500/15 text-amber-700 dark:bg-amber-400/15 dark:text-amber-400",
+  "bg-rose-500/15 text-rose-700 dark:bg-rose-400/15 dark:text-rose-400",
+  "bg-cyan-500/15 text-cyan-700 dark:bg-cyan-400/15 dark:text-cyan-400",
+];
+
+function toneForId(id: string): string {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0;
+  return AVATAR_TONES[Math.abs(hash) % AVATAR_TONES.length];
+}
+
+function initialsFor(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  return (parts[0]?.[0] ?? "?").toUpperCase() + (parts[1]?.[0] ?? "").toUpperCase();
+}
+
+// The persistent Client▼/Invoice▼ selector — always visible at the top of
+// the page, in both queue and workspace modes, as the direct route to a
+// specific project. Built from `enriched` (already loaded for the queue),
+// so picking a project needs no extra query; only opening it does
+// (getFulfillmentWorkspaceDataAction, fired by the parent). Each selector
+// is a searchable popover styled as a selected-value "card" (avatar/icon +
+// name + metadata), not a native <select> — the metadata shown (tracker/
+// remaining counts for clients; project name + live status for invoices)
+// is all data the queue already has loaded, nothing new is fetched here.
 function ClientInvoiceSelector({
   enriched,
   selectedClientId,
   selectedInvoiceId,
   onSelectInvoice,
+  onClearInvoice,
 }: {
   enriched: EnrichedClient[];
   selectedClientId: string | null;
   selectedInvoiceId: string | null;
   onSelectInvoice: (invoiceId: string) => void;
+  onClearInvoice: () => void;
 }) {
   const [clientId, setClientId] = useState<string | null>(selectedClientId);
 
@@ -933,57 +965,266 @@ function ClientInvoiceSelector({
 
   const invoices = useMemo(() => {
     if (!client) return [];
-    const map = new Map<string, { invoiceId: string; label: string }>();
+    const map = new Map<
+      string,
+      { invoiceId: string; invoiceNumber: string; projectName: string | null; projectStatus: string | null }
+    >();
     for (const t of client.trackers) {
       if (t.project_id && !map.has(t.invoice_id)) {
         map.set(t.invoice_id, {
           invoiceId: t.invoice_id,
-          label: t.project_name ? `${t.invoice_number} — ${t.project_name}` : t.invoice_number,
+          invoiceNumber: t.invoice_number,
+          projectName: t.project_name,
+          projectStatus: t.project_status,
         });
       }
     }
     return [...map.values()];
   }, [client]);
 
+  const selectedInvoice = invoices.find((inv) => inv.invoiceId === selectedInvoiceId) ?? null;
+
+  function handleSelectClient(id: string) {
+    setClientId(id);
+    const firstInvoice = enriched.find((c) => c.clientId === id)?.trackers.find((t) => t.project_id)?.invoice_id;
+    if (firstInvoice) onSelectInvoice(firstInvoice);
+    else onClearInvoice();
+  }
+
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-card p-2.5">
-      <Select
-        value={clientId ?? undefined}
-        onValueChange={(v) => {
-          setClientId(v);
-          const firstInvoice = enriched
-            .find((c) => c.clientId === v)
-            ?.trackers.find((t) => t.project_id)?.invoice_id;
-          if (firstInvoice) onSelectInvoice(firstInvoice);
-        }}
-      >
-        <SelectTrigger className="h-9 w-[220px]">
-          <SelectValue placeholder="Client…" />
-        </SelectTrigger>
-        <SelectContent>
-          {enriched.map((c) => (
-            <SelectItem key={c.clientId} value={c.clientId}>
-              {c.clientName}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Select
-        value={selectedInvoiceId ?? undefined}
-        onValueChange={onSelectInvoice}
-        disabled={invoices.length === 0}
-      >
-        <SelectTrigger className="h-9 w-[260px]">
-          <SelectValue placeholder="Invoice…" />
-        </SelectTrigger>
-        <SelectContent>
-          {invoices.map((inv) => (
-            <SelectItem key={inv.invoiceId} value={inv.invoiceId}>
-              {inv.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className="flex flex-wrap items-center gap-2.5 rounded-xl border bg-card/60 p-2.5 shadow-xs">
+      <ClientCombobox enriched={enriched} client={client} onSelect={handleSelectClient} />
+      <InvoiceCombobox
+        invoices={invoices}
+        selectedInvoice={selectedInvoice}
+        disabled={!client}
+        onSelect={onSelectInvoice}
+        onClear={onClearInvoice}
+      />
     </div>
+  );
+}
+
+function ComboboxSearch({ query, onQueryChange, placeholder }: { query: string; onQueryChange: (v: string) => void; placeholder: string }) {
+  return (
+    <div className="flex items-center gap-2 border-b px-3 py-2">
+      <Search className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+      <input
+        autoFocus
+        value={query}
+        onChange={(e) => onQueryChange(e.target.value)}
+        placeholder={placeholder}
+        className="h-7 w-full bg-transparent text-[13px] outline-none placeholder:text-muted-foreground"
+      />
+    </div>
+  );
+}
+
+function ClientCombobox({
+  enriched,
+  client,
+  onSelect,
+}: {
+  enriched: EnrichedClient[];
+  client: EnrichedClient | null;
+  onSelect: (clientId: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return enriched;
+    return enriched.filter((c) => c.clientName.toLowerCase().includes(q));
+  }, [enriched, query]);
+
+  return (
+    <Popover
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (next) setQuery("");
+      }}
+    >
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="flex min-w-[230px] items-center gap-2.5 rounded-lg border bg-card px-2.5 py-2 text-left shadow-xs transition-colors hover:border-primary/30 hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <Avatar className={cn("h-8 w-8", client ? toneForId(client.clientId) : "bg-muted")}>
+            <AvatarFallback className={cn("bg-transparent text-[11px] font-semibold", client && toneForId(client.clientId))}>
+              {client ? initialsFor(client.clientName) : <Users className="h-3.5 w-3.5 text-muted-foreground" />}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[13px] font-semibold leading-tight">
+              {client?.clientName ?? "Select client…"}
+            </div>
+            <div className="truncate text-[11px] text-muted-foreground">
+              {client
+                ? `${client.trackers.length} tracker${client.trackers.length === 1 ? "" : "s"} · ${client.stats.remaining} remaining`
+                : "No client selected"}
+            </div>
+          </div>
+          <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-[300px] p-0">
+        <ComboboxSearch query={query} onQueryChange={setQuery} placeholder="Search clients…" />
+        <div className="max-h-72 overflow-y-auto p-1.5">
+          {results.length === 0 ? (
+            <p className="px-3 py-6 text-center text-[13px] text-muted-foreground">No clients found</p>
+          ) : (
+            results.map((c) => (
+              <button
+                key={c.clientId}
+                type="button"
+                onClick={() => {
+                  onSelect(c.clientId);
+                  setOpen(false);
+                }}
+                className={cn(
+                  "flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left transition-colors",
+                  c.clientId === client?.clientId ? "bg-accent" : "hover:bg-accent/60"
+                )}
+              >
+                <Avatar className="h-7 w-7">
+                  <AvatarFallback className={cn("bg-transparent text-[10px] font-semibold", toneForId(c.clientId))}>
+                    {initialsFor(c.clientName)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-[13px] font-medium">{c.clientName}</div>
+                  <div className="truncate text-[11px] text-muted-foreground">
+                    {c.trackers.length} tracker{c.trackers.length === 1 ? "" : "s"} · {c.stats.remaining} remaining
+                  </div>
+                </div>
+                {c.clientId === client?.clientId && <Check className="h-3.5 w-3.5 shrink-0 text-primary" />}
+              </button>
+            ))
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+type InvoiceOption = { invoiceId: string; invoiceNumber: string; projectName: string | null; projectStatus: string | null };
+
+function InvoiceCombobox({
+  invoices,
+  selectedInvoice,
+  disabled,
+  onSelect,
+  onClear,
+}: {
+  invoices: InvoiceOption[];
+  selectedInvoice: InvoiceOption | null;
+  disabled: boolean;
+  onSelect: (invoiceId: string) => void;
+  onClear: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return invoices;
+    return invoices.filter(
+      (inv) =>
+        inv.invoiceNumber.toLowerCase().includes(q) ||
+        (inv.projectName ?? "").toLowerCase().includes(q)
+    );
+  }, [invoices, query]);
+
+  return (
+    <Popover
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (next) setQuery("");
+      }}
+    >
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          disabled={disabled}
+          className="flex min-w-[260px] items-center gap-2.5 rounded-lg border bg-card px-2.5 py-2 text-left shadow-xs transition-colors hover:border-primary/30 hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted">
+            <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[13px] font-semibold leading-tight">
+              {selectedInvoice ? selectedInvoice.invoiceNumber : "All invoices"}
+            </div>
+            <div className="truncate text-[11px] text-muted-foreground">
+              {selectedInvoice ? selectedInvoice.projectName ?? "Untitled project" : "Overview of all invoices"}
+            </div>
+          </div>
+          {selectedInvoice?.projectStatus && (
+            <StatusBadge status={selectedInvoice.projectStatus} className="shrink-0 text-[10px]" />
+          )}
+          <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-[320px] p-0">
+        <ComboboxSearch query={query} onQueryChange={setQuery} placeholder="Search invoices…" />
+        <div className="max-h-72 overflow-y-auto p-1.5">
+          <button
+            type="button"
+            onClick={() => {
+              onClear();
+              setOpen(false);
+            }}
+            className={cn(
+              "flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left transition-colors",
+              !selectedInvoice ? "bg-accent" : "hover:bg-accent/60"
+            )}
+          >
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted">
+              <Users className="h-3.5 w-3.5 text-muted-foreground" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-[13px] font-medium">All invoices</div>
+              <div className="truncate text-[11px] text-muted-foreground">Overview of all invoices</div>
+            </div>
+            {!selectedInvoice && <Check className="h-3.5 w-3.5 shrink-0 text-primary" />}
+          </button>
+          {results.length === 0 ? (
+            <p className="px-3 py-6 text-center text-[13px] text-muted-foreground">No invoices found</p>
+          ) : (
+            results.map((inv) => (
+              <button
+                key={inv.invoiceId}
+                type="button"
+                onClick={() => {
+                  onSelect(inv.invoiceId);
+                  setOpen(false);
+                }}
+                className={cn(
+                  "flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left transition-colors",
+                  inv.invoiceId === selectedInvoice?.invoiceId ? "bg-accent" : "hover:bg-accent/60"
+                )}
+              >
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted">
+                  <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-[13px] font-medium">{inv.invoiceNumber}</div>
+                  <div className="truncate text-[11px] text-muted-foreground">
+                    {inv.projectName ?? "Untitled project"}
+                  </div>
+                </div>
+                {inv.projectStatus && <StatusBadge status={inv.projectStatus} className="shrink-0 text-[10px]" />}
+                {inv.invoiceId === selectedInvoice?.invoiceId && (
+                  <Check className="h-3.5 w-3.5 shrink-0 text-primary" />
+                )}
+              </button>
+            ))
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
