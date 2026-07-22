@@ -114,8 +114,8 @@ export function QuotationDetail({
                   · Internal ID {quotation.internal_id}
                 </span>
               )}
-              · {quotation.client.name}
-              {quotation.client.company ? ` · ${quotation.client.company}` : ""}
+              · {quotation.client?.name ?? "Deleted client"}
+              {quotation.client?.company ? ` · ${quotation.client.company}` : ""}
               <button
                 type="button"
                 onClick={handleCopyNumber}

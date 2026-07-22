@@ -47,11 +47,11 @@ export function InvoiceCard({ invoice }: InvoiceCardProps) {
             {invoice.invoice_number}
           </span>
           <h3 className="mt-1 truncate text-sm font-semibold">
-            {invoice.title || invoice.client.name}
+            {invoice.title || invoice.client?.name || "Deleted client"}
           </h3>
           <p className="truncate text-xs text-muted-foreground">
-            {invoice.client.name}
-            {invoice.client.company ? ` · ${invoice.client.company}` : ""}
+            {invoice.client?.name ?? "Deleted client"}
+            {invoice.client?.company ? ` · ${invoice.client.company}` : ""}
           </p>
         </div>
 

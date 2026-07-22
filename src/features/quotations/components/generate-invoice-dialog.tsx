@@ -47,7 +47,7 @@ export function GenerateInvoiceDialog({
   const [step, setStep] = useState<"configure" | "review">("configure");
   const [invoiceDate, setInvoiceDate] = useState(todayISO());
   const [dueDate, setDueDate] = useState(
-    addDays(todayISO(), quotation.client.payment_terms ?? 30)
+    addDays(todayISO(), quotation.client?.payment_terms ?? 30)
   );
   const [copyNotes, setCopyNotes] = useState(true);
   const [isPending, startTransition] = useTransition();
@@ -144,7 +144,7 @@ export function GenerateInvoiceDialog({
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Client</p>
-                  <p className="font-medium">{quotation.client.name}</p>
+                  <p className="font-medium">{quotation.client?.name ?? "Deleted client"}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Invoice date</p>

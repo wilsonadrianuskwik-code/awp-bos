@@ -55,7 +55,10 @@ export type ConvertedInvoiceSummary = {
 };
 
 export type QuotationWithClient = Quotation & {
-  client: ClientSummary;
+  // Null when the client was soft-deleted after this quotation was
+  // created — RLS on `clients` filters deleted_at rows, so the embedded
+  // join legitimately returns nothing for that row.
+  client: ClientSummary | null;
   converted_invoice: ConvertedInvoiceSummary | null;
 };
 
@@ -69,7 +72,7 @@ export type QuotationProfileSummary = {
 };
 
 export type QuotationDetail = Quotation & {
-  client: ClientSummary;
+  client: ClientSummary | null;
   converted_invoice: ConvertedInvoiceSummary | null;
   line_items: LineItem[];
   created_by_profile: QuotationProfileSummary | null;

@@ -108,8 +108,8 @@ export function InvoiceDetail({
                   · Internal ID {invoice.internal_id}
                 </span>
               )}
-              · {invoice.client.name}
-              {invoice.client.company ? ` · ${invoice.client.company}` : ""}
+              · {invoice.client?.name ?? "Deleted client"}
+              {invoice.client?.company ? ` · ${invoice.client.company}` : ""}
               <button
                 type="button"
                 onClick={handleCopyNumber}

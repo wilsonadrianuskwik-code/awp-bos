@@ -37,8 +37,8 @@ export default async function InvoicePortalPage({
     title: invoice.title,
     summary: invoice.summary,
     client: {
-      name: invoice.client.name,
-      company: invoice.client.company,
+      name: invoice.client?.name ?? "Deleted client",
+      company: invoice.client?.company ?? null,
     },
     issue_date: invoice.issue_date,
     due_date: invoice.due_date,

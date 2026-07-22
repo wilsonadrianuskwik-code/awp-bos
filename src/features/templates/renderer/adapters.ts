@@ -37,14 +37,21 @@ function companyFromWorkspace(workspace: WorkspaceForRender): DocumentRenderData
   };
 }
 
-function clientFromSummary(client: {
-  name: string;
-  company?: string | null;
-  email?: string | null;
-  phone?: string | null;
-  address?: RenderAddress | null;
-  tax_id?: string | null;
-}): DocumentRenderData["client"] {
+function clientFromSummary(
+  client: {
+    name: string;
+    company?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    address?: RenderAddress | null;
+    tax_id?: string | null;
+  } | null
+): DocumentRenderData["client"] {
+  // Null when the client behind this document was soft-deleted after the
+  // fact — the document is a historical record and must still render.
+  if (!client) {
+    return { name: "Deleted client" };
+  }
   return {
     name: client.name,
     company: client.company ?? undefined,

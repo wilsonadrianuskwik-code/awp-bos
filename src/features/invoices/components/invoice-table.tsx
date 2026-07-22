@@ -52,8 +52,10 @@ export function InvoiceTable({ invoices, selectedIds, onSelectedIdsChange }: Inv
       header: "Customer",
       cell: ({ row }) => (
         <div className="min-w-0">
-          <p className="truncate text-[13px] font-medium">{row.original.client.name}</p>
-          {row.original.client.company && (
+          <p className="truncate text-[13px] font-medium">
+            {row.original.client?.name ?? "Deleted client"}
+          </p>
+          {row.original.client?.company && (
             <p className="truncate text-xs text-muted-foreground">
               {row.original.client.company}
             </p>

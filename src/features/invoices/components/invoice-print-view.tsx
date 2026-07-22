@@ -33,9 +33,9 @@ export function InvoicePrintView({ invoice, workspaceName }: InvoicePrintViewPro
       <div className="mt-6 grid grid-cols-2 gap-6 text-sm">
         <div>
           <p className="font-semibold text-gray-500">Billed to</p>
-          <p className="font-medium">{invoice.client.name}</p>
-          {invoice.client.company && <p>{invoice.client.company}</p>}
-          {invoice.client.email && <p>{invoice.client.email}</p>}
+          <p className="font-medium">{invoice.client?.name ?? "Deleted client"}</p>
+          {invoice.client?.company && <p>{invoice.client.company}</p>}
+          {invoice.client?.email && <p>{invoice.client.email}</p>}
         </div>
         <div className="text-right">
           <p>

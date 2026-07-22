@@ -51,11 +51,11 @@ export function QuotationCard({ quotation }: QuotationCardProps) {
             )}
           </div>
           <h3 className="mt-1 truncate text-sm font-semibold">
-            {quotation.title || quotation.client.name}
+            {quotation.title || quotation.client?.name || "Deleted client"}
           </h3>
           <p className="truncate text-xs text-muted-foreground">
-            {quotation.client.name}
-            {quotation.client.company ? ` · ${quotation.client.company}` : ""}
+            {quotation.client?.name ?? "Deleted client"}
+            {quotation.client?.company ? ` · ${quotation.client.company}` : ""}
           </p>
         </div>
 

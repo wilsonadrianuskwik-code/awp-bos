@@ -155,8 +155,8 @@ export function QuotationPortalView({
       <div className="mb-6 grid grid-cols-2 gap-4 text-sm">
         <div>
           <p className="text-muted-foreground">Prepared for</p>
-          <p className="font-medium">{quotation.client.name}</p>
-          {quotation.client.company && <p>{quotation.client.company}</p>}
+          <p className="font-medium">{quotation.client?.name ?? "Deleted client"}</p>
+          {quotation.client?.company && <p>{quotation.client.company}</p>}
         </div>
         <div className="text-right">
           <p>

@@ -41,9 +41,9 @@ export function QuotationPrintView({
       <div className="mt-6 grid grid-cols-2 gap-6 text-sm">
         <div>
           <p className="font-semibold text-gray-500">Prepared for</p>
-          <p className="font-medium">{quotation.client.name}</p>
-          {quotation.client.company && <p>{quotation.client.company}</p>}
-          {quotation.client.email && <p>{quotation.client.email}</p>}
+          <p className="font-medium">{quotation.client?.name ?? "Deleted client"}</p>
+          {quotation.client?.company && <p>{quotation.client.company}</p>}
+          {quotation.client?.email && <p>{quotation.client.email}</p>}
         </div>
         <div className="text-right">
           <p>

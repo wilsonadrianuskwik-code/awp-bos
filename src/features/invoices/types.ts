@@ -83,7 +83,11 @@ export type SourceQuotationSummary = {
 };
 
 export type InvoiceWithClient = Invoice & {
-  client: ClientSummary;
+  // Null when the client was soft-deleted after this invoice was created —
+  // RLS on `clients` filters out deleted_at rows, so the embedded join
+  // legitimately returns nothing for that row. An invoice is a historical
+  // record and must still render even if the client behind it is gone.
+  client: ClientSummary | null;
   source_quotation: SourceQuotationSummary | null;
 };
 
@@ -97,7 +101,7 @@ export type PaymentWithRecorder = Payment & {
 };
 
 export type InvoiceDetail = Invoice & {
-  client: ClientSummary;
+  client: ClientSummary | null;
   source_quotation: SourceQuotationSummary | null;
   line_items: LineItem[];
   payments: PaymentWithRecorder[];
