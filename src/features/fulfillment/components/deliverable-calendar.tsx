@@ -43,8 +43,12 @@ type DeliverableCalendarProps = {
 // scheduled, emerald = posted, red = cancelled) so status colors agree
 // across every view in the workspace.
 const CHIP_TONE: Record<DeliverableStatus, string> = {
+  draft:
+    "bg-slate-50 text-slate-700 dark:bg-slate-400/10 dark:text-slate-400",
   scheduled:
     "bg-amber-50 text-amber-800 dark:bg-amber-400/10 dark:text-amber-400",
+  in_progress:
+    "bg-blue-50 text-blue-800 dark:bg-blue-400/10 dark:text-blue-400",
   posted:
     "bg-emerald-50 text-emerald-800 dark:bg-emerald-400/10 dark:text-emerald-400",
   cancelled:
@@ -179,9 +183,16 @@ export function DeliverableCalendar({
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
   );
 
-  const byDate = useMemo(
-    () => groupByDateKey(deliverables, (d) => d.scheduled_date),
+  // Draft deliverables have no date yet, so they simply don't appear on
+  // this grid — they live in the Kanban's Draft column until scheduled.
+  const datedDeliverables = useMemo(
+    () => deliverables.filter((d) => d.scheduled_date != null),
     [deliverables]
+  );
+
+  const byDate = useMemo(
+    () => groupByDateKey(datedDeliverables, (d) => d.scheduled_date as string),
+    [datedDeliverables]
   );
 
   const days = useMemo(() => {

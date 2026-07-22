@@ -22,7 +22,11 @@ import {
   assignFulfillmentDeliverableAction,
   getFulfillmentDeliverableActivitiesAction,
 } from "@/features/fulfillment/actions-projects";
-import type { FulfillmentDeliverable } from "@/features/fulfillment/types-projects";
+import {
+  DELIVERABLE_NEXT_ACTIONS,
+  type DeliverableStatus,
+  type FulfillmentDeliverable,
+} from "@/features/fulfillment/types-projects";
 import type { WorkspaceMember } from "@/features/workspace/types";
 import type { Activity } from "@/features/activities/types";
 
@@ -64,9 +68,7 @@ export function DeliverableDetailSheet({
     return <Sheet open={false} onOpenChange={onOpenChange} />;
   }
 
-  const isTerminal = deliverable.status === "posted" || deliverable.status === "cancelled";
-
-  function setStatus(status: "scheduled" | "posted" | "cancelled") {
+  function setStatus(status: DeliverableStatus) {
     if (!deliverable) return;
     startTransition(async () => {
       const result = await updateFulfillmentDeliverableStatusAction(workspace.id, deliverable.id, {
@@ -122,21 +124,17 @@ export function DeliverableDetailSheet({
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge status={deliverable.status} />
-              {deliverable.status === "scheduled" && (
-                <>
-                  <Button size="sm" variant="outline" disabled={isPending} onClick={() => setStatus("posted")}>
-                    Mark Posted
-                  </Button>
-                  <Button size="sm" variant="outline" disabled={isPending} onClick={() => setStatus("cancelled")}>
-                    Cancel
-                  </Button>
-                </>
-              )}
-              {isTerminal && (
-                <Button size="sm" variant="outline" disabled={isPending} onClick={() => setStatus("scheduled")}>
-                  Reopen
+              {DELIVERABLE_NEXT_ACTIONS[deliverable.status].map((action) => (
+                <Button
+                  key={action.to}
+                  size="sm"
+                  variant="outline"
+                  disabled={isPending}
+                  onClick={() => setStatus(action.to)}
+                >
+                  {action.label}
                 </Button>
-              )}
+              ))}
             </div>
           </div>
 
@@ -146,7 +144,7 @@ export function DeliverableDetailSheet({
             </div>
             <Input
               type="date"
-              defaultValue={deliverable.scheduled_date}
+              defaultValue={deliverable.scheduled_date ?? undefined}
               className="h-8"
               disabled={isPending}
               onChange={(e) => e.target.value && reschedule(e.target.value)}

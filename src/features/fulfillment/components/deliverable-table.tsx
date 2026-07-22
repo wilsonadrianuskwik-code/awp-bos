@@ -24,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { cn } from "@/lib/utils/cn";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import {
@@ -34,7 +35,12 @@ import {
   deleteFulfillmentDeliverableAction,
 } from "@/features/fulfillment/actions-projects";
 import { useDeliverableBulkActions } from "@/features/fulfillment/hooks/use-deliverable-bulk-actions";
-import { DELIVERABLE_STATUSES, type FulfillmentDeliverable } from "@/features/fulfillment/types-projects";
+import {
+  DELIVERABLE_STATUSES,
+  DELIVERABLE_NEXT_ACTIONS,
+  type DeliverableStatus,
+  type FulfillmentDeliverable,
+} from "@/features/fulfillment/types-projects";
 import type { WorkspaceMember } from "@/features/workspace/types";
 
 type DeliverableTableProps = {
@@ -93,7 +99,7 @@ export function DeliverableTable({
     });
   }
 
-  function setStatus(id: string, status: "scheduled" | "posted" | "cancelled") {
+  function setStatus(id: string, status: DeliverableStatus) {
     startTransition(async () => {
       const result = await updateFulfillmentDeliverableStatusAction(workspace.id, id, { status });
       if (result.error) {
@@ -109,7 +115,7 @@ export function DeliverableTable({
     startTransition(async () => {
       const result = await createFulfillmentDeliverableAction(workspace.id, d.project_id, {
         title: `${d.title} (copy)`,
-        scheduled_date: d.scheduled_date,
+        scheduled_date: d.scheduled_date ?? undefined,
         description: d.description || undefined,
         fulfillment_item_id: d.fulfillment_item_id || undefined,
         assigned_to: d.assigned_to || undefined,
@@ -150,9 +156,12 @@ export function DeliverableTable({
               <button
                 type="button"
                 onClick={(e) => e.stopPropagation()}
-                className="font-mono text-[13px] tabular-nums hover:text-primary hover:underline"
+                className={cn(
+                  "font-mono text-[13px] tabular-nums hover:text-primary hover:underline",
+                  !d.scheduled_date && "italic text-muted-foreground"
+                )}
               >
-                {d.scheduled_date}
+                {d.scheduled_date ?? "No date"}
               </button>
             </PopoverTrigger>
             <PopoverContent
@@ -161,7 +170,7 @@ export function DeliverableTable({
             >
               <Input
                 type="date"
-                defaultValue={d.scheduled_date}
+                defaultValue={d.scheduled_date ?? undefined}
                 className="h-8 w-40"
                 onChange={(e) => e.target.value && reschedule(d.id, e.target.value)}
               />
@@ -241,7 +250,6 @@ export function DeliverableTable({
       header: "",
       cell: ({ row }) => {
         const d = row.original;
-        const isTerminal = d.status === "posted" || d.status === "cancelled";
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -255,21 +263,11 @@ export function DeliverableTable({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-              {d.status === "scheduled" && (
-                <>
-                  <DropdownMenuItem onSelect={() => setStatus(d.id, "posted")}>
-                    Mark Posted
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => setStatus(d.id, "cancelled")}>
-                    Cancel
-                  </DropdownMenuItem>
-                </>
-              )}
-              {isTerminal && (
-                <DropdownMenuItem onSelect={() => setStatus(d.id, "scheduled")}>
-                  Reopen
+              {DELIVERABLE_NEXT_ACTIONS[d.status].map((action) => (
+                <DropdownMenuItem key={action.to} onSelect={() => setStatus(d.id, action.to)}>
+                  {action.label}
                 </DropdownMenuItem>
-              )}
+              ))}
               <DropdownMenuItem onSelect={() => duplicate(d)}>
                 <Copy className="mr-2 h-3.5 w-3.5" /> Duplicate
               </DropdownMenuItem>

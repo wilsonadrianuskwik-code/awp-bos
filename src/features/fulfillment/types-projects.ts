@@ -52,9 +52,47 @@ export type FulfillmentProjectWithRollup = {
   next_deliverable_date: string | null;
 };
 
-export const DELIVERABLE_STATUSES = ["scheduled", "posted", "cancelled"] as const;
+export const DELIVERABLE_STATUSES = [
+  "draft",
+  "scheduled",
+  "in_progress",
+  "posted",
+  "cancelled",
+] as const;
 
 export type DeliverableStatus = (typeof DELIVERABLE_STATUSES)[number];
+
+// Mirrors update_fulfillment_deliverable_status's state machine
+// (supabase/migrations/00061_deliverable_draft_in_progress.sql) — the same
+// transition set the Kanban board's drag/drop enforces, offered here as
+// explicit menu actions (List row menu, detail sheet) instead of a drag
+// gesture. Shared by DeliverableTable and DeliverableDetailSheet so the two
+// surfaces never drift on what's a valid next status.
+export const DELIVERABLE_NEXT_ACTIONS: Record<
+  DeliverableStatus,
+  { label: string; to: DeliverableStatus }[]
+> = {
+  draft: [
+    { label: "Move to Scheduled", to: "scheduled" },
+    { label: "Move to In Progress", to: "in_progress" },
+    { label: "Cancel", to: "cancelled" },
+  ],
+  scheduled: [
+    { label: "Start (In Progress)", to: "in_progress" },
+    { label: "Mark Posted", to: "posted" },
+    { label: "Cancel", to: "cancelled" },
+  ],
+  in_progress: [
+    { label: "Mark Posted", to: "posted" },
+    { label: "Back to Scheduled", to: "scheduled" },
+    { label: "Cancel", to: "cancelled" },
+  ],
+  posted: [{ label: "Reopen (Scheduled)", to: "scheduled" }],
+  cancelled: [
+    { label: "Reopen (Scheduled)", to: "scheduled" },
+    { label: "Mark Posted", to: "posted" },
+  ],
+};
 
 export type FulfillmentDeliverable = {
   id: string;
@@ -65,7 +103,10 @@ export type FulfillmentDeliverable = {
   tracker_description: string | null;
   title: string;
   description: string | null;
-  scheduled_date: string;
+  // Null for a 'draft' deliverable (an idea captured before it's actually
+  // scheduled) — every other status normally carries a date, but nothing
+  // enforces that server-side, so treat this as always-nullable.
+  scheduled_date: string | null;
   status: DeliverableStatus;
   // Computed at read time (scheduled_date in the past AND status =
   // 'scheduled') — never stored, matching the never-cache-progress
@@ -96,7 +137,7 @@ export type ClientFulfillmentDeliverable = {
   fulfillment_item_id: string | null;
   tracker_description: string | null;
   title: string;
-  scheduled_date: string;
+  scheduled_date: string | null;
   status: DeliverableStatus;
   is_overdue: boolean;
   assigned_to: string | null;

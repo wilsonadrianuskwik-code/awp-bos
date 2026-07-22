@@ -742,7 +742,7 @@ function ClientWorkPanel({
                 className="flex items-center gap-3 rounded-lg border bg-card px-3 py-2"
               >
                 <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
-                  {d.scheduled_date}
+                  {d.scheduled_date ?? "No date"}
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProjectHeaderBar } from "@/features/fulfillment/components/project-header-bar";
-import { ProjectDetailsSheet } from "@/features/fulfillment/components/project-details-sheet";
+import { WorkspaceSidebar } from "@/features/fulfillment/components/workspace-sidebar";
 import { FulfillmentProgressCard } from "@/features/fulfillment/components/fulfillment-progress-card";
 import { RecordDeliveryDialog } from "@/features/fulfillment/components/record-delivery-dialog";
 import { DeliverableTable } from "@/features/fulfillment/components/deliverable-table";
@@ -63,11 +63,10 @@ type FulfillmentWorkspaceProps = {
 // entirely (fulfillment-cockpit.tsx renders this instead of the queue, not
 // alongside it) and this becomes the whole page. The header provides
 // context only (client, invoice, status, dates, team, one progress line);
-// everything below it is exactly one active view — Tracker/List/Kanban
-// (Calendar/Timeline disabled placeholders for now) — never a stacked
-// summary section scrolled past to reach the real work. Notes/Activity
-// move into a "Details" slide-over (ProjectDetailsSheet), opened from the
-// header, not permanently occupying page space. Fed entirely by `data`,
+// below it, a persistent right sidebar (mini calendar, upcoming
+// deliverables, Notes, Activity Timeline) sits alongside the active
+// Tracker/List/Kanban/Calendar/Timeline view — never swapped out by a
+// selection, and never behind a "Details" button. Fed entirely by `data`,
 // fetched client-side by the shell via getFulfillmentWorkspaceDataAction —
 // nothing here triggers a Next.js navigation.
 export function FulfillmentWorkspace({
@@ -79,7 +78,6 @@ export function FulfillmentWorkspace({
   const [recording, setRecording] = useState<FulfillmentItemWithProgress | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [selectedDeliverableId, setSelectedDeliverableId] = useState<string | null>(null);
   const [view, setViewState] = useState<MainView>(readStoredView);
@@ -115,116 +113,124 @@ export function FulfillmentWorkspace({
         onSwitchProject={onSwitchProject}
         onBackToQueue={onBackToQueue}
         onRefresh={onRefresh}
-        onOpenDetails={() => setDetailsOpen(true)}
       />
 
-      <Tabs value={view} onValueChange={(v) => setView(v as MainView)} className="flex flex-1 flex-col">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <TabsList>
-            <TabsTrigger value="tracker">
-              <PackageCheck className="mr-1.5 h-3.5 w-3.5" /> Tracker
-            </TabsTrigger>
-            <TabsTrigger value="list">
-              <Table2 className="mr-1.5 h-3.5 w-3.5" /> List
-            </TabsTrigger>
-            <TabsTrigger value="kanban">
-              <Columns3 className="mr-1.5 h-3.5 w-3.5" /> Kanban
-            </TabsTrigger>
-            <TabsTrigger value="calendar">
-              <CalendarDays className="mr-1.5 h-3.5 w-3.5" /> Calendar
-            </TabsTrigger>
-            <TabsTrigger value="timeline">
-              <GanttChartSquare className="mr-1.5 h-3.5 w-3.5" /> Timeline
-            </TabsTrigger>
-          </TabsList>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => setAddOpen(true)}>
-              + Add Deliverable
-            </Button>
-            <Button size="sm" onClick={() => setWizardOpen(true)}>
-              <CalendarRange className="mr-1.5 h-3.5 w-3.5" />
-              Generate Schedule
-            </Button>
-          </div>
-        </div>
-
-        {deliverables.length === 0 ? (
-          <EmptyState
-            icon={CalendarRange}
-            title="Build the posting schedule"
-            description="Generate every deliverable at once from a start date and a method, instead of adding them one by one."
-            action={
-              <Button onClick={() => setWizardOpen(true)}>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+        <Tabs
+          value={view}
+          onValueChange={(v) => setView(v as MainView)}
+          className="flex min-w-0 flex-1 flex-col"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <TabsList>
+              <TabsTrigger value="tracker">
+                <PackageCheck className="mr-1.5 h-3.5 w-3.5" /> Tracker
+              </TabsTrigger>
+              <TabsTrigger value="list">
+                <Table2 className="mr-1.5 h-3.5 w-3.5" /> List
+              </TabsTrigger>
+              <TabsTrigger value="kanban">
+                <Columns3 className="mr-1.5 h-3.5 w-3.5" /> Kanban
+              </TabsTrigger>
+              <TabsTrigger value="calendar">
+                <CalendarDays className="mr-1.5 h-3.5 w-3.5" /> Calendar
+              </TabsTrigger>
+              <TabsTrigger value="timeline">
+                <GanttChartSquare className="mr-1.5 h-3.5 w-3.5" /> Timeline
+              </TabsTrigger>
+            </TabsList>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => setAddOpen(true)}>
+                + Add Deliverable
+              </Button>
+              <Button size="sm" onClick={() => setWizardOpen(true)}>
                 <CalendarRange className="mr-1.5 h-3.5 w-3.5" />
                 Generate Schedule
               </Button>
-            }
-          />
-        ) : (
-          <>
-            <TabsContent value="tracker">
-              {trackers.length === 0 ? (
-                <p className="py-8 text-center text-sm text-muted-foreground">
-                  No trackers for this invoice yet.
-                </p>
-              ) : (
-                <div className="flex flex-col gap-3">
-                  {trackers.map((t) => (
-                    <FulfillmentProgressCard
-                      key={t.id}
-                      tracker={t}
-                      stalledAfterDays={FULFILLMENT_STALLED_AFTER_DAYS}
-                      onRecordDelivery={setRecording}
-                      linkedDeliverableCount={deliverables.filter((d) => d.fulfillment_item_id === t.id).length}
-                    />
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-            <TabsContent value="list">
-              <DeliverableTable
-                deliverables={deliverables}
-                members={members}
-                selectedIds={selectedIds}
-                onSelectedIdsChange={setSelectedIds}
-                onSelectDeliverable={setSelectedDeliverableId}
-                onChanged={onRefresh}
-              />
-            </TabsContent>
-            <TabsContent value="kanban">
-              <DeliverableKanbanBoard
-                deliverables={deliverables}
-                members={members}
-                selectedIds={selectedIds}
-                onSelectedIdsChange={setSelectedIds}
-                onSelectDeliverable={setSelectedDeliverableId}
-                onChanged={onRefresh}
-              />
-            </TabsContent>
-            <TabsContent value="calendar">
-              <DeliverableCalendar
-                deliverables={deliverables}
-                onSelectDeliverable={setSelectedDeliverableId}
-                onChanged={onRefresh}
-              />
-            </TabsContent>
-            <TabsContent value="timeline">
-              <DeliverableTimeline
-                deliverables={deliverables}
-                members={members}
-                onSelectDeliverable={setSelectedDeliverableId}
-              />
-            </TabsContent>
-          </>
-        )}
-      </Tabs>
+            </div>
+          </div>
 
-      <ProjectDetailsSheet
-        open={detailsOpen}
-        onOpenChange={setDetailsOpen}
-        project={project}
-        activities={activities}
-      />
+          {deliverables.length === 0 ? (
+            <EmptyState
+              icon={CalendarRange}
+              title="Build the posting schedule"
+              description="Generate every deliverable at once from a start date and a method, instead of adding them one by one."
+              action={
+                <Button onClick={() => setWizardOpen(true)}>
+                  <CalendarRange className="mr-1.5 h-3.5 w-3.5" />
+                  Generate Schedule
+                </Button>
+              }
+            />
+          ) : (
+            <>
+              <TabsContent value="tracker">
+                {trackers.length === 0 ? (
+                  <p className="py-8 text-center text-sm text-muted-foreground">
+                    No trackers for this invoice yet.
+                  </p>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    {trackers.map((t) => (
+                      <FulfillmentProgressCard
+                        key={t.id}
+                        tracker={t}
+                        stalledAfterDays={FULFILLMENT_STALLED_AFTER_DAYS}
+                        onRecordDelivery={setRecording}
+                        linkedDeliverableCount={deliverables.filter((d) => d.fulfillment_item_id === t.id).length}
+                      />
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+              <TabsContent value="list">
+                <DeliverableTable
+                  deliverables={deliverables}
+                  members={members}
+                  selectedIds={selectedIds}
+                  onSelectedIdsChange={setSelectedIds}
+                  onSelectDeliverable={setSelectedDeliverableId}
+                  onChanged={onRefresh}
+                />
+              </TabsContent>
+              <TabsContent value="kanban">
+                <DeliverableKanbanBoard
+                  deliverables={deliverables}
+                  members={members}
+                  selectedIds={selectedIds}
+                  onSelectedIdsChange={setSelectedIds}
+                  onSelectDeliverable={setSelectedDeliverableId}
+                  onChanged={onRefresh}
+                />
+              </TabsContent>
+              <TabsContent value="calendar">
+                <DeliverableCalendar
+                  deliverables={deliverables}
+                  onSelectDeliverable={setSelectedDeliverableId}
+                  onChanged={onRefresh}
+                />
+              </TabsContent>
+              <TabsContent value="timeline">
+                <DeliverableTimeline
+                  deliverables={deliverables}
+                  members={members}
+                  onSelectDeliverable={setSelectedDeliverableId}
+                />
+              </TabsContent>
+            </>
+          )}
+        </Tabs>
+
+        <WorkspaceSidebar
+          project={project}
+          deliverables={deliverables}
+          activities={activities}
+          onSelectDeliverable={setSelectedDeliverableId}
+          onOpenCalendar={() => setView("calendar")}
+          onOpenTimeline={() => setView("timeline")}
+          onRefresh={onRefresh}
+        />
+      </div>
 
       <AddDeliverableDialog
         open={addOpen}
