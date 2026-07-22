@@ -50,9 +50,7 @@ function TimelineRow({
         ? "bg-red-500"
         : deliverable.status === "in_progress"
           ? "bg-blue-500"
-          : deliverable.status === "draft"
-            ? "bg-slate-400"
-            : "bg-amber-500";
+          : "bg-amber-500";
 
   return (
     <button
@@ -68,9 +66,7 @@ function TimelineRow({
         <div className="min-w-0">
           <div className="truncate text-[13px] font-medium">{deliverable.title}</div>
           <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
-            <span className={cn("font-mono tabular-nums", !deliverable.scheduled_date && "italic")}>
-              {deliverable.scheduled_date ?? "No date"}
-            </span>
+            <span className="font-mono tabular-nums">{deliverable.scheduled_date}</span>
             {deliverable.tracker_description && <span>· {deliverable.tracker_description}</span>}
             {assignee && <span>· {assignee}</span>}
           </div>
@@ -127,58 +123,30 @@ export function DeliverableTimeline({
 }: DeliverableTimelineProps) {
   const [showCancelled, setShowCancelled] = useState(false);
 
-  // Draft has no date to group by week — it's not part of the dated
-  // chronological read at all, just a flat "awaiting a schedule" list.
-  const drafts = useMemo(
-    () => deliverables.filter((d) => d.status === "draft"),
-    [deliverables]
-  );
-
   const upcomingGroups = useMemo(() => {
     const upcoming = deliverables
-      .filter((d) => (d.status === "scheduled" || d.status === "in_progress") && d.scheduled_date)
-      .sort((a, b) => (a.scheduled_date as string).localeCompare(b.scheduled_date as string));
-    return groupByWeek(upcoming, (d) => d.scheduled_date as string);
+      .filter((d) => d.status === "scheduled" || d.status === "in_progress")
+      .sort((a, b) => a.scheduled_date.localeCompare(b.scheduled_date));
+    return groupByWeek(upcoming, (d) => d.scheduled_date);
   }, [deliverables]);
 
   const completedGroups = useMemo(() => {
     const completed = deliverables
       .filter((d) => d.status === "posted")
-      .sort((a, b) =>
-        (a.posted_at ?? a.scheduled_date ?? "").localeCompare(b.posted_at ?? b.scheduled_date ?? "")
-      );
-    return groupByWeek(completed, (d) =>
-      d.posted_at ? formatISODate(new Date(d.posted_at)) : (d.scheduled_date as string)
-    );
+      .sort((a, b) => (a.posted_at ?? a.scheduled_date).localeCompare(b.posted_at ?? b.scheduled_date));
+    return groupByWeek(completed, (d) => (d.posted_at ? formatISODate(new Date(d.posted_at)) : d.scheduled_date));
   }, [deliverables]);
 
   const cancelled = useMemo(
     () =>
       deliverables
         .filter((d) => d.status === "cancelled")
-        .sort((a, b) => (a.scheduled_date ?? "").localeCompare(b.scheduled_date ?? "")),
+        .sort((a, b) => a.scheduled_date.localeCompare(b.scheduled_date)),
     [deliverables]
   );
 
   return (
     <div className="space-y-6">
-      {drafts.length > 0 && (
-        <div>
-          <h3 className="mb-3 text-sm font-semibold">Draft</h3>
-          <div className="flex flex-col">
-            {drafts.map((d, i) => (
-              <TimelineRow
-                key={d.id}
-                deliverable={d}
-                members={members}
-                isLast={i === drafts.length - 1}
-                onSelectDeliverable={onSelectDeliverable}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
       <div>
         <h3 className="mb-3 text-sm font-semibold">Upcoming</h3>
         {upcomingGroups.length === 0 ? (

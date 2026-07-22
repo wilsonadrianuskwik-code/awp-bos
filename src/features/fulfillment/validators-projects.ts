@@ -35,9 +35,7 @@ export type AssignFulfillmentProjectInput = z.infer<
 
 export const createDeliverableSchema = z.object({
   title: z.string().min(1, "Title is required").max(200),
-  // Optional — omitting it creates a 'draft' (an idea captured before it's
-  // actually scheduled); giving a date creates it as 'scheduled' directly.
-  scheduled_date: z.string().optional().or(z.literal("")),
+  scheduled_date: z.string().min(1, "Scheduled date is required"),
   description: z.string().max(2000).optional().or(z.literal("")),
   fulfillment_item_id: z.string().uuid().optional().nullable(),
   assigned_to: z.string().uuid().optional().nullable(),

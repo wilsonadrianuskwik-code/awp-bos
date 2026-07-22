@@ -23,7 +23,6 @@ import type {
 import type { Activity } from "@/features/activities/types";
 
 const DOT_TONE: Record<DeliverableStatus, string> = {
-  draft: "bg-slate-400",
   scheduled: "bg-amber-500",
   in_progress: "bg-blue-500",
   posted: "bg-emerald-500",
@@ -67,11 +66,7 @@ export function WorkspaceSidebar({
   const router = useRouter();
 
   const byDate = useMemo(
-    () =>
-      groupByDateKey(
-        deliverables.filter((d) => d.scheduled_date != null),
-        (d) => d.scheduled_date as string
-      ),
+    () => groupByDateKey(deliverables, (d) => d.scheduled_date),
     [deliverables]
   );
 
@@ -85,12 +80,8 @@ export function WorkspaceSidebar({
   const upcoming = useMemo(
     () =>
       deliverables
-        .filter(
-          (d) =>
-            (d.status === "scheduled" || d.status === "in_progress") &&
-            d.scheduled_date
-        )
-        .sort((a, b) => (a.scheduled_date as string).localeCompare(b.scheduled_date as string))
+        .filter((d) => d.status === "scheduled" || d.status === "in_progress")
+        .sort((a, b) => a.scheduled_date.localeCompare(b.scheduled_date))
         .slice(0, 5),
     [deliverables]
   );

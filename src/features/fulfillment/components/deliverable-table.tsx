@@ -24,7 +24,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { cn } from "@/lib/utils/cn";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import {
@@ -115,7 +114,7 @@ export function DeliverableTable({
     startTransition(async () => {
       const result = await createFulfillmentDeliverableAction(workspace.id, d.project_id, {
         title: `${d.title} (copy)`,
-        scheduled_date: d.scheduled_date ?? undefined,
+        scheduled_date: d.scheduled_date,
         description: d.description || undefined,
         fulfillment_item_id: d.fulfillment_item_id || undefined,
         assigned_to: d.assigned_to || undefined,
@@ -156,12 +155,9 @@ export function DeliverableTable({
               <button
                 type="button"
                 onClick={(e) => e.stopPropagation()}
-                className={cn(
-                  "font-mono text-[13px] tabular-nums hover:text-primary hover:underline",
-                  !d.scheduled_date && "italic text-muted-foreground"
-                )}
+                className="font-mono text-[13px] tabular-nums hover:text-primary hover:underline"
               >
-                {d.scheduled_date ?? "No date"}
+                {d.scheduled_date}
               </button>
             </PopoverTrigger>
             <PopoverContent
@@ -170,7 +166,7 @@ export function DeliverableTable({
             >
               <Input
                 type="date"
-                defaultValue={d.scheduled_date ?? undefined}
+                defaultValue={d.scheduled_date}
                 className="h-8 w-40"
                 onChange={(e) => e.target.value && reschedule(d.id, e.target.value)}
               />

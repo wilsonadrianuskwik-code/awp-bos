@@ -144,7 +144,7 @@ export function DeliverableDetailSheet({
             </div>
             <Input
               type="date"
-              defaultValue={deliverable.scheduled_date ?? undefined}
+              defaultValue={deliverable.scheduled_date}
               className="h-8"
               disabled={isPending}
               onChange={(e) => e.target.value && reschedule(e.target.value)}

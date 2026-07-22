@@ -108,7 +108,7 @@ function DraggableCard({ id, children }: { id: string; children: ReactNode }) {
       {...listeners}
       {...attributes}
       className={cn(
-        "cursor-grab transition-transform active:cursor-grabbing",
+        "cursor-grab active:cursor-grabbing",
         isDragging && "touch-none cursor-grabbing opacity-0"
       )}
     >
@@ -139,9 +139,15 @@ export function KanbanBoard<TItem>({
   renderCard,
   onDrop,
 }: KanbanBoardProps<TItem>) {
+  // A short activation distance means the drag starts the instant the
+  // pointer moves, rather than requiring a deliberate drag gesture first —
+  // this is what makes Jira/Linear-style boards feel like the card is
+  // "attached" to the cursor immediately instead of lagging behind it.
+  // Still enough (4px) that a plain click reliably opens the card instead
+  // of accidentally starting a drag.
   const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
+    useSensor(MouseSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 8 } })
   );
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -204,17 +210,23 @@ export function KanbanBoard<TItem>({
           positions the overlay from the pointer's offset into the ORIGINAL
           card's box, so a differently-sized clone visibly drifts from the
           cursor. Forcing the same width here keeps the drag ghost identical
-          to the card the user actually grabbed. */}
-      <DragOverlay>
+          to the card the user actually grabbed.
+
+          No rotation and no scale — Jira/Linear-style drag keeps the card
+          exactly the size it was and exactly under the cursor at the pixel
+          it was grabbed; a tilt or scale reads as "lifted" but actually
+          makes the ghost visibly drift from the pointer since the rotate
+          transform pivots around the card's center, not the grab point.
+          dropAnimation={null} skips dnd-kit's default "snap back" animation
+          on drop, which otherwise adds a beat of lag before the real
+          (optimistic) card appears in its new column. */}
+      <DragOverlay dropAnimation={null}>
         {/* w-[272px] = the column's w-72 (288px) minus its content wrapper's
             p-2 padding (8px each side) — the exact stretched width a card
             has in-column, since a plain w-72 here would still be 16px wider
-            than the real card and re-introduce the same drift. The scale +
-            shadow read as "lifted off the board," distinct from a resting
-            card, without affecting the drop-position math above (both are
-            pure visual layers on top of the same fixed-width box). */}
+            than the real card and re-introduce the same drift. */}
         {activeItem ? (
-          <div className="w-[272px] scale-[1.03] rotate-1 shadow-xl">
+          <div className="w-[272px] cursor-grabbing shadow-xl">
             {renderCard(activeItem)}
           </div>
         ) : null}

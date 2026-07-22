@@ -54,15 +54,15 @@ export function AddDeliverableDialog({
     const description = (formData.get("description") as string)?.trim();
     const trackerId = formData.get("fulfillment_item_id") as string;
 
-    if (!title) {
-      toast("Title is required", "error");
+    if (!title || !scheduledDate) {
+      toast("Title and scheduled date are required", "error");
       return;
     }
 
     startTransition(async () => {
       const result = await createFulfillmentDeliverableAction(workspace.id, projectId, {
         title,
-        scheduled_date: scheduledDate || undefined,
+        scheduled_date: scheduledDate,
         description: description || undefined,
         fulfillment_item_id: trackerId && trackerId !== "none" ? trackerId : undefined,
       });
@@ -94,11 +94,8 @@ export function AddDeliverableDialog({
               <Input id="deliverable-title" name="title" maxLength={200} required autoFocus />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="deliverable-date">Scheduled Date</Label>
-              <Input id="deliverable-date" name="scheduled_date" type="date" />
-              <p className="text-xs text-muted-foreground">
-                Leave blank to save as a Draft — schedule it later.
-              </p>
+              <Label htmlFor="deliverable-date">Scheduled Date *</Label>
+              <Input id="deliverable-date" name="scheduled_date" type="date" required />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="deliverable-tracker">Link to Tracker (optional)</Label>

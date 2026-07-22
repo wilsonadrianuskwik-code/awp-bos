@@ -25,7 +25,6 @@ import {
 import type { WorkspaceMember } from "@/features/workspace/types";
 
 const LANES: { id: DeliverableStatus; label: string; tone: KanbanTone; emptyLabel: string }[] = [
-  { id: "draft", label: "Draft", tone: "slate", emptyLabel: "No drafts" },
   { id: "scheduled", label: "Scheduled", tone: "amber", emptyLabel: "Nothing scheduled" },
   { id: "in_progress", label: "In Progress", tone: "blue", emptyLabel: "Nothing in progress" },
   { id: "posted", label: "Posted", tone: "emerald", emptyLabel: "Nothing posted yet" },
@@ -47,31 +46,20 @@ function initialsFor(member?: WorkspaceMember): string {
 // Mirrors LANES' tones so a card's left-border stripe always agrees with
 // the column it's currently sitting in.
 const CARD_BORDER: Record<DeliverableStatus, string> = {
-  draft: "border-l-4 border-l-slate-400",
   scheduled: "border-l-4 border-l-amber-500",
   in_progress: "border-l-4 border-l-blue-500",
   posted: "border-l-4 border-l-emerald-500",
   cancelled: "border-l-4 border-l-red-500",
 };
 
-// Mirrors update_fulfillment_deliverable_status's state machine
-// (supabase/migrations/00061_deliverable_draft_in_progress.sql) — the
-// reopen transitions (posted -> scheduled, cancelled -> scheduled/posted)
-// are admin-gated server-side, enforced here too so a staff drag visibly
-// rejects instead of erroring after an optimistic move.
-const VALID_NEXT: Record<DeliverableStatus, DeliverableStatus[]> = {
-  draft: ["scheduled", "in_progress", "cancelled"],
-  scheduled: ["in_progress", "posted", "cancelled"],
-  in_progress: ["scheduled", "posted", "cancelled"],
-  posted: ["scheduled"],
-  cancelled: ["scheduled", "posted"],
-};
-
-// Only a move off of posted/cancelled reopens a terminal state — it gets a
-// confirmation step even for an admin who's allowed to do it, same
-// discipline as this codebase's other destructive/state-reversing actions
-// (useConfirm, already used for deletes elsewhere). Draft/scheduled/
-// in_progress moves are routine and don't need a confirm step.
+// Movement between any two columns is allowed — dragging a card to any
+// lane always attempts that transition (supabase/migrations/
+// 00062_remove_draft_free_transitions.sql lifts the server-side matrix
+// the same way). The only remaining rule, mirrored from the server's own
+// admin/owner gate: leaving 'posted' or 'cancelled' (undoing a terminal
+// state) needs admin permission and a confirmation step, since that can
+// reverse a tracker credit or bulk-generated schedule state — every other
+// move is routine and applies immediately.
 function isReopenTransition(from: DeliverableStatus): boolean {
   return from === "posted" || from === "cancelled";
 }
@@ -84,16 +72,15 @@ function reopenConfirmCopy(from: DeliverableStatus, to: DeliverableStatus) {
         "This will record it as posted and credit one delivery unit to its linked tracker, if any.",
     };
   }
-  if (from === "cancelled" && to === "scheduled") {
+  if (from === "posted") {
     return {
-      title: "Reopen this cancelled deliverable?",
-      description: "It will move back to Scheduled.",
+      title: `Move this posted deliverable to ${to.replace("_", " ")}?`,
+      description: "Its credited delivery unit will be reversed.",
     };
   }
   return {
-    title: "Reopen this posted deliverable?",
-    description:
-      "It will move back to Scheduled and its credited delivery unit will be reversed.",
+    title: `Reopen this cancelled deliverable to ${to.replace("_", " ")}?`,
+    description: "",
   };
 }
 
@@ -141,10 +128,6 @@ export function DeliverableKanbanBoard({
     if (!item) return;
 
     const nextStatus = toColumnId as DeliverableStatus;
-    if (!VALID_NEXT[item.status].includes(nextStatus)) {
-      toast(`Cannot move a ${item.status} deliverable to ${toColumnId}`, "error");
-      return;
-    }
 
     // Mirrors the server's own admin/owner gate in
     // update_fulfillment_deliverable_status.
@@ -290,7 +273,12 @@ export function DeliverableKanbanBoard({
           return (
             <div
               className={cn(
-                "group/dcard relative cursor-pointer rounded-lg border bg-card p-3 shadow-2xs transition-colors hover:border-foreground/20 hover:shadow-sm",
+                // No cursor set here — the draggable wrapper around this
+                // card already shows cursor-grab/grabbing, and this card
+                // covers its entire surface, so setting cursor-pointer here
+                // would override that everywhere and the grab affordance
+                // would never actually be visible.
+                "group/dcard relative rounded-lg border bg-card p-3 shadow-2xs transition-colors hover:border-foreground/20 hover:shadow-sm",
                 CARD_BORDER[d.status]
               )}
               onClick={() => onSelectDeliverable(d.id)}
@@ -335,12 +323,11 @@ export function DeliverableKanbanBoard({
                 <span
                   className={cn(
                     "inline-flex items-center gap-1 font-mono text-xs tabular-nums text-muted-foreground",
-                    d.is_overdue && "font-medium text-red-600 dark:text-red-400",
-                    !d.scheduled_date && "italic text-muted-foreground/60"
+                    d.is_overdue && "font-medium text-red-600 dark:text-red-400"
                   )}
                 >
                   <CalendarClock className="h-3 w-3" />
-                  {d.scheduled_date ?? "No date"}
+                  {d.scheduled_date}
                 </span>
                 {assignee ? (
                   <Avatar className="h-5 w-5 shrink-0" title={assignee.profile?.full_name ?? assignee.email ?? undefined}>

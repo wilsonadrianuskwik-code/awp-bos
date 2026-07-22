@@ -226,7 +226,7 @@ export async function createFulfillmentDeliverableAction(
       p_workspace_id: ctx.workspaceId,
       p_actor_id: ctx.userId,
       p_title: parsed.data.title,
-      p_scheduled_date: parsed.data.scheduled_date || null,
+      p_scheduled_date: parsed.data.scheduled_date,
       p_description: parsed.data.description || null,
       p_fulfillment_item_id: parsed.data.fulfillment_item_id || null,
       p_assigned_to: parsed.data.assigned_to || null,
