@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MoreHorizontal, ChevronDown } from "lucide-react";
+import { MoreHorizontal, ChevronDown, PanelRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -92,18 +92,22 @@ type ProjectHeaderBarProps = {
   onSwitchProject: (invoiceId: string) => void;
   onBackToQueue: () => void;
   onRefresh: () => void;
+  onOpenDetails: () => void;
 };
 
 // Compact (~120-150px) header for the project workspace — client/invoice,
-// status, overall progress, assignee, and every mutation the old, always-
-// expanded ProjectInfoCard had, now behind a "Details" dialog and a ⋯ menu
-// so the List/Kanban/Tracker views below get the bulk of the screen.
+// status, overall progress, assignee, and a "Details" button that opens
+// Notes/Activity Timeline in a slide-over (ProjectDetailsSheet) rather than
+// occupying page space, plus a ⋯ menu for every project-level mutation —
+// so the List/Kanban/Tracker workspace below is the only thing that
+// permanently fills the screen.
 export function ProjectHeaderBar({
   project,
   members,
   onSwitchProject,
   onBackToQueue,
   onRefresh,
+  onOpenDetails,
 }: ProjectHeaderBarProps) {
   const router = useRouter();
   const { workspace, can } = useWorkspace();
@@ -234,12 +238,23 @@ export function ProjectHeaderBar({
             <StatusBadge status={project.status} className="ml-1 shrink-0" />
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
+          <div className="flex shrink-0 items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 gap-1.5 px-2 text-muted-foreground"
+              onClick={onOpenDetails}
+              title="Notes and activity history"
+            >
+              <PanelRight className="h-3.5 w-3.5" />
+              Details
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {can("staff") && (
                 <DropdownMenuItem onSelect={() => setDetailsOpen(true)}>
@@ -270,7 +285,8 @@ export function ProjectHeaderBar({
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
-          </DropdownMenu>
+            </DropdownMenu>
+          </div>
         </div>
 
         {/* Row 2 — the stat strip: client/invoice/dates/team all as plain
