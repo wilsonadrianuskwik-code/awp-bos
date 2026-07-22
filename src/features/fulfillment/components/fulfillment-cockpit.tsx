@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   Search,
   ArrowLeft,
@@ -10,7 +10,6 @@ import {
   Clock,
   CircleDot,
   CheckCircle2,
-  CalendarClock,
   PackageCheck,
   ChevronsUpDown,
   Check,
@@ -25,7 +24,6 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { AnimatedValue } from "@/components/shared/animated-value";
 import { cn } from "@/lib/utils/cn";
 import { useWorkspace } from "@/providers/workspace-provider";
-import { useToast } from "@/providers/toast-provider";
 import { FulfillmentProgressCard } from "@/features/fulfillment/components/fulfillment-progress-card";
 import { RecordDeliveryDialog } from "@/features/fulfillment/components/record-delivery-dialog";
 import { FulfillmentWorkspace } from "@/features/fulfillment/components/fulfillment-workspace";
@@ -35,13 +33,8 @@ import {
   trackerReasons,
   type AttentionReason,
 } from "@/features/fulfillment/attention";
-import {
-  getClientFulfillmentDeliverablesAction,
-  getFulfillmentWorkspaceDataAction,
-  updateFulfillmentDeliverableStatusAction,
-} from "@/features/fulfillment/actions-projects";
+import { getFulfillmentWorkspaceDataAction } from "@/features/fulfillment/actions-projects";
 import type { FulfillmentWorkspaceData } from "@/features/fulfillment/actions-projects";
-import type { ClientFulfillmentDeliverable } from "@/features/fulfillment/types-projects";
 import type { FulfillmentItemWithProgress } from "@/features/fulfillment/types";
 
 type View = "active" | "completed" | "all";
@@ -564,8 +557,6 @@ function ClientWorkPanel({
   onOpenProject: (invoiceId: string) => void;
 }) {
   const { workspace } = useWorkspace();
-  const router = useRouter();
-  const { toast } = useToast();
   const s = client.stats;
   const outstanding = client.trackers.filter((t) => t.status !== "completed");
   const completed = client.trackers.filter((t) => t.status === "completed");
@@ -584,67 +575,6 @@ function ClientWorkPanel({
     }
     return [...map.values()];
   }, [client.trackers]);
-
-  const [deliverables, setDeliverables] = useState<ClientFulfillmentDeliverable[]>([]);
-  const [loadingDeliverables, setLoadingDeliverables] = useState(true);
-  // TEMPORARY debug capture — the raw { data, error } this fetch actually
-  // received, rendered directly on the page (see debug line below) so the
-  // discrepancy can be seen without DevTools/SQL, since direct DB access
-  // has already proven the data exists and is correct.
-  const [debugRaw, setDebugRaw] = useState<string>("(pending)");
-  const [, startTransition] = useTransition();
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoadingDeliverables(true);
-    getClientFulfillmentDeliverablesAction(workspace.id, client.clientId)
-      .then((result) => {
-        if (cancelled) return;
-        setDebugRaw(JSON.stringify({ error: result.error, count: result.data?.length ?? null, sample: result.data?.[0] ?? null }));
-        // A real failure here must not look identical to "genuinely no
-        // outstanding deliverables" — that exact silent-swallow previously
-        // masked a backend bug (an ambiguous overloaded RPC) as an empty
-        // state for every client, indefinitely.
-        if (result.error) {
-          toast(result.error, "error");
-          setDeliverables([]);
-        } else {
-          setDeliverables(result.data ?? []);
-        }
-      })
-      .catch((err) => {
-        // A thrown/rejected promise (as opposed to the action's normal
-        // { error } return shape) previously had no handler at all here —
-        // the .then callback above simply never ran, so the loading
-        // skeleton spun forever with no visible error, indistinguishable
-        // from a slow network on screen.
-        if (cancelled) return;
-        setDebugRaw(`(threw) ${err instanceof Error ? err.message : String(err)}`);
-        toast(err instanceof Error ? err.message : "Failed to load deliverables", "error");
-        setDeliverables([]);
-      })
-      .finally(() => {
-        if (!cancelled) setLoadingDeliverables(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [workspace.id, client.clientId, toast]);
-
-  function markPosted(deliverableId: string) {
-    startTransition(async () => {
-      const result = await updateFulfillmentDeliverableStatusAction(workspace.id, deliverableId, {
-        status: "posted",
-      });
-      if (result.error) {
-        toast(result.error, "error");
-        return;
-      }
-      setDeliverables((prev) => prev.filter((d) => d.id !== deliverableId));
-      toast("Marked as posted", "success");
-      router.refresh();
-    });
-  }
 
   return (
     // Keyed by clientId in the parent, so switching clients remounts and
@@ -731,64 +661,6 @@ function ClientWorkPanel({
       </div>
 
       <div className="p-5">
-        {/* Outstanding Deliverables — the client's remaining scheduled
-            "Post #N" items across ALL their projects, fetched inline via
-            get_fulfillment_deliverables_by_client so seeing what's due
-            never requires leaving the cockpit. */}
-        <SectionLabel text="Outstanding Deliverables" count={deliverables.length} />
-        {/* TEMPORARY debug line — remove once the empty-result mismatch is
-            root-caused. Shows exactly which ids this fetch used, since the
-            RPC returning a real empty array (not an error) here means
-            either these ids don't match what's actually in the database,
-            or the query itself needs re-checking against them directly. */}
-        <p className="mb-2 break-all font-mono text-[10px] text-muted-foreground">
-          debug: ws={workspace.id} client={client.clientId} result={debugRaw}
-        </p>
-        {loadingDeliverables ? (
-          <div className="mb-6 flex flex-col gap-2">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="h-11 animate-pulse rounded-lg bg-muted/50" />
-            ))}
-          </div>
-        ) : deliverables.length === 0 ? (
-          <div className="mb-6 flex items-center gap-2 rounded-lg border border-dashed py-4 px-4 text-sm text-muted-foreground">
-            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500/70" />
-            Nothing scheduled and outstanding for this client.
-          </div>
-        ) : (
-          <div className="mb-6 flex flex-col gap-1.5">
-            {deliverables.map((d) => (
-              <div
-                key={d.id}
-                className="flex items-center gap-3 rounded-lg border bg-card px-3 py-2"
-              >
-                <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
-                  {d.scheduled_date}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="truncate text-[13px] font-medium">{d.title}</span>
-                    {d.is_overdue && (
-                      <span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-red-600 dark:text-red-400">
-                        <CalendarClock className="h-3 w-3" /> Overdue
-                      </span>
-                    )}
-                  </div>
-                  <span className="truncate font-mono text-xs text-muted-foreground">{d.invoice_number}</span>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 shrink-0 text-xs"
-                  onClick={() => markPosted(d.id)}
-                >
-                  Mark Posted
-                </Button>
-              </div>
-            ))}
-          </div>
-        )}
-
         {outstanding.length > 0 ? (
           <>
             <SectionLabel text="Outstanding" count={outstanding.length} />
