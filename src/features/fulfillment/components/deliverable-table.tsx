@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Copy, MoreHorizontal, CalendarClock, CheckCircle2, XCircle } from "lucide-react";
+import { Copy, MoreHorizontal, CalendarClock, CheckCircle2, Trash2, UserCircle2 } from "lucide-react";
 import { DataTable } from "@/components/shared/data-table";
 import { BulkActionToolbar, type BulkAction } from "@/components/shared/bulk-action-toolbar";
 import { Button } from "@/components/ui/button";
@@ -30,12 +30,11 @@ import {
   rescheduleFulfillmentDeliverableAction,
   updateFulfillmentDeliverableStatusAction,
   assignFulfillmentDeliverableAction,
-  bulkUpdateFulfillmentDeliverableStatusAction,
-  bulkRescheduleFulfillmentDeliverablesAction,
   createFulfillmentDeliverableAction,
   deleteFulfillmentDeliverableAction,
 } from "@/features/fulfillment/actions-projects";
-import type { FulfillmentDeliverable } from "@/features/fulfillment/types-projects";
+import { useDeliverableBulkActions } from "@/features/fulfillment/hooks/use-deliverable-bulk-actions";
+import { DELIVERABLE_STATUSES, type FulfillmentDeliverable } from "@/features/fulfillment/types-projects";
 import type { WorkspaceMember } from "@/features/workspace/types";
 
 type DeliverableTableProps = {
@@ -137,56 +136,7 @@ export function DeliverableTable({
     });
   }
 
-  function bulkMarkPosted() {
-    startTransition(async () => {
-      const result = await bulkUpdateFulfillmentDeliverableStatusAction(workspace.id, {
-        deliverable_ids: [...selectedIds],
-        status: "posted",
-      });
-      if (result.error) {
-        toast(result.error, "error");
-        return;
-      }
-      toast("Marked as posted", "success");
-      onSelectedIdsChange(new Set());
-      router.refresh();
-      onChanged();
-    });
-  }
-
-  function bulkCancel() {
-    startTransition(async () => {
-      const result = await bulkUpdateFulfillmentDeliverableStatusAction(workspace.id, {
-        deliverable_ids: [...selectedIds],
-        status: "cancelled",
-      });
-      if (result.error) {
-        toast(result.error, "error");
-        return;
-      }
-      toast("Cancelled", "success");
-      onSelectedIdsChange(new Set());
-      router.refresh();
-      onChanged();
-    });
-  }
-
-  function bulkReschedule(date: string) {
-    startTransition(async () => {
-      const result = await bulkRescheduleFulfillmentDeliverablesAction(workspace.id, {
-        deliverable_ids: [...selectedIds],
-        scheduled_date: date,
-      });
-      if (result.error) {
-        toast(result.error, "error");
-        return;
-      }
-      toast("Rescheduled", "success");
-      onSelectedIdsChange(new Set());
-      router.refresh();
-      onChanged();
-    });
-  }
+  const bulk = useDeliverableBulkActions({ selectedIds, onSelectedIdsChange, onChanged });
 
   const columns: ColumnDef<FulfillmentDeliverable, unknown>[] = [
     {
@@ -337,28 +287,76 @@ export function DeliverableTable({
   ];
 
   const bulkActions: BulkAction[] = [
-    { label: "Mark Posted", icon: CheckCircle2, onClick: bulkMarkPosted },
-    { label: "Cancel", icon: XCircle, onClick: bulkCancel, destructive: true },
+    { label: "Mark Posted", icon: CheckCircle2, onClick: bulk.markPosted, disabled: bulk.isPending },
+    { label: "Delete", icon: Trash2, onClick: bulk.remove, destructive: true, disabled: bulk.isPending },
   ];
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-end gap-2">
         {selectedIds.size > 0 && (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm">
-                Quick Reschedule
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-2">
-              <Input
-                type="date"
-                className="h-8 w-40"
-                onChange={(e) => e.target.value && bulkReschedule(e.target.value)}
-              />
-            </PopoverContent>
-          </Popover>
+          <>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm">
+                  Change Status
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-40 p-1">
+                {DELIVERABLE_STATUSES.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => bulk.changeStatus(s)}
+                    className="flex w-full items-center rounded-sm px-2 py-1.5 text-left text-[13px] capitalize hover:bg-muted"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </PopoverContent>
+            </Popover>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <UserCircle2 className="mr-1.5 h-3.5 w-3.5" />
+                  Assign
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-1">
+                <button
+                  type="button"
+                  onClick={() => bulk.assign(null)}
+                  className="flex w-full items-center rounded-sm px-2 py-1.5 text-left text-[13px] hover:bg-muted"
+                >
+                  Unassigned
+                </button>
+                {members.map((m) => (
+                  <button
+                    key={m.user_id}
+                    type="button"
+                    onClick={() => bulk.assign(m.user_id)}
+                    className="flex w-full items-center truncate rounded-sm px-2 py-1.5 text-left text-[13px] hover:bg-muted"
+                  >
+                    {m.profile?.full_name ?? m.email ?? m.user_id}
+                  </button>
+                ))}
+              </PopoverContent>
+            </Popover>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm">
+                  Quick Reschedule
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-2">
+                <Input
+                  type="date"
+                  className="h-8 w-40"
+                  onChange={(e) => e.target.value && bulk.reschedule(e.target.value)}
+                />
+              </PopoverContent>
+            </Popover>
+          </>
         )}
       </div>
 
@@ -371,7 +369,12 @@ export function DeliverableTable({
           columns={columns}
           data={deliverables}
           onRowClick={(d) => onSelectDeliverable(d.id)}
-          selection={{ selectedIds, onSelectedIdsChange, getId: (d) => d.id }}
+          selection={{
+            selectedIds,
+            onSelectedIdsChange,
+            getId: (d) => d.id,
+            onItemClick: (id, index, ids, event) => bulk.handleItemClick(id, index, ids, event),
+          }}
         />
       )}
 
@@ -379,7 +382,7 @@ export function DeliverableTable({
         count={selectedIds.size}
         noun="deliverable"
         actions={bulkActions}
-        onClear={() => onSelectedIdsChange(new Set())}
+        onClear={bulk.clearSelection}
       />
     </div>
   );

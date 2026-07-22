@@ -3,14 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  Plus,
-  ChevronRight,
-  CalendarClock,
-  UserCircle2,
-  BadgeCheck,
-  Paperclip,
-} from "lucide-react";
+import { Plus, ChevronRight, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 import { useWorkspace } from "@/providers/workspace-provider";
@@ -142,7 +135,7 @@ export function FulfillmentProgressCard({
 
   return (
     <div className={cn("rounded-lg border border-l-[3px] bg-card", style.stripe)}>
-      <div className="p-4">
+      <div className="p-3">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h3 className="text-[15px] font-semibold leading-tight tracking-tight">
@@ -182,9 +175,9 @@ export function FulfillmentProgressCard({
         </div>
 
         {/* Large progress visualization — the card's focal point */}
-        <div className="mt-3.5 flex items-center gap-4">
+        <div className="mt-2.5 flex items-center gap-4">
           <div className="flex shrink-0 items-baseline gap-1">
-            <span className="font-mono text-[28px] font-bold leading-none tracking-tight tabular-nums">
+            <span className="font-mono text-2xl font-bold leading-none tracking-tight tabular-nums">
               {tracker.delivered}
             </span>
             <span className="font-mono text-sm text-muted-foreground">/</span>
@@ -234,29 +227,7 @@ export function FulfillmentProgressCard({
           </div>
         </div>
 
-        {/* Future-proof operational slots: Staff Assignment + Scheduling
-            (+ Sign-off on completed). Non-functional placeholders today —
-            obvious homes so these extensions drop in without a redesign. */}
-        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground/80">
-          <span className="inline-flex items-center gap-1.5">
-            <UserCircle2 className="h-3.5 w-3.5" />
-            Unassigned
-          </span>
-          {!isTerminal && (
-            <span className="inline-flex items-center gap-1.5">
-              <CalendarClock className="h-3.5 w-3.5" />
-              No delivery date
-            </span>
-          )}
-          {tracker.status === "completed" && (
-            <span className="inline-flex items-center gap-1.5">
-              <BadgeCheck className="h-3.5 w-3.5" />
-              Sign-off not requested
-            </span>
-          )}
-        </div>
-
-        <div className="mt-3.5 flex flex-wrap items-center gap-2 border-t pt-3">
+        <div className="mt-2.5 flex flex-wrap items-center gap-2 border-t pt-2.5">
           {canDeliver && (
             <Button size="sm" onClick={() => onRecordDelivery(tracker)}>
               <Plus className="mr-1.5 h-4 w-4" />

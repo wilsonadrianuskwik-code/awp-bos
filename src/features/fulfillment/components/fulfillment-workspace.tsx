@@ -11,6 +11,8 @@ import { FulfillmentProgressCard } from "@/features/fulfillment/components/fulfi
 import { RecordDeliveryDialog } from "@/features/fulfillment/components/record-delivery-dialog";
 import { DeliverableTable } from "@/features/fulfillment/components/deliverable-table";
 import { DeliverableKanbanBoard } from "@/features/fulfillment/components/deliverable-kanban-board";
+import { DeliverableCalendar } from "@/features/fulfillment/components/deliverable-calendar";
+import { DeliverableTimeline } from "@/features/fulfillment/components/deliverable-timeline";
 import { DeliverableDetailSheet } from "@/features/fulfillment/components/deliverable-detail-sheet";
 import { AddDeliverableDialog } from "@/features/fulfillment/components/add-deliverable-dialog";
 import { GenerateScheduleWizard } from "@/features/fulfillment/components/generate-schedule-wizard";
@@ -18,7 +20,28 @@ import { FULFILLMENT_STALLED_AFTER_DAYS } from "@/features/fulfillment/config";
 import type { FulfillmentWorkspaceData } from "@/features/fulfillment/actions-projects";
 import type { FulfillmentItemWithProgress } from "@/features/fulfillment/types";
 
-type MainView = "tracker" | "list" | "kanban";
+type MainView = "tracker" | "list" | "kanban" | "calendar" | "timeline";
+
+// Operations spends most of the day managing deliverables/workflow, not
+// reviewing package summaries — Kanban is the default operational surface,
+// and whichever view someone last used is remembered across sessions
+// (workspace-wide, not per-project: a habit like "I work in List" isn't
+// project-specific). This must survive FulfillmentWorkspace staying mounted
+// across a data refresh, which local `useState`'s literal default already
+// does today — localStorage additionally survives a full page reload.
+const VIEW_STORAGE_KEY = "fulfillment.workspace.view";
+
+function readStoredView(): MainView {
+  if (typeof window === "undefined") return "kanban";
+  const stored = window.localStorage.getItem(VIEW_STORAGE_KEY);
+  return stored === "tracker" ||
+    stored === "list" ||
+    stored === "kanban" ||
+    stored === "calendar" ||
+    stored === "timeline"
+    ? stored
+    : "kanban";
+}
 
 type FulfillmentWorkspaceProps = {
   data: FulfillmentWorkspaceData;
@@ -50,7 +73,12 @@ export function FulfillmentWorkspace({
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [selectedDeliverableId, setSelectedDeliverableId] = useState<string | null>(null);
-  const [view, setView] = useState<MainView>("list");
+  const [view, setViewState] = useState<MainView>(readStoredView);
+
+  function setView(next: MainView) {
+    setViewState(next);
+    if (typeof window !== "undefined") window.localStorage.setItem(VIEW_STORAGE_KEY, next);
+  }
 
   if (!data) {
     return (
@@ -93,10 +121,10 @@ export function FulfillmentWorkspace({
             <TabsTrigger value="kanban">
               <Columns3 className="mr-1.5 h-3.5 w-3.5" /> Kanban
             </TabsTrigger>
-            <TabsTrigger value="calendar" disabled title="Coming soon">
+            <TabsTrigger value="calendar">
               <CalendarDays className="mr-1.5 h-3.5 w-3.5" /> Calendar
             </TabsTrigger>
-            <TabsTrigger value="timeline" disabled title="Coming soon">
+            <TabsTrigger value="timeline">
               <GanttChartSquare className="mr-1.5 h-3.5 w-3.5" /> Timeline
             </TabsTrigger>
           </TabsList>
@@ -162,6 +190,20 @@ export function FulfillmentWorkspace({
                 onSelectedIdsChange={setSelectedIds}
                 onSelectDeliverable={setSelectedDeliverableId}
                 onChanged={onRefresh}
+              />
+            </TabsContent>
+            <TabsContent value="calendar">
+              <DeliverableCalendar
+                deliverables={deliverables}
+                onSelectDeliverable={setSelectedDeliverableId}
+                onChanged={onRefresh}
+              />
+            </TabsContent>
+            <TabsContent value="timeline">
+              <DeliverableTimeline
+                deliverables={deliverables}
+                members={members}
+                onSelectDeliverable={setSelectedDeliverableId}
               />
             </TabsContent>
           </>

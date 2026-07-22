@@ -8,7 +8,7 @@ import {
   type ColumnDef,
   type SortingState,
 } from "@tanstack/react-table";
-import { useState, type KeyboardEvent } from "react";
+import { useRef, useState, type KeyboardEvent } from "react";
 import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -17,6 +17,16 @@ type DataTableSelection<TData> = {
   selectedIds: Set<string>;
   onSelectedIdsChange: (ids: Set<string>) => void;
   getId: (row: TData) => string;
+  // Optional: overrides the default plain-toggle-on-click with a richer
+  // selection gesture (shift-range-select). Omitted = unchanged behavior
+  // (a checkbox click always just toggles that one row), so every existing
+  // caller of DataTable keeps working with no change.
+  onItemClick?: (
+    id: string,
+    index: number,
+    orderedIds: string[],
+    event: { shiftKey: boolean }
+  ) => void;
 };
 
 type DataTableProps<TData> = {
@@ -37,6 +47,11 @@ export function DataTable<TData>({
   selection,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
+  // Recorded from the checkbox cell's capture-phase click, since Radix
+  // Checkbox's onCheckedChange doesn't hand back the native event — capture
+  // fires before the checkbox's own click handling, so this is always set
+  // before onItemClick reads it for the same click.
+  const shiftPressedRef = useRef(false);
 
   const table = useReactTable({
     data,
@@ -80,7 +95,7 @@ export function DataTable<TData>({
   return (
     <div className="overflow-x-auto rounded-lg border bg-card shadow-2xs">
       <table className="w-full caption-bottom">
-        <thead className="border-b bg-muted/40">
+        <thead className="sticky top-0 z-10 border-b bg-card">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {selection && (
@@ -148,7 +163,7 @@ export function DataTable<TData>({
               </td>
             </tr>
           ) : (
-            table.getRowModel().rows.map((row) => {
+            table.getRowModel().rows.map((row, rowIndex) => {
               const rowId = selection?.getId(row.original);
               const isSelected = rowId ? selection!.selectedIds.has(rowId) : false;
               return (
@@ -164,10 +179,22 @@ export function DataTable<TData>({
                   {...(onRowClick && {
                     role: "button",
                     tabIndex: 0,
-                    onKeyDown: (e: KeyboardEvent) => {
+                    onKeyDown: (e: KeyboardEvent<HTMLTableRowElement>) => {
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
                         onRowClick(row.original);
+                        return;
+                      }
+                      // Arrow keys walk focus row-to-row without opening
+                      // anything — DOM order matches visual order, so the
+                      // adjacent <tr> sibling is always the right target.
+                      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                        e.preventDefault();
+                        const sibling =
+                          e.key === "ArrowDown"
+                            ? e.currentTarget.nextElementSibling
+                            : e.currentTarget.previousElementSibling;
+                        (sibling as HTMLElement | null)?.focus();
                       }
                     },
                   })}
@@ -176,10 +203,21 @@ export function DataTable<TData>({
                     <td
                       className="px-3 py-2.5 align-middle first:pl-4"
                       onClick={(e) => e.stopPropagation()}
+                      onClickCapture={(e) => {
+                        shiftPressedRef.current = e.shiftKey;
+                      }}
                     >
                       <Checkbox
                         checked={isSelected}
-                        onCheckedChange={() => toggleRow(rowId!)}
+                        onCheckedChange={() => {
+                          if (selection!.onItemClick) {
+                            selection!.onItemClick(rowId!, rowIndex, pageIds, {
+                              shiftKey: shiftPressedRef.current,
+                            });
+                          } else {
+                            toggleRow(rowId!);
+                          }
+                        }}
                         aria-label="Select row"
                       />
                     </td>

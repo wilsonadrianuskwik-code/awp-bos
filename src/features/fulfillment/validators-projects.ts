@@ -86,6 +86,19 @@ export type BulkRescheduleDeliverablesInput = z.infer<
   typeof bulkRescheduleDeliverablesSchema
 >;
 
+export const bulkAssignDeliverablesSchema = z.object({
+  deliverable_ids: z.array(z.string().uuid()).min(1, "Select at least one deliverable"),
+  assigned_to: z.string().uuid().nullable(),
+});
+
+export type BulkAssignDeliverablesInput = z.infer<typeof bulkAssignDeliverablesSchema>;
+
+export const bulkDeleteDeliverablesSchema = z.object({
+  deliverable_ids: z.array(z.string().uuid()).min(1, "Select at least one deliverable"),
+});
+
+export type BulkDeleteDeliverablesInput = z.infer<typeof bulkDeleteDeliverablesSchema>;
+
 // Backs the Generate Schedule wizard — an explicit, already-computed (and
 // possibly hand-edited) list of rows, unlike bulkGenerateDeliverablesSchema's
 // fixed frequency/count which can't represent an edited preview or the

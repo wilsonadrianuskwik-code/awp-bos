@@ -34,6 +34,9 @@ export type KanbanColumnDef<TItem> = {
   items: TItem[];
   footer?: ReactNode;
   tone?: KanbanTone;
+  // Shown instead of a bare empty gap when this column has zero items —
+  // optional, defaults to a generic "Nothing here" inside KanbanColumn.
+  emptyLabel?: string;
 };
 
 type KanbanBoardProps<TItem> = {
@@ -49,9 +52,11 @@ type KanbanBoardProps<TItem> = {
 
 function KanbanColumn({
   column,
+  emptyLabel,
   children,
 }: {
   column: { id: string; label: string; count: number; footer?: ReactNode; tone?: KanbanTone };
+  emptyLabel?: string;
   children: ReactNode;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
@@ -59,13 +64,16 @@ function KanbanColumn({
     <div
       ref={setNodeRef}
       className={cn(
-        "flex w-72 shrink-0 flex-col rounded-lg border bg-muted/30 transition-colors duration-150",
-        isOver && "border-primary/40 bg-primary/5"
+        "flex w-72 shrink-0 flex-col rounded-lg border bg-muted/30 shadow-[0_0_0_0_transparent] transition-[border-color,background-color,box-shadow] duration-200",
+        isOver && "border-primary/40 bg-primary/5 shadow-[inset_0_0_0_1px] shadow-primary/20"
       )}
     >
+      {/* Sticky within the column's own scroll container — the header stays
+          pinned while a long column's cards scroll underneath it, matching
+          the sticky treatment applied to List's table header. */}
       <div
         className={cn(
-          "flex items-center gap-2 rounded-t-lg border-b px-3 py-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground",
+          "sticky top-0 z-10 flex items-center gap-2 rounded-t-lg border-b bg-card px-3 py-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground",
           column.tone && TONE_HEADER[column.tone]
         )}
       >
@@ -75,7 +83,13 @@ function KanbanColumn({
         </span>
       </div>
       <div className="flex flex-1 flex-col gap-2 overflow-y-auto p-2">
-        {children}
+        {column.count === 0 ? (
+          <div className="flex flex-1 items-center justify-center rounded-md border border-dashed py-8 text-center text-xs text-muted-foreground/70">
+            {emptyLabel ?? "Nothing here"}
+          </div>
+        ) : (
+          children
+        )}
       </div>
       {column.footer && (
         <div className="border-t px-3 py-2 text-xs font-medium tabular-nums text-muted-foreground">
@@ -94,7 +108,7 @@ function DraggableCard({ id, children }: { id: string; children: ReactNode }) {
       {...listeners}
       {...attributes}
       className={cn(
-        "cursor-grab active:cursor-grabbing",
+        "cursor-grab transition-transform active:cursor-grabbing",
         isDragging && "touch-none cursor-grabbing opacity-0"
       )}
     >
@@ -174,6 +188,7 @@ export function KanbanBoard<TItem>({
               footer: column.footer,
               tone: column.tone,
             }}
+            emptyLabel={column.emptyLabel}
           >
             {column.items.map((item) => (
               <DraggableCard key={getItemId(item)} id={getItemId(item)}>
@@ -194,8 +209,15 @@ export function KanbanBoard<TItem>({
         {/* w-[272px] = the column's w-72 (288px) minus its content wrapper's
             p-2 padding (8px each side) — the exact stretched width a card
             has in-column, since a plain w-72 here would still be 16px wider
-            than the real card and re-introduce the same drift. */}
-        {activeItem ? <div className="w-[272px]">{renderCard(activeItem)}</div> : null}
+            than the real card and re-introduce the same drift. The scale +
+            shadow read as "lifted off the board," distinct from a resting
+            card, without affecting the drop-position math above (both are
+            pure visual layers on top of the same fixed-width box). */}
+        {activeItem ? (
+          <div className="w-[272px] scale-[1.03] rotate-1 shadow-xl">
+            {renderCard(activeItem)}
+          </div>
+        ) : null}
       </DragOverlay>
     </DndContext>
   );

@@ -332,15 +332,29 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
       {/* Always visible, regardless of queue vs. workspace mode — the
           direct way to jump straight to a specific project without
           triaging the queue below. */}
-      <ClientInvoiceSelector
-        enriched={enriched}
-        selectedClientId={selectedInvoiceClientId}
-        selectedInvoiceId={selectedInvoiceId}
-        onSelectInvoice={openInvoice}
-      />
+      <div className="flex items-center gap-2">
+        <ClientInvoiceSelector
+          enriched={enriched}
+          selectedClientId={selectedInvoiceClientId}
+          selectedInvoiceId={selectedInvoiceId}
+          onSelectInvoice={openInvoice}
+        />
+        {/* Subtle, non-blocking signal for a background refresh (e.g. after
+            a Kanban drop) — the workspace itself stays mounted and
+            interactive throughout, this is just a courtesy indicator. */}
+        {loadingWorkspace && workspaceData && (
+          <span className="text-xs text-muted-foreground">Syncing…</span>
+        )}
+      </div>
 
       {selectedInvoiceId ? (
-        loadingWorkspace ? (
+        // Gated on workspaceData, not loadingWorkspace: a refresh (e.g. a
+        // Kanban drop calling onChanged -> onRefresh) must never unmount
+        // FulfillmentWorkspace, since that would reset its own local state
+        // (its active view) back to a default on every mutation. Only the
+        // very first load / switching to a different project — where there's
+        // no data yet to show underneath — shows the full-page placeholder.
+        !workspaceData ? (
           <div className="flex min-h-[420px] items-center justify-center rounded-lg border bg-card text-sm text-muted-foreground">
             Loading project…
           </div>

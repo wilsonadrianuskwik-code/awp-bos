@@ -14,6 +14,8 @@ import {
   bulkUpdateDeliverableStatusSchema,
   bulkRescheduleDeliverablesSchema,
   bulkCreateDeliverablesSchema,
+  bulkAssignDeliverablesSchema,
+  bulkDeleteDeliverablesSchema,
 } from "@/features/fulfillment/validators-projects";
 import type {
   UpdateFulfillmentProjectInput,
@@ -26,6 +28,8 @@ import type {
   BulkUpdateDeliverableStatusInput,
   BulkRescheduleDeliverablesInput,
   BulkCreateDeliverablesInput,
+  BulkAssignDeliverablesInput,
+  BulkDeleteDeliverablesInput,
 } from "@/features/fulfillment/validators-projects";
 import type {
   FulfillmentDeliverable,
@@ -363,6 +367,61 @@ export async function bulkRescheduleFulfillmentDeliverablesAction(
         p_workspace_id: ctx.workspaceId,
         p_actor_id: ctx.userId,
         p_scheduled_date: parsed.data.scheduled_date,
+      }
+    );
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath(`/${ctx.workspaceSlug}`);
+    return (data ?? []) as unknown as FulfillmentDeliverable[];
+  });
+}
+
+export async function bulkAssignFulfillmentDeliverablesAction(
+  workspaceId: string,
+  input: BulkAssignDeliverablesInput
+) {
+  return withWorkspace(workspaceId, "staff", async (ctx) => {
+    const parsed = bulkAssignDeliverablesSchema.safeParse(input);
+    if (!parsed.success) {
+      throw new Error(parsed.error.issues[0].message);
+    }
+
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc(
+      "bulk_assign_fulfillment_deliverables",
+      {
+        p_deliverable_ids: parsed.data.deliverable_ids,
+        p_workspace_id: ctx.workspaceId,
+        p_actor_id: ctx.userId,
+        p_assigned_to: parsed.data.assigned_to,
+      }
+    );
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath(`/${ctx.workspaceSlug}`);
+    return (data ?? []) as unknown as FulfillmentDeliverable[];
+  });
+}
+
+export async function bulkDeleteFulfillmentDeliverablesAction(
+  workspaceId: string,
+  input: BulkDeleteDeliverablesInput
+) {
+  return withWorkspace(workspaceId, "staff", async (ctx) => {
+    const parsed = bulkDeleteDeliverablesSchema.safeParse(input);
+    if (!parsed.success) {
+      throw new Error(parsed.error.issues[0].message);
+    }
+
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc(
+      "bulk_delete_fulfillment_deliverables",
+      {
+        p_deliverable_ids: parsed.data.deliverable_ids,
+        p_workspace_id: ctx.workspaceId,
+        p_actor_id: ctx.userId,
       }
     );
 
