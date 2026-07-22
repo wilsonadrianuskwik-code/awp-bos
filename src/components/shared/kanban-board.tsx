@@ -64,7 +64,10 @@ function KanbanColumn({
     <div
       ref={setNodeRef}
       className={cn(
-        "flex w-72 shrink-0 flex-col rounded-lg border bg-muted/30 shadow-[0_0_0_0_transparent] transition-[border-color,background-color,box-shadow] duration-200",
+        // min-h-0 overrides the flex item default of min-height:auto, which
+        // would otherwise let this column's content stretch the whole row
+        // taller instead of scrolling inside overflow-y-auto below.
+        "flex h-full min-h-0 w-72 shrink-0 flex-col rounded-lg border bg-muted/30 shadow-[0_0_0_0_transparent] transition-[border-color,background-color,box-shadow] duration-200",
         isOver && "border-primary/40 bg-primary/5 shadow-[inset_0_0_0_1px] shadow-primary/20"
       )}
     >
@@ -82,7 +85,7 @@ function KanbanColumn({
           {column.count}
         </span>
       </div>
-      <div className="flex flex-1 flex-col gap-2 overflow-y-auto p-2">
+      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-2">
         {column.count === 0 ? (
           <div className="flex flex-1 items-center justify-center rounded-md border border-dashed py-8 text-center text-xs text-muted-foreground/70">
             {emptyLabel ?? "Nothing here"}
@@ -183,7 +186,12 @@ export function KanbanBoard<TItem>({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex gap-4 overflow-x-auto pb-2">
+      {/* Bounded height so each column scrolls its own cards internally
+          (KanbanColumn's own overflow-y-auto) instead of the whole page
+          growing to fit the tallest column — without a height on this
+          row, flex children have no basis to compute against and just
+          expand to their content's full height. */}
+      <div className="flex h-[calc(100vh-320px)] min-h-[420px] gap-4 overflow-x-auto pb-2">
         {columns.map((column) => (
           <KanbanColumn
             key={column.id}

@@ -150,39 +150,50 @@ export function FulfillmentWorkspace({
             </div>
           </div>
 
+          {/* Trackers (quantity purchased/delivered per line item) exist
+              independently of deliverables (the dated posting schedule) —
+              a project gets its trackers the moment the invoice is paid,
+              well before anyone runs Generate Schedule. The Tracker tab
+              must always show them; only the deliverable-based views below
+              (List/Kanban/Calendar/Timeline) have anything to gain from
+              promoting "Generate Schedule" when there's no schedule yet. */}
+          <TabsContent value="tracker">
+            {trackers.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                No trackers for this invoice yet.
+              </p>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {trackers.map((t) => (
+                  <FulfillmentProgressCard
+                    key={t.id}
+                    tracker={t}
+                    stalledAfterDays={FULFILLMENT_STALLED_AFTER_DAYS}
+                    onRecordDelivery={setRecording}
+                    linkedDeliverableCount={deliverables.filter((d) => d.fulfillment_item_id === t.id).length}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
           {deliverables.length === 0 ? (
-            <EmptyState
-              icon={CalendarRange}
-              title="Build the posting schedule"
-              description="Generate every deliverable at once from a start date and a method, instead of adding them one by one."
-              action={
-                <Button onClick={() => setWizardOpen(true)}>
-                  <CalendarRange className="mr-1.5 h-3.5 w-3.5" />
-                  Generate Schedule
-                </Button>
-              }
-            />
+            <>
+              <TabsContent value="list">
+                <DeliverableScheduleEmptyState onGenerate={() => setWizardOpen(true)} />
+              </TabsContent>
+              <TabsContent value="kanban">
+                <DeliverableScheduleEmptyState onGenerate={() => setWizardOpen(true)} />
+              </TabsContent>
+              <TabsContent value="calendar">
+                <DeliverableScheduleEmptyState onGenerate={() => setWizardOpen(true)} />
+              </TabsContent>
+              <TabsContent value="timeline">
+                <DeliverableScheduleEmptyState onGenerate={() => setWizardOpen(true)} />
+              </TabsContent>
+            </>
           ) : (
             <>
-              <TabsContent value="tracker">
-                {trackers.length === 0 ? (
-                  <p className="py-8 text-center text-sm text-muted-foreground">
-                    No trackers for this invoice yet.
-                  </p>
-                ) : (
-                  <div className="flex flex-col gap-3">
-                    {trackers.map((t) => (
-                      <FulfillmentProgressCard
-                        key={t.id}
-                        tracker={t}
-                        stalledAfterDays={FULFILLMENT_STALLED_AFTER_DAYS}
-                        onRecordDelivery={setRecording}
-                        linkedDeliverableCount={deliverables.filter((d) => d.fulfillment_item_id === t.id).length}
-                      />
-                    ))}
-                  </div>
-                )}
-              </TabsContent>
               <TabsContent value="list">
                 <DeliverableTable
                   deliverables={deliverables}
@@ -275,5 +286,24 @@ export function FulfillmentWorkspace({
         />
       )}
     </div>
+  );
+}
+
+// Shared empty state for the four deliverable-based views (List/Kanban/
+// Calendar/Timeline) when no schedule exists yet — the Tracker tab has its
+// own independent content and never shows this.
+function DeliverableScheduleEmptyState({ onGenerate }: { onGenerate: () => void }) {
+  return (
+    <EmptyState
+      icon={CalendarRange}
+      title="Build the posting schedule"
+      description="Generate every deliverable at once from a start date and a method, instead of adding them one by one."
+      action={
+        <Button onClick={onGenerate}>
+          <CalendarRange className="mr-1.5 h-3.5 w-3.5" />
+          Generate Schedule
+        </Button>
+      }
+    />
   );
 }
