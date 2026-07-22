@@ -587,6 +587,11 @@ function ClientWorkPanel({
 
   const [deliverables, setDeliverables] = useState<ClientFulfillmentDeliverable[]>([]);
   const [loadingDeliverables, setLoadingDeliverables] = useState(true);
+  // TEMPORARY debug capture — the raw { data, error } this fetch actually
+  // received, rendered directly on the page (see debug line below) so the
+  // discrepancy can be seen without DevTools/SQL, since direct DB access
+  // has already proven the data exists and is correct.
+  const [debugRaw, setDebugRaw] = useState<string>("(pending)");
   const [, startTransition] = useTransition();
 
   useEffect(() => {
@@ -595,6 +600,7 @@ function ClientWorkPanel({
     getClientFulfillmentDeliverablesAction(workspace.id, client.clientId)
       .then((result) => {
         if (cancelled) return;
+        setDebugRaw(JSON.stringify({ error: result.error, count: result.data?.length ?? null, sample: result.data?.[0] ?? null }));
         // A real failure here must not look identical to "genuinely no
         // outstanding deliverables" — that exact silent-swallow previously
         // masked a backend bug (an ambiguous overloaded RPC) as an empty
@@ -613,6 +619,7 @@ function ClientWorkPanel({
         // skeleton spun forever with no visible error, indistinguishable
         // from a slow network on screen.
         if (cancelled) return;
+        setDebugRaw(`(threw) ${err instanceof Error ? err.message : String(err)}`);
         toast(err instanceof Error ? err.message : "Failed to load deliverables", "error");
         setDeliverables([]);
       })
@@ -735,7 +742,7 @@ function ClientWorkPanel({
             either these ids don't match what's actually in the database,
             or the query itself needs re-checking against them directly. */}
         <p className="mb-2 break-all font-mono text-[10px] text-muted-foreground">
-          debug: ws={workspace.id} client={client.clientId}
+          debug: ws={workspace.id} client={client.clientId} result={debugRaw}
         </p>
         {loadingDeliverables ? (
           <div className="mb-6 flex flex-col gap-2">
