@@ -5,7 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 import { withWorkspace } from "@/lib/with-workspace";
 import {
   updateFulfillmentProjectSchema,
-  updateFulfillmentProjectStatusSchema,
   assignFulfillmentProjectSchema,
   createDeliverableSchema,
   rescheduleDeliverableSchema,
@@ -19,7 +18,6 @@ import {
 } from "@/features/fulfillment/validators-projects";
 import type {
   UpdateFulfillmentProjectInput,
-  UpdateFulfillmentProjectStatusInput,
   AssignFulfillmentProjectInput,
   CreateDeliverableInput,
   RescheduleDeliverableInput,
@@ -144,36 +142,9 @@ export async function updateFulfillmentProjectAction(
       p_project_id: projectId,
       p_workspace_id: ctx.workspaceId,
       p_actor_id: ctx.userId,
-      p_name: parsed.data.name || null,
       p_start_date: parsed.data.start_date || null,
       p_end_date: parsed.data.end_date || null,
       p_notes: parsed.data.notes || null,
-    });
-
-    if (error) throw new Error(error.message);
-
-    revalidatePath(`/${ctx.workspaceSlug}`);
-    return data as unknown as FulfillmentProject;
-  });
-}
-
-export async function updateFulfillmentProjectStatusAction(
-  workspaceId: string,
-  projectId: string,
-  input: UpdateFulfillmentProjectStatusInput
-) {
-  return withWorkspace(workspaceId, "staff", async (ctx) => {
-    const parsed = updateFulfillmentProjectStatusSchema.safeParse(input);
-    if (!parsed.success) {
-      throw new Error(parsed.error.issues[0].message);
-    }
-
-    const supabase = await createClient();
-    const { data, error } = await supabase.rpc("update_fulfillment_project_status", {
-      p_project_id: projectId,
-      p_workspace_id: ctx.workspaceId,
-      p_actor_id: ctx.userId,
-      p_new_status: parsed.data.status,
     });
 
     if (error) throw new Error(error.message);

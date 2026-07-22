@@ -1,8 +1,15 @@
+// A project's identity/status is not a separately stored, editable thing —
+// its name doesn't exist at all (every surface uses the invoice number/
+// client name instead) and its status is always computed from its own
+// trackers (see get_fulfillment_project_by_invoice,
+// supabase/migrations/00065_remove_project_name_status.sql), never stored
+// or manually transitioned. "cancelled" is not a reachable value here for
+// exactly that reason — a computed rollup has no signal for "someone
+// decided to cancel this"; that decision lives on the invoice instead.
 export const FULFILLMENT_PROJECT_STATUSES = [
   "not_started",
   "in_progress",
   "completed",
-  "cancelled",
 ] as const;
 
 export type FulfillmentProjectStatus =
@@ -13,10 +20,6 @@ export type FulfillmentProject = {
   workspace_id: string;
   invoice_id: string;
   client_id: string;
-  // Nullable: blank until Operations names the project — see
-  // 00052_fulfillment_projects.sql for why this is deliberate.
-  name: string | null;
-  status: FulfillmentProjectStatus;
   start_date: string | null;
   end_date: string | null;
   notes: string | null;
@@ -30,6 +33,9 @@ export type FulfillmentProject = {
 // Shape returned by get_fulfillment_project_by_invoice — a project joined
 // with its invoice/client context plus rollup counts, computed at read
 // time (never cached), same discipline as FulfillmentItemWithProgress.
+// `status` is likewise always computed (see FulfillmentProjectStatus above)
+// — there is no `name` field; the invoice number/client name are the
+// project's identity.
 export type FulfillmentProjectWithRollup = {
   id: string;
   workspace_id: string;
@@ -37,7 +43,6 @@ export type FulfillmentProjectWithRollup = {
   invoice_number: string;
   client_id: string;
   client_name: string;
-  name: string | null;
   status: FulfillmentProjectStatus;
   start_date: string | null;
   end_date: string | null;
@@ -120,14 +125,15 @@ export type FulfillmentDeliverableFilters = {
 // outstanding (scheduled) deliverables across ALL of their projects, for
 // the cockpit's inline "Outstanding Deliverables" panel (no per-project
 // navigation required to see what's due). Matches the RPC's actual
-// RETURNS TABLE exactly (supabase/migrations/00063_fix_deliverables_by_client_overload.sql)
-// — this previously listed invoice_id/assigned_to, which the function has
-// never returned; nothing consumed them, so drop them here rather than
-// keep a type that claims data that was never sent.
+// RETURNS TABLE exactly (supabase/migrations/00065_remove_project_name_status.sql)
+// — `invoice_number` replaces the old `project_name`, since a project has
+// no name of its own to distinguish one row from another across a
+// client's several projects; the invoice it belongs to is the natural
+// per-row identifier instead.
 export type ClientFulfillmentDeliverable = {
   id: string;
   project_id: string;
-  project_name: string;
+  invoice_number: string;
   fulfillment_item_id: string | null;
   tracker_description: string | null;
   title: string;

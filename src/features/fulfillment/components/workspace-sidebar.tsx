@@ -90,7 +90,6 @@ export function WorkspaceSidebar({
     if (notes === (project.notes ?? "")) return;
     setSavingNotes(true);
     const result = await updateFulfillmentProjectAction(workspace.id, project.id, {
-      name: project.name ?? "",
       start_date: project.start_date ?? "",
       end_date: project.end_date ?? "",
       notes,

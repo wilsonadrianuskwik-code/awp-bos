@@ -21,7 +21,6 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -30,7 +29,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useWorkspace } from "@/providers/workspace-provider";
@@ -38,41 +36,10 @@ import { useToast } from "@/providers/toast-provider";
 import { ProjectSwitcherPopover } from "@/features/fulfillment/components/project-search";
 import {
   updateFulfillmentProjectAction,
-  updateFulfillmentProjectStatusAction,
   assignFulfillmentProjectAction,
 } from "@/features/fulfillment/actions-projects";
-import type {
-  FulfillmentProjectStatus,
-  FulfillmentProjectWithRollup,
-} from "@/features/fulfillment/types-projects";
+import type { FulfillmentProjectWithRollup } from "@/features/fulfillment/types-projects";
 import type { WorkspaceMember } from "@/features/workspace/types";
-
-const CONFIRM_COPY: Record<
-  string,
-  { title: string; description: string; label: string }
-> = {
-  in_progress: {
-    title: "Start this project?",
-    description: "Marks the project as actively being worked on.",
-    label: "Start Project",
-  },
-  completed: {
-    title: "Mark project as completed?",
-    description: "This does not change the status of its individual trackers or deliverables.",
-    label: "Mark Completed",
-  },
-  cancelled: {
-    title: "Cancel this project?",
-    description: "This does not change the status of its individual trackers or deliverables.",
-    label: "Cancel Project",
-  },
-};
-
-const REOPEN_COPY = {
-  title: "Reopen this project?",
-  description: "This reverses a completed/cancelled project back to in-progress — use this to correct a mistake.",
-  label: "Reopen",
-};
 
 function initialsFor(member?: WorkspaceMember): string {
   const source = member?.profile?.full_name || member?.email || "?";
@@ -110,15 +77,11 @@ export function ProjectHeaderBar({
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const [confirmTarget, setConfirmTarget] = useState<FulfillmentProjectStatus | null>(null);
 
-  const [name, setName] = useState(project.name ?? "");
   const [startDate, setStartDate] = useState(project.start_date ?? "");
   const [endDate, setEndDate] = useState(project.end_date ?? "");
   const [notes, setNotes] = useState(project.notes ?? "");
 
-  const isTerminal = project.status === "completed" || project.status === "cancelled";
-  const canReopen = isTerminal && can("admin");
   const assignee = members.find((m) => m.user_id === project.assigned_to);
 
   // Overall progress is always derived, never stored: deliverables are the
@@ -134,7 +97,6 @@ export function ProjectHeaderBar({
   function saveDetails() {
     startTransition(async () => {
       const result = await updateFulfillmentProjectAction(workspace.id, project.id, {
-        name,
         start_date: startDate,
         end_date: endDate,
         notes,
@@ -145,22 +107,6 @@ export function ProjectHeaderBar({
       }
       toast("Project details updated", "success");
       setDetailsOpen(false);
-      router.refresh();
-      onRefresh();
-    });
-  }
-
-  function transition(next: FulfillmentProjectStatus) {
-    startTransition(async () => {
-      const result = await updateFulfillmentProjectStatusAction(workspace.id, project.id, {
-        status: next,
-      });
-      if (result.error) {
-        toast(result.error, "error");
-        return;
-      }
-      toast("Project status updated", "success");
-      setConfirmTarget(null);
       router.refresh();
       onRefresh();
     });
@@ -224,8 +170,8 @@ export function ProjectHeaderBar({
                   type="button"
                   className="flex min-w-0 items-center gap-1 rounded-md px-1.5 py-0.5 hover:bg-muted"
                 >
-                  <span className="truncate font-semibold">
-                    {project.name || "Untitled Project"}
+                  <span className="truncate font-mono font-semibold">
+                    {project.invoice_number}
                   </span>
                   <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                 </button>
@@ -234,45 +180,22 @@ export function ProjectHeaderBar({
             <StatusBadge status={project.status} className="ml-1 shrink-0" />
           </div>
 
-          <div className="flex shrink-0 items-center gap-1">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {can("staff") && (
-                <DropdownMenuItem onSelect={() => setDetailsOpen(true)}>
-                  Edit Details
-                </DropdownMenuItem>
-              )}
-              {(can("staff") || canReopen) && <DropdownMenuSeparator />}
-              {project.status === "not_started" && can("staff") && (
-                <DropdownMenuItem onSelect={() => setConfirmTarget("in_progress")}>
-                  Start Project
-                </DropdownMenuItem>
-              )}
-              {!isTerminal && can("staff") && (
-                <>
-                  {project.status === "in_progress" && (
-                    <DropdownMenuItem onSelect={() => setConfirmTarget("completed")}>
-                      Mark Completed
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem onSelect={() => setConfirmTarget("cancelled")}>
-                    Cancel Project
+          {can("staff") && (
+            <div className="flex shrink-0 items-center gap-1">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onSelect={() => setDetailsOpen(true)}>
+                    Edit Details
                   </DropdownMenuItem>
-                </>
-              )}
-              {canReopen && (
-                <DropdownMenuItem onSelect={() => setConfirmTarget("in_progress")}>
-                  Reopen
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
         </div>
 
         {/* Row 2 — the stat strip: client/invoice/dates/team all as plain
@@ -340,16 +263,6 @@ export function ProjectHeaderBar({
             <DialogTitle>Edit Project Details</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="project-name">Project Name</Label>
-              <Input
-                id="project-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Kampanye Ramadan 2026"
-                maxLength={200}
-              />
-            </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="project-start">Start Date</Label>
@@ -386,7 +299,6 @@ export function ProjectHeaderBar({
             <Button
               variant="outline"
               onClick={() => {
-                setName(project.name ?? "");
                 setStartDate(project.start_date ?? "");
                 setEndDate(project.end_date ?? "");
                 setNotes(project.notes ?? "");
@@ -400,32 +312,6 @@ export function ProjectHeaderBar({
               {isPending ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={!!confirmTarget} onOpenChange={(open) => !open && setConfirmTarget(null)}>
-        <DialogContent>
-          {confirmTarget &&
-            (() => {
-              const copy = isTerminal ? REOPEN_COPY : CONFIRM_COPY[confirmTarget];
-              if (!copy) return null;
-              return (
-                <>
-                  <DialogHeader>
-                    <DialogTitle>{copy.title}</DialogTitle>
-                    <DialogDescription>{copy.description}</DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setConfirmTarget(null)} disabled={isPending}>
-                      Cancel
-                    </Button>
-                    <Button onClick={() => transition(confirmTarget)} disabled={isPending}>
-                      {isPending ? "Processing..." : copy.label}
-                    </Button>
-                  </DialogFooter>
-                </>
-              );
-            })()}
         </DialogContent>
       </Dialog>
     </Card>

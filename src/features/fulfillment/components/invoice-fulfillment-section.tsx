@@ -58,10 +58,11 @@ export function InvoiceFulfillmentSection({
 
   // All trackers on an invoice share the same project (one project per
   // invoice, see 00052_fulfillment_projects.sql) — read it off the first
-  // one rather than fetching/passing a separate prop.
+  // one rather than fetching/passing a separate prop. A project has no
+  // name of its own; its status is always computed from its trackers.
   const projectItem = fulfillmentItems.find((fi) => fi.project_id);
   const project = projectItem
-    ? { id: projectItem.project_id!, name: projectItem.project_name, status: projectItem.project_status! }
+    ? { id: projectItem.project_id!, status: projectItem.project_status! }
     : null;
 
   function handleTrack(lineItemId: string) {
@@ -92,10 +93,7 @@ export function InvoiceFulfillmentSection({
           className="flex items-center justify-between gap-3 rounded-lg border bg-muted/30 p-3 text-sm transition-colors hover:bg-muted/50"
         >
           <span className="min-w-0 truncate">
-            Fulfilment Project:{" "}
-            <span className="font-medium text-primary">
-              {project.name || "Untitled Project"}
-            </span>
+            <span className="font-medium text-primary">Fulfilment Project</span>
             <StatusBadge status={project.status} className="ml-2" />
           </span>
           <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground" />

@@ -92,8 +92,10 @@ export type FulfillmentItemWithProgress = {
   is_package_item: boolean;
   // The Fulfilment Project this tracker is nested under (see
   // types-projects.ts) — null until the invoice reaches its first payment.
+  // No project_name: a project has no name of its own, this row's own
+  // invoice_number above is its identity. project_status is always
+  // computed from this project's trackers, never stored.
   project_id: string | null;
-  project_name: string | null;
   project_status: FulfillmentProjectStatus | null;
 };
 

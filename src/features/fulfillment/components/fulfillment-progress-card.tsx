@@ -164,7 +164,7 @@ export function FulfillmentProgressCard({
                   href={`/${workspace.slug}/fulfillment?invoice=${tracker.invoice_id}`}
                   className="hover:text-primary hover:underline"
                 >
-                  · Project: {tracker.project_name || "Untitled"}
+                  · Fulfilment workspace
                 </Link>
               )}
             </div>

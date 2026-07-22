@@ -576,10 +576,10 @@ function ClientWorkPanel({
   // single "Open Project" button that would silently pick just one. These
   // stay in place — no navigation — since the whole module is one page now.
   const projects = useMemo(() => {
-    const map = new Map<string, { invoiceId: string; name: string | null; status: string | null }>();
+    const map = new Map<string, { invoiceId: string; invoiceNumber: string; status: string | null }>();
     for (const t of client.trackers) {
       if (t.project_id && !map.has(t.project_id)) {
-        map.set(t.project_id, { invoiceId: t.invoice_id, name: t.project_name, status: t.project_status });
+        map.set(t.project_id, { invoiceId: t.invoice_id, invoiceNumber: t.invoice_number, status: t.project_status });
       }
     }
     return [...map.values()];
@@ -674,7 +674,7 @@ function ClientWorkPanel({
                 onClick={() => onOpenProject(p.invoiceId)}
                 className="inline-flex items-center gap-1.5 rounded-full border bg-muted/30 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
               >
-                {p.name || "Untitled"}
+                {p.invoiceNumber}
                 {p.status && <span className="text-[10px] uppercase tracking-wide opacity-70">· {p.status.replace("_", " ")}</span>}
               </button>
             ))}
@@ -767,7 +767,7 @@ function ClientWorkPanel({
                       </span>
                     )}
                   </div>
-                  <span className="truncate text-xs text-muted-foreground">{d.project_name}</span>
+                  <span className="truncate font-mono text-xs text-muted-foreground">{d.invoice_number}</span>
                 </div>
                 <Button
                   variant="outline"
@@ -967,14 +967,13 @@ function ClientInvoiceSelector({
     if (!client) return [];
     const map = new Map<
       string,
-      { invoiceId: string; invoiceNumber: string; projectName: string | null; projectStatus: string | null }
+      { invoiceId: string; invoiceNumber: string; projectStatus: string | null }
     >();
     for (const t of client.trackers) {
       if (t.project_id && !map.has(t.invoice_id)) {
         map.set(t.invoice_id, {
           invoiceId: t.invoice_id,
           invoiceNumber: t.invoice_number,
-          projectName: t.project_name,
           projectStatus: t.project_status,
         });
       }
@@ -1109,7 +1108,7 @@ function ClientCombobox({
   );
 }
 
-type InvoiceOption = { invoiceId: string; invoiceNumber: string; projectName: string | null; projectStatus: string | null };
+type InvoiceOption = { invoiceId: string; invoiceNumber: string; projectStatus: string | null };
 
 function InvoiceCombobox({
   invoices,
@@ -1130,11 +1129,7 @@ function InvoiceCombobox({
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return invoices;
-    return invoices.filter(
-      (inv) =>
-        inv.invoiceNumber.toLowerCase().includes(q) ||
-        (inv.projectName ?? "").toLowerCase().includes(q)
-    );
+    return invoices.filter((inv) => inv.invoiceNumber.toLowerCase().includes(q));
   }, [invoices, query]);
 
   return (
@@ -1159,7 +1154,7 @@ function InvoiceCombobox({
               {selectedInvoice ? selectedInvoice.invoiceNumber : "All invoices"}
             </div>
             <div className="truncate text-[11px] text-muted-foreground">
-              {selectedInvoice ? selectedInvoice.projectName ?? "Untitled project" : "Overview of all invoices"}
+              {selectedInvoice ? "Fulfilment project" : "Overview of all invoices"}
             </div>
           </div>
           {selectedInvoice?.projectStatus && (
@@ -1212,9 +1207,6 @@ function InvoiceCombobox({
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[13px] font-medium">{inv.invoiceNumber}</div>
-                  <div className="truncate text-[11px] text-muted-foreground">
-                    {inv.projectName ?? "Untitled project"}
-                  </div>
                 </div>
                 {inv.projectStatus && <StatusBadge status={inv.projectStatus} className="shrink-0 text-[10px]" />}
                 {inv.invoiceId === selectedInvoice?.invoiceId && (

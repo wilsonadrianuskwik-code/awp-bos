@@ -1,9 +1,8 @@
 import { z } from "zod/v4";
-import { FULFILLMENT_PROJECT_STATUSES, DELIVERABLE_STATUSES } from "@/features/fulfillment/types-projects";
+import { DELIVERABLE_STATUSES } from "@/features/fulfillment/types-projects";
 
 export const updateFulfillmentProjectSchema = z
   .object({
-    name: z.string().max(200).optional().or(z.literal("")),
     start_date: z.string().optional().or(z.literal("")),
     end_date: z.string().optional().or(z.literal("")),
     notes: z.string().max(4000).optional().or(z.literal("")),
@@ -15,14 +14,6 @@ export const updateFulfillmentProjectSchema = z
 
 export type UpdateFulfillmentProjectInput = z.infer<
   typeof updateFulfillmentProjectSchema
->;
-
-export const updateFulfillmentProjectStatusSchema = z.object({
-  status: z.enum(FULFILLMENT_PROJECT_STATUSES),
-});
-
-export type UpdateFulfillmentProjectStatusInput = z.infer<
-  typeof updateFulfillmentProjectStatusSchema
 >;
 
 export const assignFulfillmentProjectSchema = z.object({
