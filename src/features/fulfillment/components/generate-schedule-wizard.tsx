@@ -131,6 +131,19 @@ export function GenerateScheduleWizard({
   const [assignedTo, setAssignedTo] = useState<string>("unassigned");
   const [rows, setRows] = useState<DraftRow[]>([]);
 
+  const selectedTracker = trackers.find((t) => t.id === trackerId);
+
+  // Picking a tracker tallies the count to what's actually left on that
+  // package — a smart default, not a hard cap, so an intentional overshoot
+  // (e.g. padding in a make-good post) is still just a manual edit away.
+  function handleTrackerChange(id: string) {
+    setTrackerId(id);
+    if (id === "none") return;
+    const tracker = trackers.find((t) => t.id === id);
+    if (!tracker) return;
+    setCount(Math.max(1, tracker.remaining > 0 ? tracker.remaining : tracker.purchased));
+  }
+
   const canProceedFromRange = startDate.length > 0 && count >= 1 && count <= 200;
 
   function toPreview() {
@@ -205,6 +218,22 @@ export function GenerateScheduleWizard({
 
         {step === "range" && (
           <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="gs-tracker">Package / Tracker</Label>
+              <Select value={trackerId} onValueChange={handleTrackerChange}>
+                <SelectTrigger id="gs-tracker">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No tracker link</SelectItem>
+                  {trackers.map((t) => (
+                    <SelectItem key={t.id} value={t.id}>
+                      {t.description} — {t.remaining} remaining
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="gs-start">Project Start Date *</Label>
@@ -236,6 +265,18 @@ export function GenerateScheduleWizard({
                 onChange={(e) => setCount(Math.max(1, Math.min(200, Number(e.target.value) || 1)))}
                 className="w-32"
               />
+              {selectedTracker && (
+                <p className="text-xs text-muted-foreground">
+                  {selectedTracker.description} — {selectedTracker.delivered}/
+                  {selectedTracker.purchased} delivered, {selectedTracker.remaining} remaining
+                  {count !== selectedTracker.remaining && (
+                    <span className="ml-1 text-amber-700 dark:text-amber-400">
+                      · this doesn&apos;t match the package&apos;s remaining quantity (
+                      {selectedTracker.remaining})
+                    </span>
+                  )}
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -280,39 +321,21 @@ export function GenerateScheduleWizard({
                 placeholder="Post"
               />
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label htmlFor="gs-tracker">Link to Tracker (optional)</Label>
-                <Select value={trackerId} onValueChange={setTrackerId}>
-                  <SelectTrigger id="gs-tracker">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">No tracker link</SelectItem>
-                    {trackers.map((t) => (
-                      <SelectItem key={t.id} value={t.id}>
-                        {t.description}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="gs-assignee">Assignee (optional)</Label>
-                <Select value={assignedTo} onValueChange={setAssignedTo}>
-                  <SelectTrigger id="gs-assignee">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="unassigned">Unassigned</SelectItem>
-                    {members.map((m) => (
-                      <SelectItem key={m.user_id} value={m.user_id}>
-                        {m.profile?.full_name ?? m.email ?? m.user_id}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="gs-assignee">Assignee (optional)</Label>
+              <Select value={assignedTo} onValueChange={setAssignedTo}>
+                <SelectTrigger id="gs-assignee">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="unassigned">Unassigned</SelectItem>
+                  {members.map((m) => (
+                    <SelectItem key={m.user_id} value={m.user_id}>
+                      {m.profile?.full_name ?? m.email ?? m.user_id}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         )}
