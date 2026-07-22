@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LogOut, User, Menu, Search } from "lucide-react";
+import { LogOut, User, Menu, Search, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,7 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { CommandPalette } from "@/components/layout/command-palette";
 import { useSupabase } from "@/providers/supabase-provider";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 type HeaderProps = {
   workspaceSlug: string;
@@ -25,7 +25,14 @@ type HeaderProps = {
 export function Header({ workspaceSlug, onMobileMenuToggle }: HeaderProps) {
   const { supabase, user } = useSupabase();
   const router = useRouter();
+  const pathname = usePathname();
   const [paletteOpen, setPaletteOpen] = useState(false);
+
+  // Hidden only on the workspace's own home/dashboard — every other page
+  // sits somewhere below that in the hierarchy, so a single global Back
+  // (browser history, not a hardcoded parent route) always makes sense
+  // there without every page having to wire up its own button.
+  const isDashboardHome = pathname === `/${workspaceSlug}`;
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -62,6 +69,18 @@ export function Header({ workspaceSlug, onMobileMenuToggle }: HeaderProps) {
         >
           <Menu className="h-5 w-5" />
         </Button>
+
+        {!isDashboardHome && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 shrink-0"
+            onClick={() => router.back()}
+            aria-label="Go back"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        )}
 
         <button
           type="button"
