@@ -728,6 +728,14 @@ function ClientWorkPanel({
             get_fulfillment_deliverables_by_client so seeing what's due
             never requires leaving the cockpit. */}
         <SectionLabel text="Outstanding Deliverables" count={deliverables.length} />
+        {/* TEMPORARY debug line — remove once the empty-result mismatch is
+            root-caused. Shows exactly which ids this fetch used, since the
+            RPC returning a real empty array (not an error) here means
+            either these ids don't match what's actually in the database,
+            or the query itself needs re-checking against them directly. */}
+        <p className="mb-2 break-all font-mono text-[10px] text-muted-foreground">
+          debug: ws={workspace.id} client={client.clientId}
+        </p>
         {loadingDeliverables ? (
           <div className="mb-6 flex flex-col gap-2">
             {[0, 1, 2].map((i) => (
