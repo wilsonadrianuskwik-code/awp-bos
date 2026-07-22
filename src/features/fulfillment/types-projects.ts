@@ -83,3 +83,21 @@ export type FulfillmentDeliverableFilters = {
   fromDate?: string;
   toDate?: string;
 };
+
+// Shape returned by get_fulfillment_deliverables_by_client — a client's
+// outstanding (scheduled) deliverables across ALL of their projects, for
+// the cockpit's inline "Outstanding Deliverables" panel (no per-project
+// navigation required to see what's due).
+export type ClientFulfillmentDeliverable = {
+  id: string;
+  project_id: string;
+  project_name: string;
+  invoice_id: string;
+  fulfillment_item_id: string | null;
+  tracker_description: string | null;
+  title: string;
+  scheduled_date: string;
+  status: DeliverableStatus;
+  is_overdue: boolean;
+  assigned_to: string | null;
+};

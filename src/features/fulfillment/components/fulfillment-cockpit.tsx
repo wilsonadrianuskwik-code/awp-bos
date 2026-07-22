@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Search,
   ArrowLeft,
+  ArrowUpRight,
   AlertTriangle,
   Clock,
   CircleDot,
   CheckCircle2,
+  CalendarClock,
   PackageCheck,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -17,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { AnimatedValue } from "@/components/shared/animated-value";
 import { cn } from "@/lib/utils/cn";
 import { useWorkspace } from "@/providers/workspace-provider";
+import { useToast } from "@/providers/toast-provider";
 import { FulfillmentProgressCard } from "@/features/fulfillment/components/fulfillment-progress-card";
 import { RecordDeliveryDialog } from "@/features/fulfillment/components/record-delivery-dialog";
 import {
@@ -25,6 +28,11 @@ import {
   trackerReasons,
   type AttentionReason,
 } from "@/features/fulfillment/attention";
+import {
+  getClientFulfillmentDeliverablesAction,
+  updateFulfillmentDeliverableStatusAction,
+} from "@/features/fulfillment/actions-projects";
+import type { ClientFulfillmentDeliverable } from "@/features/fulfillment/types-projects";
 import type { FulfillmentItemWithProgress } from "@/features/fulfillment/types";
 
 type View = "attention" | "active" | "completed" | "all";
@@ -470,6 +478,8 @@ function ClientWorkPanel({
   onRecordDelivery: (t: FulfillmentItemWithProgress) => void;
 }) {
   const { workspace } = useWorkspace();
+  const router = useRouter();
+  const { toast } = useToast();
   const s = client.stats;
   const outstanding = client.trackers.filter((t) => t.status !== "completed");
   const completed = client.trackers.filter((t) => t.status === "completed");
@@ -477,7 +487,10 @@ function ClientWorkPanel({
   // A client can have more than one paid invoice, and a Fulfilment Project
   // is scoped per invoice, not per client — so trackers here can belong to
   // several distinct projects. Show one pill per project rather than a
-  // single "Open Project" button that would silently pick just one.
+  // single "Open Project" button that would silently pick just one. These
+  // are now an explicit "deep-link if you need the full workspace" escape
+  // hatch, not the only way to see what's outstanding — that's the
+  // Outstanding Deliverables section below, fetched inline.
   const projects = useMemo(() => {
     const map = new Map<string, { invoiceId: string; name: string | null; status: string | null }>();
     for (const t of client.trackers) {
@@ -487,6 +500,38 @@ function ClientWorkPanel({
     }
     return [...map.values()];
   }, [client.trackers]);
+
+  const [deliverables, setDeliverables] = useState<ClientFulfillmentDeliverable[]>([]);
+  const [loadingDeliverables, setLoadingDeliverables] = useState(true);
+  const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoadingDeliverables(true);
+    getClientFulfillmentDeliverablesAction(workspace.id, client.clientId).then((result) => {
+      if (cancelled) return;
+      setDeliverables(result.error ? [] : (result.data ?? []));
+      setLoadingDeliverables(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [workspace.id, client.clientId]);
+
+  function markPosted(deliverableId: string) {
+    startTransition(async () => {
+      const result = await updateFulfillmentDeliverableStatusAction(workspace.id, deliverableId, {
+        status: "posted",
+      });
+      if (result.error) {
+        toast(result.error, "error");
+        return;
+      }
+      setDeliverables((prev) => prev.filter((d) => d.id !== deliverableId));
+      toast("Marked as posted", "success");
+      router.refresh();
+    });
+  }
 
   return (
     // Keyed by clientId in the parent, so switching clients remounts and
@@ -520,10 +565,14 @@ function ClientWorkPanel({
               <Link
                 key={p.invoiceId}
                 href={`/${workspace.slug}/fulfillment/${p.invoiceId}`}
+                title="Opens the full project workspace (List/Kanban, wizard, activity)"
                 className="inline-flex items-center gap-1.5 rounded-full border bg-muted/30 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
               >
-                Project: {p.name || "Untitled"}
+                {p.name || "Untitled"}
                 {p.status && <span className="text-[10px] uppercase tracking-wide opacity-70">· {p.status.replace("_", " ")}</span>}
+                <span className="inline-flex items-center gap-0.5 text-[10px] opacity-70">
+                  Open full workspace <ArrowUpRight className="h-2.5 w-2.5" />
+                </span>
               </Link>
             ))}
           </div>
@@ -572,6 +621,56 @@ function ClientWorkPanel({
       </div>
 
       <div className="p-5">
+        {/* Outstanding Deliverables — the client's remaining scheduled
+            "Post #N" items across ALL their projects, fetched inline via
+            get_fulfillment_deliverables_by_client so seeing what's due
+            never requires leaving the cockpit. */}
+        <SectionLabel text="Outstanding Deliverables" count={deliverables.length} />
+        {loadingDeliverables ? (
+          <div className="mb-6 flex flex-col gap-2">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="h-11 animate-pulse rounded-lg bg-muted/50" />
+            ))}
+          </div>
+        ) : deliverables.length === 0 ? (
+          <div className="mb-6 flex items-center gap-2 rounded-lg border border-dashed py-4 px-4 text-sm text-muted-foreground">
+            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500/70" />
+            Nothing scheduled and outstanding for this client.
+          </div>
+        ) : (
+          <div className="mb-6 flex flex-col gap-1.5">
+            {deliverables.map((d) => (
+              <div
+                key={d.id}
+                className="flex items-center gap-3 rounded-lg border bg-card px-3 py-2"
+              >
+                <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
+                  {d.scheduled_date}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="truncate text-[13px] font-medium">{d.title}</span>
+                    {d.is_overdue && (
+                      <span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-red-600 dark:text-red-400">
+                        <CalendarClock className="h-3 w-3" /> Overdue
+                      </span>
+                    )}
+                  </div>
+                  <span className="truncate text-xs text-muted-foreground">{d.project_name}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 shrink-0 text-xs"
+                  onClick={() => markPosted(d.id)}
+                >
+                  Mark Posted
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+
         {outstanding.length > 0 ? (
           <>
             <SectionLabel text="Outstanding" count={outstanding.length} />

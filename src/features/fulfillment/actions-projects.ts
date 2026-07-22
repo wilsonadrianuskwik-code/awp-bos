@@ -32,7 +32,10 @@ import type {
   FulfillmentProject,
 } from "@/features/fulfillment/types-projects";
 import { getInvoices } from "@/features/invoices/queries";
-import { getFulfillmentDeliverableActivities } from "@/features/fulfillment/queries-projects";
+import {
+  getFulfillmentDeliverableActivities,
+  getFulfillmentDeliverablesByClient,
+} from "@/features/fulfillment/queries-projects";
 import { FULFILLMENT_ELIGIBLE_INVOICE_STATUSES } from "@/features/fulfillment/types";
 
 /**
@@ -96,6 +99,18 @@ export async function getFulfillmentDeliverableActivitiesAction(
 ) {
   return withWorkspace(workspaceId, "viewer", async () => {
     return getFulfillmentDeliverableActivities(deliverableId);
+  });
+}
+
+// Lazy read for the cockpit's inline "Outstanding Deliverables" panel —
+// fetched only when a client row is selected, not preloaded for every
+// client in the list.
+export async function getClientFulfillmentDeliverablesAction(
+  workspaceId: string,
+  clientId: string
+) {
+  return withWorkspace(workspaceId, "viewer", async (ctx) => {
+    return getFulfillmentDeliverablesByClient(ctx.workspaceId, clientId);
   });
 }
 

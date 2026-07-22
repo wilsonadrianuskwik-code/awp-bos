@@ -15,11 +15,25 @@ import {
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils/cn";
 
+export type KanbanTone = "amber" | "emerald" | "red" | "blue" | "slate";
+
+// Optional per-column color language. Omitted entirely = today's neutral
+// look (used by boards like invoice-kanban-board.tsx that haven't opted
+// in), so this is backward-compatible for every existing caller.
+const TONE_HEADER: Record<KanbanTone, string> = {
+  amber: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  emerald: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+  red: "bg-red-500/10 text-red-700 dark:text-red-400",
+  blue: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
+  slate: "bg-slate-500/10 text-slate-600 dark:text-slate-400",
+};
+
 export type KanbanColumnDef<TItem> = {
   id: string;
   label: string;
   items: TItem[];
   footer?: ReactNode;
+  tone?: KanbanTone;
 };
 
 type KanbanBoardProps<TItem> = {
@@ -37,7 +51,7 @@ function KanbanColumn({
   column,
   children,
 }: {
-  column: { id: string; label: string; count: number; footer?: ReactNode };
+  column: { id: string; label: string; count: number; footer?: ReactNode; tone?: KanbanTone };
   children: ReactNode;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
@@ -49,7 +63,12 @@ function KanbanColumn({
         isOver && "border-primary/40 bg-primary/5"
       )}
     >
-      <div className="flex items-center gap-2 border-b px-3 py-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+      <div
+        className={cn(
+          "flex items-center gap-2 rounded-t-lg border-b px-3 py-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground",
+          column.tone && TONE_HEADER[column.tone]
+        )}
+      >
         <span>{column.label}</span>
         <span className="rounded bg-muted px-1.5 font-mono text-[10.5px] normal-case tracking-normal text-muted-foreground">
           {column.count}
@@ -74,7 +93,10 @@ function DraggableCard({ id, children }: { id: string; children: ReactNode }) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className={cn(isDragging && "touch-none opacity-0")}
+      className={cn(
+        "cursor-grab active:cursor-grabbing",
+        isDragging && "touch-none cursor-grabbing opacity-0"
+      )}
     >
       {children}
     </div>
@@ -145,7 +167,13 @@ export function KanbanBoard<TItem>({
         {columns.map((column) => (
           <KanbanColumn
             key={column.id}
-            column={{ id: column.id, label: column.label, count: column.items.length, footer: column.footer }}
+            column={{
+              id: column.id,
+              label: column.label,
+              count: column.items.length,
+              footer: column.footer,
+              tone: column.tone,
+            }}
           >
             {column.items.map((item) => (
               <DraggableCard key={getItemId(item)} id={getItemId(item)}>

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type {
+  ClientFulfillmentDeliverable,
   FulfillmentDeliverable,
   FulfillmentDeliverableFilters,
   FulfillmentProjectWithRollup,
@@ -93,4 +94,24 @@ export async function getFulfillmentDeliverables(
     items: rows.map(({ total_count: _total_count, ...row }) => row),
     totalCount: rows[0]?.total_count ?? 0,
   };
+}
+
+// A client's outstanding deliverables across all of their projects
+// (00057_deliverables_by_client.sql) — powers the cockpit's inline
+// "Outstanding Deliverables" panel so seeing what's due doesn't require
+// navigating into a specific project's workspace first.
+export async function getFulfillmentDeliverablesByClient(
+  workspaceId: string,
+  clientId: string
+): Promise<ClientFulfillmentDeliverable[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc("get_fulfillment_deliverables_by_client", {
+    p_workspace_id: workspaceId,
+    p_client_id: clientId,
+  });
+
+  if (error) throw error;
+
+  return (data ?? []) as ClientFulfillmentDeliverable[];
 }

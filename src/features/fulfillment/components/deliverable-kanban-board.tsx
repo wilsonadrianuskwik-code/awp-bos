@@ -1,11 +1,13 @@
 "use client";
 
 import { useOptimistic, useTransition } from "react";
-import { KanbanBoard } from "@/components/shared/kanban-board";
+import { useRouter } from "next/navigation";
+import { KanbanBoard, type KanbanTone } from "@/components/shared/kanban-board";
 import { Checkbox } from "@/components/ui/checkbox";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
+import { cn } from "@/lib/utils/cn";
 import { updateFulfillmentDeliverableStatusAction } from "@/features/fulfillment/actions-projects";
 import type {
   DeliverableStatus,
@@ -13,11 +15,19 @@ import type {
 } from "@/features/fulfillment/types-projects";
 import type { WorkspaceMember } from "@/features/workspace/types";
 
-const LANES: { id: DeliverableStatus; label: string }[] = [
-  { id: "scheduled", label: "Scheduled" },
-  { id: "posted", label: "Posted" },
-  { id: "cancelled", label: "Cancelled" },
+const LANES: { id: DeliverableStatus; label: string; tone: KanbanTone }[] = [
+  { id: "scheduled", label: "Scheduled", tone: "amber" },
+  { id: "posted", label: "Posted", tone: "emerald" },
+  { id: "cancelled", label: "Cancelled", tone: "red" },
 ];
+
+// Mirrors LANES' tones so a card's left-border stripe always agrees with
+// the column it's currently sitting in.
+const CARD_BORDER: Record<DeliverableStatus, string> = {
+  scheduled: "border-l-4 border-l-amber-500",
+  posted: "border-l-4 border-l-emerald-500",
+  cancelled: "border-l-4 border-l-red-500",
+};
 
 // Mirrors update_fulfillment_deliverable_status's state machine
 // (supabase/migrations/00055_deliverable_tracker_cascade.sql) — the
@@ -47,6 +57,7 @@ export function DeliverableKanbanBoard({
 }: DeliverableKanbanBoardProps) {
   const { workspace, can } = useWorkspace();
   const { toast } = useToast();
+  const router = useRouter();
   const [, startTransition] = useTransition();
 
   const [optimisticDeliverables, applyOptimisticStatus] = useOptimistic(
@@ -78,27 +89,35 @@ export function DeliverableKanbanBoard({
       return;
     }
 
-    // Posting now cascades a delivery event onto the linked tracker (see
+    // Posting cascades a delivery event onto the linked tracker (see
     // migration 00055) — a real side effect that can fail (tracker already
-    // completed/cancelled), so the card only moves after the server call
-    // actually succeeds, not optimistically-then-hope like a plain status flip.
+    // completed/cancelled) — so this still confirms against the server
+    // rather than assuming success. But the move itself is applied
+    // immediately (not after the await), otherwise the card visibly snaps
+    // back to its origin column the instant the drop ends and only jumps
+    // to the target column once the network round-trip finishes. Applying
+    // it up front and rolling back only on error gives an instant, stable
+    // move with a rare visible correction instead of a guaranteed flicker.
+    const previousStatus = item.status;
     startTransition(async () => {
+      applyOptimisticStatus({ id: itemId, status: nextStatus });
       const result = await updateFulfillmentDeliverableStatusAction(workspace.id, itemId, {
         status: nextStatus,
       });
       if (result.error) {
+        applyOptimisticStatus({ id: itemId, status: previousStatus });
         toast(result.error, "error");
         return;
       }
-      applyOptimisticStatus({ id: itemId, status: nextStatus });
       toast("Deliverable updated", "success");
+      router.refresh();
     });
     void fromColumnId;
   }
 
   const columns = LANES.map((lane) => {
     const items = optimisticDeliverables.filter((d) => d.status === lane.id);
-    return { id: lane.id, label: lane.label, items };
+    return { id: lane.id, label: lane.label, tone: lane.tone, items };
   });
 
   return (
@@ -110,7 +129,10 @@ export function DeliverableKanbanBoard({
         const assignee = members.find((m) => m.user_id === d.assigned_to);
         return (
           <div
-            className="group/dcard relative cursor-pointer rounded-lg border bg-card p-3 shadow-2xs transition-colors hover:border-foreground/20"
+            className={cn(
+              "group/dcard relative cursor-pointer rounded-lg border bg-card p-3 shadow-2xs transition-colors hover:border-foreground/20",
+              CARD_BORDER[d.status]
+            )}
             onClick={() => onSelectDeliverable(d.id)}
           >
             <div
