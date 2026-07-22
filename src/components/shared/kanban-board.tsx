@@ -183,8 +183,19 @@ export function KanbanBoard<TItem>({
           </KanbanColumn>
         ))}
       </div>
+      {/* DragOverlay portals outside the column's flex/stretch context, so
+          without an explicit width the cloned card shrinks/grows to fit its
+          own content instead of staying the column's width — dnd-kit then
+          positions the overlay from the pointer's offset into the ORIGINAL
+          card's box, so a differently-sized clone visibly drifts from the
+          cursor. Forcing the same width here keeps the drag ghost identical
+          to the card the user actually grabbed. */}
       <DragOverlay>
-        {activeItem ? renderCard(activeItem) : null}
+        {/* w-[272px] = the column's w-72 (288px) minus its content wrapper's
+            p-2 padding (8px each side) — the exact stretched width a card
+            has in-column, since a plain w-72 here would still be 16px wider
+            than the real card and re-introduce the same drift. */}
+        {activeItem ? <div className="w-[272px]">{renderCard(activeItem)}</div> : null}
       </DragOverlay>
     </DndContext>
   );

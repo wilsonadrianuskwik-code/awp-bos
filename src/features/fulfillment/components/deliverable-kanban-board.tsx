@@ -46,6 +46,7 @@ type DeliverableKanbanBoardProps = {
   selectedIds: Set<string>;
   onSelectedIdsChange: (ids: Set<string>) => void;
   onSelectDeliverable: (id: string) => void;
+  onChanged: () => void;
 };
 
 export function DeliverableKanbanBoard({
@@ -54,6 +55,7 @@ export function DeliverableKanbanBoard({
   selectedIds,
   onSelectedIdsChange,
   onSelectDeliverable,
+  onChanged,
 }: DeliverableKanbanBoardProps) {
   const { workspace, can } = useWorkspace();
   const { toast } = useToast();
@@ -111,6 +113,7 @@ export function DeliverableKanbanBoard({
       }
       toast("Deliverable updated", "success");
       router.refresh();
+      onChanged();
     });
     void fromColumnId;
   }

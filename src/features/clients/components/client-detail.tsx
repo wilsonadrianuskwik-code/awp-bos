@@ -402,7 +402,7 @@ export function ClientDetail({
                   {fulfillmentItems.map((fi) => (
                     <Link
                       key={fi.id}
-                      href={`/${workspace.slug}/fulfillment/${fi.id}`}
+                      href={`/${workspace.slug}/fulfillment/tracker/${fi.id}`}
                       className="block rounded-lg border p-3 transition-colors duration-100 hover:border-primary/30 hover:bg-accent/50"
                     >
                       <div className="flex items-center justify-between gap-2">

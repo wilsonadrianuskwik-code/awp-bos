@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Search,
   ArrowLeft,
-  ArrowUpRight,
   AlertTriangle,
   Clock,
   CircleDot,
@@ -16,12 +15,20 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { AnimatedValue } from "@/components/shared/animated-value";
 import { cn } from "@/lib/utils/cn";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { FulfillmentProgressCard } from "@/features/fulfillment/components/fulfillment-progress-card";
 import { RecordDeliveryDialog } from "@/features/fulfillment/components/record-delivery-dialog";
+import { FulfillmentWorkspace } from "@/features/fulfillment/components/fulfillment-workspace";
 import {
   ATTENTION_REASONS,
   isActive,
@@ -30,8 +37,10 @@ import {
 } from "@/features/fulfillment/attention";
 import {
   getClientFulfillmentDeliverablesAction,
+  getFulfillmentWorkspaceDataAction,
   updateFulfillmentDeliverableStatusAction,
 } from "@/features/fulfillment/actions-projects";
+import type { FulfillmentWorkspaceData } from "@/features/fulfillment/actions-projects";
 import type { ClientFulfillmentDeliverable } from "@/features/fulfillment/types-projects";
 import type { FulfillmentItemWithProgress } from "@/features/fulfillment/types";
 
@@ -156,12 +165,56 @@ type FulfillmentCockpitProps = {
 
 export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockpitProps) {
   const searchParams = useSearchParams();
+  const { workspace } = useWorkspace();
 
   const enriched = useMemo<EnrichedClient[]>(
     () =>
       groupByClient(items).map((g) => ({ ...g, stats: computeStats(g, stalledAfterDays) })),
     [items, stalledAfterDays]
   );
+
+  // The whole /fulfillment module is one page: with no invoice selected,
+  // this renders the triage queue below; picking a project (via the
+  // Client▼/Invoice▼ selectors, a queue row's project pill, or the
+  // workspace's own breadcrumb switcher) swaps in the unified
+  // FulfillmentWorkspace in place — never a Next.js navigation.
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(
+    searchParams.get("invoice")
+  );
+  const [workspaceData, setWorkspaceData] = useState<FulfillmentWorkspaceData>(null);
+  const [loadingWorkspace, setLoadingWorkspace] = useState(false);
+
+  const fetchWorkspace = useCallback(
+    (invoiceId: string) => {
+      setLoadingWorkspace(true);
+      getFulfillmentWorkspaceDataAction(workspace.id, invoiceId).then((res) => {
+        setWorkspaceData(res.error ? null : (res.data ?? null));
+        setLoadingWorkspace(false);
+      });
+    },
+    [workspace.id]
+  );
+
+  useEffect(() => {
+    if (selectedInvoiceId) fetchWorkspace(selectedInvoiceId);
+  }, [selectedInvoiceId, fetchWorkspace]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (selectedInvoiceId) params.set("invoice", selectedInvoiceId);
+    else params.delete("invoice");
+    window.history.replaceState(null, "", `?${params.toString()}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedInvoiceId]);
+
+  function openInvoice(invoiceId: string) {
+    setSelectedInvoiceId(invoiceId);
+  }
+
+  function backToQueue() {
+    setSelectedInvoiceId(null);
+    setWorkspaceData(null);
+  }
 
   const counts = useMemo(
     () => ({
@@ -242,7 +295,7 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
         searchRef.current?.blur();
         return;
       }
-      if (typing || recording) return;
+      if (typing || recording || selectedInvoiceId) return;
       if (["1", "2", "3", "4"].includes(e.key)) {
         setView(VIEWS[Number(e.key) - 1]);
         setReason("all");
@@ -262,15 +315,45 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [filtered, selected?.clientId, recording]);
+  }, [filtered, selected?.clientId, recording, selectedInvoiceId]);
 
   function selectClient(id: string) {
     setSelectedId(id);
     setMobileDetail(true);
   }
 
+  const selectedInvoiceClientId = useMemo(() => {
+    if (!selectedInvoiceId) return null;
+    return items.find((t) => t.invoice_id === selectedInvoiceId)?.client_id ?? null;
+  }, [items, selectedInvoiceId]);
+
   return (
     <div className="space-y-4">
+      {/* Always visible, regardless of queue vs. workspace mode — the
+          direct way to jump straight to a specific project without
+          triaging the queue below. */}
+      <ClientInvoiceSelector
+        enriched={enriched}
+        selectedClientId={selectedInvoiceClientId}
+        selectedInvoiceId={selectedInvoiceId}
+        onSelectInvoice={openInvoice}
+      />
+
+      {selectedInvoiceId ? (
+        loadingWorkspace ? (
+          <div className="flex min-h-[420px] items-center justify-center rounded-lg border bg-card text-sm text-muted-foreground">
+            Loading project…
+          </div>
+        ) : (
+          <FulfillmentWorkspace
+            data={workspaceData}
+            onRefresh={() => fetchWorkspace(selectedInvoiceId)}
+            onSwitchProject={openInvoice}
+            onBackToQueue={backToQueue}
+          />
+        )
+      ) : (
+        <>
       {/* Operational summary — each tile is the primary filter. Ordered to
           answer "what should I work on now" before "what's wrong": active
           work leads, Needs Attention trails (still fully visible, still
@@ -441,6 +524,7 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
               stalledAfterDays={stalledAfterDays}
               onBack={() => setMobileDetail(false)}
               onRecordDelivery={setRecording}
+              onOpenProject={openInvoice}
             />
           )}
         </div>
@@ -462,6 +546,8 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
           unitLabel={recording.unit}
         />
       )}
+        </>
+      )}
     </div>
   );
 }
@@ -471,11 +557,13 @@ function ClientWorkPanel({
   stalledAfterDays,
   onBack,
   onRecordDelivery,
+  onOpenProject,
 }: {
   client: EnrichedClient;
   stalledAfterDays: number;
   onBack: () => void;
   onRecordDelivery: (t: FulfillmentItemWithProgress) => void;
+  onOpenProject: (invoiceId: string) => void;
 }) {
   const { workspace } = useWorkspace();
   const router = useRouter();
@@ -488,9 +576,7 @@ function ClientWorkPanel({
   // is scoped per invoice, not per client — so trackers here can belong to
   // several distinct projects. Show one pill per project rather than a
   // single "Open Project" button that would silently pick just one. These
-  // are now an explicit "deep-link if you need the full workspace" escape
-  // hatch, not the only way to see what's outstanding — that's the
-  // Outstanding Deliverables section below, fetched inline.
+  // stay in place — no navigation — since the whole module is one page now.
   const projects = useMemo(() => {
     const map = new Map<string, { invoiceId: string; name: string | null; status: string | null }>();
     for (const t of client.trackers) {
@@ -562,18 +648,15 @@ function ClientWorkPanel({
         {projects.length > 0 && (
           <div className="mt-3 flex flex-wrap items-center gap-1.5">
             {projects.map((p) => (
-              <Link
+              <button
                 key={p.invoiceId}
-                href={`/${workspace.slug}/fulfillment/${p.invoiceId}`}
-                title="Opens the full project workspace (List/Kanban, wizard, activity)"
+                type="button"
+                onClick={() => onOpenProject(p.invoiceId)}
                 className="inline-flex items-center gap-1.5 rounded-full border bg-muted/30 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
               >
                 {p.name || "Untitled"}
                 {p.status && <span className="text-[10px] uppercase tracking-wide opacity-70">· {p.status.replace("_", " ")}</span>}
-                <span className="inline-flex items-center gap-0.5 text-[10px] opacity-70">
-                  Open full workspace <ArrowUpRight className="h-2.5 w-2.5" />
-                </span>
-              </Link>
+              </button>
             ))}
           </div>
         )}
@@ -793,6 +876,87 @@ function SectionLabel({ text, count }: { text: string; count: number }) {
       <span className="rounded bg-muted px-1.5 font-mono text-[10.5px] text-muted-foreground">
         {count}
       </span>
+    </div>
+  );
+}
+
+// The mockup's persistent Client▼/Invoice▼ selector — always visible at
+// the top of the page, in both queue and workspace modes, as the direct
+// route to a specific project. Built from `enriched` (already loaded for
+// the queue), so picking a project needs no extra query; only opening it
+// does (getFulfillmentWorkspaceDataAction, fired by the parent).
+function ClientInvoiceSelector({
+  enriched,
+  selectedClientId,
+  selectedInvoiceId,
+  onSelectInvoice,
+}: {
+  enriched: EnrichedClient[];
+  selectedClientId: string | null;
+  selectedInvoiceId: string | null;
+  onSelectInvoice: (invoiceId: string) => void;
+}) {
+  const [clientId, setClientId] = useState<string | null>(selectedClientId);
+
+  useEffect(() => {
+    setClientId(selectedClientId);
+  }, [selectedClientId]);
+
+  const client = enriched.find((c) => c.clientId === clientId) ?? null;
+
+  const invoices = useMemo(() => {
+    if (!client) return [];
+    const map = new Map<string, { invoiceId: string; label: string }>();
+    for (const t of client.trackers) {
+      if (t.project_id && !map.has(t.invoice_id)) {
+        map.set(t.invoice_id, {
+          invoiceId: t.invoice_id,
+          label: t.project_name ? `${t.invoice_number} — ${t.project_name}` : t.invoice_number,
+        });
+      }
+    }
+    return [...map.values()];
+  }, [client]);
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-card p-2.5">
+      <Select
+        value={clientId ?? undefined}
+        onValueChange={(v) => {
+          setClientId(v);
+          const firstInvoice = enriched
+            .find((c) => c.clientId === v)
+            ?.trackers.find((t) => t.project_id)?.invoice_id;
+          if (firstInvoice) onSelectInvoice(firstInvoice);
+        }}
+      >
+        <SelectTrigger className="h-9 w-[220px]">
+          <SelectValue placeholder="Client…" />
+        </SelectTrigger>
+        <SelectContent>
+          {enriched.map((c) => (
+            <SelectItem key={c.clientId} value={c.clientId}>
+              {c.clientName}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Select
+        value={selectedInvoiceId ?? undefined}
+        onValueChange={onSelectInvoice}
+        disabled={invoices.length === 0}
+      >
+        <SelectTrigger className="h-9 w-[260px]">
+          <SelectValue placeholder="Invoice…" />
+        </SelectTrigger>
+        <SelectContent>
+          {invoices.map((inv) => (
+            <SelectItem key={inv.invoiceId} value={inv.invoiceId}>
+              {inv.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

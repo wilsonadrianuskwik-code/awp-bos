@@ -30,13 +30,23 @@ import type {
 import type {
   FulfillmentDeliverable,
   FulfillmentProject,
+  FulfillmentProjectWithRollup,
 } from "@/features/fulfillment/types-projects";
+import type { FulfillmentItemWithProgress } from "@/features/fulfillment/types";
+import type { WorkspaceMember } from "@/features/workspace/types";
+import type { Activity } from "@/features/activities/types";
 import { getInvoices } from "@/features/invoices/queries";
 import {
   getFulfillmentDeliverableActivities,
   getFulfillmentDeliverablesByClient,
+  getFulfillmentProjectByInvoice,
+  getFulfillmentDeliverables,
+  getFulfillmentProjectActivities,
 } from "@/features/fulfillment/queries-projects";
+import { getFulfillmentItems } from "@/features/fulfillment/queries";
+import { getWorkspaceMembers } from "@/features/workspace/queries";
 import { FULFILLMENT_ELIGIBLE_INVOICE_STATUSES } from "@/features/fulfillment/types";
+import { FULFILLMENT_COCKPIT_BATCH_SIZE } from "@/features/fulfillment/config";
 
 /**
  * Every mutation below is a thin wrapper around a single Postgres function
@@ -419,5 +429,37 @@ export async function deleteFulfillmentDeliverableAction(
 
     revalidatePath(`/${ctx.workspaceSlug}`);
     return data as { success: true; id: string };
+  });
+}
+
+export type FulfillmentWorkspaceData = {
+  project: FulfillmentProjectWithRollup;
+  trackers: FulfillmentItemWithProgress[];
+  deliverables: FulfillmentDeliverable[];
+  members: WorkspaceMember[];
+  activities: Activity[];
+} | null;
+
+// The single data-loading call the unified workspace shell makes whenever
+// the selected invoice changes — bundles exactly what the old
+// /fulfillment/[invoiceId] server page fetched (project + its trackers +
+// deliverables + workspace members + project activities) into one
+// client-callable action, so switching projects is a state update instead
+// of a Next.js navigation. Returns null when the invoice hasn't reached
+// partial/paid yet (no project exists) — same "read, don't create" contract
+// getFulfillmentProjectByInvoice already has.
+export async function getFulfillmentWorkspaceDataAction(workspaceId: string, invoiceId: string) {
+  return withWorkspace(workspaceId, "viewer", async (ctx) => {
+    const project = await getFulfillmentProjectByInvoice(ctx.workspaceId, invoiceId);
+    if (!project) return null;
+
+    const [{ items: trackers }, { items: deliverables }, members, activities] = await Promise.all([
+      getFulfillmentItems(ctx.workspaceId, { projectId: project.id }, 1, FULFILLMENT_COCKPIT_BATCH_SIZE),
+      getFulfillmentDeliverables(ctx.workspaceId, project.id),
+      getWorkspaceMembers(ctx.workspaceId),
+      getFulfillmentProjectActivities(project.id),
+    ]);
+
+    return { project, trackers, deliverables, members, activities };
   });
 }

@@ -96,6 +96,7 @@ type GenerateScheduleWizardProps = {
   projectEndDate: string | null;
   trackers: FulfillmentItemWithProgress[];
   members: WorkspaceMember[];
+  onChanged: () => void;
 };
 
 // The primary first-run flow: Operations tells the wizard the project's
@@ -114,6 +115,7 @@ export function GenerateScheduleWizard({
   projectEndDate,
   trackers,
   members,
+  onChanged,
 }: GenerateScheduleWizardProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
@@ -192,6 +194,7 @@ export function GenerateScheduleWizard({
       reset();
       onOpenChange(false);
       router.refresh();
+      onChanged();
     });
   }
 

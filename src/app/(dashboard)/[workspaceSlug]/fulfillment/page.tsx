@@ -3,7 +3,6 @@ import { PackageCheck } from "lucide-react";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { FulfillmentCockpit } from "@/features/fulfillment/components/fulfillment-cockpit";
-import { ProjectJumpBar } from "@/features/fulfillment/components/project-search";
 import { getFulfillmentItems } from "@/features/fulfillment/queries";
 import { syncFulfillmentItemsAction } from "@/features/fulfillment/actions";
 import { getWorkspaceBySlug } from "@/lib/workspace";
@@ -38,12 +37,6 @@ export default async function FulfillmentPage({
         title="Fulfilment"
         description="Deliver outstanding work and manage every project's schedule, client by client"
       />
-
-      {/* Jump straight into a specific project's workspace without
-          triaging the queue below — one search box matching client name
-          or invoice number, replacing the old two-step client/invoice
-          picker. */}
-      <ProjectJumpBar />
 
       {totalCount === 0 ? (
         <EmptyState

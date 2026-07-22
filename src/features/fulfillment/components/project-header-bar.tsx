@@ -89,13 +89,22 @@ function initialsFor(member?: WorkspaceMember): string {
 type ProjectHeaderBarProps = {
   project: FulfillmentProjectWithRollup;
   members: WorkspaceMember[];
+  onSwitchProject: (invoiceId: string) => void;
+  onBackToQueue: () => void;
+  onRefresh: () => void;
 };
 
 // Compact (~120-150px) header for the project workspace — client/invoice,
 // status, overall progress, assignee, and every mutation the old, always-
 // expanded ProjectInfoCard had, now behind a "Details" dialog and a ⋯ menu
 // so the List/Kanban/Tracker views below get the bulk of the screen.
-export function ProjectHeaderBar({ project, members }: ProjectHeaderBarProps) {
+export function ProjectHeaderBar({
+  project,
+  members,
+  onSwitchProject,
+  onBackToQueue,
+  onRefresh,
+}: ProjectHeaderBarProps) {
   const router = useRouter();
   const { workspace, can } = useWorkspace();
   const { toast } = useToast();
@@ -137,6 +146,7 @@ export function ProjectHeaderBar({ project, members }: ProjectHeaderBarProps) {
       toast("Project details updated", "success");
       setDetailsOpen(false);
       router.refresh();
+      onRefresh();
     });
   }
 
@@ -152,6 +162,7 @@ export function ProjectHeaderBar({ project, members }: ProjectHeaderBarProps) {
       toast("Project status updated", "success");
       setConfirmTarget(null);
       router.refresh();
+      onRefresh();
     });
   }
 
@@ -166,6 +177,7 @@ export function ProjectHeaderBar({ project, members }: ProjectHeaderBarProps) {
       }
       toast(userId ? "Assignee updated" : "Unassigned", "success");
       router.refresh();
+      onRefresh();
     });
   }
 
@@ -190,12 +202,13 @@ export function ProjectHeaderBar({ project, members }: ProjectHeaderBarProps) {
             they're identified once, here. */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-1.5 text-sm">
-            <Link
-              href={`/${workspace.slug}/fulfillment`}
+            <button
+              type="button"
+              onClick={onBackToQueue}
               className="text-muted-foreground hover:text-foreground hover:underline"
             >
               Fulfilment
-            </Link>
+            </button>
             <span className="text-muted-foreground/50">/</span>
             <Link
               href={`/${workspace.slug}/clients/${project.client_id}`}
@@ -205,6 +218,7 @@ export function ProjectHeaderBar({ project, members }: ProjectHeaderBarProps) {
             </Link>
             <span className="text-muted-foreground/50">/</span>
             <ProjectSwitcherPopover
+              onSelect={onSwitchProject}
               trigger={
                 <button
                   type="button"

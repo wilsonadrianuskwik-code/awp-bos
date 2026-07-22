@@ -14,7 +14,15 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/:workspaceSlug/fulfillment-projects/:invoiceId",
-        destination: "/:workspaceSlug/fulfillment/:invoiceId",
+        destination: "/:workspaceSlug/fulfillment?invoice=:invoiceId",
+        permanent: false,
+      },
+      // The per-project workspace was later folded into /fulfillment itself
+      // (one page, Client▼/Invoice▼ selectors, no per-project route) — old
+      // /fulfillment/[invoiceId] links resolve via the `invoice` query param.
+      {
+        source: "/:workspaceSlug/fulfillment/:invoiceId",
+        destination: "/:workspaceSlug/fulfillment?invoice=:invoiceId",
         permanent: false,
       },
     ];

@@ -31,6 +31,7 @@ type AddDeliverableDialogProps = {
   onOpenChange: (open: boolean) => void;
   projectId: string;
   trackers: FulfillmentItemWithProgress[];
+  onChanged: () => void;
 };
 
 export function AddDeliverableDialog({
@@ -38,6 +39,7 @@ export function AddDeliverableDialog({
   onOpenChange,
   projectId,
   trackers,
+  onChanged,
 }: AddDeliverableDialogProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
@@ -71,6 +73,7 @@ export function AddDeliverableDialog({
       toast("Deliverable added", "success");
       onOpenChange(false);
       router.refresh();
+      onChanged();
     });
   }
 

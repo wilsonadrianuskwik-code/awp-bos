@@ -37,6 +37,7 @@ type RecordDeliveryDialogProps = {
   delivered: number;
   remaining: number;
   unitLabel?: string | null;
+  onChanged?: () => void;
 };
 
 export function RecordDeliveryDialog({
@@ -52,6 +53,7 @@ export function RecordDeliveryDialog({
   delivered,
   remaining,
   unitLabel,
+  onChanged,
 }: RecordDeliveryDialogProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
@@ -95,6 +97,7 @@ export function RecordDeliveryDialog({
       reset();
       onOpenChange(false);
       router.refresh();
+      onChanged?.();
     });
   }
 

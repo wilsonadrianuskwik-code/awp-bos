@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useWorkspace } from "@/providers/workspace-provider";
-import { cn } from "@/lib/utils/cn";
 import {
   searchFulfillmentProjectsAction,
   type FulfillmentProjectSearchResult,
@@ -81,75 +79,25 @@ function ResultsList({
   );
 }
 
-// Landing page (/fulfillment): a single full-width search bar replacing
-// the old two-step Client▼ / Invoice▼ picker. Typing a client name or an
-// invoice number surfaces matching projects; picking one navigates
-// straight into its workspace.
-export function ProjectJumpBar() {
-  const router = useRouter();
-  const { workspace } = useWorkspace();
-  const { query, setQuery, results, loading } = useProjectSearch();
-  const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function onClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
-  }, []);
-
-  function select(invoiceId: string) {
-    setOpen(false);
-    setQuery("");
-    router.push(`/${workspace.slug}/fulfillment/${invoiceId}`);
-  }
-
-  return (
-    <div ref={containerRef} className="relative">
-      <div
-        className={cn(
-          "flex items-center gap-2 rounded-lg border bg-card px-3 py-2 shadow-2xs transition-colors",
-          open && query && "rounded-b-none border-b-transparent"
-        )}
-      >
-        <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
-        <input
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setOpen(true);
-          }}
-          onFocus={() => setOpen(true)}
-          placeholder="Jump to a project — search by client or invoice number…"
-          className="h-6 flex-1 bg-transparent text-[13.5px] outline-none placeholder:text-muted-foreground"
-        />
-      </div>
-      {open && query.trim() && (
-        <div className="absolute inset-x-0 top-full z-20 rounded-b-lg border border-t-0 bg-card shadow-modal">
-          <ResultsList results={results} loading={loading} query={query} onSelect={select} />
-        </div>
-      )}
-    </div>
-  );
-}
-
 // Project workspace header: the breadcrumb's dropdown caret opens this
-// popover to jump to a different project without a permanent picker
-// taking up header space (see project-header-bar.tsx).
-export function ProjectSwitcherPopover({ trigger }: { trigger: React.ReactNode }) {
-  const router = useRouter();
-  const { workspace } = useWorkspace();
+// popover to jump to a different project without a permanent picker taking
+// up header space (see project-header-bar.tsx). `onSelect` sets the
+// workspace shell's selected invoice in place — the whole /fulfillment
+// module is one page now, so switching projects is never a navigation.
+export function ProjectSwitcherPopover({
+  trigger,
+  onSelect,
+}: {
+  trigger: React.ReactNode;
+  onSelect: (invoiceId: string) => void;
+}) {
   const { query, setQuery, results, loading } = useProjectSearch();
   const [open, setOpen] = useState(false);
 
   function select(invoiceId: string) {
     setOpen(false);
     setQuery("");
-    router.push(`/${workspace.slug}/fulfillment/${invoiceId}`);
+    onSelect(invoiceId);
   }
 
   return (

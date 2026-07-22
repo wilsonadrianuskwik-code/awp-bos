@@ -44,6 +44,7 @@ type DeliverableTableProps = {
   selectedIds: Set<string>;
   onSelectedIdsChange: (ids: Set<string>) => void;
   onSelectDeliverable: (id: string) => void;
+  onChanged: () => void;
 };
 
 function memberLabel(members: WorkspaceMember[], userId: string | null): string {
@@ -58,6 +59,7 @@ export function DeliverableTable({
   selectedIds,
   onSelectedIdsChange,
   onSelectDeliverable,
+  onChanged,
 }: DeliverableTableProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
@@ -74,6 +76,7 @@ export function DeliverableTable({
         return;
       }
       router.refresh();
+      onChanged();
     });
   }
 
@@ -87,6 +90,7 @@ export function DeliverableTable({
         return;
       }
       router.refresh();
+      onChanged();
     });
   }
 
@@ -98,6 +102,7 @@ export function DeliverableTable({
         return;
       }
       router.refresh();
+      onChanged();
     });
   }
 
@@ -116,6 +121,7 @@ export function DeliverableTable({
       }
       toast("Deliverable duplicated", "success");
       router.refresh();
+      onChanged();
     });
   }
 
@@ -127,6 +133,7 @@ export function DeliverableTable({
         return;
       }
       router.refresh();
+      onChanged();
     });
   }
 
@@ -143,6 +150,7 @@ export function DeliverableTable({
       toast("Marked as posted", "success");
       onSelectedIdsChange(new Set());
       router.refresh();
+      onChanged();
     });
   }
 
@@ -159,6 +167,7 @@ export function DeliverableTable({
       toast("Cancelled", "success");
       onSelectedIdsChange(new Set());
       router.refresh();
+      onChanged();
     });
   }
 
@@ -175,6 +184,7 @@ export function DeliverableTable({
       toast("Rescheduled", "success");
       onSelectedIdsChange(new Set());
       router.refresh();
+      onChanged();
     });
   }
 

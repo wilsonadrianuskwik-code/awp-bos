@@ -79,12 +79,20 @@ type FulfillmentProgressCardProps = {
   tracker: FulfillmentItemWithProgress;
   stalledAfterDays: number;
   onRecordDelivery: (tracker: FulfillmentItemWithProgress) => void;
+  // How many deliverables link to this tracker, when known (the workspace
+  // has the full deliverable list already loaded; the cockpit's cross-client
+  // queue doesn't). Deliverables are the primary entity here — Tracker is a
+  // summary of them, not an independent ledger — so when this is > 0 the
+  // card says so explicitly instead of presenting delivered/purchased as if
+  // it were tallied on its own.
+  linkedDeliverableCount?: number;
 };
 
 export function FulfillmentProgressCard({
   tracker,
   stalledAfterDays,
   onRecordDelivery,
+  linkedDeliverableCount,
 }: FulfillmentProgressCardProps) {
   const router = useRouter();
   const { workspace, can } = useWorkspace();
@@ -154,7 +162,7 @@ export function FulfillmentProgressCard({
               )}
               {tracker.project_id && (
                 <Link
-                  href={`/${workspace.slug}/fulfillment/${tracker.invoice_id}`}
+                  href={`/${workspace.slug}/fulfillment?invoice=${tracker.invoice_id}`}
                   className="hover:text-primary hover:underline"
                 >
                   · Project: {tracker.project_name || "Untitled"}
@@ -217,6 +225,12 @@ export function FulfillmentProgressCard({
                 {tracker.progress_percent}%
               </span>
             </div>
+            {!!linkedDeliverableCount && (
+              <div className="mt-1 text-[11px] text-muted-foreground">
+                Live rollup of {linkedDeliverableCount} linked deliverable
+                {linkedDeliverableCount === 1 ? "" : "s"} — not tracked separately
+              </div>
+            )}
           </div>
         </div>
 
