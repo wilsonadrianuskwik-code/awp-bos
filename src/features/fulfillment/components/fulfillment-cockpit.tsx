@@ -591,20 +591,33 @@ function ClientWorkPanel({
   useEffect(() => {
     let cancelled = false;
     setLoadingDeliverables(true);
-    getClientFulfillmentDeliverablesAction(workspace.id, client.clientId).then((result) => {
-      if (cancelled) return;
-      // A real failure here must not look identical to "genuinely no
-      // outstanding deliverables" — that exact silent-swallow previously
-      // masked a backend bug (an ambiguous overloaded RPC) as an empty
-      // state for every client, indefinitely.
-      if (result.error) {
-        toast(result.error, "error");
+    getClientFulfillmentDeliverablesAction(workspace.id, client.clientId)
+      .then((result) => {
+        if (cancelled) return;
+        // A real failure here must not look identical to "genuinely no
+        // outstanding deliverables" — that exact silent-swallow previously
+        // masked a backend bug (an ambiguous overloaded RPC) as an empty
+        // state for every client, indefinitely.
+        if (result.error) {
+          toast(result.error, "error");
+          setDeliverables([]);
+        } else {
+          setDeliverables(result.data ?? []);
+        }
+      })
+      .catch((err) => {
+        // A thrown/rejected promise (as opposed to the action's normal
+        // { error } return shape) previously had no handler at all here —
+        // the .then callback above simply never ran, so the loading
+        // skeleton spun forever with no visible error, indistinguishable
+        // from a slow network on screen.
+        if (cancelled) return;
+        toast(err instanceof Error ? err.message : "Failed to load deliverables", "error");
         setDeliverables([]);
-      } else {
-        setDeliverables(result.data ?? []);
-      }
-      setLoadingDeliverables(false);
-    });
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingDeliverables(false);
+      });
     return () => {
       cancelled = true;
     };
