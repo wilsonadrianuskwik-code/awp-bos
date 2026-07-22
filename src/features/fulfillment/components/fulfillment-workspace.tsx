@@ -33,14 +33,23 @@ const VIEW_STORAGE_KEY = "fulfillment.workspace.view";
 
 function readStoredView(): MainView {
   if (typeof window === "undefined") return "kanban";
-  const stored = window.localStorage.getItem(VIEW_STORAGE_KEY);
-  return stored === "tracker" ||
-    stored === "list" ||
-    stored === "kanban" ||
-    stored === "calendar" ||
-    stored === "timeline"
-    ? stored
-    : "kanban";
+  // localStorage access can throw (private-browsing storage restrictions,
+  // third-party-cookie blocking in an embedded iframe) — a thrown error
+  // here would otherwise crash the initial render, silently replacing the
+  // whole page with the nearest error boundary instead of just falling
+  // back to the default view.
+  try {
+    const stored = window.localStorage.getItem(VIEW_STORAGE_KEY);
+    return stored === "tracker" ||
+      stored === "list" ||
+      stored === "kanban" ||
+      stored === "calendar" ||
+      stored === "timeline"
+      ? stored
+      : "kanban";
+  } catch {
+    return "kanban";
+  }
 }
 
 type FulfillmentWorkspaceProps = {

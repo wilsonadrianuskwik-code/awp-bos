@@ -13,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
+import { useConfirm } from "@/providers/confirm-provider";
 import { cn } from "@/lib/utils/cn";
 import { updateFulfillmentDeliverableStatusAction } from "@/features/fulfillment/actions-projects";
 import { useDeliverableBulkActions } from "@/features/fulfillment/hooks/use-deliverable-bulk-actions";
@@ -50,15 +51,41 @@ const CARD_BORDER: Record<DeliverableStatus, string> = {
 };
 
 // Mirrors update_fulfillment_deliverable_status's state machine
-// (supabase/migrations/00055_deliverable_tracker_cascade.sql) — the
-// reopen transitions (posted/cancelled -> scheduled) are admin-gated
+// (supabase/migrations/00055_deliverable_tracker_cascade.sql +
+// 00060_allow_cancelled_to_posted.sql) — the reopen transitions
+// (posted -> scheduled, cancelled -> scheduled/posted) are admin-gated
 // server-side, enforced here too so a staff drag visibly rejects instead
 // of erroring after an optimistic move.
 const VALID_NEXT: Record<DeliverableStatus, DeliverableStatus[]> = {
   scheduled: ["posted", "cancelled"],
   posted: ["scheduled"],
-  cancelled: ["scheduled"],
+  cancelled: ["scheduled", "posted"],
 };
+
+// Any transition off of posted/cancelled is a "reopen" — it un-does a
+// terminal state, so it gets a confirmation step even for an admin who's
+// allowed to do it, same discipline as this codebase's other destructive/
+// state-reversing actions (useConfirm, already used for deletes elsewhere).
+function reopenConfirmCopy(from: DeliverableStatus, to: DeliverableStatus) {
+  if (from === "cancelled" && to === "posted") {
+    return {
+      title: "Mark this cancelled deliverable as posted?",
+      description:
+        "This will record it as posted and credit one delivery unit to its linked tracker, if any.",
+    };
+  }
+  if (from === "cancelled" && to === "scheduled") {
+    return {
+      title: "Reopen this cancelled deliverable?",
+      description: "It will move back to Scheduled.",
+    };
+  }
+  return {
+    title: "Reopen this posted deliverable?",
+    description:
+      "It will move back to Scheduled and its credited delivery unit will be reversed.",
+  };
+}
 
 type DeliverableKanbanBoardProps = {
   deliverables: FulfillmentDeliverable[];
@@ -79,6 +106,7 @@ export function DeliverableKanbanBoard({
 }: DeliverableKanbanBoardProps) {
   const { workspace, can } = useWorkspace();
   const { toast } = useToast();
+  const confirm = useConfirm();
   const router = useRouter();
   const [, startTransition] = useTransition();
   const bulk = useDeliverableBulkActions({ selectedIds, onSelectedIdsChange, onChanged });
@@ -98,7 +126,7 @@ export function DeliverableKanbanBoard({
   // whether it's fired from a card or a table row.
   const orderedIds = optimisticDeliverables.map((d) => d.id);
 
-  function handleDrop(itemId: string, fromColumnId: string, toColumnId: string) {
+  async function handleDrop(itemId: string, fromColumnId: string, toColumnId: string) {
     const item = optimisticDeliverables.find((d) => d.id === itemId);
     if (!item) return;
 
@@ -108,10 +136,17 @@ export function DeliverableKanbanBoard({
       return;
     }
 
-    const isReopen = item.status !== "scheduled" && nextStatus === "scheduled";
+    // Any move off of posted/cancelled reopens a terminal state — mirrors
+    // the server's own admin/owner gate in update_fulfillment_deliverable_status.
+    const isReopen = item.status !== "scheduled";
     if (isReopen && !can("admin")) {
       toast("Only an admin can reopen a posted or cancelled deliverable", "error");
       return;
+    }
+    if (isReopen) {
+      const copy = reopenConfirmCopy(item.status, nextStatus);
+      const ok = await confirm({ ...copy, confirmLabel: "Confirm" });
+      if (!ok) return;
     }
 
     // Posting cascades a delivery event onto the linked tracker (see
@@ -266,7 +301,14 @@ export function DeliverableKanbanBoard({
                     })
                   }
                   aria-label="Select deliverable"
-                  className="bg-card opacity-0 shadow-2xs transition-opacity group-hover/dcard:opacity-100 data-[state=checked]:opacity-100"
+                  // Faintly visible at rest (not opacity-0) so the ability to
+                  // multi-select is discoverable without having to hover every
+                  // card first — full opacity on hover/checked/any active
+                  // selection, same as before.
+                  className={cn(
+                    "bg-card opacity-40 shadow-2xs transition-opacity group-hover/dcard:opacity-100 data-[state=checked]:opacity-100",
+                    selectedIds.size > 0 && "opacity-100"
+                  )}
                 />
               </div>
               <div className="pl-5">
