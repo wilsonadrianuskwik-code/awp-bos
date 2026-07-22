@@ -1,17 +1,18 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { PackageCheck, Table2, Columns3, ChevronDown, CalendarRange } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ViewToggle } from "@/components/shared/view-toggle";
 import { EmptyState } from "@/components/shared/empty-state";
+import { useWorkspace } from "@/providers/workspace-provider";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ClientInvoicePicker } from "@/features/fulfillment/components/client-invoice-picker";
 import { ProjectHeaderBar } from "@/features/fulfillment/components/project-header-bar";
 import { FulfillmentProgressCard } from "@/features/fulfillment/components/fulfillment-progress-card";
 import { RecordDeliveryDialog } from "@/features/fulfillment/components/record-delivery-dialog";
@@ -21,7 +22,6 @@ import { AddDeliverableDialog } from "@/features/fulfillment/components/add-deli
 import { GenerateScheduleWizard } from "@/features/fulfillment/components/generate-schedule-wizard";
 import { WorkspaceSidebar } from "@/features/fulfillment/components/workspace-sidebar";
 import { FULFILLMENT_STALLED_AFTER_DAYS } from "@/features/fulfillment/config";
-import type { ClientSummary } from "@/features/line-items/types";
 import type { FulfillmentItemWithProgress } from "@/features/fulfillment/types";
 import type {
   FulfillmentDeliverable,
@@ -31,7 +31,6 @@ import type { WorkspaceMember } from "@/features/workspace/types";
 import type { Activity } from "@/features/activities/types";
 
 type FulfillmentWorkspaceProps = {
-  clients: ClientSummary[];
   invoiceId?: string;
   invoiceEligible: boolean;
   project: FulfillmentProjectWithRollup | null;
@@ -51,7 +50,6 @@ type MainView = "list" | "kanban";
 // picker's "nothing selected yet" state — the merged landing page owns
 // that now.
 export function FulfillmentWorkspace({
-  clients,
   invoiceId,
   invoiceEligible,
   project,
@@ -63,6 +61,7 @@ export function FulfillmentWorkspace({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { workspace } = useWorkspace();
 
   const [recording, setRecording] = useState<FulfillmentItemWithProgress | null>(null);
   const [addOpen, setAddOpen] = useState(false);
@@ -112,17 +111,16 @@ export function FulfillmentWorkspace({
 
   return (
     <div className="space-y-4">
-      <ClientInvoicePicker
-        clients={clients}
-        initialClientId={project?.client_id}
-        initialInvoiceId={invoiceId}
-      />
-
       {invoiceId && !invoiceEligible && (
         <EmptyState
           icon={PackageCheck}
           title="No Fulfilment Project yet"
           description="Projects are created automatically once this invoice's first payment is recorded. Nothing to manage here until then."
+          action={
+            <Button variant="outline" asChild>
+              <Link href={`/${workspace.slug}/fulfillment`}>Back to Fulfilment</Link>
+            </Button>
+          }
         />
       )}
 

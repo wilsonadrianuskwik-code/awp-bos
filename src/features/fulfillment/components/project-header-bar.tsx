@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, ChevronDown } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
+import { ProjectSwitcherPopover } from "@/features/fulfillment/components/project-search";
 import {
   updateFulfillmentProjectAction,
   updateFulfillmentProjectStatusAction,
@@ -168,42 +169,126 @@ export function ProjectHeaderBar({ project, members }: ProjectHeaderBarProps) {
     });
   }
 
+  const progressFraction =
+    project.deliverable_count > 0
+      ? `${project.deliverable_posted_count}/${project.deliverable_count} posted`
+      : project.tracker_count > 0
+        ? `${project.tracker_completed_count}/${project.tracker_count} trackers`
+        : "Not scheduled yet";
+
+  const dateRange =
+    project.start_date && project.end_date
+      ? `${project.start_date} → ${project.end_date}`
+      : project.start_date || project.end_date || "Not scheduled";
+
   return (
     <Card>
-      <CardContent className="space-y-2.5 py-3.5">
+      <CardContent className="space-y-3.5 py-3.5">
+        {/* Row 1 — breadcrumb doubles as the project switcher, replacing
+            the old standalone Client▼/Invoice▼ picker: the same client
+            and invoice were shown twice before (picker + header), now
+            they're identified once, here. */}
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <h2 className="truncate text-base font-semibold tracking-tight">
-                {project.name || "Untitled Project"}
-              </h2>
-              <StatusBadge status={project.status} />
-            </div>
-            <p className="mt-0.5 truncate text-xs text-muted-foreground">
-              <Link href={`/${workspace.slug}/clients/${project.client_id}`} className="hover:text-foreground hover:underline">
-                {project.client_name}
-              </Link>
-              {" · Invoice "}
-              <Link href={`/${workspace.slug}/invoices/${project.invoice_id}`} className="font-mono hover:text-foreground hover:underline">
-                {project.invoice_number}
-              </Link>
-            </p>
+          <div className="flex min-w-0 items-center gap-1.5 text-sm">
+            <Link
+              href={`/${workspace.slug}/fulfillment`}
+              className="text-muted-foreground hover:text-foreground hover:underline"
+            >
+              Fulfilment
+            </Link>
+            <span className="text-muted-foreground/50">/</span>
+            <Link
+              href={`/${workspace.slug}/clients/${project.client_id}`}
+              className="truncate text-muted-foreground hover:text-foreground hover:underline"
+            >
+              {project.client_name}
+            </Link>
+            <span className="text-muted-foreground/50">/</span>
+            <ProjectSwitcherPopover
+              trigger={
+                <button
+                  type="button"
+                  className="flex min-w-0 items-center gap-1 rounded-md px-1.5 py-0.5 hover:bg-muted"
+                >
+                  <span className="truncate font-semibold">
+                    {project.name || "Untitled Project"}
+                  </span>
+                  <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                </button>
+              }
+            />
+            <StatusBadge status={project.status} className="ml-1 shrink-0" />
           </div>
 
-          <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {can("staff") && (
+                <DropdownMenuItem onSelect={() => setDetailsOpen(true)}>
+                  Edit Details
+                </DropdownMenuItem>
+              )}
+              {(can("staff") || canReopen) && <DropdownMenuSeparator />}
+              {project.status === "not_started" && can("staff") && (
+                <DropdownMenuItem onSelect={() => setConfirmTarget("in_progress")}>
+                  Start Project
+                </DropdownMenuItem>
+              )}
+              {!isTerminal && can("staff") && (
+                <>
+                  {project.status === "in_progress" && (
+                    <DropdownMenuItem onSelect={() => setConfirmTarget("completed")}>
+                      Mark Completed
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onSelect={() => setConfirmTarget("cancelled")}>
+                    Cancel Project
+                  </DropdownMenuItem>
+                </>
+              )}
+              {canReopen && (
+                <DropdownMenuItem onSelect={() => setConfirmTarget("in_progress")}>
+                  Reopen
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Row 2 — the stat strip: client/invoice/dates/team all as plain
+            reference facts (no more duplicated navigation), plus the
+            derived progress bar. */}
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t pt-3 text-xs">
+          <div>
+            <div className="font-medium uppercase tracking-wide text-muted-foreground">Invoice</div>
+            <Link
+              href={`/${workspace.slug}/invoices/${project.invoice_id}`}
+              className="font-mono text-[13px] text-foreground hover:text-primary hover:underline"
+            >
+              {project.invoice_number}
+            </Link>
+          </div>
+          <div>
+            <div className="font-medium uppercase tracking-wide text-muted-foreground">Dates</div>
+            <span className="font-mono text-[13px] tabular-nums">{dateRange}</span>
+          </div>
+          <div>
+            <div className="mb-0.5 font-medium uppercase tracking-wide text-muted-foreground">Team</div>
             <Select
               value={project.assigned_to ?? "unassigned"}
               onValueChange={(v) => assign(v === "unassigned" ? null : v)}
               disabled={isPending || !can("staff")}
             >
-              <SelectTrigger className="h-8 w-auto gap-1.5 border-none bg-transparent px-1.5 shadow-none hover:bg-muted">
-                <Avatar className="h-6 w-6">
-                  <AvatarFallback className="text-[10px]">{initialsFor(assignee)}</AvatarFallback>
+              <SelectTrigger className="h-6 w-auto gap-1.5 border-none bg-transparent px-0 py-0 text-[13px] shadow-none hover:bg-transparent">
+                <Avatar className="h-5 w-5">
+                  <AvatarFallback className="text-[9px]">{initialsFor(assignee)}</AvatarFallback>
                 </Avatar>
                 <SelectValue>
-                  <span className="hidden text-xs sm:inline">
-                    {assignee ? assignee.profile?.full_name ?? assignee.email : "Unassigned"}
-                  </span>
+                  {assignee ? assignee.profile?.full_name ?? assignee.email : "Unassigned"}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
@@ -215,62 +300,21 @@ export function ProjectHeaderBar({ project, members }: ProjectHeaderBarProps) {
                 ))}
               </SelectContent>
             </Select>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {can("staff") && (
-                  <DropdownMenuItem onSelect={() => setDetailsOpen(true)}>
-                    Edit Details
-                  </DropdownMenuItem>
-                )}
-                {(can("staff") || canReopen) && <DropdownMenuSeparator />}
-                {project.status === "not_started" && can("staff") && (
-                  <DropdownMenuItem onSelect={() => setConfirmTarget("in_progress")}>
-                    Start Project
-                  </DropdownMenuItem>
-                )}
-                {!isTerminal && can("staff") && (
-                  <>
-                    {project.status === "in_progress" && (
-                      <DropdownMenuItem onSelect={() => setConfirmTarget("completed")}>
-                        Mark Completed
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem onSelect={() => setConfirmTarget("cancelled")}>
-                      Cancel Project
-                    </DropdownMenuItem>
-                  </>
-                )}
-                {canReopen && (
-                  <DropdownMenuItem onSelect={() => setConfirmTarget("in_progress")}>
-                    Reopen
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-            <div
-              className="animate-grow-x h-full rounded-full bg-emerald-500 transition-[width] duration-500"
-              style={{ width: `${progressPct}%` }}
-            />
+          <div className="min-w-[160px] flex-1">
+            <div className="mb-1 flex items-baseline justify-between font-medium uppercase tracking-wide text-muted-foreground">
+              <span>Progress</span>
+              <span className="font-mono normal-case tracking-normal text-foreground">
+                {progressFraction}
+              </span>
+            </div>
+            <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+              <div
+                className="animate-grow-x h-full rounded-full bg-emerald-500 transition-[width] duration-500"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
           </div>
-          <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
-            {progressPct}%
-            {project.deliverable_count > 0
-              ? ` · ${project.deliverable_posted_count}/${project.deliverable_count} posted`
-              : project.tracker_count > 0
-                ? ` · ${project.tracker_completed_count}/${project.tracker_count} trackers`
-                : ""}
-          </span>
         </div>
       </CardContent>
 

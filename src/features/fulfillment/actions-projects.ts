@@ -31,8 +31,9 @@ import type {
   FulfillmentDeliverable,
   FulfillmentProject,
 } from "@/features/fulfillment/types-projects";
-import { getInvoicesByClient } from "@/features/invoices/queries";
+import { getInvoices } from "@/features/invoices/queries";
 import { getFulfillmentDeliverableActivities } from "@/features/fulfillment/queries-projects";
+import { FULFILLMENT_ELIGIBLE_INVOICE_STATUSES } from "@/features/fulfillment/types";
 
 /**
  * Every mutation below is a thin wrapper around a single Postgres function
@@ -45,15 +46,44 @@ import { getFulfillmentDeliverableActivities } from "@/features/fulfillment/quer
  * admin+ inside the RPC itself).
  */
 
-// Read wrapper so the Client -> Invoice picker can lazily load a client's
-// invoices on selection, without a full page navigation — same pattern as
-// getFulfillmentEventsAction in src/features/fulfillment/actions.ts.
-export async function getInvoicesForClientAction(
+export type FulfillmentProjectSearchResult = {
+  invoiceId: string;
+  invoiceNumber: string;
+  clientId: string;
+  clientName: string;
+};
+
+// Single search box behind both the /fulfillment landing page's jump bar
+// and the project workspace's breadcrumb switcher — matches by client
+// name/company OR invoice number/title in one query (reusing getInvoices'
+// existing search clause, see src/features/invoices/queries.ts) rather
+// than a two-step "pick client, then pick invoice" flow. Only invoices
+// that have actually reached a Fulfilment-eligible status are worth
+// surfacing here, since anything earlier has no project to jump into yet.
+export async function searchFulfillmentProjectsAction(
   workspaceId: string,
-  clientId: string
+  query: string
 ) {
   return withWorkspace(workspaceId, "viewer", async (ctx) => {
-    return getInvoicesByClient(clientId, ctx.workspaceId);
+    if (!query.trim()) return [];
+
+    const { invoices } = await getInvoices(ctx.workspaceId, {
+      search: query,
+      pageSize: 8,
+    });
+
+    return invoices
+      .filter((i) =>
+        (FULFILLMENT_ELIGIBLE_INVOICE_STATUSES as readonly string[]).includes(i.status)
+      )
+      .map(
+        (i): FulfillmentProjectSearchResult => ({
+          invoiceId: i.id,
+          invoiceNumber: i.invoice_number,
+          clientId: i.client_id,
+          clientName: i.client?.name ?? "Unknown client",
+        })
+      );
   });
 }
 

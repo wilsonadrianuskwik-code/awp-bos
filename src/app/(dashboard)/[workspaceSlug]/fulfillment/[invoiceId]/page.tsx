@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { getWorkspaceBySlug } from "@/lib/workspace";
-import { getAllClients } from "@/features/clients/queries";
 import { getWorkspaceMembers } from "@/features/workspace/queries";
 import { syncFulfillmentItemsAction } from "@/features/fulfillment/actions";
 import { getFulfillmentItems } from "@/features/fulfillment/queries";
@@ -27,13 +26,11 @@ export default async function FulfillmentProjectByInvoicePage({
   // invoices that have reached partial/paid since the last visit.
   await syncFulfillmentItemsAction(workspace.id);
 
-  const clients = await getAllClients(workspace.id);
   const project = await getFulfillmentProjectByInvoice(workspace.id, invoiceId);
 
   if (!project) {
     return (
       <FulfillmentWorkspace
-        clients={clients}
         invoiceId={invoiceId}
         invoiceEligible={false}
         project={null}
@@ -54,7 +51,6 @@ export default async function FulfillmentProjectByInvoicePage({
 
   return (
     <FulfillmentWorkspace
-      clients={clients}
       invoiceId={invoiceId}
       invoiceEligible
       project={project}
