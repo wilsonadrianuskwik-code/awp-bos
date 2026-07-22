@@ -44,7 +44,7 @@ import type { FulfillmentWorkspaceData } from "@/features/fulfillment/actions-pr
 import type { ClientFulfillmentDeliverable } from "@/features/fulfillment/types-projects";
 import type { FulfillmentItemWithProgress } from "@/features/fulfillment/types";
 
-type View = "attention" | "active" | "completed" | "all";
+type View = "active" | "completed" | "all";
 
 type ClientGroup = {
   clientId: string;
@@ -66,10 +66,9 @@ type ClientStats = {
 
 type EnrichedClient = ClientGroup & { stats: ClientStats };
 
-// Order matches the KPI tile row below (also what the 1–4 keyboard
-// shortcuts map to) — "what should I work on now" first, "what needs
-// triage" last, so opening the cockpit doesn't lead with problems.
-const VIEWS: View[] = ["active", "completed", "all", "attention"];
+// Order matches the KPI tile row below (also what the 1–3 keyboard
+// shortcuts map to) — "what should I work on now" first.
+const VIEWS: View[] = ["active", "completed", "all"];
 
 function groupByClient(items: FulfillmentItemWithProgress[]): ClientGroup[] {
   const map = new Map<string, ClientGroup>();
@@ -218,7 +217,6 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
 
   const counts = useMemo(
     () => ({
-      attention: enriched.filter((c) => c.stats.reasons.size > 0).length,
       active: enriched.filter((c) => c.stats.activeCount > 0).length,
       completed: enriched.filter((c) => c.stats.allDone).length,
       all: enriched.length,
@@ -227,13 +225,12 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
   );
 
   // Default to the view that answers "what should I work on now": active
-  // work first (the primary operational queue), then attention items if
-  // there's no active work to show, then all clients as the final fallback.
+  // work first (the primary operational queue), all clients as the fallback.
   const initialView: View =
     (VIEWS.includes(searchParams.get("view") as View)
       ? (searchParams.get("view") as View)
       : null) ??
-    (counts.active > 0 ? "active" : counts.attention > 0 ? "attention" : "all");
+    (counts.active > 0 ? "active" : "all");
 
   const [view, setView] = useState<View>(initialView);
   const [reason, setReason] = useState<AttentionReason | "all">("all");
@@ -248,10 +245,10 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
     return enriched
       .filter((c) => {
         if (term && !c.clientName.toLowerCase().includes(term)) return false;
-        if (view === "attention") {
-          if (c.stats.reasons.size === 0) return false;
-          if (reason !== "all" && !c.stats.reasons.has(reason)) return false;
-        }
+        // Reason is an orthogonal filter on top of whichever KPI tab is
+        // active — e.g. "Active work" + "Stalled" narrows to active clients
+        // that are also stalled, instead of requiring its own separate tab.
+        if (reason !== "all" && !c.stats.reasons.has(reason)) return false;
         if (view === "active" && c.stats.activeCount === 0) return false;
         if (view === "completed" && !c.stats.allDone) return false;
         return true;
@@ -296,9 +293,8 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
         return;
       }
       if (typing || recording || selectedInvoiceId) return;
-      if (["1", "2", "3", "4"].includes(e.key)) {
+      if (["1", "2", "3"].includes(e.key)) {
         setView(VIEWS[Number(e.key) - 1]);
-        setReason("all");
         return;
       }
       if (["ArrowDown", "ArrowUp", "j", "k"].includes(e.key)) {
@@ -368,11 +364,9 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
         )
       ) : (
         <>
-      {/* Operational summary — each tile is the primary filter. Ordered to
-          answer "what should I work on now" before "what's wrong": active
-          work leads, Needs Attention trails (still fully visible, still
-          styled as a warning — just not the first thing you see). */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      {/* Operational summary — each tile is the primary filter, ordered to
+          answer "what should I work on now" first. */}
+      <div className="grid grid-cols-3 gap-3">
         <KpiTile
           label="Active work"
           value={counts.active}
@@ -397,45 +391,34 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
           active={view === "all"}
           onClick={() => setView("all")}
         />
-        <KpiTile
-          label="Needs attention"
-          value={counts.attention}
-          hint="stalled, over-delivered or in progress"
-          tone="crit"
-          active={view === "attention"}
-          onClick={() => {
-            setView("attention");
-            setReason("all");
-          }}
-        />
       </div>
 
-      {/* Operations Inbox reason chips — only while triaging attention */}
-      {view === "attention" && (
-        <div className="flex flex-wrap items-center gap-2">
-          <ReasonChip label="All reasons" active={reason === "all"} onClick={() => setReason("all")} />
-          {ATTENTION_REASONS.map((r) => (
-            <ReasonChip
-              key={r.key}
-              label={r.label}
-              active={reason === r.key}
-              onClick={() => setReason(r.key)}
-            />
-          ))}
-          {/* Reserved for the future Scheduling extension */}
-          <span
-            className="cursor-not-allowed rounded-full border border-dashed px-3 py-1 text-xs font-medium text-muted-foreground/50"
-            title="Available once Scheduling is added"
-          >
-            Due soon
-          </span>
-          <span className="ml-auto hidden text-xs text-muted-foreground lg:block">
-            <kbd className="rounded border bg-muted px-1 font-mono text-[10px]">↑↓</kbd> move ·{" "}
-            <kbd className="rounded border bg-muted px-1 font-mono text-[10px]">/</kbd> search ·{" "}
-            <kbd className="rounded border bg-muted px-1 font-mono text-[10px]">1–4</kbd> views
-          </span>
-        </div>
-      )}
+      {/* Reason chips — an orthogonal filter layered on top of whichever
+          KPI tab is active above (e.g. Active work + Stalled), always
+          available rather than gated behind its own tab. */}
+      <div className="flex flex-wrap items-center gap-2">
+        <ReasonChip label="All reasons" active={reason === "all"} onClick={() => setReason("all")} />
+        {ATTENTION_REASONS.map((r) => (
+          <ReasonChip
+            key={r.key}
+            label={r.label}
+            active={reason === r.key}
+            onClick={() => setReason(r.key)}
+          />
+        ))}
+        {/* Reserved for the future Scheduling extension */}
+        <span
+          className="cursor-not-allowed rounded-full border border-dashed px-3 py-1 text-xs font-medium text-muted-foreground/50"
+          title="Available once Scheduling is added"
+        >
+          Due soon
+        </span>
+        <span className="ml-auto hidden text-xs text-muted-foreground lg:block">
+          <kbd className="rounded border bg-muted px-1 font-mono text-[10px]">↑↓</kbd> move ·{" "}
+          <kbd className="rounded border bg-muted px-1 font-mono text-[10px]">/</kbd> search ·{" "}
+          <kbd className="rounded border bg-muted px-1 font-mono text-[10px]">1–3</kbd> views
+        </span>
+      </div>
 
       <div className="grid items-start gap-4 lg:grid-cols-[340px_1fr]">
         {/* LEFT — prioritized client queue */}
@@ -460,8 +443,8 @@ export function FulfillmentCockpit({ items, stalledAfterDays }: FulfillmentCockp
           <div className="max-h-[calc(100vh-260px)] min-h-[360px] overflow-y-auto">
             {filtered.length === 0 ? (
               <div className="p-8 text-center text-sm text-muted-foreground">
-                {view === "attention"
-                  ? "Nothing needs attention. You're all caught up."
+                {reason !== "all"
+                  ? "No clients match this reason filter."
                   : "No clients match these filters."}
               </div>
             ) : (
@@ -610,13 +593,22 @@ function ClientWorkPanel({
     setLoadingDeliverables(true);
     getClientFulfillmentDeliverablesAction(workspace.id, client.clientId).then((result) => {
       if (cancelled) return;
-      setDeliverables(result.error ? [] : (result.data ?? []));
+      // A real failure here must not look identical to "genuinely no
+      // outstanding deliverables" — that exact silent-swallow previously
+      // masked a backend bug (an ambiguous overloaded RPC) as an empty
+      // state for every client, indefinitely.
+      if (result.error) {
+        toast(result.error, "error");
+        setDeliverables([]);
+      } else {
+        setDeliverables(result.data ?? []);
+      }
       setLoadingDeliverables(false);
     });
     return () => {
       cancelled = true;
     };
-  }, [workspace.id, client.clientId]);
+  }, [workspace.id, client.clientId, toast]);
 
   function markPosted(deliverableId: string) {
     startTransition(async () => {
