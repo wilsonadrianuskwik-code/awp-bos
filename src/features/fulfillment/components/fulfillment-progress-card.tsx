@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, ChevronRight, Paperclip } from "lucide-react";
+import { Plus, ChevronRight, Paperclip, CalendarRange } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 import { useWorkspace } from "@/providers/workspace-provider";
@@ -79,6 +79,11 @@ type FulfillmentProgressCardProps = {
   // card says so explicitly instead of presenting delivered/purchased as if
   // it were tallied on its own.
   linkedDeliverableCount?: number;
+  // Opens the Generate Schedule wizard preselected to this tracker. Only
+  // the project workspace (which owns the wizard) passes this — the
+  // cross-client cockpit queue leaves it unset and the button is omitted
+  // there, since a per-project wizard doesn't make sense in that context.
+  onGenerateSchedule?: (tracker: FulfillmentItemWithProgress) => void;
 };
 
 export function FulfillmentProgressCard({
@@ -86,6 +91,7 @@ export function FulfillmentProgressCard({
   stalledAfterDays,
   onRecordDelivery,
   linkedDeliverableCount,
+  onGenerateSchedule,
 }: FulfillmentProgressCardProps) {
   const router = useRouter();
   const { workspace, can } = useWorkspace();
@@ -232,6 +238,12 @@ export function FulfillmentProgressCard({
             <Button size="sm" onClick={() => onRecordDelivery(tracker)}>
               <Plus className="mr-1.5 h-4 w-4" />
               Record Delivery
+            </Button>
+          )}
+          {onGenerateSchedule && (
+            <Button size="sm" variant="outline" onClick={() => onGenerateSchedule(tracker)}>
+              <CalendarRange className="mr-1.5 h-4 w-4" />
+              Generate Schedule
             </Button>
           )}
           {isTerminal && can("admin") && (

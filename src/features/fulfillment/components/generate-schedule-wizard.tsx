@@ -97,6 +97,10 @@ type GenerateScheduleWizardProps = {
   trackers: FulfillmentItemWithProgress[];
   members: WorkspaceMember[];
   onChanged: () => void;
+  // Set when opened from a specific tracker card's own "Generate Schedule"
+  // action, so that tracker is preselected (and its remaining quantity
+  // tallied in) instead of landing on "No tracker link" every time.
+  initialTrackerId?: string | null;
 };
 
 // The primary first-run flow: Operations tells the wizard the project's
@@ -116,6 +120,7 @@ export function GenerateScheduleWizard({
   trackers,
   members,
   onChanged,
+  initialTrackerId,
 }: GenerateScheduleWizardProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
@@ -125,11 +130,24 @@ export function GenerateScheduleWizard({
   const [step, setStep] = useState<"range" | "method" | "preview">("range");
   const [startDate, setStartDate] = useState(projectStartDate ?? "");
   const [endDate, setEndDate] = useState(projectEndDate ?? "");
-  const [count, setCount] = useState(10);
+  // Preselecting a tracker (opened from that tracker's own card action)
+  // tallies the count to what's actually left on that package right from
+  // the first render — the parent forces a remount (via a `key` tied to
+  // initialTrackerId) whenever a different preselection is intended, so
+  // this initializer alone is enough; no effect is needed to react to a
+  // prop change after mount.
+  const initialTracker = initialTrackerId
+    ? trackers.find((t) => t.id === initialTrackerId)
+    : undefined;
+  const [count, setCount] = useState(
+    initialTracker
+      ? Math.max(1, initialTracker.remaining > 0 ? initialTracker.remaining : initialTracker.purchased)
+      : 10
+  );
   const [method, setMethod] = useState<Method>("even");
   const [frequencyDays, setFrequencyDays] = useState(7);
   const [titleTemplate, setTitleTemplate] = useState("Post");
-  const [trackerId, setTrackerId] = useState<string>("none");
+  const [trackerId, setTrackerId] = useState<string>(initialTrackerId ?? "none");
   const [assignedTo, setAssignedTo] = useState<string>("unassigned");
   const [rows, setRows] = useState<DraftRow[]>([]);
 

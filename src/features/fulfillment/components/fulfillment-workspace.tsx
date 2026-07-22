@@ -78,6 +78,7 @@ export function FulfillmentWorkspace({
   const [recording, setRecording] = useState<FulfillmentItemWithProgress | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [wizardTrackerId, setWizardTrackerId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [selectedDeliverableId, setSelectedDeliverableId] = useState<string | null>(null);
   const [view, setViewState] = useState<MainView>(readStoredView);
@@ -143,7 +144,13 @@ export function FulfillmentWorkspace({
               <Button variant="outline" size="sm" onClick={() => setAddOpen(true)}>
                 + Add Deliverable
               </Button>
-              <Button size="sm" onClick={() => setWizardOpen(true)}>
+              <Button
+                size="sm"
+                onClick={() => {
+                  setWizardTrackerId(null);
+                  setWizardOpen(true);
+                }}
+              >
                 <CalendarRange className="mr-1.5 h-3.5 w-3.5" />
                 Generate Schedule
               </Button>
@@ -171,6 +178,10 @@ export function FulfillmentWorkspace({
                     stalledAfterDays={FULFILLMENT_STALLED_AFTER_DAYS}
                     onRecordDelivery={setRecording}
                     linkedDeliverableCount={deliverables.filter((d) => d.fulfillment_item_id === t.id).length}
+                    onGenerateSchedule={(tracker) => {
+                      setWizardTrackerId(tracker.id);
+                      setWizardOpen(true);
+                    }}
                   />
                 ))}
               </div>
@@ -180,16 +191,36 @@ export function FulfillmentWorkspace({
           {deliverables.length === 0 ? (
             <>
               <TabsContent value="list">
-                <DeliverableScheduleEmptyState onGenerate={() => setWizardOpen(true)} />
+                <DeliverableScheduleEmptyState
+                  onGenerate={() => {
+                    setWizardTrackerId(null);
+                    setWizardOpen(true);
+                  }}
+                />
               </TabsContent>
               <TabsContent value="kanban">
-                <DeliverableScheduleEmptyState onGenerate={() => setWizardOpen(true)} />
+                <DeliverableScheduleEmptyState
+                  onGenerate={() => {
+                    setWizardTrackerId(null);
+                    setWizardOpen(true);
+                  }}
+                />
               </TabsContent>
               <TabsContent value="calendar">
-                <DeliverableScheduleEmptyState onGenerate={() => setWizardOpen(true)} />
+                <DeliverableScheduleEmptyState
+                  onGenerate={() => {
+                    setWizardTrackerId(null);
+                    setWizardOpen(true);
+                  }}
+                />
               </TabsContent>
               <TabsContent value="timeline">
-                <DeliverableScheduleEmptyState onGenerate={() => setWizardOpen(true)} />
+                <DeliverableScheduleEmptyState
+                  onGenerate={() => {
+                    setWizardTrackerId(null);
+                    setWizardOpen(true);
+                  }}
+                />
               </TabsContent>
             </>
           ) : (
@@ -251,6 +282,7 @@ export function FulfillmentWorkspace({
         onChanged={onRefresh}
       />
       <GenerateScheduleWizard
+        key={wizardTrackerId ?? "none"}
         open={wizardOpen}
         onOpenChange={setWizardOpen}
         projectId={project.id}
@@ -259,6 +291,7 @@ export function FulfillmentWorkspace({
         trackers={trackers}
         members={members}
         onChanged={onRefresh}
+        initialTrackerId={wizardTrackerId}
       />
 
       <DeliverableDetailSheet
