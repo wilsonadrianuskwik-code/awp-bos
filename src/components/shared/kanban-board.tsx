@@ -11,10 +11,29 @@ import {
   useDroppable,
   type DragEndEvent,
   type DragStartEvent,
+  type Modifier,
 } from "@dnd-kit/core";
-import { snapCenterToCursor } from "@dnd-kit/modifiers";
+import { getEventCoordinates } from "@dnd-kit/utilities";
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils/cn";
+
+// Centers the drag overlay on the pointer instead of preserving the exact
+// pixel it was grabbed at — see the comment on <DragOverlay> below for why.
+// Inlined (rather than depending on @dnd-kit/modifiers, a package this repo
+// doesn't otherwise install) since it's one small, stable function; @dnd-kit/
+// utilities is already a dependency and exports the coordinate helper it needs.
+const snapCenterToCursor: Modifier = ({ activatorEvent, draggingNodeRect, transform }) => {
+  if (!draggingNodeRect || !activatorEvent) return transform;
+  const activatorCoordinates = getEventCoordinates(activatorEvent);
+  if (!activatorCoordinates) return transform;
+  const offsetX = activatorCoordinates.x - draggingNodeRect.left;
+  const offsetY = activatorCoordinates.y - draggingNodeRect.top;
+  return {
+    ...transform,
+    x: transform.x + offsetX - draggingNodeRect.width / 2,
+    y: transform.y + offsetY - draggingNodeRect.height / 2,
+  };
+};
 
 export type KanbanTone = "amber" | "emerald" | "red" | "blue" | "slate";
 
