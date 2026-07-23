@@ -12,6 +12,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
+import { snapCenterToCursor } from "@dnd-kit/modifiers";
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils/cn";
 
@@ -185,6 +186,7 @@ export function KanbanBoard<TItem>({
       sensors={sensors}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      onDragCancel={() => setActiveId(null)}
     >
       {/* Bounded height so each column scrolls its own cards internally
           (KanbanColumn's own overflow-y-auto) instead of the whole page
@@ -214,27 +216,27 @@ export function KanbanBoard<TItem>({
       </div>
       {/* DragOverlay portals outside the column's flex/stretch context, so
           without an explicit width the cloned card shrinks/grows to fit its
-          own content instead of staying the column's width — dnd-kit then
-          positions the overlay from the pointer's offset into the ORIGINAL
-          card's box, so a differently-sized clone visibly drifts from the
-          cursor. Forcing the same width here keeps the drag ghost identical
-          to the card the user actually grabbed.
+          own content instead of staying the column's width. w-[272px] = the
+          column's w-72 (288px) minus its content wrapper's p-2 padding (8px
+          each side) — the exact stretched width a card has in-column.
 
-          No rotation and no scale — Jira/Linear-style drag keeps the card
-          exactly the size it was and exactly under the cursor at the pixel
-          it was grabbed; a tilt or scale reads as "lifted" but actually
-          makes the ghost visibly drift from the pointer since the rotate
-          transform pivots around the card's center, not the grab point.
+          snapCenterToCursor overrides dnd-kit's default "preserve the exact
+          pixel you grabbed" placement — that default drifts visibly whenever
+          the overlay's measured rect doesn't perfectly match the source
+          card's live rect (nested independently-scrolling containers here:
+          the board scrolls horizontally, each column scrolls vertically on
+          its own, so the two rects can disagree by a few pixels). Centering
+          the ghost on the pointer instead guarantees it's always exactly
+          under the cursor, at the cost of the grab-point offset — the
+          standard trade-off for multi-scroll-container Kanban boards.
+          scale-105 + shadow-xl read as "lifted" without the drift a rotate
+          transform would add (rotation pivots around the card's center).
           dropAnimation={null} skips dnd-kit's default "snap back" animation
           on drop, which otherwise adds a beat of lag before the real
           (optimistic) card appears in its new column. */}
-      <DragOverlay dropAnimation={null}>
-        {/* w-[272px] = the column's w-72 (288px) minus its content wrapper's
-            p-2 padding (8px each side) — the exact stretched width a card
-            has in-column, since a plain w-72 here would still be 16px wider
-            than the real card and re-introduce the same drift. */}
+      <DragOverlay dropAnimation={null} modifiers={[snapCenterToCursor]}>
         {activeItem ? (
-          <div className="w-[272px] cursor-grabbing shadow-xl">
+          <div className="w-[272px] scale-105 cursor-grabbing shadow-xl transition-shadow">
             {renderCard(activeItem)}
           </div>
         ) : null}
