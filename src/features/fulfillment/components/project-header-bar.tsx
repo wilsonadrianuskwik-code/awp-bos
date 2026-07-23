@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MoreHorizontal, ChevronDown } from "lucide-react";
+import { MoreHorizontal, ChevronDown, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -151,8 +151,9 @@ export function ProjectHeaderBar({
             <button
               type="button"
               onClick={onBackToQueue}
-              className="text-muted-foreground hover:text-foreground hover:underline"
+              className="flex shrink-0 items-center gap-1 rounded-md py-0.5 pl-1 pr-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
             >
+              <ArrowLeft className="h-3.5 w-3.5" />
               Fulfilment
             </button>
             <span className="text-muted-foreground/50">/</span>
