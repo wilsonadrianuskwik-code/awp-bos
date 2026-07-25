@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Copy, GitCompare, Printer, Receipt } from "lucide-react";
+import { Building2, Copy, GitCompare, Printer, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -131,6 +131,15 @@ export function QuotationDetail({
                 >
                   <Receipt className="h-3 w-3" />
                   Generated {quotation.converted_invoice.invoice_number}
+                </Link>
+              )}
+              {quotation.project && (
+                <Link
+                  href={`/${workspace.slug}/projects/${quotation.project.id}`}
+                  className="ml-1 inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
+                >
+                  <Building2 className="h-3 w-3" />
+                  {quotation.project.code} — {quotation.project.name}
                 </Link>
               )}
             </span>

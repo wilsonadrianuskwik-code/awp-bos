@@ -40,6 +40,7 @@ import type {
 } from "@/features/line-items/types";
 import type { Invoice, InvoiceDetail } from "@/features/invoices/types";
 import type { CatalogItem } from "@/features/catalog/types";
+import type { Project } from "@/features/projects/types";
 
 const CURRENCIES = ["IDR", "USD", "EUR", "GBP", "SGD", "MYR", "AUD", "CAD"];
 
@@ -69,9 +70,11 @@ function inferUniform(values: number[]): number | null {
 type InvoiceBuilderProps = {
   invoice?: InvoiceDetail;
   clients: ClientSummary[];
+  projects: Project[];
   templates: TemplateWithItems[];
   catalogItems: CatalogItem[];
   initialClientId?: string;
+  initialProjectId?: string;
   defaultPaymentTerms?: string;
   defaultNotes?: string;
 };
@@ -79,9 +82,11 @@ type InvoiceBuilderProps = {
 export function InvoiceBuilder({
   invoice,
   clients,
+  projects,
   templates: initialTemplates,
   catalogItems,
   initialClientId,
+  initialProjectId,
   defaultPaymentTerms,
   defaultNotes,
 }: InvoiceBuilderProps) {
@@ -94,6 +99,9 @@ export function InvoiceBuilder({
   const [invoiceId, setInvoiceId] = useState<string | null>(invoice?.id ?? null);
   const [clientId, setClientId] = useState(
     invoice?.client_id ?? initialClientId ?? ""
+  );
+  const [projectId, setProjectId] = useState(
+    invoice?.project_id ?? initialProjectId ?? ""
   );
   const [title, setTitle] = useState(invoice?.title ?? "");
   const [summary, setSummary] = useState(invoice?.summary ?? "");
@@ -151,6 +159,7 @@ export function InvoiceBuilder({
 
   const currentPayload: CreateInvoiceInput = {
     client_id: clientId,
+    project_id: projectId,
     title,
     summary,
     currency,
@@ -174,6 +183,7 @@ export function InvoiceBuilder({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     clientId,
+    projectId,
     title,
     summary,
     currency,
@@ -326,6 +336,7 @@ export function InvoiceBuilder({
   // Send-readiness: what still stands between this draft and the client.
   const readyReasons: string[] = [];
   if (!clientId) readyReasons.push("Choose a client");
+  if (!projectId) readyReasons.push("Choose a project");
   if (submittableLineItems.length === 0)
     readyReasons.push("Add at least one item");
 
@@ -618,6 +629,23 @@ export function InvoiceBuilder({
                   }}
                 />
               )}
+            </div>
+            <div className="mt-4 grid grid-cols-[96px_1fr] items-center gap-3">
+              <span className="text-xs text-muted-foreground">
+                Project <span className="text-destructive">*</span>
+              </span>
+              <Select value={projectId} onValueChange={setProjectId}>
+                <SelectTrigger className="h-8">
+                  <SelectValue placeholder="Select a project" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.code} — {p.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

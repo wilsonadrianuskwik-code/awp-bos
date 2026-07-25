@@ -143,7 +143,7 @@ export function PurchaseOrderBuilder({
 
   const currentPayload: CreatePurchaseOrderInput = {
     supplier_id: supplierId,
-    project_id: projectId || null,
+    project_id: projectId,
     currency,
     issue_date: issueDate,
     expected_date: expectedDate,
@@ -524,18 +524,14 @@ export function PurchaseOrderBuilder({
             </div>
 
             <p className="mt-6 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-              Project (optional)
+              Project <span className="text-destructive">*</span>
             </p>
             <div className="mt-2.5">
-              <Select
-                value={projectId || "none"}
-                onValueChange={(v) => setProjectId(v === "none" ? "" : v)}
-              >
+              <Select value={projectId} onValueChange={setProjectId}>
                 <SelectTrigger className="h-8">
-                  <SelectValue placeholder="No project" />
+                  <SelectValue placeholder="Select a project" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">No project</SelectItem>
                   {projects.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
                       {p.code} · {p.name}

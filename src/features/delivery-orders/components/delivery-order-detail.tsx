@@ -88,6 +88,18 @@ export function DeliveryOrderDetailView({
               )}
             </dd>
           </div>
+          <div>
+            <dt className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Project</dt>
+            <dd className="mt-1 text-sm">
+              {deliveryOrder.project ? (
+                <Link href={`/${workspaceSlug}/projects/${deliveryOrder.project.id}`} className="hover:underline">
+                  {deliveryOrder.project.code} — {deliveryOrder.project.name}
+                </Link>
+              ) : (
+                "—"
+              )}
+            </dd>
+          </div>
           <DetailItem label="Client" value={deliveryOrder.client?.name} />
           <DetailItem label="Delivery Date" value={deliveryOrder.delivery_date} />
           <DetailItem label="Received By" value={deliveryOrder.received_by} />

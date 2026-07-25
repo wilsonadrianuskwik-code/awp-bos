@@ -29,6 +29,7 @@ export type Invoice = {
   id: string;
   workspace_id: string;
   client_id: string;
+  project_id: string | null;
   invoice_number: string;
   internal_id: string | null;
   source_quotation_id: string | null;
@@ -82,6 +83,12 @@ export type SourceQuotationSummary = {
   quotation_number: string;
 };
 
+export type ProjectSummary = {
+  id: string;
+  code: string;
+  name: string;
+};
+
 export type InvoiceWithClient = Invoice & {
   // Null when the client was soft-deleted after this invoice was created —
   // RLS on `clients` filters out deleted_at rows, so the embedded join
@@ -89,6 +96,7 @@ export type InvoiceWithClient = Invoice & {
   // record and must still render even if the client behind it is gone.
   client: ClientSummary | null;
   source_quotation: SourceQuotationSummary | null;
+  project: ProjectSummary | null;
 };
 
 export type InvoiceProfileSummary = {
@@ -103,6 +111,7 @@ export type PaymentWithRecorder = Payment & {
 export type InvoiceDetail = Invoice & {
   client: ClientSummary | null;
   source_quotation: SourceQuotationSummary | null;
+  project: ProjectSummary | null;
   line_items: LineItem[];
   payments: PaymentWithRecorder[];
   created_by_profile: InvoiceProfileSummary | null;

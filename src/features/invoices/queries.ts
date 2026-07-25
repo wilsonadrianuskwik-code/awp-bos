@@ -16,6 +16,7 @@ const CLIENT_JOIN = "client:clients(id,name,company,email,payment_terms,phone,ad
 // (unlike the auth.users-referencing columns elsewhere in this file) this
 // embed is safe for PostgREST to traverse directly.
 const SOURCE_QUOTATION_JOIN = "source_quotation:quotations!source_quotation_id(id,quotation_number)";
+const PROJECT_JOIN = "project:projects(id,code,name)";
 
 export async function getInvoices(
   workspaceId: string,
@@ -25,7 +26,7 @@ export async function getInvoices(
 
   let query = supabase
     .from("invoices")
-    .select(`*, ${CLIENT_JOIN}, ${SOURCE_QUOTATION_JOIN}`, { count: "exact" })
+    .select(`*, ${CLIENT_JOIN}, ${SOURCE_QUOTATION_JOIN}, ${PROJECT_JOIN}`, { count: "exact" })
     .eq("workspace_id", workspaceId)
     .is("deleted_at", null);
 
@@ -94,7 +95,7 @@ export async function getInvoice(
   // separately instead, same as line_items/payments below.
   const { data: invoice, error } = await supabase
     .from("invoices")
-    .select(`*, ${CLIENT_JOIN}, ${SOURCE_QUOTATION_JOIN}`)
+    .select(`*, ${CLIENT_JOIN}, ${SOURCE_QUOTATION_JOIN}, ${PROJECT_JOIN}`)
     .eq("id", invoiceId)
     .eq("workspace_id", workspaceId)
     .is("deleted_at", null)

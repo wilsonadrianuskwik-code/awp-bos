@@ -8,7 +8,7 @@ import type {
   DeliveryOrderWithRelations,
 } from "@/features/delivery-orders/types";
 
-const RELATIONS = "client:clients(id,name,company), invoice:invoices(id,invoice_number)";
+const RELATIONS = "client:clients(id,name,company), invoice:invoices(id,invoice_number), project:projects(id,code,name)";
 
 export async function getDeliveryOrders(
   workspaceId: string,

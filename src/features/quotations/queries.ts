@@ -16,6 +16,7 @@ const CLIENT_JOIN = "client:clients(id,name,company,email,payment_terms,phone,ad
 // to traverse directly, unlike the auth.users-referencing columns
 // elsewhere in this file.
 const CONVERTED_INVOICE_JOIN = "converted_invoice:invoices!generated_invoice_id(id,invoice_number)";
+const PROJECT_JOIN = "project:projects(id,code,name)";
 
 export async function getQuotations(
   workspaceId: string,
@@ -25,7 +26,7 @@ export async function getQuotations(
 
   let query = supabase
     .from("quotations")
-    .select(`*, ${CLIENT_JOIN}, ${CONVERTED_INVOICE_JOIN}`, { count: "exact" })
+    .select(`*, ${CLIENT_JOIN}, ${CONVERTED_INVOICE_JOIN}, ${PROJECT_JOIN}`, { count: "exact" })
     .eq("workspace_id", workspaceId)
     .is("deleted_at", null);
 
@@ -94,7 +95,7 @@ export async function getQuotation(
   // fetched separately instead, same as line_items below.
   const { data: quotation, error } = await supabase
     .from("quotations")
-    .select(`*, ${CLIENT_JOIN}, ${CONVERTED_INVOICE_JOIN}`)
+    .select(`*, ${CLIENT_JOIN}, ${CONVERTED_INVOICE_JOIN}, ${PROJECT_JOIN}`)
     .eq("id", quotationId)
     .eq("workspace_id", workspaceId)
     .is("deleted_at", null)
@@ -160,7 +161,7 @@ export async function getQuotationVersions(
 
   const { data } = await supabase
     .from("quotations")
-    .select(`*, ${CLIENT_JOIN}, ${CONVERTED_INVOICE_JOIN}`)
+    .select(`*, ${CLIENT_JOIN}, ${CONVERTED_INVOICE_JOIN}, ${PROJECT_JOIN}`)
     .eq("workspace_id", workspaceId)
     .is("deleted_at", null)
     .or(`id.eq.${rootId},parent_quotation_id.eq.${rootId}`)

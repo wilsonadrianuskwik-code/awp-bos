@@ -40,6 +40,7 @@ import type {
 } from "@/features/line-items/types";
 import type { Quotation, QuotationDetail } from "@/features/quotations/types";
 import type { CatalogItem } from "@/features/catalog/types";
+import type { Project } from "@/features/projects/types";
 
 const CURRENCIES = ["IDR", "USD", "EUR", "GBP", "SGD", "MYR", "AUD", "CAD"];
 
@@ -69,6 +70,7 @@ function inferUniform(values: number[]): number | null {
 type QuotationBuilderProps = {
   quotation?: QuotationDetail;
   clients: ClientSummary[];
+  projects: Project[];
   templates: TemplateWithItems[];
   catalogItems: CatalogItem[];
   initialClientId?: string;
@@ -79,6 +81,7 @@ type QuotationBuilderProps = {
 export function QuotationBuilder({
   quotation,
   clients,
+  projects,
   templates: initialTemplates,
   catalogItems,
   initialClientId,
@@ -97,6 +100,7 @@ export function QuotationBuilder({
   const [clientId, setClientId] = useState(
     quotation?.client_id ?? initialClientId ?? ""
   );
+  const [projectId, setProjectId] = useState(quotation?.project_id ?? "");
   const [title, setTitle] = useState(quotation?.title ?? "");
   const [summary, setSummary] = useState(quotation?.summary ?? "");
   const [currency, setCurrency] = useState(
@@ -159,6 +163,7 @@ export function QuotationBuilder({
 
   const currentPayload: CreateQuotationInput = {
     client_id: clientId,
+    project_id: projectId,
     title,
     summary,
     currency,
@@ -183,6 +188,7 @@ export function QuotationBuilder({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     clientId,
+    projectId,
     title,
     summary,
     currency,
@@ -385,6 +391,7 @@ export function QuotationBuilder({
   // Send-readiness + the review moment.
   const readyReasons: string[] = [];
   if (!clientId) readyReasons.push("Choose a client");
+  if (!projectId) readyReasons.push("Choose a project");
   if (submittableLineItems.length === 0)
     readyReasons.push("Add at least one item");
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -602,6 +609,23 @@ export function QuotationBuilder({
                   }}
                 />
               )}
+            </div>
+            <div className="mt-4 grid grid-cols-[96px_1fr] items-center gap-3">
+              <span className="text-xs text-muted-foreground">
+                Project <span className="text-destructive">*</span>
+              </span>
+              <Select value={projectId} onValueChange={setProjectId}>
+                <SelectTrigger className="h-8">
+                  <SelectValue placeholder="Select a project" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.code} — {p.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

@@ -4,7 +4,7 @@ import { PURCHASE_ORDER_STATUSES } from "@/features/purchase-orders/types";
 
 export const createPurchaseOrderSchema = z.object({
   supplier_id: z.string().min(1, "Supplier is required"),
-  project_id: z.string().uuid().optional().nullable(),
+  project_id: z.string().uuid("Project is required"),
   currency: z.string().length(3),
   issue_date: z.string().min(1, "Issue date is required"),
   expected_date: z.string().optional().or(z.literal("")),

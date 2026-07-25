@@ -42,9 +42,16 @@ export type InvoiceSummary = {
   invoice_number: string;
 };
 
+export type ProjectSummary = {
+  id: string;
+  code: string;
+  name: string;
+};
+
 export type DeliveryOrderWithRelations = DeliveryOrder & {
   client: ClientSummary | null;
   invoice: InvoiceSummary | null;
+  project: ProjectSummary | null;
 };
 
 // The polymorphic line_items table isn't typed for entity_type =

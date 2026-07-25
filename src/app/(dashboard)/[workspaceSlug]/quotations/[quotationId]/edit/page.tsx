@@ -4,6 +4,7 @@ import { getAllClients } from "@/features/clients/queries";
 import { getQuotation } from "@/features/quotations/queries";
 import { getLineItemTemplates } from "@/features/line-items/queries";
 import { getActiveCatalogItems } from "@/features/catalog/queries";
+import { getAllProjects } from "@/features/projects/queries";
 import { QuotationBuilder } from "@/features/quotations/components/quotation-builder";
 import { isEditableStatus } from "@/features/quotations/helpers";
 
@@ -23,16 +24,18 @@ export default async function EditQuotationPage({
     redirect(`/${workspaceSlug}/quotations/${quotationId}`);
   }
 
-  const [clients, templates, catalogItems] = await Promise.all([
+  const [clients, templates, catalogItems, projects] = await Promise.all([
     getAllClients(workspace.id),
     getLineItemTemplates(workspace.id),
     getActiveCatalogItems(workspace.id),
+    getAllProjects(workspace.id),
   ]);
 
   return (
     <QuotationBuilder
       quotation={quotation}
       clients={clients}
+      projects={projects}
       templates={templates}
       catalogItems={catalogItems}
     />

@@ -4,6 +4,7 @@ import { getAllClients } from "@/features/clients/queries";
 import { getInvoice } from "@/features/invoices/queries";
 import { getLineItemTemplates } from "@/features/line-items/queries";
 import { getActiveCatalogItems } from "@/features/catalog/queries";
+import { getAllProjects } from "@/features/projects/queries";
 import { InvoiceBuilder } from "@/features/invoices/components/invoice-builder";
 
 export default async function EditInvoicePage({
@@ -22,16 +23,18 @@ export default async function EditInvoicePage({
     redirect(`/${workspaceSlug}/invoices/${invoiceId}`);
   }
 
-  const [clients, templates, catalogItems] = await Promise.all([
+  const [clients, templates, catalogItems, projects] = await Promise.all([
     getAllClients(workspace.id),
     getLineItemTemplates(workspace.id),
     getActiveCatalogItems(workspace.id),
+    getAllProjects(workspace.id),
   ]);
 
   return (
     <InvoiceBuilder
       invoice={invoice}
       clients={clients}
+      projects={projects}
       templates={templates}
       catalogItems={catalogItems}
     />

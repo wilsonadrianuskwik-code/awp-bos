@@ -67,7 +67,9 @@ export function InvoiceTable({ invoices, selectedIds, onSelectedIdsChange }: Inv
       id: "project",
       header: "Project",
       cell: ({ row }) => (
-        <span className="truncate text-[13px]">{row.original.title || "—"}</span>
+        <span className="truncate text-[13px]">
+          {row.original.project ? row.original.project.code : "—"}
+        </span>
       ),
     },
     {

@@ -4,6 +4,7 @@ import { PAYMENT_METHODS } from "@/features/invoices/types";
 
 export const createInvoiceSchema = z.object({
   client_id: z.string().min(1, "Client is required"),
+  project_id: z.string().min(1, "Project is required"),
   title: z.string().max(255).optional().or(z.literal("")),
   summary: z.string().optional().or(z.literal("")),
   currency: z.string().length(3),

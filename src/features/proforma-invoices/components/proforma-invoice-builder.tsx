@@ -447,19 +447,17 @@ export function ProformaInvoiceBuilder({
               )}
             </div>
             <div className="mt-4 grid grid-cols-[96px_1fr] items-center gap-3">
-              <span className="text-xs text-muted-foreground">Project</span>
-              <Select
-                value={projectId || "none"}
-                onValueChange={(v) => setProjectId(v === "none" ? "" : v)}
-              >
+              <span className="text-xs text-muted-foreground">
+                Project <span className="text-destructive">*</span>
+              </span>
+              <Select value={projectId} onValueChange={setProjectId}>
                 <SelectTrigger className="h-8">
-                  <SelectValue placeholder="No project" />
+                  <SelectValue placeholder="Select a project" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">No project</SelectItem>
                   {projects.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
-                      {p.name}
+                      {p.code} — {p.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

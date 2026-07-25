@@ -17,6 +17,7 @@ export type Quotation = {
   id: string;
   workspace_id: string;
   client_id: string;
+  project_id: string | null;
   quotation_number: string;
   internal_id: string | null;
   status: QuotationStatus;
@@ -54,12 +55,19 @@ export type ConvertedInvoiceSummary = {
   invoice_number: string;
 };
 
+export type ProjectSummary = {
+  id: string;
+  code: string;
+  name: string;
+};
+
 export type QuotationWithClient = Quotation & {
   // Null when the client was soft-deleted after this quotation was
   // created — RLS on `clients` filters deleted_at rows, so the embedded
   // join legitimately returns nothing for that row.
   client: ClientSummary | null;
   converted_invoice: ConvertedInvoiceSummary | null;
+  project: ProjectSummary | null;
 };
 
 export type QuotationWithLineItems = Quotation & {
@@ -74,6 +82,7 @@ export type QuotationProfileSummary = {
 export type QuotationDetail = Quotation & {
   client: ClientSummary | null;
   converted_invoice: ConvertedInvoiceSummary | null;
+  project: ProjectSummary | null;
   line_items: LineItem[];
   created_by_profile: QuotationProfileSummary | null;
   approved_by_profile: QuotationProfileSummary | null;
