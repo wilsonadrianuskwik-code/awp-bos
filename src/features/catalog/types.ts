@@ -30,6 +30,11 @@ export type CatalogItem = {
   default_category: LineItemCategory;
   default_unit_price: number;
   default_unit: string | null;
+  // Master data links (00068). Nullable — items created before master
+  // data existed, or created without picking one, carry NULL and fall
+  // back to the free-text default_unit above.
+  category_id: string | null;
+  unit_of_measure_id: string | null;
   currency: string;
   is_active: boolean;
   // Package support (migration 00050). is_package=false → a standalone

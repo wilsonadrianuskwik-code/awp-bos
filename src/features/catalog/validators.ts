@@ -59,6 +59,10 @@ export const createCatalogItemSchema = z
     default_category: z.enum(LINE_ITEM_CATEGORIES).default("per_unit"),
     default_unit_price: z.coerce.number().min(0, "Price cannot be negative").default(0),
     default_unit: z.string().max(50).optional().or(z.literal("")),
+    // Master data from 00068 — optional so existing free-text-unit flows
+    // and quick item creation keep working unchanged.
+    category_id: z.string().uuid().optional().or(z.literal("")),
+    unit_of_measure_id: z.string().uuid().optional().or(z.literal("")),
     currency: z.string().length(3),
     // Same enum+transform posture as is_active — a plain "true"/"false"
     // string from a Select, not a checkbox (which serializes as "on"/absent
@@ -99,6 +103,8 @@ export const updateCatalogItemSchema = z
     default_category: z.enum(LINE_ITEM_CATEGORIES).optional(),
     default_unit_price: z.coerce.number().min(0, "Price cannot be negative").optional(),
     default_unit: z.string().max(50).optional().or(z.literal("")),
+    category_id: z.string().uuid().optional().or(z.literal("")),
+    unit_of_measure_id: z.string().uuid().optional().or(z.literal("")),
     currency: z.string().length(3).optional(),
     is_package: z
       .enum(["standalone", "package"])

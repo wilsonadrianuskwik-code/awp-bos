@@ -12,8 +12,10 @@ import type {
   ArAgingBucket,
   AvailableCurrencies,
   CatalogRevenueRow,
+  DeliveryPerformanceRow,
   FulfillmentOverviewRow,
   ProjectProfitabilityRow,
+  PurchaseOrderStatusSummaryRow,
   RevenuePeriodPoint,
 } from "@/features/reports/types";
 
@@ -231,4 +233,53 @@ export async function getAvailableCurrencies(
   for (const row of paymentCurrencies ?? []) currencies.add(row.currency);
 
   return Array.from(currencies).sort();
+}
+
+/**
+ * Open/received/cancelled Purchase Order counts and value by status —
+ * the procurement pipeline's health at a glance
+ * (00077_construction_reports.sql).
+ */
+export async function getPurchaseOrderStatusSummary(
+  workspaceId: string
+): Promise<PurchaseOrderStatusSummaryRow[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_purchase_order_status_summary", {
+    p_workspace_id: workspaceId,
+  });
+  if (error) throw new Error(error.message);
+
+  return (data ?? []).map(
+    (row: { status: string; po_count: number; total_by_currency: Record<string, number> | null }) => ({
+      status: row.status,
+      poCount: row.po_count,
+      totalByCurrency: row.total_by_currency ?? {},
+    })
+  ) as PurchaseOrderStatusSummaryRow[];
+}
+
+/**
+ * Delivery Order counts and average dispatch-to-delivery lead time per
+ * status over a date range (00077_construction_reports.sql).
+ */
+export async function getDeliveryPerformance(
+  workspaceId: string,
+  fromDate: string,
+  toDate: string
+): Promise<DeliveryPerformanceRow[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_delivery_performance", {
+    p_workspace_id: workspaceId,
+    p_from_date: fromDate,
+    p_to_date: toDate,
+  });
+  if (error) throw new Error(error.message);
+
+  return (data ?? []).map(
+    (row: { status: string; do_count: number; avg_days_to_deliver: number | null }) => ({
+      status: row.status,
+      doCount: row.do_count,
+      avgDaysToDeliver: row.avg_days_to_deliver,
+    })
+  ) as DeliveryPerformanceRow[];
 }

@@ -18,6 +18,8 @@ import { QuotationSummaryHero } from "./quotation-summary-hero";
 import { QuotationVersionHistory } from "./quotation-version-history";
 import { QuotationVersionDiffDialog } from "./quotation-version-diff-dialog";
 import { GenerateInvoiceDialog } from "./generate-invoice-dialog";
+import { GenerateDocumentMenu } from "@/features/documents/components/generate-document-menu";
+import { GeneratePurchaseOrderDialog } from "./generate-purchase-order-dialog";
 import { QuotationPortalAccessCard } from "./quotation-portal-access-card";
 import { PricingSummary } from "@/features/line-items/components/pricing-summary";
 import { QuotationPrintView } from "./quotation-print-view";
@@ -31,6 +33,7 @@ import type {
 import type { Activity } from "@/features/activities/types";
 import type { DocumentTemplateWithTheme, CompanyProfile } from "@/features/templates/types";
 import type { PackageItem } from "@/features/catalog/types";
+import type { Supplier } from "@/features/suppliers/types";
 
 type QuotationDetailProps = {
   quotation: QuotationDetailType;
@@ -42,6 +45,8 @@ type QuotationDetailProps = {
   /** Live package contents by catalog_item_id, for any package line items
       on this quotation — see getPackageBreakdowns. */
   packageBreakdowns?: Record<string, PackageItem[]>;
+  /** Needed only to pick a supplier when generating a Purchase Order. */
+  suppliers?: Supplier[];
 };
 
 export function QuotationDetail({
@@ -52,6 +57,7 @@ export function QuotationDetail({
   workspace: workspaceInfo,
   template,
   packageBreakdowns = {},
+  suppliers = [],
 }: QuotationDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
@@ -59,7 +65,15 @@ export function QuotationDetail({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [generateInvoiceOpen, setGenerateInvoiceOpen] = useState(false);
+  const [generatePoOpen, setGeneratePoOpen] = useState(false);
   const [diffOpen, setDiffOpen] = useState(false);
+
+  // Terminal states can't seed new documents — everything else can,
+  // including draft (generating never consumes or locks the source, so
+  // there's no reason to gate it behind sending/approval).
+  const canGenerate = !["rejected", "expired", "cancelled"].includes(
+    quotation.status
+  );
 
   function handlePrint() {
     const clientName = quotation.client?.name ?? "Client";
@@ -151,6 +165,33 @@ export function QuotationDetail({
                   <GitCompare className="mr-2 h-4 w-4" />
                   Compare with V{previousVersion.version}
                 </Button>
+              )}
+              {/* Invoice is deliberately absent here: it has its own
+                  approved-only flow via GenerateInvoiceDialog (which also
+                  sets the generated_invoice_id back-link and enforces
+                  one-invoice-per-quotation). These two targets have no
+                  such constraints — a quotation can seed a Proforma
+                  Invoice or a supplier PO at any point while it's still
+                  live. */}
+              {canGenerate && (
+                <GenerateDocumentMenu
+                  fromType="quotation"
+                  fromId={quotation.id}
+                  onNeedsInput={() => setGeneratePoOpen(true)}
+                  targets={[
+                    {
+                      toType: "proforma_invoice",
+                      label: "Proforma Invoice",
+                      routeSegment: "proforma-invoices",
+                    },
+                    {
+                      toType: "purchase_order",
+                      label: "Purchase Order",
+                      routeSegment: "purchase-orders",
+                      needsInput: true,
+                    },
+                  ]}
+                />
               )}
               <Button variant="outline" onClick={handlePrint}>
                 <Printer className="mr-2 h-4 w-4" />
@@ -308,6 +349,14 @@ export function QuotationDetail({
         open={generateInvoiceOpen}
         onOpenChange={setGenerateInvoiceOpen}
         quotation={quotation}
+      />
+
+      <GeneratePurchaseOrderDialog
+        open={generatePoOpen}
+        onOpenChange={setGeneratePoOpen}
+        quotationId={quotation.id}
+        quotationNumber={quotation.quotation_number}
+        suppliers={suppliers}
       />
 
       {previousVersion && (

@@ -26,6 +26,7 @@ import { useToast } from "@/providers/toast-provider";
 import { createCatalogItem, updateCatalogItem } from "@/features/catalog/actions";
 import { ITEM_TYPES } from "@/features/catalog/types";
 import type { CatalogItem, ItemType, PackageItem } from "@/features/catalog/types";
+import type { ItemCategory, SimpleLookup } from "@/features/master-data/queries";
 
 const CURRENCIES = ["USD", "EUR", "GBP", "SGD", "MYR", "IDR", "AUD", "CAD"];
 
@@ -38,9 +39,18 @@ type CatalogFormProps = {
   item?: CatalogItem;
   // Active standalone items available to nest inside a package.
   products?: CatalogItem[];
+  // Master data (00068) — empty until configured in Settings, in which
+  // case the selects simply offer only the "none" option.
+  categories?: ItemCategory[];
+  unitsOfMeasure?: SimpleLookup[];
 };
 
-export function CatalogForm({ item, products = [] }: CatalogFormProps) {
+export function CatalogForm({
+  item,
+  products = [],
+  categories = [],
+  unitsOfMeasure = [],
+}: CatalogFormProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const { workspace } = useWorkspace();
@@ -107,6 +117,13 @@ export function CatalogForm({ item, products = [] }: CatalogFormProps) {
     }
 
     const formData = new FormData(e.currentTarget);
+
+    // Radix Select can't hold an empty-string value, so "no selection" is
+    // carried as the "none" sentinel. Normalize it back to "" here, which
+    // the validators accept and the action stores as NULL.
+    for (const key of ["category_id", "unit_of_measure_id"]) {
+      if (formData.get(key) === "none") formData.set(key, "");
+    }
 
     startTransition(async () => {
       const result = isEditing
@@ -238,6 +255,57 @@ export function CatalogForm({ item, products = [] }: CatalogFormProps) {
               maxLength={50}
               placeholder={isPackage ? "bulan" : "e.g. hour, page, seat"}
             />
+          </FieldGroup>
+
+          {/* Master data (00068). Both optional — an item can still be
+              created with just the free-text Unit above, which is what
+              every pre-existing item uses. */}
+          <FieldGroup
+            label="Category"
+            htmlFor="category_id"
+            hint="Manage in Settings → Master Data"
+          >
+            <Select
+              name="category_id"
+              defaultValue={item?.category_id ?? "none"}
+              key={`cat-${item?.category_id ?? "none"}`}
+            >
+              <SelectTrigger id="category_id">
+                <SelectValue placeholder="Uncategorized" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Uncategorized</SelectItem>
+                {categories.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FieldGroup>
+
+          <FieldGroup
+            label="Unit of Measure"
+            htmlFor="unit_of_measure_id"
+            hint="Standardized unit — manage in Settings → Master Data"
+          >
+            <Select
+              name="unit_of_measure_id"
+              defaultValue={item?.unit_of_measure_id ?? "none"}
+              key={`uom-${item?.unit_of_measure_id ?? "none"}`}
+            >
+              <SelectTrigger id="unit_of_measure_id">
+                <SelectValue placeholder="None" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">None</SelectItem>
+                {unitsOfMeasure.map((u) => (
+                  <SelectItem key={u.id} value={u.id}>
+                    {u.name} ({u.code})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </FieldGroup>
 
           <FieldGroup label="Status" htmlFor="is_active">

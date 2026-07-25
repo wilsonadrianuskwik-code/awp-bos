@@ -20,19 +20,33 @@ export type GenerateTarget = {
   label: string;
   /** Route segment the new document lives under, e.g. "proforma-invoices". */
   routeSegment: string;
+  /**
+   * Set when the target needs a field the source document can't supply —
+   * e.g. a Purchase Order needs a supplier, which no Quotation knows.
+   * Selecting the item calls onNeedsInput instead of generating, letting
+   * the parent collect that input and call generateDocument itself with
+   * the value passed through p_overrides.
+   */
+  needsInput?: boolean;
 };
 
 type GenerateDocumentMenuProps = {
   fromType: string;
   fromId: string;
   targets: GenerateTarget[];
+  onNeedsInput?: (target: GenerateTarget) => void;
 };
 
 // Shared "Generate..." action across every document detail page (Quotation,
 // Proforma Invoice) — a thin dropdown over the generic generate_document()
 // RPC (00074_document_engine_seed_and_generate.sql), so adding a new
 // downstream document type is just adding an entry to `targets`.
-export function GenerateDocumentMenu({ fromType, fromId, targets }: GenerateDocumentMenuProps) {
+export function GenerateDocumentMenu({
+  fromType,
+  fromId,
+  targets,
+  onNeedsInput,
+}: GenerateDocumentMenuProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
   const { toast } = useToast();
@@ -41,6 +55,10 @@ export function GenerateDocumentMenu({ fromType, fromId, targets }: GenerateDocu
   if (targets.length === 0) return null;
 
   function handleGenerate(target: GenerateTarget) {
+    if (target.needsInput) {
+      onNeedsInput?.(target);
+      return;
+    }
     startTransition(async () => {
       const result = await generateDocument(workspace.id, fromType, fromId, target.toType);
       if (result.error) {

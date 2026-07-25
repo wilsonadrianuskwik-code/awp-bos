@@ -59,3 +59,17 @@ export type ProjectProfitabilityRow = {
   poCostTotal: number;
   budget: number | null;
 };
+
+export type PurchaseOrderStatusSummaryRow = {
+  status: string;
+  poCount: number;
+  /** Totals keyed by currency code — POs aren't converted across currencies. */
+  totalByCurrency: Record<string, number>;
+};
+
+export type DeliveryPerformanceRow = {
+  status: string;
+  doCount: number;
+  /** Null until a delivery order has actually moved past creation. */
+  avgDaysToDeliver: number | null;
+};

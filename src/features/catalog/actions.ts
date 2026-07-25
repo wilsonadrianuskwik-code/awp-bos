@@ -36,6 +36,8 @@ export async function createCatalogItem(
         // stays 0 so nothing double-counts if it's ever read as a standalone.
         default_unit_price: isPackage ? 0 : parsed.data.default_unit_price,
         default_unit: parsed.data.default_unit || null,
+        category_id: parsed.data.category_id || null,
+        unit_of_measure_id: parsed.data.unit_of_measure_id || null,
         currency: parsed.data.currency,
         is_active: parsed.data.is_active,
         is_package: isPackage,

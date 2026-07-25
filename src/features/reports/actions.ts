@@ -3,8 +3,10 @@
 import {
   getApAging,
   getArAging,
+  getDeliveryPerformance,
   getFulfillmentOverview,
   getProjectProfitability,
+  getPurchaseOrderStatusSummary,
   getRevenueByCatalogItem,
   getRevenueByPeriod,
 } from "@/features/reports/queries";
@@ -103,6 +105,34 @@ export async function getProjectProfitabilityAction(workspaceId: string) {
     return { data, error: null };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to load project profitability";
+    return { data: null, error: message };
+  }
+}
+
+/** Same pass-through reasoning as the other report actions. */
+export async function getPurchaseOrderStatusSummaryAction(workspaceId: string) {
+  try {
+    const data = await getPurchaseOrderStatusSummary(workspaceId);
+    return { data, error: null };
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Failed to load purchase order report";
+    return { data: null, error: message };
+  }
+}
+
+/** Same pass-through reasoning as the other report actions. */
+export async function getDeliveryPerformanceAction(
+  workspaceId: string,
+  fromDate: string,
+  toDate: string
+) {
+  try {
+    const data = await getDeliveryPerformance(workspaceId, fromDate, toDate);
+    return { data, error: null };
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Failed to load delivery report";
     return { data: null, error: message };
   }
 }

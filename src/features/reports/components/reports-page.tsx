@@ -12,6 +12,8 @@ import { ApAgingCard } from "@/features/reports/components/ap-aging-card";
 import { CatalogRevenueCard } from "@/features/reports/components/catalog-revenue-card";
 import { FulfillmentOverviewCard } from "@/features/reports/components/fulfillment-overview-card";
 import { ProjectProfitabilityCard } from "@/features/reports/components/project-profitability-card";
+import { PurchaseOrderStatusCard } from "@/features/reports/components/purchase-order-status-card";
+import { DeliveryPerformanceCard } from "@/features/reports/components/delivery-performance-card";
 
 function defaultDateRange(): DateRange {
   const to = new Date();
@@ -115,6 +117,28 @@ export function ReportsPage({
           </CardHeader>
           <CardContent>
             <ApAgingCard workspaceId={workspaceId} currency={currency} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Purchase Order Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PurchaseOrderStatusCard workspaceId={workspaceId} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Delivery Performance</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <DeliveryPerformanceCard
+              workspaceId={workspaceId}
+              fromDate={dateRange.from}
+              toDate={dateRange.to}
+            />
           </CardContent>
         </Card>
 
