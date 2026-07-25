@@ -4,7 +4,6 @@ import type {
   ClientSummary,
   CurrencyAmount,
   InvoiceSummary,
-  LeadSummary,
   OverdueSummary,
   RevenueSummary,
   RevenueTrendPoint,
@@ -25,28 +24,6 @@ function sumByCurrency(
     totals.set(row.currency, (totals.get(row.currency) ?? 0) + row.amount);
   }
   return Array.from(totals, ([currency, amount]) => ({ currency, amount }));
-}
-
-/**
- * Lead counts by status. PostgREST has no server-side GROUP BY without an
- * RPC/view (out of scope for this phase), so this selects only the
- * `status` column — no other row data — and reduces in JS. For CRM-scale
- * lead volume this is a single small round trip, not a per-status query.
- */
-export async function getLeadSummary(workspaceId: string): Promise<LeadSummary> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("leads")
-    .select("status")
-    .eq("workspace_id", workspaceId)
-    .is("deleted_at", null);
-
-  const byStatus: Record<string, number> = {};
-  for (const row of data ?? []) {
-    byStatus[row.status] = (byStatus[row.status] ?? 0) + 1;
-  }
-
-  return { total: data?.length ?? 0, byStatus };
 }
 
 /**

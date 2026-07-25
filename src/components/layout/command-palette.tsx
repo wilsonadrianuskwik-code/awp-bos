@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import {
   Search,
   CornerDownLeft,
-  Users,
   UserCheck,
   FileText,
   Receipt,
@@ -49,7 +48,6 @@ export function CommandPalette({ open, onOpenChange, workspaceSlug }: CommandPal
       nav.push({ ...item, group: "General" });
     }
     const creates: Destination[] = [
-      { label: "New Lead", href: "/leads/new", icon: Users, group: "Create" },
       { label: "New Client", href: "/clients/new", icon: UserCheck, group: "Create" },
       { label: "New Quotation", href: "/quotations/new", icon: FileText, group: "Create" },
       { label: "New Invoice", href: "/invoices/new", icon: Receipt, group: "Create" },

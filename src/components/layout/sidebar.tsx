@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Building2,
-  Users,
   UserCheck,
   FileText,
   FileSpreadsheet,
@@ -54,7 +53,6 @@ export const NAV_GROUPS = [
   {
     label: "Sales",
     items: [
-      { label: "Leads", href: "/leads", icon: Users, color: "#a855f7" },
       { label: "Clients", href: "/clients", icon: UserCheck, color: "#ec4899" },
       { label: "Quotations", href: "/quotations", icon: FileText, color: "#06b6d4" },
       { label: "Proforma Invoices", href: "/proforma-invoices", icon: FileSpreadsheet, color: "#0ea5e9" },

@@ -442,16 +442,6 @@ export function ClientDetail({
                 <DetailItem label="Company" value={client.company} />
                 <DetailItem label="Website" value={client.website} />
               </FieldList>
-              {client.source_lead_id && (
-                <div className="mt-4 border-t pt-3">
-                  <Link
-                    href={`/${workspace.slug}/leads/${client.source_lead_id}`}
-                    className="text-xs text-muted-foreground transition-colors hover:text-primary"
-                  >
-                    Converted from a lead — view original →
-                  </Link>
-                </div>
-              )}
             </CardContent>
           </Card>
 

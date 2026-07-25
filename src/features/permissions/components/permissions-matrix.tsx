@@ -8,7 +8,7 @@ import type { ModulePermission } from "@/features/permissions/queries";
 
 const ROLES = ["viewer", "staff", "admin"] as const;
 const MODULES = [
-  "leads", "clients", "quotations", "proforma_invoices", "invoices", "payments",
+  "clients", "quotations", "proforma_invoices", "invoices", "payments",
   "suppliers", "purchase_orders", "delivery_orders", "catalog", "projects", "reports",
 ] as const;
 
