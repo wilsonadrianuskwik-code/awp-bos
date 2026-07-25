@@ -188,6 +188,13 @@ export type CompanyProfile = {
 
 export type BrandingSettings = {
   tagline?: string;
+  /** Public storage URL of the approver's signature image. */
+  signature_url?: string;
+  /** Line above the signature, e.g. "Approved by,". */
+  signature_label?: string;
+  signatory_name?: string;
+  signatory_title?: string;
+  signatory_company?: string;
 };
 
 // ---------------------------------------------------------------------

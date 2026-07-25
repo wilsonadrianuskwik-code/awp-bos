@@ -29,6 +29,10 @@ export default async function ProformaInvoiceDetailRoute({
       proformaInvoice={proformaInvoice}
       activities={activities}
       links={links}
+      workspaceName={workspace.name}
+      logoUrl={workspace.logo_url}
+      companyProfile={workspace.settings?.company_profile}
+      branding={workspace.settings?.branding}
     />
   );
 }

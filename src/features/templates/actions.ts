@@ -455,3 +455,24 @@ export async function updateBranding(workspaceId: string, input: BrandingInput) 
   if (!parsed.success) throw new Error(parsed.error.issues[0].message);
   return updateWorkspaceSettings(workspaceId, "branding", parsed.data);
 }
+
+/**
+ * Company logo lives on workspaces.logo_url rather than in the settings
+ * JSONB (the column predates this feature and is what document renderers
+ * already read), so it needs its own action — set_workspace_logo (00083).
+ */
+export async function setWorkspaceLogo(workspaceId: string, logoUrl: string) {
+  return withWorkspace(workspaceId, "admin", async (ctx) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("set_workspace_logo", {
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+      p_logo_url: logoUrl,
+    });
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath(`/${ctx.workspaceSlug}`);
+    return data;
+  });
+}

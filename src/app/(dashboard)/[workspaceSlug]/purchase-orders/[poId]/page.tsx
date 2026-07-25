@@ -29,6 +29,10 @@ export default async function PurchaseOrderDetailRoute({
       purchaseOrder={purchaseOrder}
       activities={activities}
       relationships={relationships}
+      workspaceName={workspace.name}
+      logoUrl={workspace.logo_url}
+      companyProfile={workspace.settings?.company_profile}
+      branding={workspace.settings?.branding}
     />
   );
 }

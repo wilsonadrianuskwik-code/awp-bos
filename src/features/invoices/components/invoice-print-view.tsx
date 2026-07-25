@@ -1,6 +1,12 @@
 import type { InvoiceDetail } from "@/features/invoices/types";
 import type { LineItemCategory } from "@/features/line-items/types";
 import { formatCurrency } from "@/lib/utils/format-currency";
+import {
+  DocumentLetterhead,
+  DocumentSignature,
+} from "@/features/documents/components/document-letterhead";
+import { TaxBreakdownBlock } from "@/features/documents/components/tax-breakdown";
+import type { BrandingSettings, CompanyProfile } from "@/features/templates/types";
 
 const CATEGORY_LABEL: Record<LineItemCategory, string> = {
   package: "Packages",
@@ -13,22 +19,30 @@ const CATEGORIES: LineItemCategory[] = ["package", "add_on", "per_unit"];
 type InvoicePrintViewProps = {
   invoice: InvoiceDetail;
   workspaceName: string;
+  logoUrl?: string | null;
+  companyProfile?: CompanyProfile;
+  branding?: BrandingSettings;
 };
 
-export function InvoicePrintView({ invoice, workspaceName }: InvoicePrintViewProps) {
+export function InvoicePrintView({
+  invoice,
+  workspaceName,
+  logoUrl,
+  companyProfile,
+  branding,
+}: InvoicePrintViewProps) {
   const fmt = (value: number) => formatCurrency(value, invoice.currency);
 
   return (
     <div className="hidden print:block print:text-black">
-      <div className="flex items-start justify-between border-b pb-4">
-        <div>
-          <h1 className="text-xl font-bold">{workspaceName}</h1>
-        </div>
-        <div className="text-right">
-          <h2 className="text-2xl font-bold uppercase tracking-wide">Invoice</h2>
-          <p className="text-sm">{invoice.invoice_number}</p>
-        </div>
-      </div>
+      <DocumentLetterhead
+        workspaceName={workspaceName}
+        logoUrl={logoUrl}
+        tagline={branding?.tagline}
+        companyProfile={companyProfile}
+        documentLabel="Invoice"
+        documentNumber={invoice.invoice_number}
+      />
 
       <div className="mt-6 grid grid-cols-2 gap-6 text-sm">
         <div>
@@ -103,31 +117,31 @@ export function InvoicePrintView({ invoice, workspaceName }: InvoicePrintViewPro
       </table>
 
       <div className="mt-4 flex justify-end">
-        <div className="w-64 space-y-1 text-sm">
-          <div className="flex justify-between">
-            <span>Subtotal</span>
-            <span>{fmt(invoice.subtotal)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Discount</span>
-            <span>−{fmt(invoice.discount_amount)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Tax</span>
-            <span>{fmt(invoice.tax_amount)}</span>
-          </div>
-          <div className="flex justify-between border-t pt-1 text-base font-bold">
-            <span>Total</span>
-            <span>{fmt(invoice.total)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Amount Paid</span>
-            <span>{fmt(invoice.amount_paid)}</span>
-          </div>
-          <div className="flex justify-between border-t pt-1 text-base font-bold">
-            <span>Balance Due</span>
-            <span>{fmt(invoice.amount_due)}</span>
-          </div>
+        <div className="w-72 space-y-1 text-sm">
+          <TaxBreakdownBlock
+            hargaJual={invoice.subtotal - invoice.discount_amount}
+            currency={invoice.currency}
+            settings={{
+              dpp_numerator: invoice.dpp_numerator,
+              dpp_denominator: invoice.dpp_denominator,
+              ppn_percent: invoice.ppn_percent,
+              pph_percent: invoice.pph_percent,
+              retensi_percent: invoice.retensi_percent,
+            }}
+            dense
+          />
+          {invoice.amount_paid > 0 && (
+            <>
+              <div className="flex justify-between pt-1">
+                <span>Amount Paid</span>
+                <span>{fmt(invoice.amount_paid)}</span>
+              </div>
+              <div className="flex justify-between border-t pt-1 text-base font-bold">
+                <span>Balance Due</span>
+                <span>{fmt(invoice.amount_due)}</span>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -153,6 +167,8 @@ export function InvoicePrintView({ invoice, workspaceName }: InvoicePrintViewPro
           Payment is due by {new Date(invoice.due_date).toLocaleDateString()}.
         </p>
       )}
+
+      <DocumentSignature branding={branding} />
     </div>
   );
 }

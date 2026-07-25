@@ -15,5 +15,15 @@ export default async function DeliveryOrderDetailRoute({
   const deliveryOrder = await getDeliveryOrderById(workspace.id, doId);
   if (!deliveryOrder) notFound();
 
-  return <DeliveryOrderDetailView deliveryOrder={deliveryOrder} workspaceId={workspace.id} workspaceSlug={workspaceSlug} />;
+  return (
+    <DeliveryOrderDetailView
+      deliveryOrder={deliveryOrder}
+      workspaceId={workspace.id}
+      workspaceSlug={workspaceSlug}
+      workspaceName={workspace.name}
+      logoUrl={workspace.logo_url}
+      companyProfile={workspace.settings?.company_profile}
+      branding={workspace.settings?.branding}
+    />
+  );
 }

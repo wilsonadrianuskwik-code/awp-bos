@@ -34,13 +34,17 @@ import { getOverdueDays } from "@/lib/utils/date";
 import type { InvoiceDetail as InvoiceDetailType } from "@/features/invoices/types";
 import type { Activity } from "@/features/activities/types";
 import type { FulfillmentItemWithProgress } from "@/features/fulfillment/types";
-import type { DocumentTemplateWithTheme, CompanyProfile } from "@/features/templates/types";
+import type { DocumentTemplateWithTheme, CompanyProfile, BrandingSettings } from "@/features/templates/types";
 import type { PackageItem } from "@/features/catalog/types";
 
 type InvoiceDetailProps = {
   invoice: InvoiceDetailType;
   activities: Activity[];
-  workspace: { name: string; logo_url: string | null; settings?: { company_profile?: CompanyProfile } | null };
+  workspace: {
+    name: string;
+    logo_url: string | null;
+    settings?: { company_profile?: CompanyProfile; branding?: BrandingSettings } | null;
+  };
   fulfillmentItems: FulfillmentItemWithProgress[];
   template: DocumentTemplateWithTheme | null;
   /** Live package contents by catalog_item_id, for any package line items
@@ -320,7 +324,15 @@ export function InvoiceDetail({
       <DocumentRenderView
         template={template}
         data={invoiceToRenderData(invoice, workspaceInfo, packageBreakdowns)}
-        fallback={<InvoicePrintView invoice={invoice} workspaceName={workspaceInfo.name} />}
+        fallback={
+          <InvoicePrintView
+            invoice={invoice}
+            workspaceName={workspaceInfo.name}
+            logoUrl={workspaceInfo.logo_url}
+            companyProfile={workspaceInfo.settings?.company_profile}
+            branding={workspaceInfo.settings?.branding}
+          />
+        }
       />
 
       <GeneratePurchaseOrderDialog

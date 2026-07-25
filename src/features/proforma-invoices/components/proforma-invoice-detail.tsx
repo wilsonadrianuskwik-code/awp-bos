@@ -12,11 +12,15 @@ import { LineItemsTable } from "@/features/line-items/components/line-items-tabl
 import { GenerateDocumentMenu } from "@/features/documents/components/generate-document-menu";
 import { LinkedDocumentsCard } from "@/features/documents/components/linked-documents-card";
 import { TaxSettingsCard } from "@/features/documents/components/tax-settings-card";
+import { TaxBreakdownBlock } from "@/features/documents/components/tax-breakdown";
+import { SimplePrintView } from "@/features/documents/components/simple-print-view";
+import { PrintButton } from "@/features/documents/components/print-button";
 import { ProformaInvoiceStatusActions } from "./proforma-invoice-status-actions";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { ProformaInvoiceDetail as ProformaInvoiceDetailType } from "@/features/proforma-invoices/types";
 import type { DocumentLink } from "@/features/documents/queries";
 import type { Activity } from "@/features/activities/types";
+import type { BrandingSettings, CompanyProfile } from "@/features/templates/types";
 
 const DOCUMENT_LABEL: Record<string, string> = {
   quotation: "Quotation",
@@ -39,12 +43,21 @@ type ProformaInvoiceDetailProps = {
   proformaInvoice: ProformaInvoiceDetailType;
   activities: Activity[];
   links: DocumentLink[];
+  /** Company branding for the printable view. */
+  workspaceName: string;
+  logoUrl?: string | null;
+  companyProfile?: CompanyProfile;
+  branding?: BrandingSettings;
 };
 
 export function ProformaInvoiceDetail({
   proformaInvoice,
   activities,
   links,
+  workspaceName,
+  logoUrl,
+  companyProfile,
+  branding,
 }: ProformaInvoiceDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
@@ -58,7 +71,10 @@ export function ProformaInvoiceDetail({
     proformaInvoice.status === "accepted" && !proformaInvoice.generated_invoice_id;
 
   return (
-    <div className="space-y-6">
+    <>
+      {/* print:hidden so the on-screen layout doesn't print alongside the
+          document view below it. */}
+      <div className="space-y-6 print:hidden">
       <DetailHeader
         backHref={`/${workspace.slug}/proforma-invoices`}
         backLabel="Back to Proforma Invoices"
@@ -81,15 +97,20 @@ export function ProformaInvoiceDetail({
           </span>
         }
         actions={
-          canGenerateInvoice ? (
-            <GenerateDocumentMenu
-              fromType="proforma_invoice"
-              fromId={proformaInvoice.id}
-              targets={[
-                { toType: "invoice", label: "Invoice", routeSegment: "invoices" },
-              ]}
+          <>
+            {canGenerateInvoice && (
+              <GenerateDocumentMenu
+                fromType="proforma_invoice"
+                fromId={proformaInvoice.id}
+                targets={[
+                  { toType: "invoice", label: "Invoice", routeSegment: "invoices" },
+                ]}
+              />
+            )}
+            <PrintButton
+              filename={`${proformaInvoice.client?.name ?? "Client"} - ${proformaInvoice.pi_number}`}
             />
-          ) : undefined
+          </>
         }
       />
 
@@ -182,5 +203,49 @@ export function ProformaInvoiceDetail({
         </div>
       </div>
     </div>
+
+      <SimplePrintView
+        workspaceName={workspaceName}
+        logoUrl={logoUrl}
+        companyProfile={companyProfile}
+        branding={branding}
+        documentLabel="Proforma Invoice"
+        documentNumber={proformaInvoice.pi_number}
+        party={{
+          heading: "Billed to",
+          name: proformaInvoice.client?.name ?? "Deleted client",
+          lines: [
+            proformaInvoice.client?.company,
+            proformaInvoice.client?.email,
+            proformaInvoice.client?.phone,
+          ],
+        }}
+        meta={[
+          { label: "Issue date", value: new Date(proformaInvoice.issue_date).toLocaleDateString() },
+          ...(proformaInvoice.expiry_date
+            ? [{ label: "Valid until", value: new Date(proformaInvoice.expiry_date).toLocaleDateString() }]
+            : []),
+        ]}
+        title={proformaInvoice.title}
+        lines={proformaInvoice.line_items}
+        currency={proformaInvoice.currency}
+        totals={
+          <TaxBreakdownBlock
+            hargaJual={proformaInvoice.subtotal - proformaInvoice.discount_amount}
+            currency={proformaInvoice.currency}
+            settings={{
+              dpp_numerator: proformaInvoice.dpp_numerator,
+              dpp_denominator: proformaInvoice.dpp_denominator,
+              ppn_percent: proformaInvoice.ppn_percent,
+              pph_percent: proformaInvoice.pph_percent,
+              retensi_percent: proformaInvoice.retensi_percent,
+            }}
+            dense
+          />
+        }
+        notes={proformaInvoice.notes}
+        terms={proformaInvoice.terms_and_conditions}
+      />
+    </>
   );
 }

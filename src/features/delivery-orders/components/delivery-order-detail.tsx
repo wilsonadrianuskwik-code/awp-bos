@@ -10,6 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { updateDeliveryOrderStatus } from "@/features/delivery-orders/actions";
 import { DELIVERY_ORDER_STATUSES, type DeliveryOrderDetail } from "@/features/delivery-orders/types";
+import { SimplePrintView } from "@/features/documents/components/simple-print-view";
+import { PrintButton } from "@/features/documents/components/print-button";
+import type { BrandingSettings, CompanyProfile } from "@/features/templates/types";
 
 const NEXT_STATUS: Record<string, string | null> = {
   draft: "prepared",
@@ -23,10 +26,18 @@ export function DeliveryOrderDetailView({
   deliveryOrder,
   workspaceId,
   workspaceSlug,
+  workspaceName,
+  logoUrl,
+  companyProfile,
+  branding,
 }: {
   deliveryOrder: DeliveryOrderDetail;
   workspaceId: string;
   workspaceSlug: string;
+  workspaceName: string;
+  logoUrl?: string | null;
+  companyProfile?: CompanyProfile;
+  branding?: BrandingSettings;
 }) {
   const [status, setStatus] = useState(deliveryOrder.status);
   const [receivedBy, setReceivedBy] = useState(deliveryOrder.received_by ?? "");
@@ -48,7 +59,10 @@ export function DeliveryOrderDetailView({
   }
 
   return (
-    <div className="space-y-6">
+    <>
+      {/* print:hidden so the on-screen layout doesn't print alongside the
+          document view below it. */}
+      <div className="space-y-6 print:hidden">
       <DetailHeader
         title={deliveryOrder.do_number}
         backHref={`/${workspaceSlug}/delivery-orders`}
@@ -56,7 +70,11 @@ export function DeliveryOrderDetailView({
         badges={<StatusBadge status={status} />}
         subtitle={deliveryOrder.client?.name ?? undefined}
         actions={
-          next && (
+          <div className="flex items-center gap-2">
+            <PrintButton
+              filename={`${deliveryOrder.client?.name ?? "Client"} - ${deliveryOrder.do_number}`}
+            />
+            {next && (
             <div className="flex items-center gap-2">
               {next === "delivered" && (
                 <Input
@@ -70,7 +88,8 @@ export function DeliveryOrderDetailView({
                 Mark as {next}
               </Button>
             </div>
-          )
+            )}
+          </div>
         }
       />
 
@@ -133,5 +152,40 @@ export function DeliveryOrderDetailView({
         </p>
       </Card>
     </div>
+
+      <SimplePrintView
+        workspaceName={workspaceName}
+        logoUrl={logoUrl}
+        companyProfile={companyProfile}
+        branding={branding}
+        documentLabel="Delivery Order"
+        documentNumber={deliveryOrder.do_number}
+        party={{
+          heading: "Deliver to",
+          name: deliveryOrder.client?.name ?? "Deleted client",
+          lines: [deliveryOrder.client?.company],
+        }}
+        meta={[
+          ...(deliveryOrder.delivery_date
+            ? [{ label: "Delivery date", value: new Date(deliveryOrder.delivery_date).toLocaleDateString() }]
+            : []),
+          ...(deliveryOrder.invoice
+            ? [{ label: "Invoice", value: deliveryOrder.invoice.invoice_number }]
+            : []),
+          ...(deliveryOrder.project
+            ? [{ label: "Project", value: deliveryOrder.project.code }]
+            : []),
+        ]}
+        lines={deliveryOrder.line_items}
+        currency="IDR"
+        showPricing={false}
+        notes={deliveryOrder.notes}
+        footerNote={
+          deliveryOrder.received_by
+            ? `Received by ${deliveryOrder.received_by}.`
+            : null
+        }
+      />
+    </>
   );
 }

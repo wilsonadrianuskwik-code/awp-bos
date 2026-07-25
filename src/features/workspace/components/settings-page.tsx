@@ -16,7 +16,7 @@ import type {
 } from "@/features/templates/types";
 
 type SettingsPageProps = {
-  workspace: { id: string; name: string; default_currency: string };
+  workspace: { id: string; name: string; default_currency: string; logo_url?: string | null };
   members: WorkspaceMember[];
   invites: WorkspaceInvite[];
   companyProfile: CompanyProfile;
@@ -68,6 +68,7 @@ export function SettingsPage({
           paymentDetails={paymentDetails}
           defaultTerms={defaultTerms}
           branding={branding}
+          logoUrl={workspace.logo_url}
         />
       </TabsContent>
     </Tabs>

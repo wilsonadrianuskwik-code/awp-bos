@@ -1,6 +1,11 @@
 import type { QuotationDetail } from "@/features/quotations/types";
 import type { LineItemCategory } from "@/features/line-items/types";
 import { formatCurrency } from "@/lib/utils/format-currency";
+import {
+  DocumentLetterhead,
+  DocumentSignature,
+} from "@/features/documents/components/document-letterhead";
+import type { BrandingSettings, CompanyProfile } from "@/features/templates/types";
 
 const CATEGORY_LABEL: Record<LineItemCategory, string> = {
   package: "Packages",
@@ -13,30 +18,32 @@ const CATEGORIES: LineItemCategory[] = ["package", "add_on", "per_unit"];
 type QuotationPrintViewProps = {
   quotation: QuotationDetail;
   workspaceName: string;
+  logoUrl?: string | null;
+  companyProfile?: CompanyProfile;
+  branding?: BrandingSettings;
 };
 
 export function QuotationPrintView({
   quotation,
   workspaceName,
+  logoUrl,
+  companyProfile,
+  branding,
 }: QuotationPrintViewProps) {
   const fmt = (value: number) => formatCurrency(value, quotation.currency);
 
   return (
     <div className="hidden print:block print:text-black">
-      <div className="flex items-start justify-between border-b pb-4">
-        <div>
-          <h1 className="text-xl font-bold">{workspaceName}</h1>
-        </div>
-        <div className="text-right">
-          <h2 className="text-2xl font-bold uppercase tracking-wide">
-            Quotation
-          </h2>
-          <p className="text-sm">
-            {quotation.quotation_number}
-            {quotation.version > 1 ? ` (V${quotation.version})` : ""}
-          </p>
-        </div>
-      </div>
+      <DocumentLetterhead
+        workspaceName={workspaceName}
+        logoUrl={logoUrl}
+        tagline={branding?.tagline}
+        companyProfile={companyProfile}
+        documentLabel="Quotation"
+        documentNumber={`${quotation.quotation_number}${
+          quotation.version > 1 ? ` (V${quotation.version})` : ""
+        }`}
+      />
 
       <div className="mt-6 grid grid-cols-2 gap-6 text-sm">
         <div>
@@ -161,6 +168,8 @@ export function QuotationPrintView({
           {new Date(quotation.expiry_date).toLocaleDateString()}.
         </p>
       )}
+
+      <DocumentSignature branding={branding} />
     </div>
   );
 }

@@ -115,6 +115,12 @@ export type CompanyProfileInput = z.infer<typeof companyProfileSchema>;
 
 export const brandingSchema = z.object({
   tagline: z.string().max(255).optional().or(z.literal("")),
+  // Signature block printed at the bottom of every issued document.
+  signature_url: z.string().url().optional().or(z.literal("")),
+  signature_label: z.string().max(80).optional().or(z.literal("")),
+  signatory_name: z.string().max(120).optional().or(z.literal("")),
+  signatory_title: z.string().max(120).optional().or(z.literal("")),
+  signatory_company: z.string().max(160).optional().or(z.literal("")),
 });
 
 export type BrandingInput = z.infer<typeof brandingSchema>;

@@ -15,11 +15,19 @@ import type {
   PurchaseOrderDetail as PurchaseOrderDetailType,
 } from "@/features/purchase-orders/types";
 import type { Activity } from "@/features/activities/types";
+import type { BrandingSettings, CompanyProfile } from "@/features/templates/types";
+import { SimplePrintView } from "@/features/documents/components/simple-print-view";
+import { PrintButton } from "@/features/documents/components/print-button";
 
 type PurchaseOrderDetailProps = {
   purchaseOrder: PurchaseOrderDetailType;
   activities: Activity[];
   relationships: DocumentRelationship[];
+  /** Company branding for the printable view. */
+  workspaceName: string;
+  logoUrl?: string | null;
+  companyProfile?: CompanyProfile;
+  branding?: BrandingSettings;
 };
 
 // Mirrors InvoiceDetail's structure (line items + notes/terms on the
@@ -30,6 +38,10 @@ export function PurchaseOrderDetail({
   purchaseOrder,
   activities,
   relationships,
+  workspaceName,
+  logoUrl,
+  companyProfile,
+  branding,
 }: PurchaseOrderDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
@@ -40,7 +52,10 @@ export function PurchaseOrderDetail({
   }
 
   return (
-    <div className="space-y-6">
+    <>
+      {/* print:hidden so the on-screen layout doesn't print alongside the
+          document view below it. */}
+      <div className="space-y-6 print:hidden">
       <DetailHeader
         backHref={`/${workspace.slug}/purchase-orders`}
         backLabel="Back to Purchase Orders"
@@ -60,6 +75,11 @@ export function PurchaseOrderDetail({
               Copy
             </button>
           </span>
+        }
+        actions={
+          <PrintButton
+            filename={`${purchaseOrder.supplier?.name ?? "Supplier"} - ${purchaseOrder.po_number}`}
+          />
         }
       />
 
@@ -135,6 +155,39 @@ export function PurchaseOrderDetail({
           />
         </div>
       </div>
-    </div>
+      </div>
+
+      <SimplePrintView
+        workspaceName={workspaceName}
+        logoUrl={logoUrl}
+        companyProfile={companyProfile}
+        branding={branding}
+        documentLabel="Purchase Order"
+        documentNumber={purchaseOrder.po_number}
+        party={{
+          heading: "Supplier",
+          name: purchaseOrder.supplier?.name ?? "Deleted supplier",
+          lines: [
+            purchaseOrder.supplier?.company,
+            purchaseOrder.supplier?.email,
+            purchaseOrder.supplier?.phone,
+          ],
+        }}
+        meta={[
+          { label: "Issue date", value: new Date(purchaseOrder.issue_date).toLocaleDateString() },
+          ...(purchaseOrder.expected_date
+            ? [{ label: "Expected", value: new Date(purchaseOrder.expected_date).toLocaleDateString() }]
+            : []),
+          ...(purchaseOrder.project
+            ? [{ label: "Project", value: purchaseOrder.project.code }]
+            : []),
+        ]}
+        title={purchaseOrder.title}
+        lines={purchaseOrder.line_items}
+        currency={purchaseOrder.currency}
+        notes={purchaseOrder.notes}
+        terms={purchaseOrder.terms_and_conditions}
+      />
+    </>
   );
 }

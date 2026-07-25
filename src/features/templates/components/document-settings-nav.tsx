@@ -37,6 +37,7 @@ type DocumentSettingsNavProps = {
   paymentDetails: PaymentDetails;
   defaultTerms: DefaultTerms;
   branding: BrandingSettings;
+  logoUrl?: string | null;
 };
 
 export function DocumentSettingsNav({
@@ -45,6 +46,7 @@ export function DocumentSettingsNav({
   paymentDetails,
   defaultTerms,
   branding,
+  logoUrl,
 }: DocumentSettingsNavProps) {
   const [activeSection, setActiveSection] = useState<Section>("company-profile");
   const { workspace } = useWorkspace();
@@ -118,7 +120,7 @@ export function DocumentSettingsNav({
           <CompanyProfileForm workspaceId={workspaceId} companyProfile={companyProfile} />
         )}
         {activeSection === "branding" && (
-          <BrandingForm workspaceId={workspaceId} branding={branding} />
+          <BrandingForm workspaceId={workspaceId} branding={branding} logoUrl={logoUrl} />
         )}
         {activeSection === "payment-details" && (
           <PaymentDetailsForm workspaceId={workspaceId} paymentDetails={paymentDetails} />

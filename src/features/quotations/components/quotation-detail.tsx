@@ -31,7 +31,7 @@ import type {
   QuotationWithClient,
 } from "@/features/quotations/types";
 import type { Activity } from "@/features/activities/types";
-import type { DocumentTemplateWithTheme, CompanyProfile } from "@/features/templates/types";
+import type { DocumentTemplateWithTheme, CompanyProfile, BrandingSettings } from "@/features/templates/types";
 import type { PackageItem } from "@/features/catalog/types";
 import type { Supplier } from "@/features/suppliers/types";
 
@@ -40,7 +40,11 @@ type QuotationDetailProps = {
   activities: Activity[];
   versions: QuotationWithClient[];
   previousVersion: QuotationDetailType | null;
-  workspace: { name: string; logo_url: string | null; settings?: { company_profile?: CompanyProfile } | null };
+  workspace: {
+    name: string;
+    logo_url: string | null;
+    settings?: { company_profile?: CompanyProfile; branding?: BrandingSettings } | null;
+  };
   template: DocumentTemplateWithTheme | null;
   /** Live package contents by catalog_item_id, for any package line items
       on this quotation — see getPackageBreakdowns. */
@@ -342,7 +346,15 @@ export function QuotationDetail({
       <DocumentRenderView
         template={template}
         data={quotationToRenderData(quotation, workspaceInfo, packageBreakdowns)}
-        fallback={<QuotationPrintView quotation={quotation} workspaceName={workspaceInfo.name} />}
+        fallback={
+          <QuotationPrintView
+            quotation={quotation}
+            workspaceName={workspaceInfo.name}
+            logoUrl={workspaceInfo.logo_url}
+            companyProfile={workspaceInfo.settings?.company_profile}
+            branding={workspaceInfo.settings?.branding}
+          />
+        }
       />
 
       <GenerateInvoiceDialog
