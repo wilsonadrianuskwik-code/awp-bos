@@ -86,7 +86,7 @@ export async function getDeliveryOrderById(
 
   const { data: lineItems } = await supabase
     .from("line_items")
-    .select("id, entity_type, entity_id, sort_order, description, quantity, unit")
+    .select("id, entity_type, entity_id, sort_order, description, quantity, unit, source_line_item_id")
     .eq("entity_type", "delivery_order")
     .eq("entity_id", deliveryOrderId)
     .order("sort_order", { ascending: true });

@@ -66,6 +66,9 @@ export type DeliveryOrderLineItem = {
   description: string;
   quantity: number;
   unit: string | null;
+  /** Set when this line was generated from an invoice line — drives the
+      automatic fulfillment posting in 00081. */
+  source_line_item_id: string | null;
 };
 
 export type DeliveryOrderDetail = DeliveryOrderWithRelations & {
@@ -91,6 +94,12 @@ export type DeliveryOrderLineInput = {
   description: string;
   quantity: number;
   unit?: string;
+  /**
+   * The invoice line this delivery line fulfils. Set whenever the source
+   * is known, so marking the Delivery Order delivered posts fulfillment
+   * progress against that line automatically (00081).
+   */
+  source_line_item_id?: string;
 };
 
 export type CreateDeliveryOrderInput = {

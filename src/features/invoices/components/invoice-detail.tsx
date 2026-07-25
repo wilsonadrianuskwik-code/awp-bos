@@ -277,6 +277,7 @@ export function InvoiceDetail({
               workspaceSlug={workspace.slug}
               deliveryOrders={deliveryOrders}
               invoiceLineItems={invoice.line_items.map((li) => ({
+                id: li.id,
                 description: li.description,
                 quantity: li.quantity,
                 unit: li.unit,

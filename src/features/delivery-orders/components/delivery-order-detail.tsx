@@ -111,14 +111,26 @@ export function DeliveryOrderDetailView({
         <h3 className="mb-3 text-[15px] font-semibold">Items</h3>
         <ul className="divide-y">
           {deliveryOrder.line_items.map((item) => (
-            <li key={item.id} className="flex items-center justify-between py-2 text-[13px]">
-              <span>{item.description}</span>
-              <span className="tabular-nums text-muted-foreground">
+            <li key={item.id} className="flex items-center justify-between gap-3 py-2 text-[13px]">
+              <span className="min-w-0">
+                <span className="block truncate">{item.description}</span>
+                {!item.source_line_item_id && (
+                  <span className="block text-xs text-muted-foreground">
+                    Not linked to an invoice line — won&apos;t update fulfillment
+                  </span>
+                )}
+              </span>
+              <span className="shrink-0 tabular-nums text-muted-foreground">
                 {item.quantity} {item.unit ?? ""}
               </span>
             </li>
           ))}
         </ul>
+        <p className="mt-3 border-t pt-2.5 text-xs text-muted-foreground">
+          {status === "delivered"
+            ? "These quantities have been recorded against the invoice's fulfillment."
+            : "Marking this delivered records these quantities against the invoice's fulfillment."}
+        </p>
       </Card>
     </div>
   );

@@ -8,7 +8,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { createDeliveryOrder } from "@/features/delivery-orders/actions";
 import type { DeliveryOrderWithRelations } from "@/features/delivery-orders/types";
 
-type InvoiceLineForDelivery = { description: string; quantity: number; unit: string | null };
+type InvoiceLineForDelivery = { id: string; description: string; quantity: number; unit: string | null };
 
 // Embedded on the Invoice detail page — fulfillment is tracked primarily
 // from the Invoice, per the architecture (master plan §5.4), while still
@@ -33,7 +33,12 @@ export function DeliveryOrdersSection({
     startTransition(async () => {
       const result = await createDeliveryOrder(workspaceId, {
         invoice_id: invoiceId,
-        line_items: invoiceLineItems.map((li) => ({ description: li.description, quantity: li.quantity, unit: li.unit ?? undefined })),
+        line_items: invoiceLineItems.map((li) => ({
+          description: li.description,
+          quantity: li.quantity,
+          unit: li.unit ?? undefined,
+          source_line_item_id: li.id,
+        })),
       });
       if (result.data) {
         window.location.reload();
@@ -52,16 +57,32 @@ export function DeliveryOrdersSection({
       {orders.length === 0 ? (
         <p className="mt-3 text-[13px] text-muted-foreground">No delivery orders yet.</p>
       ) : (
-        <ul className="mt-3 divide-y">
-          {orders.map((doItem) => (
-            <li key={doItem.id} className="flex items-center justify-between py-2 text-[13px]">
-              <Link href={`/${workspaceSlug}/delivery-orders/${doItem.id}`} className="font-mono hover:underline">
-                {doItem.do_number}
-              </Link>
-              <StatusBadge status={doItem.status} />
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="mt-3 divide-y">
+            {orders.map((doItem) => (
+              <li key={doItem.id} className="flex items-center justify-between gap-2 py-2 text-[13px]">
+                <Link
+                  href={`/${workspaceSlug}/delivery-orders/${doItem.id}`}
+                  className="font-mono hover:underline"
+                >
+                  {doItem.do_number}
+                </Link>
+                <span className="flex items-center gap-2">
+                  {doItem.delivery_date && (
+                    <span className="text-xs text-muted-foreground">
+                      {doItem.delivery_date}
+                    </span>
+                  )}
+                  <StatusBadge status={doItem.status} />
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 border-t pt-2.5 text-xs text-muted-foreground">
+            Marking a delivery order delivered records its quantities against
+            this invoice&apos;s fulfillment automatically.
+          </p>
+        </>
       )}
     </Card>
   );
