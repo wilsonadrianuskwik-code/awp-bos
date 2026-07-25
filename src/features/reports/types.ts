@@ -42,3 +42,20 @@ export type FulfillmentOverviewRow = {
   itemCount: number;
   totalRemaining: number;
 };
+
+export type ApAgingBucket = {
+  bucket: ArAgingBucketLabel;
+  poCount: number;
+  outstandingAmount: number;
+};
+
+export type ProjectProfitabilityRow = {
+  projectId: string;
+  projectCode: string;
+  projectName: string;
+  currency: string;
+  invoicedTotal: number;
+  paidTotal: number;
+  poCostTotal: number;
+  budget: number | null;
+};

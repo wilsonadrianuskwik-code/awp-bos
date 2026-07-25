@@ -234,6 +234,178 @@ export async function getActiveFulfillmentSummary(
   return { activeCount: count ?? 0 };
 }
 
+export type AttentionItem = {
+  label: string;
+  count: number;
+  href: string;
+};
+
+/**
+ * The dashboard's Attention Strip (Construction BOS command-center
+ * redesign, replacing the CRM's revenue-hero-first layout) — counted
+ * exceptions across every document type, each a clickable chip. Every
+ * count is a head-only query, same cheap shape as getClientSummary.
+ * Rows with a zero count are filtered out by the caller so the strip
+ * only ever shows things that actually need attention.
+ */
+export async function getAttentionItems(workspaceId: string): Promise<AttentionItem[]> {
+  const supabase = await createClient();
+
+  const [overdueInvoices, posAwaiting, delaysDelivery, expiringQuotations] = await Promise.all([
+    supabase
+      .from("invoices")
+      .select("*", { count: "exact", head: true })
+      .eq("workspace_id", workspaceId)
+      .is("deleted_at", null)
+      .eq("status", "overdue"),
+    supabase
+      .from("purchase_orders")
+      .select("*", { count: "exact", head: true })
+      .eq("workspace_id", workspaceId)
+      .is("deleted_at", null)
+      .in("status", ["sent", "acknowledged"]),
+    supabase
+      .from("delivery_orders")
+      .select("*", { count: "exact", head: true })
+      .eq("workspace_id", workspaceId)
+      .is("deleted_at", null)
+      .lt("delivery_date", new Date().toISOString().slice(0, 10))
+      .not("status", "in", "(delivered,cancelled)"),
+    supabase
+      .from("quotations")
+      .select("*", { count: "exact", head: true })
+      .eq("workspace_id", workspaceId)
+      .is("deleted_at", null)
+      .eq("status", "sent")
+      .lte("expiry_date", new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10)),
+  ]);
+
+  const items: AttentionItem[] = [
+    { label: "Invoices Overdue", count: overdueInvoices.count ?? 0, href: "/invoices?status=overdue" },
+    { label: "POs Awaiting Receipt", count: posAwaiting.count ?? 0, href: "/purchase-orders" },
+    { label: "Deliveries Delayed", count: delaysDelivery.count ?? 0, href: "/delivery-orders" },
+    { label: "Quotations Expiring This Week", count: expiringQuotations.count ?? 0, href: "/quotations" },
+  ];
+
+  return items.filter((item) => item.count > 0);
+}
+
+export type ProjectHealthCard = {
+  id: string;
+  code: string;
+  name: string;
+  status: string;
+  clientName: string | null;
+  currency: string;
+  health: { quoted_total: number; invoiced_total: number; paid_total: number; delivered_count: number; delivery_total: number };
+};
+
+/**
+ * The dashboard's Active Projects grid — the actual center of gravity of
+ * a construction business, replacing the CRM's single revenue-hero
+ * number. Capped at 6 for the dashboard (the full portfolio lives on the
+ * Projects list page); health is computed per-project via
+ * get_project_health (00069_projects.sql), which reads quotations/
+ * invoices/delivery_orders directly rather than assuming a fixed set of
+ * document types.
+ */
+export async function getActiveProjectsWithHealth(workspaceId: string): Promise<ProjectHealthCard[]> {
+  const supabase = await createClient();
+  const { data: projects } = await supabase
+    .from("projects")
+    .select("id, code, name, status, currency, client:clients(name)")
+    .eq("workspace_id", workspaceId)
+    .is("deleted_at", null)
+    .in("status", ["planning", "active"])
+    .order("created_at", { ascending: false })
+    .limit(6);
+
+  if (!projects || projects.length === 0) return [];
+
+  const withHealth = await Promise.all(
+    projects.map(async (project) => {
+      const { data: health } = await supabase.rpc("get_project_health", {
+        p_project_id: project.id,
+        p_workspace_id: workspaceId,
+      });
+      return {
+        id: project.id,
+        code: project.code,
+        name: project.name,
+        status: project.status,
+        currency: project.currency,
+        clientName: (project.client as unknown as { name: string } | null)?.name ?? null,
+        health: (health as ProjectHealthCard["health"]) ?? {
+          quoted_total: 0,
+          invoiced_total: 0,
+          paid_total: 0,
+          delivered_count: 0,
+          delivery_total: 0,
+        },
+      };
+    })
+  );
+
+  return withHealth;
+}
+
+export type ActionQueueItem = {
+  id: string;
+  type: "quotation" | "proforma_invoice" | "purchase_order" | "delivery_order";
+  label: string;
+  href: string;
+};
+
+/**
+ * "Documents awaiting your action" — draft quotations not yet sent, POs
+ * not yet acknowledged, DOs not yet dispatched — a personal to-do view
+ * generated from document status rather than a separate task table.
+ */
+export async function getActionQueue(workspaceId: string): Promise<ActionQueueItem[]> {
+  const supabase = await createClient();
+
+  const [draftQuotations, unacknowledgedPOs, undispatchedDOs] = await Promise.all([
+    supabase
+      .from("quotations")
+      .select("id, quotation_number")
+      .eq("workspace_id", workspaceId)
+      .is("deleted_at", null)
+      .eq("status", "draft")
+      .order("created_at", { ascending: false })
+      .limit(5),
+    supabase
+      .from("purchase_orders")
+      .select("id, po_number")
+      .eq("workspace_id", workspaceId)
+      .is("deleted_at", null)
+      .eq("status", "sent")
+      .order("created_at", { ascending: false })
+      .limit(5),
+    supabase
+      .from("delivery_orders")
+      .select("id, do_number")
+      .eq("workspace_id", workspaceId)
+      .is("deleted_at", null)
+      .in("status", ["draft", "prepared"])
+      .order("created_at", { ascending: false })
+      .limit(5),
+  ]);
+
+  const items: ActionQueueItem[] = [
+    ...(draftQuotations.data ?? []).map((q) => ({
+      id: q.id, type: "quotation" as const, label: `${q.quotation_number} — not sent`, href: `/quotations/${q.id}`,
+    })),
+    ...(unacknowledgedPOs.data ?? []).map((po) => ({
+      id: po.id, type: "purchase_order" as const, label: `${po.po_number} — not acknowledged`, href: `/purchase-orders/${po.id}`,
+    })),
+    ...(undispatchedDOs.data ?? []).map((d) => ({
+      id: d.id, type: "delivery_order" as const, label: `${d.do_number} — not dispatched`, href: `/delivery-orders/${d.id}`,
+    })),
+  ];
+
+  return items.slice(0, 10);
+}
+
 /**
  * Workspace-wide recent activity feed — the first read of `activities`
  * that isn't scoped to a single entity (every existing caller, e.g.

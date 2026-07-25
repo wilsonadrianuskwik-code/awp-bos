@@ -8,8 +8,10 @@ import { DateRangePicker, type DateRange } from "@/components/ui/date-range-pick
 import { CurrencySelector } from "@/features/reports/components/currency-selector";
 import { RevenueChart } from "@/features/reports/components/revenue-chart";
 import { ArAgingCard } from "@/features/reports/components/ar-aging-card";
+import { ApAgingCard } from "@/features/reports/components/ap-aging-card";
 import { CatalogRevenueCard } from "@/features/reports/components/catalog-revenue-card";
 import { FulfillmentOverviewCard } from "@/features/reports/components/fulfillment-overview-card";
+import { ProjectProfitabilityCard } from "@/features/reports/components/project-profitability-card";
 
 function defaultDateRange(): DateRange {
   const to = new Date();
@@ -23,12 +25,14 @@ function defaultDateRange(): DateRange {
 
 type ReportsPageProps = {
   workspaceId: string;
+  workspaceSlug: string;
   availableCurrencies: string[];
   defaultCurrency: string;
 };
 
 export function ReportsPage({
   workspaceId,
+  workspaceSlug,
   availableCurrencies,
   defaultCurrency,
 }: ReportsPageProps) {
@@ -102,6 +106,24 @@ export function ReportsPage({
           </CardHeader>
           <CardContent>
             <FulfillmentOverviewCard workspaceId={workspaceId} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">AP Aging</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ApAgingCard workspaceId={workspaceId} currency={currency} />
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-base">Project Profitability</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ProjectProfitabilityCard workspaceId={workspaceId} workspaceSlug={workspaceSlug} />
           </CardContent>
         </Card>
       </div>

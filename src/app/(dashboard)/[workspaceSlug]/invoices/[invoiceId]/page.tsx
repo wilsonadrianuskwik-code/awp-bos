@@ -6,6 +6,7 @@ import { syncFulfillmentItemsAction } from "@/features/fulfillment/actions";
 import { InvoiceDetail } from "@/features/invoices/components/invoice-detail";
 import { getDefaultTemplate } from "@/features/templates/queries";
 import { getPackageBreakdowns } from "@/features/catalog/queries";
+import { getDeliveryOrdersForInvoice } from "@/features/delivery-orders/queries";
 
 export default async function InvoiceDetailRoute({
   params,
@@ -20,11 +21,12 @@ export default async function InvoiceDetailRoute({
   // line items on load, same as the ledger page (see sync_fulfillment_items).
   await syncFulfillmentItemsAction(workspace.id);
 
-  const [invoice, activities, { items: fulfillmentItems }, template] = await Promise.all([
+  const [invoice, activities, { items: fulfillmentItems }, template, deliveryOrders] = await Promise.all([
     getInvoice(invoiceId, workspace.id),
     getInvoiceActivities(invoiceId),
     getFulfillmentItems(workspace.id, { invoiceId }),
     getDefaultTemplate(workspace.id, "invoice"),
+    getDeliveryOrdersForInvoice(workspace.id, invoiceId),
   ]);
 
   if (!invoice) notFound();
@@ -42,6 +44,7 @@ export default async function InvoiceDetailRoute({
       fulfillmentItems={fulfillmentItems}
       template={template}
       packageBreakdowns={packageBreakdowns}
+      deliveryOrders={deliveryOrders}
     />
   );
 }

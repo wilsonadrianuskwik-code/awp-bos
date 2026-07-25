@@ -9,6 +9,9 @@ import {
   FileText,
   LayoutTemplate,
   ChevronRight,
+  Hash,
+  Database,
+  Shield,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils/cn";
@@ -82,6 +85,30 @@ export function DocumentSettingsNav({
         >
           <Palette className="h-4 w-4" />
           <span className="flex-1 text-left">Themes</span>
+          <ChevronRight className="h-3.5 w-3.5" />
+        </Link>
+        <Link
+          href={`/${workspace.slug}/settings/numbering`}
+          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <Hash className="h-4 w-4" />
+          <span className="flex-1 text-left">Document Numbering</span>
+          <ChevronRight className="h-3.5 w-3.5" />
+        </Link>
+        <Link
+          href={`/${workspace.slug}/settings/master-data`}
+          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <Database className="h-4 w-4" />
+          <span className="flex-1 text-left">Master Data</span>
+          <ChevronRight className="h-3.5 w-3.5" />
+        </Link>
+        <Link
+          href={`/${workspace.slug}/settings/permissions`}
+          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <Shield className="h-4 w-4" />
+          <span className="flex-1 text-left">Permissions</span>
           <ChevronRight className="h-3.5 w-3.5" />
         </Link>
       </nav>

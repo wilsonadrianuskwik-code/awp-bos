@@ -1,8 +1,10 @@
 "use server";
 
 import {
+  getApAging,
   getArAging,
   getFulfillmentOverview,
+  getProjectProfitability,
   getRevenueByCatalogItem,
   getRevenueByPeriod,
 } from "@/features/reports/queries";
@@ -79,6 +81,28 @@ export async function getFulfillmentOverviewAction(workspaceId: string) {
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Failed to load fulfillment overview";
+    return { data: null, error: message };
+  }
+}
+
+/** Same reasoning as getArAgingAction, mirrored for Purchase Orders/Suppliers. */
+export async function getApAgingAction(workspaceId: string, input: ArAgingInput) {
+  try {
+    const data = await getApAging(workspaceId, input);
+    return { data, error: null };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to load AP aging report";
+    return { data: null, error: message };
+  }
+}
+
+/** No user-adjustable inputs, same shape as getFulfillmentOverviewAction. */
+export async function getProjectProfitabilityAction(workspaceId: string) {
+  try {
+    const data = await getProjectProfitability(workspaceId);
+    return { data, error: null };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to load project profitability";
     return { data: null, error: message };
   }
 }

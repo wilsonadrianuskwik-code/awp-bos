@@ -19,6 +19,8 @@ import { InvoiceSummaryHero } from "@/features/invoices/components/invoice-summa
 import { InvoicePortalAccessCard } from "@/features/invoices/components/invoice-portal-access-card";
 import { InvoicePrintView } from "@/features/invoices/components/invoice-print-view";
 import { InvoiceFulfillmentSection } from "@/features/fulfillment/components/invoice-fulfillment-section";
+import { DeliveryOrdersSection } from "@/features/delivery-orders/components/delivery-orders-section";
+import type { DeliveryOrderWithRelations } from "@/features/delivery-orders/types";
 import { DocumentRenderView } from "@/features/templates/renderer/components/document-render-view";
 import { invoiceToRenderData } from "@/features/templates/renderer/adapters";
 import { formatCurrency } from "@/lib/utils/format-currency";
@@ -38,6 +40,7 @@ type InvoiceDetailProps = {
   /** Live package contents by catalog_item_id, for any package line items
       on this invoice — see getPackageBreakdowns. */
   packageBreakdowns?: Record<string, PackageItem[]>;
+  deliveryOrders?: DeliveryOrderWithRelations[];
 };
 
 export function InvoiceDetail({
@@ -47,6 +50,7 @@ export function InvoiceDetail({
   fulfillmentItems,
   template,
   packageBreakdowns = {},
+  deliveryOrders = [],
 }: InvoiceDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
@@ -217,6 +221,18 @@ export function InvoiceDetail({
                 <PaymentHistory payments={invoice.payments} />
               </CardContent>
             </Card>
+
+            <DeliveryOrdersSection
+              invoiceId={invoice.id}
+              workspaceId={workspace.id}
+              workspaceSlug={workspace.slug}
+              deliveryOrders={deliveryOrders}
+              invoiceLineItems={invoice.line_items.map((li) => ({
+                description: li.description,
+                quantity: li.quantity,
+                unit: li.unit,
+              }))}
+            />
 
             <InvoicePortalAccessCard invoice={invoice} />
 

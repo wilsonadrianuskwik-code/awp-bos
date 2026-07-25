@@ -74,6 +74,13 @@ export const STATUS_TONE: Record<string, Tone> = {
   // Deliverable (posting schedule) lifecycle
   scheduled: "neutral",
   posted: "success",
+  // Proforma invoice lifecycle
+  accepted: "success",
+  converted: "special",
+  // Delivery order lifecycle
+  prepared: "info",
+  dispatched: "attention",
+  delivered: "success",
 };
 
 type StatusBadgeProps = {

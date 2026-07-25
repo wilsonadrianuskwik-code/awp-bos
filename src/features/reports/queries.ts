@@ -8,12 +8,65 @@ import {
   type RevenueByPeriodInput,
 } from "@/features/reports/validators";
 import type {
+  ApAgingBucket,
   ArAgingBucket,
   AvailableCurrencies,
   CatalogRevenueRow,
   FulfillmentOverviewRow,
+  ProjectProfitabilityRow,
   RevenuePeriodPoint,
 } from "@/features/reports/types";
+
+/**
+ * Outstanding Purchase Order balances by age — the Procurement mirror of
+ * getArAging, same four-bucket shape, same RPC pattern
+ * (00077_construction_reports.sql).
+ */
+export async function getApAging(workspaceId: string, input: ArAgingInput): Promise<ApAgingBucket[]> {
+  const parsed = arAgingSchema.safeParse(input);
+  if (!parsed.success) throw new Error(parsed.error.issues[0].message);
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_ap_aging", {
+    p_workspace_id: workspaceId,
+    p_currency: parsed.data.currency,
+  });
+  if (error) throw new Error(error.message);
+
+  return (data ?? []).map((row: { bucket: string; po_count: number; outstanding_amount: number }) => ({
+    bucket: row.bucket,
+    poCount: row.po_count,
+    outstandingAmount: row.outstanding_amount,
+  })) as ApAgingBucket[];
+}
+
+/**
+ * Invoiced vs. paid vs. PO cost vs. budget per project — feeds the
+ * Project Profitability report (00077_construction_reports.sql).
+ */
+export async function getProjectProfitability(workspaceId: string): Promise<ProjectProfitabilityRow[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_project_profitability", {
+    p_workspace_id: workspaceId,
+  });
+  if (error) throw new Error(error.message);
+
+  return (data ?? []).map(
+    (row: {
+      project_id: string; project_code: string; project_name: string; currency: string;
+      invoiced_total: number; paid_total: number; po_cost_total: number; budget: number | null;
+    }) => ({
+      projectId: row.project_id,
+      projectCode: row.project_code,
+      projectName: row.project_name,
+      currency: row.currency,
+      invoicedTotal: row.invoiced_total,
+      paidTotal: row.paid_total,
+      poCostTotal: row.po_cost_total,
+      budget: row.budget,
+    })
+  ) as ProjectProfitabilityRow[];
+}
 
 /**
  * Revenue over time, grouped by the requested granularity. Validated here

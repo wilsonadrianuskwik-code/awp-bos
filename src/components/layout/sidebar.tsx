@@ -4,12 +4,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
+  Building2,
   Users,
   UserCheck,
   FileText,
+  FileSpreadsheet,
   Receipt,
   CreditCard,
   Package,
+  Truck,
+  ClipboardList,
   PackageCheck,
   BarChart3,
   Settings,
@@ -30,32 +34,50 @@ type SidebarProps = {
   workspaceName: string;
 };
 
+// Construction BOS navigation — "Command Deck" (Concept B): one flat
+// sidebar, no mode-switching rail. Projects is promoted to its own group
+// at the top since it's the operational spine, but every other module
+// stays a normal, always-visible, cross-project list — the ⌘K command
+// palette (command-palette.tsx, sharing this same NAV_GROUPS export) is
+// the fast-navigation layer instead of a second navigation surface.
 export const NAV_GROUPS = [
   {
     label: null,
     items: [{ label: "Dashboard", href: "", icon: LayoutDashboard, color: "#6366f1" }],
   },
   {
-    label: "CRM",
+    label: "Projects",
     items: [
-      { label: "Leads", href: "/leads", icon: Users, color: "#a855f7" },
-      { label: "Clients", href: "/clients", icon: UserCheck, color: "#ec4899" },
+      { label: "Projects", href: "/projects", icon: Building2, color: "#6366f1" },
     ],
   },
   {
     label: "Sales",
     items: [
-      { label: "Catalog", href: "/catalog", icon: Package, color: "#f59e0b" },
+      { label: "Leads", href: "/leads", icon: Users, color: "#a855f7" },
+      { label: "Clients", href: "/clients", icon: UserCheck, color: "#ec4899" },
       { label: "Quotations", href: "/quotations", icon: FileText, color: "#06b6d4" },
+      { label: "Proforma Invoices", href: "/proforma-invoices", icon: FileSpreadsheet, color: "#0ea5e9" },
       { label: "Invoices", href: "/invoices", icon: Receipt, color: "#10b981" },
       { label: "Payments", href: "/payments", icon: CreditCard, color: "#14b8a6" },
     ],
   },
   {
+    label: "Procurement",
+    items: [
+      { label: "Suppliers", href: "/suppliers", icon: Truck, color: "#eab308" },
+      { label: "Purchase Orders", href: "/purchase-orders", icon: ClipboardList, color: "#f59e0b" },
+    ],
+  },
+  {
     label: "Operations",
     items: [
-      { label: "Fulfillment", href: "/fulfillment", icon: PackageCheck, color: "#f97316" },
+      { label: "Delivery Orders", href: "/delivery-orders", icon: PackageCheck, color: "#f97316" },
     ],
+  },
+  {
+    label: "Catalog",
+    items: [{ label: "Items & Materials", href: "/catalog", icon: Package, color: "#84cc16" }],
   },
   {
     label: "Insights",

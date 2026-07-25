@@ -23,6 +23,7 @@ export default async function ReportsRoute({
       />
       <ReportsPage
         workspaceId={workspace.id}
+        workspaceSlug={workspaceSlug}
         availableCurrencies={availableCurrencies}
         defaultCurrency={workspace.default_currency}
       />
