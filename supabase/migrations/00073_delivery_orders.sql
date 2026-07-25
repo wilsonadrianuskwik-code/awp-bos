@@ -37,12 +37,15 @@ CREATE INDEX IF NOT EXISTS idx_delivery_orders_invoice ON delivery_orders(invoic
 CREATE INDEX IF NOT EXISTS idx_delivery_orders_project ON delivery_orders(project_id) WHERE deleted_at IS NULL;
 
 ALTER TABLE delivery_orders ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Members can view delivery orders" ON delivery_orders;
 CREATE POLICY "Members can view delivery orders"
   ON delivery_orders FOR SELECT
   USING (workspace_id IN (SELECT get_user_workspace_ids()) AND deleted_at IS NULL);
+DROP POLICY IF EXISTS "Staff can create delivery orders" ON delivery_orders;
 CREATE POLICY "Staff can create delivery orders"
   ON delivery_orders FOR INSERT
   WITH CHECK (get_user_role(workspace_id) IN ('staff', 'admin', 'owner'));
+DROP POLICY IF EXISTS "Staff can update delivery orders" ON delivery_orders;
 CREATE POLICY "Staff can update delivery orders"
   ON delivery_orders FOR UPDATE
   USING (get_user_role(workspace_id) IN ('staff', 'admin', 'owner'));

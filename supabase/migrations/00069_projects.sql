@@ -35,12 +35,15 @@ CREATE INDEX IF NOT EXISTS idx_projects_client ON projects(client_id) WHERE dele
 CREATE INDEX IF NOT EXISTS idx_projects_assigned ON projects(assigned_to) WHERE deleted_at IS NULL;
 
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Members can view projects" ON projects;
 CREATE POLICY "Members can view projects"
   ON projects FOR SELECT
   USING (workspace_id IN (SELECT get_user_workspace_ids()) AND deleted_at IS NULL);
+DROP POLICY IF EXISTS "Staff can create projects" ON projects;
 CREATE POLICY "Staff can create projects"
   ON projects FOR INSERT
   WITH CHECK (get_user_role(workspace_id) IN ('staff', 'admin', 'owner'));
+DROP POLICY IF EXISTS "Staff can update projects" ON projects;
 CREATE POLICY "Staff can update projects"
   ON projects FOR UPDATE
   USING (get_user_role(workspace_id) IN ('staff', 'admin', 'owner'));

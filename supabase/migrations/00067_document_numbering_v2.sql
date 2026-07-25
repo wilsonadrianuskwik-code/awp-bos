@@ -21,9 +21,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_document_number_templates_active
   ON document_number_templates(workspace_id, document_type) WHERE is_active;
 
 ALTER TABLE document_number_templates ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Members can view numbering templates" ON document_number_templates;
 CREATE POLICY "Members can view numbering templates"
   ON document_number_templates FOR SELECT
   USING (workspace_id IN (SELECT get_user_workspace_ids()));
+DROP POLICY IF EXISTS "Admins can manage numbering templates" ON document_number_templates;
 CREATE POLICY "Admins can manage numbering templates"
   ON document_number_templates FOR ALL
   USING (get_user_role(workspace_id) IN ('admin', 'owner'))
@@ -42,6 +44,7 @@ CREATE TABLE IF NOT EXISTS document_number_counters (
 );
 
 ALTER TABLE document_number_counters ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Staff can use numbering counters" ON document_number_counters;
 CREATE POLICY "Staff can use numbering counters"
   ON document_number_counters FOR ALL
   USING (get_user_role(workspace_id) IN ('staff', 'admin', 'owner'))

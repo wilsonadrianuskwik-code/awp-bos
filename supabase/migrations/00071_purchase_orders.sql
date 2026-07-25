@@ -37,12 +37,15 @@ CREATE INDEX IF NOT EXISTS idx_purchase_orders_project ON purchase_orders(projec
 CREATE INDEX IF NOT EXISTS idx_purchase_orders_supplier ON purchase_orders(supplier_id) WHERE deleted_at IS NULL;
 
 ALTER TABLE purchase_orders ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Members can view purchase orders" ON purchase_orders;
 CREATE POLICY "Members can view purchase orders"
   ON purchase_orders FOR SELECT
   USING (workspace_id IN (SELECT get_user_workspace_ids()) AND deleted_at IS NULL);
+DROP POLICY IF EXISTS "Staff can create purchase orders" ON purchase_orders;
 CREATE POLICY "Staff can create purchase orders"
   ON purchase_orders FOR INSERT
   WITH CHECK (get_user_role(workspace_id) IN ('staff', 'admin', 'owner'));
+DROP POLICY IF EXISTS "Staff can update purchase orders" ON purchase_orders;
 CREATE POLICY "Staff can update purchase orders"
   ON purchase_orders FOR UPDATE
   USING (get_user_role(workspace_id) IN ('staff', 'admin', 'owner'));

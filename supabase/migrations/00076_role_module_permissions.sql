@@ -21,9 +21,11 @@ CREATE TABLE IF NOT EXISTS role_module_permissions (
 );
 
 ALTER TABLE role_module_permissions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Members can view module permissions" ON role_module_permissions;
 CREATE POLICY "Members can view module permissions"
   ON role_module_permissions FOR SELECT
   USING (workspace_id IN (SELECT get_user_workspace_ids()));
+DROP POLICY IF EXISTS "Admins can manage module permissions" ON role_module_permissions;
 CREATE POLICY "Admins can manage module permissions"
   ON role_module_permissions FOR ALL
   USING (get_user_role(workspace_id) IN ('admin', 'owner'))

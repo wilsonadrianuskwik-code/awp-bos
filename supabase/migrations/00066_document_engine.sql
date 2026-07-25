@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS document_type_registry (
 -- what document types the codebase knows how to render/generate, not
 -- tenant data. Every workspace shares the same registry.
 ALTER TABLE document_type_registry ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Any authenticated user can view the document type registry" ON document_type_registry;
 CREATE POLICY "Any authenticated user can view the document type registry"
   ON document_type_registry FOR SELECT
   USING (auth.uid() IS NOT NULL);
@@ -48,9 +49,11 @@ CREATE INDEX IF NOT EXISTS idx_document_relationships_to ON document_relationshi
 CREATE INDEX IF NOT EXISTS idx_document_relationships_from ON document_relationships(workspace_id, from_type, from_id);
 
 ALTER TABLE document_relationships ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Members can view document relationships" ON document_relationships;
 CREATE POLICY "Members can view document relationships"
   ON document_relationships FOR SELECT
   USING (workspace_id IN (SELECT get_user_workspace_ids()));
+DROP POLICY IF EXISTS "Staff can create document relationships" ON document_relationships;
 CREATE POLICY "Staff can create document relationships"
   ON document_relationships FOR INSERT
   WITH CHECK (get_user_role(workspace_id) IN ('staff', 'admin', 'owner'));
@@ -70,6 +73,7 @@ CREATE TABLE IF NOT EXISTS document_generation_rules (
 );
 
 ALTER TABLE document_generation_rules ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Any authenticated user can view generation rules" ON document_generation_rules;
 CREATE POLICY "Any authenticated user can view generation rules"
   ON document_generation_rules FOR SELECT
   USING (auth.uid() IS NOT NULL);

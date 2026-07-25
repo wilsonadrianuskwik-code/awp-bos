@@ -33,15 +33,19 @@ CREATE INDEX IF NOT EXISTS idx_proforma_invoices_project ON proforma_invoices(pr
 CREATE INDEX IF NOT EXISTS idx_proforma_invoices_client ON proforma_invoices(client_id) WHERE deleted_at IS NULL;
 
 ALTER TABLE proforma_invoices ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Members can view proforma invoices" ON proforma_invoices;
 CREATE POLICY "Members can view proforma invoices"
   ON proforma_invoices FOR SELECT
   USING (workspace_id IN (SELECT get_user_workspace_ids()) AND deleted_at IS NULL);
+DROP POLICY IF EXISTS "Staff can create proforma invoices" ON proforma_invoices;
 CREATE POLICY "Staff can create proforma invoices"
   ON proforma_invoices FOR INSERT
   WITH CHECK (get_user_role(workspace_id) IN ('staff', 'admin', 'owner'));
+DROP POLICY IF EXISTS "Staff can update proforma invoices" ON proforma_invoices;
 CREATE POLICY "Staff can update proforma invoices"
   ON proforma_invoices FOR UPDATE
   USING (get_user_role(workspace_id) IN ('staff', 'admin', 'owner'));
+DROP POLICY IF EXISTS "Anyone with a share token can view a proforma invoice" ON proforma_invoices;
 CREATE POLICY "Anyone with a share token can view a proforma invoice"
   ON proforma_invoices FOR SELECT
   USING (share_token IS NOT NULL);

@@ -28,12 +28,15 @@ CREATE INDEX IF NOT EXISTS idx_suppliers_workspace ON suppliers(workspace_id) WH
 CREATE INDEX IF NOT EXISTS idx_suppliers_assigned ON suppliers(assigned_to) WHERE deleted_at IS NULL;
 
 ALTER TABLE suppliers ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Members can view suppliers" ON suppliers;
 CREATE POLICY "Members can view suppliers"
   ON suppliers FOR SELECT
   USING (workspace_id IN (SELECT get_user_workspace_ids()) AND deleted_at IS NULL);
+DROP POLICY IF EXISTS "Staff can create suppliers" ON suppliers;
 CREATE POLICY "Staff can create suppliers"
   ON suppliers FOR INSERT
   WITH CHECK (get_user_role(workspace_id) IN ('staff', 'admin', 'owner'));
+DROP POLICY IF EXISTS "Staff can update suppliers" ON suppliers;
 CREATE POLICY "Staff can update suppliers"
   ON suppliers FOR UPDATE
   USING (get_user_role(workspace_id) IN ('staff', 'admin', 'owner'));

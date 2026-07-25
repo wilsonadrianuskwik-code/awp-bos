@@ -26,9 +26,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_simple_lookups_code
 CREATE INDEX IF NOT EXISTS idx_simple_lookups_workspace ON simple_lookups(workspace_id, lookup_type) WHERE deleted_at IS NULL;
 
 ALTER TABLE simple_lookups ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Members can view lookups" ON simple_lookups;
 CREATE POLICY "Members can view lookups"
   ON simple_lookups FOR SELECT
   USING (workspace_id IN (SELECT get_user_workspace_ids()) AND deleted_at IS NULL);
+DROP POLICY IF EXISTS "Admins can manage lookups" ON simple_lookups;
 CREATE POLICY "Admins can manage lookups"
   ON simple_lookups FOR ALL
   USING (get_user_role(workspace_id) IN ('admin', 'owner'))
@@ -51,9 +53,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_item_categories_code
   ON item_categories(workspace_id, code) WHERE deleted_at IS NULL;
 
 ALTER TABLE item_categories ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Members can view item categories" ON item_categories;
 CREATE POLICY "Members can view item categories"
   ON item_categories FOR SELECT
   USING (workspace_id IN (SELECT get_user_workspace_ids()) AND deleted_at IS NULL);
+DROP POLICY IF EXISTS "Admins can manage item categories" ON item_categories;
 CREATE POLICY "Admins can manage item categories"
   ON item_categories FOR ALL
   USING (get_user_role(workspace_id) IN ('admin', 'owner'))
