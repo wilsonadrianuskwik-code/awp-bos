@@ -42,6 +42,9 @@ import type {
 } from "@/features/proforma-invoices/types";
 import type { CatalogItem } from "@/features/catalog/types";
 import type { Project } from "@/features/projects/types";
+import { TaxBreakdownEditor } from "@/features/documents/components/tax-breakdown-editor";
+import { setDocumentTaxSettings } from "@/features/documents/actions";
+import type { TaxSettings } from "@/features/documents/tax";
 
 const CURRENCIES = ["IDR", "USD", "EUR", "GBP", "SGD", "MYR", "AUD", "CAD"];
 
@@ -127,6 +130,16 @@ export function ProformaInvoiceBuilder({
         }))
       : []
   );
+  // Tax settings live on the document row, but the builder needs them
+  // before the row exists, so they're held here and persisted right after
+  // the draft saves (see saveDraft below).
+  const [taxSettings, setTaxSettings] = useState<TaxSettings>({
+    dpp_numerator: proformaInvoice?.dpp_numerator ?? 11,
+    dpp_denominator: proformaInvoice?.dpp_denominator ?? 12,
+    ppn_percent: proformaInvoice?.ppn_percent ?? 12,
+    pph_percent: proformaInvoice?.pph_percent ?? null,
+    retensi_percent: proformaInvoice?.retensi_percent ?? null,
+  });
   const [insertPaletteOpen, setInsertPaletteOpen] = useState(false);
 
   const [isDirty, setIsDirty] = useState(false);
@@ -187,8 +200,25 @@ export function ProformaInvoiceBuilder({
     setIsDirty(false);
     setSaveStatus("saved");
 
+    const savedId = piId ?? result.data?.id;
     if (!piId && result.data) {
       setPiId(result.data.id);
+    }
+
+    // create_/update_ don't carry tax settings, so apply them in the same
+    // save. Sequential rather than parallel: the row must exist first.
+    if (savedId) {
+      const taxResult = await setDocumentTaxSettings(
+        workspace.id,
+        "proforma_invoice",
+        savedId,
+        taxSettings
+      );
+      if (taxResult.error) {
+        setSaveStatus("error");
+        toast(taxResult.error, "error");
+        return null;
+      }
     }
 
     return result.data;
@@ -591,33 +621,16 @@ export function ProformaInvoiceBuilder({
               </div>
             )}
           </div>
-
-          <div className="space-y-2.5 self-end text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span className="tabular-nums">{formatCurrency(totals.subtotal, currency)}</span>
-            </div>
-            {totals.discount_amount > 0 && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Discount</span>
-                <span className="tabular-nums text-red-600 dark:text-red-400">
-                  −{formatCurrency(totals.discount_amount, currency)}
-                </span>
-              </div>
-            )}
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                Tax{docTax !== null && docTax > 0 ? ` (${docTax}%)` : ""}
-              </span>
-              <span className="tabular-nums">{formatCurrency(totals.tax_amount, currency)}</span>
-            </div>
-            <div className="flex items-baseline justify-between border-t pt-3">
-              <span className="text-[15px] font-medium">Total</span>
-              <span className="text-3xl font-semibold tabular-nums tracking-tight">
-                {formatCurrency(totals.total, currency)}
-              </span>
-            </div>
-          </div>
+          <TaxBreakdownEditor
+            hargaJual={totals.subtotal - totals.discount_amount}
+            currency={currency}
+            settings={taxSettings}
+            onChange={(next) => {
+              setTaxSettings(next);
+              setIsDirty(true);
+            }}
+            disabled={!isEditable}
+          />
         </div>
       </div>
 
