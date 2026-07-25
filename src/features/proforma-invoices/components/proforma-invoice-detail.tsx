@@ -186,6 +186,7 @@ export function ProformaInvoiceDetail({
               ppn_percent: proformaInvoice.ppn_percent,
               pph_percent: proformaInvoice.pph_percent,
               retensi_percent: proformaInvoice.retensi_percent,
+              show_dpp: proformaInvoice.show_dpp,
             }}
             editable={proformaInvoice.status === "draft"}
           />
@@ -239,6 +240,7 @@ export function ProformaInvoiceDetail({
               ppn_percent: proformaInvoice.ppn_percent,
               pph_percent: proformaInvoice.pph_percent,
               retensi_percent: proformaInvoice.retensi_percent,
+              show_dpp: proformaInvoice.show_dpp,
             }}
             dense
           />

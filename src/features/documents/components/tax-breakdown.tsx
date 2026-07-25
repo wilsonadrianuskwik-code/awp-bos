@@ -41,14 +41,20 @@ export function TaxBreakdownBlock({
         label="Total Harga Jual"
         value={formatCurrency(b.hargaJual, currency)}
       />
+      {settings.show_dpp && (
+        <Row
+          className={rowClass}
+          label={dppLabel(settings)}
+          value={formatCurrency(b.dppAmount, currency)}
+        />
+      )}
+      {/* Label carries no rate: the PPN percentage is a regulation
+          constant here, not a per-document negotiation like PPH and
+          Retensi, so printing it invites questions it can't answer. The
+          rate still drives the amount. */}
       <Row
         className={rowClass}
-        label={dppLabel(settings)}
-        value={formatCurrency(b.dppAmount, currency)}
-      />
-      <Row
-        className={rowClass}
-        label={`PPN ${formatPercent(settings.ppn_percent)}%`}
+        label="PPN"
         value={formatCurrency(b.ppnAmount, currency)}
       />
       {settings.pph_percent !== null && (

@@ -47,7 +47,8 @@ export function TaxSettingsCard({
     draft.dpp_denominator !== settings.dpp_denominator ||
     draft.ppn_percent !== settings.ppn_percent ||
     draft.pph_percent !== settings.pph_percent ||
-    draft.retensi_percent !== settings.retensi_percent;
+    draft.retensi_percent !== settings.retensi_percent ||
+    draft.show_dpp !== settings.show_dpp;
 
   function patch(next: Partial<TaxSettings>) {
     setDraft((prev) => ({ ...prev, ...next }));
@@ -122,6 +123,16 @@ export function TaxSettingsCard({
                 />
               </Field>
             </div>
+
+            {/* Show/hide only — DPP is still computed either way, since
+                PPN is derived from it. */}
+            <label className="flex items-center gap-2 text-[13px]">
+              <Checkbox
+                checked={draft.show_dpp}
+                onCheckedChange={(checked) => patch({ show_dpp: checked === true })}
+              />
+              Show DPP {draft.dpp_numerator}/{draft.dpp_denominator}
+            </label>
 
             <ToggleRate
               label="Potong PPH"

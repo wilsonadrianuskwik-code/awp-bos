@@ -27,6 +27,8 @@ export type ProformaInvoice = {
   ppn_percent: number;
   pph_percent: number | null;
   retensi_percent: number | null;
+  /** Presentational: whether the DPP line prints. */
+  show_dpp: boolean;
   dpp_amount: number;
   ppn_amount: number;
   pph_amount: number;

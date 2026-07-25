@@ -279,6 +279,7 @@ export function InvoiceDetail({
                 ppn_percent: invoice.ppn_percent,
                 pph_percent: invoice.pph_percent,
                 retensi_percent: invoice.retensi_percent,
+              show_dpp: invoice.show_dpp,
               }}
               editable={invoice.status === "draft"}
             />

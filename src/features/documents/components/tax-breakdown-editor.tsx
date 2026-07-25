@@ -37,6 +37,18 @@ export function TaxBreakdownEditor({
       />
 
       <div className="space-y-2 border-t pt-3">
+        {/* Show/hide only — the DPP amount is still computed either way,
+            since PPN is derived from it. */}
+        <label className="flex items-center gap-2 text-[13px]">
+          <Checkbox
+            checked={settings.show_dpp}
+            disabled={disabled}
+            onCheckedChange={(checked) =>
+              onChange({ ...settings, show_dpp: checked === true })
+            }
+          />
+          Show DPP {settings.dpp_numerator}/{settings.dpp_denominator}
+        </label>
         <Toggle
           label="Potong PPH"
           value={settings.pph_percent}

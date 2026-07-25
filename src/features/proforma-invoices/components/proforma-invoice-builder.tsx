@@ -139,6 +139,7 @@ export function ProformaInvoiceBuilder({
     ppn_percent: proformaInvoice?.ppn_percent ?? 12,
     pph_percent: proformaInvoice?.pph_percent ?? null,
     retensi_percent: proformaInvoice?.retensi_percent ?? null,
+    show_dpp: proformaInvoice?.show_dpp ?? true,
   });
   const [insertPaletteOpen, setInsertPaletteOpen] = useState(false);
 

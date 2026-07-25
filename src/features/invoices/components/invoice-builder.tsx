@@ -150,6 +150,7 @@ export function InvoiceBuilder({
     ppn_percent: invoice?.ppn_percent ?? 12,
     pph_percent: invoice?.pph_percent ?? null,
     retensi_percent: invoice?.retensi_percent ?? null,
+    show_dpp: invoice?.show_dpp ?? true,
   });
   const [insertPaletteOpen, setInsertPaletteOpen] = useState(false);
   const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);

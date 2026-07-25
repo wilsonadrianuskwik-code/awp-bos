@@ -13,6 +13,11 @@ export type TaxSettings = {
   /** null = not applicable; omitted from the document entirely. */
   pph_percent: number | null;
   retensi_percent: number | null;
+  /**
+   * Whether the DPP line is printed. Presentational only — dpp_amount is
+   * always computed regardless, because PPN is derived from it.
+   */
+  show_dpp: boolean;
 };
 
 export type TaxBreakdown = {
