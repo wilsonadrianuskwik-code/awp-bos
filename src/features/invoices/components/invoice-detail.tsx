@@ -20,7 +20,12 @@ import { InvoicePortalAccessCard } from "@/features/invoices/components/invoice-
 import { InvoicePrintView } from "@/features/invoices/components/invoice-print-view";
 import { InvoiceFulfillmentSection } from "@/features/fulfillment/components/invoice-fulfillment-section";
 import { DeliveryOrdersSection } from "@/features/delivery-orders/components/delivery-orders-section";
+import { GenerateDocumentMenu } from "@/features/documents/components/generate-document-menu";
+import { GeneratePurchaseOrderDialog } from "@/features/documents/components/generate-purchase-order-dialog";
+import { LinkedDocumentsCard } from "@/features/documents/components/linked-documents-card";
 import type { DeliveryOrderWithRelations } from "@/features/delivery-orders/types";
+import type { DocumentLink } from "@/features/documents/queries";
+import type { Supplier } from "@/features/suppliers/types";
 import { DocumentRenderView } from "@/features/templates/renderer/components/document-render-view";
 import { invoiceToRenderData } from "@/features/templates/renderer/adapters";
 import { formatCurrency } from "@/lib/utils/format-currency";
@@ -41,6 +46,10 @@ type InvoiceDetailProps = {
       on this invoice — see getPackageBreakdowns. */
   packageBreakdowns?: Record<string, PackageItem[]>;
   deliveryOrders?: DeliveryOrderWithRelations[];
+  /** Traceability chain — what this invoice came from and produced. */
+  links?: DocumentLink[];
+  /** Needed only to pick a supplier when generating a Purchase Order. */
+  suppliers?: Supplier[];
 };
 
 export function InvoiceDetail({
@@ -51,6 +60,8 @@ export function InvoiceDetail({
   template,
   packageBreakdowns = {},
   deliveryOrders = [],
+  links = [],
+  suppliers = [],
 }: InvoiceDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
@@ -58,6 +69,13 @@ export function InvoiceDetail({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [recordPaymentOpen, setRecordPaymentOpen] = useState(false);
+  const [generatePoOpen, setGeneratePoOpen] = useState(false);
+
+  // An invoice that was never issued shouldn't be seeding deliveries or
+  // supplier orders; a cancelled/refunded one shouldn't either.
+  const canGenerate = !["draft", "cancelled", "refunded"].includes(
+    invoice.status
+  );
 
   function handlePrint() {
     const clientName = invoice.client?.name ?? "Client";
@@ -143,10 +161,32 @@ export function InvoiceDetail({
             </span>
           }
           actions={
-            <Button variant="outline" onClick={handlePrint}>
-              <Printer className="mr-2 h-4 w-4" />
-              Print
-            </Button>
+            <>
+              {canGenerate && (
+                <GenerateDocumentMenu
+                  fromType="invoice"
+                  fromId={invoice.id}
+                  onNeedsInput={() => setGeneratePoOpen(true)}
+                  targets={[
+                    {
+                      toType: "delivery_order",
+                      label: "Delivery Order",
+                      routeSegment: "delivery-orders",
+                    },
+                    {
+                      toType: "purchase_order",
+                      label: "Purchase Order",
+                      routeSegment: "purchase-orders",
+                      needsInput: true,
+                    },
+                  ]}
+                />
+              )}
+              <Button variant="outline" onClick={handlePrint}>
+                <Printer className="mr-2 h-4 w-4" />
+                Print
+              </Button>
+            </>
           }
         />
 
@@ -243,6 +283,8 @@ export function InvoiceDetail({
               }))}
             />
 
+            <LinkedDocumentsCard links={links} workspaceSlug={workspace.slug} />
+
             <InvoicePortalAccessCard invoice={invoice} />
 
             <Card>
@@ -261,6 +303,15 @@ export function InvoiceDetail({
         template={template}
         data={invoiceToRenderData(invoice, workspaceInfo, packageBreakdowns)}
         fallback={<InvoicePrintView invoice={invoice} workspaceName={workspaceInfo.name} />}
+      />
+
+      <GeneratePurchaseOrderDialog
+        open={generatePoOpen}
+        onOpenChange={setGeneratePoOpen}
+        fromType="invoice"
+        fromId={invoice.id}
+        fromNumber={invoice.invoice_number}
+        suppliers={suppliers}
       />
 
       <RecordPaymentDialog

@@ -19,7 +19,7 @@ import { QuotationVersionHistory } from "./quotation-version-history";
 import { QuotationVersionDiffDialog } from "./quotation-version-diff-dialog";
 import { GenerateInvoiceDialog } from "./generate-invoice-dialog";
 import { GenerateDocumentMenu } from "@/features/documents/components/generate-document-menu";
-import { GeneratePurchaseOrderDialog } from "./generate-purchase-order-dialog";
+import { GeneratePurchaseOrderDialog } from "@/features/documents/components/generate-purchase-order-dialog";
 import { QuotationPortalAccessCard } from "./quotation-portal-access-card";
 import { PricingSummary } from "@/features/line-items/components/pricing-summary";
 import { QuotationPrintView } from "./quotation-print-view";
@@ -354,8 +354,9 @@ export function QuotationDetail({
       <GeneratePurchaseOrderDialog
         open={generatePoOpen}
         onOpenChange={setGeneratePoOpen}
-        quotationId={quotation.id}
-        quotationNumber={quotation.quotation_number}
+        fromType="quotation"
+        fromId={quotation.id}
+        fromNumber={quotation.quotation_number}
         suppliers={suppliers}
       />
 
