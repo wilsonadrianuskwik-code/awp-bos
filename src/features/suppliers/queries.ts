@@ -39,7 +39,7 @@ export async function getSuppliers(
   const { data, error, count } = await query;
   if (error) {
     logDbError("getSuppliers", error, { workspaceId });
-    throw error;
+    throw new Error(error.message);
   }
 
   return { suppliers: (data ?? []) as Supplier[], count: count ?? 0 };
@@ -97,7 +97,7 @@ export async function getAllSuppliers(workspaceId: string): Promise<Supplier[]> 
 
   if (error) {
     logDbError("getAllSuppliers", error, { workspaceId });
-    throw error;
+    throw new Error(error.message);
   }
   return (data ?? []) as Supplier[];
 }

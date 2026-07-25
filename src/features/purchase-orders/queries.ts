@@ -69,7 +69,7 @@ export async function getPurchaseOrders(
   const { data, error, count } = await query;
   if (error) {
     logDbError("getPurchaseOrders", error, { workspaceId });
-    throw error;
+    throw new Error(error.message);
   }
 
   return {
@@ -144,7 +144,7 @@ export async function getPurchaseOrderRelationships(
 
   if (error) {
     logDbError("getPurchaseOrderRelationships (rpc get_document_relationships)", error, { poId, workspaceId });
-    throw error;
+    throw new Error(error.message);
   }
   return (data ?? []) as DocumentRelationship[];
 }

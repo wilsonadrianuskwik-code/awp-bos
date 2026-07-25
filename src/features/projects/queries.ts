@@ -38,7 +38,7 @@ export async function getProjects(
   const { data, error, count } = await query;
   if (error) {
     logDbError("getProjects", error, { workspaceId });
-    throw error;
+    throw new Error(error.message);
   }
 
   return { projects: (data ?? []) as Project[], count: count ?? 0 };
@@ -81,7 +81,7 @@ export async function getAllProjects(workspaceId: string): Promise<Project[]> {
 
   if (error) {
     logDbError("getAllProjects", error, { workspaceId });
-    throw error;
+    throw new Error(error.message);
   }
   return data ?? [];
 }
@@ -133,7 +133,7 @@ export async function getProjectHealth(
 
   if (error) {
     logDbError("getProjectHealth (rpc get_project_health)", error, { projectId, workspaceId });
-    throw error;
+    throw new Error(error.message);
   }
   return (
     (data as ProjectHealth) ?? {

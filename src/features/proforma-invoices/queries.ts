@@ -66,7 +66,7 @@ export async function getProformaInvoices(
   const { data, error, count } = await query;
   if (error) {
     logDbError("getProformaInvoices", error, { workspaceId });
-    throw error;
+    throw new Error(error.message);
   }
 
   return {
