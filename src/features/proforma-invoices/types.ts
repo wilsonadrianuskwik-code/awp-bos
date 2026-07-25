@@ -19,6 +19,18 @@ export type ProformaInvoice = {
   project_id: string | null;
   status: ProformaInvoiceStatus;
   subtotal: number;
+  // Indonesian tax breakdown (00082). dpp/ppn are always present; pph and
+  // retensi are null when not applicable, which is what keeps them off
+  // the printed document rather than showing a misleading zero row.
+  dpp_numerator: number;
+  dpp_denominator: number;
+  ppn_percent: number;
+  pph_percent: number | null;
+  retensi_percent: number | null;
+  dpp_amount: number;
+  ppn_amount: number;
+  pph_amount: number;
+  retensi_amount: number;
   tax_amount: number;
   discount_amount: number;
   total: number;

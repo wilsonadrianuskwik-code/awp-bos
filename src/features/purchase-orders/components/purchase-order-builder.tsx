@@ -65,6 +65,13 @@ function inferUniform(values: number[]): number | null {
   return values.every((v) => v === values[0]) ? values[0] : null;
 }
 
+// The unit shared by every line, "" when there are no lines yet, or null
+// when they genuinely differ (the control shows "mixed").
+function inferUniformUnit(values: string[]): string | null {
+  if (values.length === 0) return "";
+  return values.every((v) => v === values[0]) ? values[0] : null;
+}
+
 type PurchaseOrderBuilderProps = {
   purchaseOrder?: PurchaseOrderDetail;
   suppliers: SupplierSummary[];
@@ -326,7 +333,15 @@ export function PurchaseOrderBuilder({
     inferUniform((purchaseOrder?.line_items ?? []).map((li) => li.discount_percent ?? 0))
   );
 
-  function applyDocDefaults(nextTax: number, nextDiscount: number) {
+  // Derived rather than state: applying a unit rewrites every line, so
+  // reading it back from the lines is always accurate and can't drift.
+  const docUnit = inferUniformUnit(
+    lineItems
+      .filter((item) => item.description.trim() !== "")
+      .map((item) => item.unit ?? "")
+  );
+
+  function applyDocDefaults(nextTax: number, nextDiscount: number, nextUnit: string) {
     setLineItems((prev) =>
       prev.map((item) => {
         const patch: Partial<LineItemInput> = {};
@@ -336,6 +351,10 @@ export function PurchaseOrderBuilder({
         if (docDiscount === null || (item.discount_percent ?? 0) === docDiscount) {
           patch.discount_percent = nextDiscount;
         }
+        // Unit applies to every line unconditionally — there's no
+        // per-line "override" concept for it the way there is for
+        // tax/discount, and setting it blank would silently wipe units.
+        if (nextUnit !== "") patch.unit = nextUnit;
         return { ...item, ...patch };
       })
     );
@@ -595,6 +614,7 @@ export function PurchaseOrderBuilder({
             onFocusHandled={handleFocusHandled}
             docTax={docTax}
             docDiscount={docDiscount}
+            docUnit={docUnit}
             onApplyDefaults={applyDocDefaults}
           />
         </div>

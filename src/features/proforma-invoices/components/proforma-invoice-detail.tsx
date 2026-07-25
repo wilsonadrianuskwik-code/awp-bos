@@ -10,9 +10,12 @@ import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { LineItemsTable } from "@/features/line-items/components/line-items-table";
 import { GenerateDocumentMenu } from "@/features/documents/components/generate-document-menu";
+import { LinkedDocumentsCard } from "@/features/documents/components/linked-documents-card";
+import { TaxSettingsCard } from "@/features/documents/components/tax-settings-card";
 import { ProformaInvoiceStatusActions } from "./proforma-invoice-status-actions";
 import { formatCurrency } from "@/lib/utils/format-currency";
-import type { ProformaInvoiceDetail as ProformaInvoiceDetailType, DocumentRelationship } from "@/features/proforma-invoices/types";
+import type { ProformaInvoiceDetail as ProformaInvoiceDetailType } from "@/features/proforma-invoices/types";
+import type { DocumentLink } from "@/features/documents/queries";
 import type { Activity } from "@/features/activities/types";
 
 const DOCUMENT_LABEL: Record<string, string> = {
@@ -35,13 +38,13 @@ const ROUTE_SEGMENT: Record<string, string> = {
 type ProformaInvoiceDetailProps = {
   proformaInvoice: ProformaInvoiceDetailType;
   activities: Activity[];
-  relationships: DocumentRelationship[];
+  links: DocumentLink[];
 };
 
 export function ProformaInvoiceDetail({
   proformaInvoice,
   activities,
-  relationships,
+  links,
 }: ProformaInvoiceDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
@@ -150,34 +153,23 @@ export function ProformaInvoiceDetail({
         {/* Right rail: the Inspector — Linked Documents traceability chain
             (get_document_relationships) plus the audit trail. */}
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Linked Documents</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {relationships.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  No linked documents yet.
-                </p>
-              ) : (
-                <ul className="space-y-2">
-                  {relationships.map((rel) => (
-                    <li key={`${rel.direction}-${rel.related_type}-${rel.related_id}`}>
-                      <Link
-                        href={`/${workspace.slug}/${ROUTE_SEGMENT[rel.related_type] ?? rel.related_type}/${rel.related_id}`}
-                        className="flex items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted/40"
-                      >
-                        <span>
-                          {rel.direction === "generated_to" ? "Generated " : "Generated from "}
-                          {DOCUMENT_LABEL[rel.related_type] ?? rel.related_type}
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
+          <TaxSettingsCard
+            workspaceId={workspace.id}
+            documentType="proforma_invoice"
+            documentId={proformaInvoice.id}
+            hargaJual={proformaInvoice.subtotal - proformaInvoice.discount_amount}
+            currency={proformaInvoice.currency}
+            settings={{
+              dpp_numerator: proformaInvoice.dpp_numerator,
+              dpp_denominator: proformaInvoice.dpp_denominator,
+              ppn_percent: proformaInvoice.ppn_percent,
+              pph_percent: proformaInvoice.pph_percent,
+              retensi_percent: proformaInvoice.retensi_percent,
+            }}
+            editable={proformaInvoice.status === "draft"}
+          />
+
+          <LinkedDocumentsCard links={links} workspaceSlug={workspace.slug} />
 
           <Card>
             <CardHeader>

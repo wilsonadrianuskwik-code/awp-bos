@@ -57,8 +57,10 @@ type LineItemsEditorProps = {
   /** Document-level defaults — null means the lines are mixed. */
   docTax?: number | null;
   docDiscount?: number | null;
+  /** Document-level unit — null when the lines use different units. */
+  docUnit?: string | null;
   /** Apply new document defaults (parent decides following vs. pinned). */
-  onApplyDefaults?: (tax: number, discount: number) => void;
+  onApplyDefaults?: (tax: number, discount: number, unit: string) => void;
 };
 
 // The document-defaults control: quiet text on the Items header that
@@ -68,26 +70,30 @@ type LineItemsEditorProps = {
 function DocDefaultsControl({
   docTax,
   docDiscount,
+  docUnit,
   onApply,
 }: {
   docTax: number | null;
   docDiscount: number | null;
-  onApply: (tax: number, discount: number) => void;
+  docUnit: string | null;
+  onApply: (tax: number, discount: number, unit: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [taxInput, setTaxInput] = useState("");
   const [discountInput, setDiscountInput] = useState("");
+  const [unitInput, setUnitInput] = useState("");
 
   function handleOpenChange(next: boolean) {
     if (next) {
       setTaxInput(docTax === null ? "" : String(docTax));
       setDiscountInput(docDiscount === null ? "" : String(docDiscount));
+      setUnitInput(docUnit === null ? "" : docUnit);
     }
     setOpen(next);
   }
 
   function apply() {
-    onApply(Number(taxInput) || 0, Number(discountInput) || 0);
+    onApply(Number(taxInput) || 0, Number(discountInput) || 0, unitInput.trim());
     setOpen(false);
   }
 
@@ -104,6 +110,8 @@ function DocDefaultsControl({
           Tax {docTax === null ? "· mixed" : `${docTax}%`}
           <span className="mx-1.5 text-muted-foreground/40">·</span>
           Discount {docDiscount === null ? "· mixed" : `${docDiscount}%`}
+          <span className="mx-1.5 text-muted-foreground/40">·</span>
+          Unit {docUnit === null ? "· mixed" : docUnit || "—"}
         </button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-72 p-4">
@@ -155,6 +163,24 @@ function DocDefaultsControl({
               %
             </span>
           </label>
+          {/* Construction documents usually price every line in the same
+              unit (m2, kg, sak), so setting it once here beats typing it
+              on each row. Unlike tax/discount this applies to every line
+              unconditionally — there's no "following vs pinned" notion
+              for a unit. */}
+          <label className="flex items-center justify-between gap-3 text-sm">
+            Unit
+            <span className="flex items-center gap-1.5">
+              <input
+                type="text"
+                maxLength={50}
+                value={unitInput}
+                onChange={(e) => setUnitInput(e.target.value)}
+                placeholder={docUnit === null ? "mixed" : "e.g. m2"}
+                className={fieldClass.replace("w-16", "w-24").replace("text-right", "text-left")}
+              />
+            </span>
+          </label>
         </div>
         <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
           {docTax === null || docDiscount === null
@@ -192,6 +218,7 @@ export function LineItemsEditor({
   onFocusHandled,
   docTax,
   docDiscount,
+  docUnit,
   onApplyDefaults,
 }: LineItemsEditorProps) {
   const nonEmpty = CATEGORY_ORDER.filter(
@@ -238,6 +265,7 @@ export function LineItemsEditor({
             <DocDefaultsControl
               docTax={docTax === undefined ? 0 : docTax}
               docDiscount={docDiscount === undefined ? 0 : docDiscount}
+              docUnit={docUnit === undefined ? "" : docUnit}
               onApply={onApplyDefaults}
             />
           )}

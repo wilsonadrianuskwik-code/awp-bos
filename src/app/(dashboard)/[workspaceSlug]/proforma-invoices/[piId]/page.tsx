@@ -3,8 +3,8 @@ import { getWorkspaceBySlug } from "@/lib/workspace";
 import {
   getProformaInvoice,
   getProformaInvoiceActivities,
-  getProformaInvoiceRelationships,
 } from "@/features/proforma-invoices/queries";
+import { getDocumentLinks } from "@/features/documents/queries";
 import { ProformaInvoiceDetail } from "@/features/proforma-invoices/components/proforma-invoice-detail";
 
 export default async function ProformaInvoiceDetailRoute({
@@ -16,10 +16,10 @@ export default async function ProformaInvoiceDetailRoute({
   const workspace = await getWorkspaceBySlug(workspaceSlug);
   if (!workspace) notFound();
 
-  const [proformaInvoice, activities, relationships] = await Promise.all([
+  const [proformaInvoice, activities, links] = await Promise.all([
     getProformaInvoice(piId, workspace.id),
     getProformaInvoiceActivities(piId),
-    getProformaInvoiceRelationships(workspace.id, piId),
+    getDocumentLinks(workspace.id, "proforma_invoice", piId),
   ]);
 
   if (!proformaInvoice) notFound();
@@ -28,7 +28,7 @@ export default async function ProformaInvoiceDetailRoute({
     <ProformaInvoiceDetail
       proformaInvoice={proformaInvoice}
       activities={activities}
-      relationships={relationships}
+      links={links}
     />
   );
 }

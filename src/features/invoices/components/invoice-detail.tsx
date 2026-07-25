@@ -23,6 +23,7 @@ import { DeliveryOrdersSection } from "@/features/delivery-orders/components/del
 import { GenerateDocumentMenu } from "@/features/documents/components/generate-document-menu";
 import { GeneratePurchaseOrderDialog } from "@/features/documents/components/generate-purchase-order-dialog";
 import { LinkedDocumentsCard } from "@/features/documents/components/linked-documents-card";
+import { TaxSettingsCard } from "@/features/documents/components/tax-settings-card";
 import type { DeliveryOrderWithRelations } from "@/features/delivery-orders/types";
 import type { DocumentLink } from "@/features/documents/queries";
 import type { Supplier } from "@/features/suppliers/types";
@@ -262,6 +263,22 @@ export function InvoiceDetail({
           <div className="space-y-6">
             {/* scroll-mt gives the anchor breathing room when the invoice
                 card's "View Payment History" quick action links here. */}
+            <TaxSettingsCard
+              workspaceId={workspace.id}
+              documentType="invoice"
+              documentId={invoice.id}
+              hargaJual={invoice.subtotal - invoice.discount_amount}
+              currency={invoice.currency}
+              settings={{
+                dpp_numerator: invoice.dpp_numerator,
+                dpp_denominator: invoice.dpp_denominator,
+                ppn_percent: invoice.ppn_percent,
+                pph_percent: invoice.pph_percent,
+                retensi_percent: invoice.retensi_percent,
+              }}
+              editable={invoice.status === "draft"}
+            />
+
             <Card id="payments" className="scroll-mt-6">
               <CardHeader>
                 <CardTitle className="text-base">Payments</CardTitle>
