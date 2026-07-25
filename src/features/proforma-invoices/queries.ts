@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { logDbError } from "@/lib/log-db-error";
 import type {
   ProformaInvoiceDetail,
   ProformaInvoiceFilters,
@@ -63,7 +64,10 @@ export async function getProformaInvoices(
   query = query.range(from, to);
 
   const { data, error, count } = await query;
-  if (error) throw error;
+  if (error) {
+    logDbError("getProformaInvoices", error, { workspaceId });
+    throw error;
+  }
 
   return {
     proformaInvoices: (data ?? []) as unknown as ProformaInvoiceWithClient[],
@@ -85,7 +89,13 @@ export async function getProformaInvoice(
     .is("deleted_at", null)
     .single();
 
-  if (error || !pi) return null;
+  if (error) {
+    if (error.code !== "PGRST116") {
+      logDbError("getProformaInvoice", error, { piId, workspaceId });
+    }
+    return null;
+  }
+  if (!pi) return null;
 
   const { data: lineItems } = await supabase
     .from("line_items")
@@ -124,7 +134,10 @@ export async function getProformaInvoiceRelationships(
     p_document_id: piId,
   });
 
-  if (error) return [];
+  if (error) {
+    logDbError("getProformaInvoiceRelationships (rpc get_document_relationships)", error, { piId, workspaceId });
+    return [];
+  }
   return (data ?? []) as DocumentRelationship[];
 }
 

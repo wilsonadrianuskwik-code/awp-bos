@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { logDbError } from "@/lib/log-db-error";
 import type {
   DocumentRelationship,
   PurchaseOrderDetail,
@@ -66,7 +67,10 @@ export async function getPurchaseOrders(
   query = query.range(from, to);
 
   const { data, error, count } = await query;
-  if (error) throw error;
+  if (error) {
+    logDbError("getPurchaseOrders", error, { workspaceId });
+    throw error;
+  }
 
   return {
     purchaseOrders: (data ?? []) as unknown as PurchaseOrderWithRelations[],
@@ -88,7 +92,13 @@ export async function getPurchaseOrderById(
     .is("deleted_at", null)
     .single();
 
-  if (error || !po) return null;
+  if (error) {
+    if (error.code !== "PGRST116") {
+      logDbError("getPurchaseOrderById", error, { poId, workspaceId });
+    }
+    return null;
+  }
+  if (!po) return null;
 
   const { data: lineItems } = await supabase
     .from("line_items")
@@ -132,7 +142,10 @@ export async function getPurchaseOrderRelationships(
     p_document_id: poId,
   });
 
-  if (error) throw error;
+  if (error) {
+    logDbError("getPurchaseOrderRelationships (rpc get_document_relationships)", error, { poId, workspaceId });
+    throw error;
+  }
   return (data ?? []) as DocumentRelationship[];
 }
 

@@ -18,7 +18,7 @@ export async function withWorkspace<T>(
   } = await supabase.auth.getUser();
   if (!user) return { data: null, error: "Not authenticated" };
 
-  const { data: member } = await supabase
+  const { data: member, error: memberError } = await supabase
     .from("workspace_members")
     .select("role")
     .eq("workspace_id", workspaceId)
@@ -26,6 +26,9 @@ export async function withWorkspace<T>(
     .is("deleted_at", null)
     .single();
 
+  if (memberError && memberError.code !== "PGRST116") {
+    console.error("withWorkspace: member lookup failed", { workspaceId, userId: user.id, memberError });
+  }
   if (!member) return { data: null, error: "Not a workspace member" };
 
   const role = member.role as Role;
@@ -33,11 +36,15 @@ export async function withWorkspace<T>(
     return { data: null, error: "Insufficient permissions" };
   }
 
-  const { data: workspace } = await supabase
+  const { data: workspace, error: workspaceError } = await supabase
     .from("workspaces")
     .select("slug")
     .eq("id", workspaceId)
     .single();
+
+  if (workspaceError && workspaceError.code !== "PGRST116") {
+    console.error("withWorkspace: workspace lookup failed", { workspaceId, workspaceError });
+  }
 
   const workspaceSlug = workspace?.slug;
   if (!workspaceSlug) return { data: null, error: "Workspace not found" };
@@ -47,6 +54,10 @@ export async function withWorkspace<T>(
     return { data: result, error: null };
   } catch (err) {
     const message = err instanceof Error ? err.message : "An error occurred";
+    // withWorkspace wraps every Server Action's DB call — log the real
+    // error here (RPC/PostgREST message, not just "An error occurred")
+    // since the caller only ever sees the string in `message` below.
+    console.error("withWorkspace action failed", { workspaceId, minRole, message, err });
     return { data: null, error: message };
   }
 }

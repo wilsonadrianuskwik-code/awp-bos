@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { logDbError } from "@/lib/log-db-error";
 import type {
   Supplier,
   SupplierFilters,
@@ -36,7 +37,10 @@ export async function getSuppliers(
   query = query.range(from, to);
 
   const { data, error, count } = await query;
-  if (error) throw error;
+  if (error) {
+    logDbError("getSuppliers", error, { workspaceId });
+    throw error;
+  }
 
   return { suppliers: (data ?? []) as Supplier[], count: count ?? 0 };
 }
@@ -91,7 +95,10 @@ export async function getAllSuppliers(workspaceId: string): Promise<Supplier[]> 
     .is("deleted_at", null)
     .order("name", { ascending: true });
 
-  if (error) throw error;
+  if (error) {
+    logDbError("getAllSuppliers", error, { workspaceId });
+    throw error;
+  }
   return (data ?? []) as Supplier[];
 }
 
@@ -108,6 +115,12 @@ export async function getSupplier(
     .is("deleted_at", null)
     .single();
 
-  if (error || !data) return null;
+  if (error) {
+    if (error.code !== "PGRST116") {
+      logDbError("getSupplier", error, { supplierId, workspaceId });
+    }
+    return null;
+  }
+  if (!data) return null;
   return data as Supplier;
 }

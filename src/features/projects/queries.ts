@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { logDbError } from "@/lib/log-db-error";
 import type {
   Project,
   ProjectFilters,
@@ -35,7 +36,10 @@ export async function getProjects(
   query = query.range(from, to);
 
   const { data, error, count } = await query;
-  if (error) throw error;
+  if (error) {
+    logDbError("getProjects", error, { workspaceId });
+    throw error;
+  }
 
   return { projects: (data ?? []) as Project[], count: count ?? 0 };
 }
@@ -75,7 +79,10 @@ export async function getAllProjects(workspaceId: string): Promise<Project[]> {
     .is("deleted_at", null)
     .order("name", { ascending: true });
 
-  if (error) throw error;
+  if (error) {
+    logDbError("getAllProjects", error, { workspaceId });
+    throw error;
+  }
   return data ?? [];
 }
 
@@ -92,7 +99,12 @@ export async function getProjectById(
     .is("deleted_at", null)
     .single();
 
-  if (error) return null;
+  if (error) {
+    if (error.code !== "PGRST116") {
+      logDbError("getProjectById", error, { projectId, workspaceId });
+    }
+    return null;
+  }
   return data;
 }
 
@@ -119,7 +131,10 @@ export async function getProjectHealth(
     p_workspace_id: workspaceId,
   });
 
-  if (error) throw error;
+  if (error) {
+    logDbError("getProjectHealth (rpc get_project_health)", error, { projectId, workspaceId });
+    throw error;
+  }
   return (
     (data as ProjectHealth) ?? {
       quoted_total: 0,

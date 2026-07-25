@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { logDbError } from "@/lib/log-db-error";
 import type {
   DeliveryOrderDetail,
   DeliveryOrderFilters,
@@ -33,7 +34,10 @@ export async function getDeliveryOrders(
   query = query.range((page - 1) * pageSize, page * pageSize - 1);
 
   const { data, count, error } = await query;
-  if (error) throw new Error(error.message);
+  if (error) {
+    logDbError("getDeliveryOrders", error, { workspaceId });
+    throw new Error(error.message);
+  }
 
   return { deliveryOrders: (data ?? []) as unknown as DeliveryOrderWithRelations[], count: count ?? 0 };
 }
@@ -51,7 +55,10 @@ export async function getDeliveryOrdersForInvoice(
     .is("deleted_at", null)
     .order("created_at", { ascending: false });
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    logDbError("getDeliveryOrdersForInvoice", error, { workspaceId, invoiceId });
+    throw new Error(error.message);
+  }
   return (data ?? []) as unknown as DeliveryOrderWithRelations[];
 }
 
@@ -69,7 +76,13 @@ export async function getDeliveryOrderById(
     .is("deleted_at", null)
     .single();
 
-  if (error || !deliveryOrder) return null;
+  if (error) {
+    if (error.code !== "PGRST116") {
+      logDbError("getDeliveryOrderById", error, { workspaceId, deliveryOrderId });
+    }
+    return null;
+  }
+  if (!deliveryOrder) return null;
 
   const { data: lineItems } = await supabase
     .from("line_items")
@@ -91,6 +104,9 @@ export async function getDocumentRelationships(workspaceId: string, documentType
     p_document_type: documentType,
     p_document_id: documentId,
   });
-  if (error) throw new Error(error.message);
+  if (error) {
+    logDbError("getDocumentRelationships (rpc get_document_relationships)", error, { workspaceId, documentType, documentId });
+    throw new Error(error.message);
+  }
   return (data ?? []) as { direction: string; related_type: string; related_id: string; relationship: string }[];
 }
