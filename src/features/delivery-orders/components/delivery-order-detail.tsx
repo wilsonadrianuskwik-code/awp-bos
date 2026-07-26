@@ -159,32 +159,28 @@ export function DeliveryOrderDetailView({
         companyProfile={companyProfile}
         branding={branding}
         documentLabel="Delivery Order"
-        documentNumber={deliveryOrder.do_number}
         party={{
-          heading: "Deliver to",
+          heading: "Deliver To",
           name: deliveryOrder.client?.name ?? "Deleted client",
           lines: [deliveryOrder.client?.company],
         }}
         meta={[
           ...(deliveryOrder.delivery_date
-            ? [{ label: "Delivery date", value: new Date(deliveryOrder.delivery_date).toLocaleDateString() }]
+            ? [{
+                label: "Delivery Date",
+                value: new Date(deliveryOrder.delivery_date).toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            }),
+              }]
             : []),
-          ...(deliveryOrder.invoice
-            ? [{ label: "Invoice", value: deliveryOrder.invoice.invoice_number }]
-            : []),
-          ...(deliveryOrder.project
-            ? [{ label: "Project", value: deliveryOrder.project.code }]
-            : []),
+          { label: "DO Number", value: deliveryOrder.do_number },
         ]}
         lines={deliveryOrder.line_items}
         currency="IDR"
         showPricing={false}
         notes={deliveryOrder.notes}
-        footerNote={
-          deliveryOrder.received_by
-            ? `Received by ${deliveryOrder.received_by}.`
-            : null
-        }
       />
     </>
   );

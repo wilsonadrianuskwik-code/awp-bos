@@ -309,4 +309,11 @@
     background: white;
     color: black;
   }
+  /* Documents carry accent bands and coloured rules; browsers strip
+     backgrounds when printing unless colour adjustment is forced. */
+  .print\:block,
+  .print\:block * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
 }

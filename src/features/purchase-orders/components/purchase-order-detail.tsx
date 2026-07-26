@@ -163,7 +163,6 @@ export function PurchaseOrderDetail({
         companyProfile={companyProfile}
         branding={branding}
         documentLabel="Purchase Order"
-        documentNumber={purchaseOrder.po_number}
         party={{
           heading: "Supplier",
           name: purchaseOrder.supplier?.name ?? "Deleted supplier",
@@ -174,17 +173,34 @@ export function PurchaseOrderDetail({
           ],
         }}
         meta={[
-          { label: "Issue date", value: new Date(purchaseOrder.issue_date).toLocaleDateString() },
-          ...(purchaseOrder.expected_date
-            ? [{ label: "Expected", value: new Date(purchaseOrder.expected_date).toLocaleDateString() }]
-            : []),
-          ...(purchaseOrder.project
-            ? [{ label: "Project", value: purchaseOrder.project.code }]
-            : []),
+          {
+            label: "Issue Date",
+            value: new Date(purchaseOrder.issue_date).toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            }),
+          },
+          { label: "PO Number", value: purchaseOrder.po_number },
         ]}
-        title={purchaseOrder.title}
         lines={purchaseOrder.line_items}
         currency={purchaseOrder.currency}
+        totalRows={[
+          { label: "Subtotal", value: formatCurrency(purchaseOrder.subtotal, purchaseOrder.currency) },
+          ...(purchaseOrder.discount_amount > 0
+            ? [{
+                label: "Discount",
+                value: `(${formatCurrency(purchaseOrder.discount_amount, purchaseOrder.currency)})`,
+              }]
+            : []),
+          ...(purchaseOrder.tax_amount > 0
+            ? [{ label: "PPN", value: formatCurrency(purchaseOrder.tax_amount, purchaseOrder.currency) }]
+            : []),
+        ]}
+        total={{
+          label: "Total",
+          value: formatCurrency(purchaseOrder.total, purchaseOrder.currency),
+        }}
         notes={purchaseOrder.notes}
         terms={purchaseOrder.terms_and_conditions}
       />

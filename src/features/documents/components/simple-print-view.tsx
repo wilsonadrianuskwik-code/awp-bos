@@ -1,9 +1,14 @@
-import {
-  DocumentLetterhead,
-  DocumentPaymentInfo,
-  DocumentSignature,
-} from "@/features/documents/components/document-letterhead";
 import { formatCurrency } from "@/lib/utils/format-currency";
+import {
+  DocumentFootnote,
+  DocumentParties,
+  DocumentShell,
+  DocumentTable,
+  DocumentTableCell,
+  DocumentTableRow,
+  DocumentTotals,
+  type DocumentMetaField,
+} from "@/features/documents/components/document-shell";
 import type {
   BrandingSettings,
   CompanyProfile,
@@ -26,6 +31,8 @@ export type PrintParty = {
   lines: (string | null | undefined)[];
 };
 
+export type PrintTotalRow = { label: string; value: string; muted?: boolean };
+
 type SimplePrintViewProps = {
   workspaceName: string;
   logoUrl?: string | null;
@@ -33,26 +40,22 @@ type SimplePrintViewProps = {
   branding?: BrandingSettings;
   paymentDetails?: PaymentDetails;
   documentLabel: string;
-  documentNumber: string;
   party: PrintParty;
-  meta: { label: string; value: string }[];
-  title?: string | null;
+  meta: DocumentMetaField[];
   lines: PrintLine[];
   currency: string;
   /** Omitted for documents that carry no money (Delivery Orders). */
   showPricing?: boolean;
-  /** Rendered where a totals block belongs — callers pass the tax breakdown. */
-  totals?: React.ReactNode;
+  totalRows?: PrintTotalRow[];
+  total?: { label: string; value: string };
   notes?: string | null;
   terms?: string | null;
-  footerNote?: string | null;
 };
 
 /**
- * The shared print/PDF layout for document types that don't have a
- * bespoke one (Proforma Invoice, Purchase Order, Delivery Order). Same
- * masthead and signature block as Invoice/Quotation so everything the
- * business sends out looks like it came from one company.
+ * The print layout for Proforma Invoice, Purchase Order and Delivery
+ * Order. Composes the same shell as Invoice and Quotation, so all five
+ * document types are the same document with different content.
  */
 export function SimplePrintView({
   workspaceName,
@@ -61,122 +64,84 @@ export function SimplePrintView({
   branding,
   paymentDetails,
   documentLabel,
-  documentNumber,
   party,
   meta,
-  title,
   lines,
   currency,
   showPricing = true,
-  totals,
+  totalRows,
+  total,
   notes,
   terms,
-  footerNote,
 }: SimplePrintViewProps) {
   const fmt = (value: number) => formatCurrency(value, currency);
 
   return (
-    <div className="hidden print:block print:text-black">
-      <DocumentLetterhead
-        workspaceName={workspaceName}
-        logoUrl={logoUrl}
-        tagline={branding?.tagline}
-        companyProfile={companyProfile}
-        documentLabel={documentLabel}
-        documentNumber={documentNumber}
+    <DocumentShell
+      documentLabel={documentLabel}
+      companyName={companyProfile?.display_name || workspaceName}
+      logoUrl={logoUrl}
+    >
+      <DocumentParties
+        partyHeading={party.heading}
+        partyName={party.name}
+        partyLines={party.lines}
+        fields={meta}
       />
 
-      <div className="mt-6 grid grid-cols-2 gap-6 text-sm">
-        <div>
-          <p className="font-semibold text-gray-500">{party.heading}</p>
-          <p className="font-medium">{party.name}</p>
-          {party.lines.filter(Boolean).map((line, i) => (
-            <p key={i}>{line}</p>
-          ))}
-        </div>
-        <div className="text-right">
-          {meta.map((m) => (
-            <p key={m.label}>
-              <span className="text-gray-500">{m.label}: </span>
-              {m.value}
-            </p>
-          ))}
-        </div>
-      </div>
-
-      {title && <h3 className="mt-6 text-lg font-semibold">{title}</h3>}
-
-      <table className="mt-6 w-full text-sm">
-        <thead>
-          <tr className="border-b-2 text-left">
-            <th className="py-2">Description</th>
-            <th className="py-2 text-right">Qty</th>
+      <DocumentTable
+        columns={[
+          { key: "description", label: "Description" },
+          { key: "quantity", label: "Quantity", align: "right", className: "w-28" },
+          ...(showPricing
+            ? [
+                {
+                  key: "unit_price",
+                  label: "Unit Price",
+                  align: "right" as const,
+                  className: "w-36",
+                },
+                {
+                  key: "amount",
+                  label: "Amount",
+                  align: "right" as const,
+                  className: "w-36",
+                },
+              ]
+            : []),
+        ]}
+      >
+        {lines.map((item) => (
+          <DocumentTableRow key={item.id}>
+            <DocumentTableCell>{item.description}</DocumentTableCell>
+            <DocumentTableCell align="right">
+              {item.quantity}
+              {item.unit ? ` ${item.unit}` : ""}
+            </DocumentTableCell>
             {showPricing && (
               <>
-                <th className="py-2 text-right">Unit Price</th>
-                <th className="py-2 text-right">Disc.</th>
-                <th className="py-2 text-right">Total</th>
+                <DocumentTableCell align="right" className="tabular-nums">
+                  {fmt(item.unit_price ?? 0)}
+                </DocumentTableCell>
+                <DocumentTableCell align="right" className="tabular-nums">
+                  {fmt(item.line_total ?? 0)}
+                </DocumentTableCell>
               </>
             )}
-          </tr>
-        </thead>
-        <tbody>
-          {lines.map((item) => (
-            <tr key={item.id} className="border-b">
-              <td className="py-1.5">{item.description}</td>
-              <td className="py-1.5 text-right">
-                {item.quantity}
-                {item.unit ? ` ${item.unit}` : ""}
-              </td>
-              {showPricing && (
-                <>
-                  <td className="py-1.5 text-right">{fmt(item.unit_price ?? 0)}</td>
-                  <td className="py-1.5 text-right">
-                    {item.discount_percent ? `${item.discount_percent}%` : "-"}
-                  </td>
-                  <td className="py-1.5 text-right font-medium">
-                    {fmt(item.line_total ?? 0)}
-                  </td>
-                </>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          </DocumentTableRow>
+        ))}
+      </DocumentTable>
 
-      {totals && (
-        <div className="mt-4 flex justify-end">
-          <div className="w-72">{totals}</div>
-        </div>
+      {showPricing && (totalRows?.length || total) && (
+        <DocumentTotals rows={totalRows ?? []} total={total} />
       )}
 
-      {notes && (
-        <div className="mt-6 text-sm">
-          <p className="font-semibold">Notes</p>
-          <div
-            className="mt-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
-            dangerouslySetInnerHTML={{ __html: notes }}
-          />
-        </div>
-      )}
-
-      {terms && (
-        <div className="mt-4 text-sm">
-          <p className="font-semibold">Terms &amp; Conditions</p>
-          <div
-            className="mt-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
-            dangerouslySetInnerHTML={{ __html: terms }}
-          />
-        </div>
-      )}
-
-      {footerNote && (
-        <p className="mt-8 text-center text-xs text-gray-500">{footerNote}</p>
-      )}
-
-      <DocumentPaymentInfo bankAccounts={paymentDetails?.bank_accounts} />
-
-      <DocumentSignature branding={branding} />
-    </div>
+      <DocumentFootnote
+        paymentDetails={paymentDetails}
+        branding={branding}
+        notes={notes}
+        terms={terms}
+      />
+    </DocumentShell>
   );
 }

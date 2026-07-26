@@ -14,6 +14,11 @@ import { LinkedDocumentsCard } from "@/features/documents/components/linked-docu
 import { TaxSettingsCard } from "@/features/documents/components/tax-settings-card";
 import { TaxBreakdownBlock } from "@/features/documents/components/tax-breakdown";
 import { SimplePrintView } from "@/features/documents/components/simple-print-view";
+import {
+  computeTaxBreakdown,
+  dppLabel,
+  formatPercent,
+} from "@/features/documents/tax";
 import { PrintButton } from "@/features/documents/components/print-button";
 import { ProformaInvoiceStatusActions } from "./proforma-invoice-status-actions";
 import { formatCurrency } from "@/lib/utils/format-currency";
@@ -75,6 +80,40 @@ export function ProformaInvoiceDetail({
 
   const canGenerateInvoice =
     proformaInvoice.status === "accepted" && !proformaInvoice.generated_invoice_id;
+
+  const fmtPi = (value: number) =>
+    formatCurrency(value, proformaInvoice.currency);
+  const piSettings = {
+    dpp_numerator: proformaInvoice.dpp_numerator,
+    dpp_denominator: proformaInvoice.dpp_denominator,
+    ppn_percent: proformaInvoice.ppn_percent,
+    pph_percent: proformaInvoice.pph_percent,
+    retensi_percent: proformaInvoice.retensi_percent,
+    show_dpp: proformaInvoice.show_dpp,
+  };
+  const piBreakdown = computeTaxBreakdown(
+    proformaInvoice.subtotal - proformaInvoice.discount_amount,
+    piSettings
+  );
+  const piTotalRows = [
+    { label: "Total Harga Jual", value: fmtPi(piBreakdown.hargaJual) },
+    ...(piSettings.show_dpp
+      ? [{ label: dppLabel(piSettings), value: fmtPi(piBreakdown.dppAmount) }]
+      : []),
+    { label: "PPN", value: fmtPi(piBreakdown.ppnAmount) },
+    ...(piSettings.pph_percent !== null
+      ? [{
+          label: `Potong PPH ${formatPercent(piSettings.pph_percent)}%`,
+          value: `(${fmtPi(piBreakdown.pphAmount)})`,
+        }]
+      : []),
+    ...(piSettings.retensi_percent !== null
+      ? [{
+          label: `Potong Retensi ${formatPercent(piSettings.retensi_percent)}%`,
+          value: `(${fmtPi(piBreakdown.retensiAmount)})`,
+        }]
+      : []),
+  ];
 
   return (
     <>
@@ -218,40 +257,29 @@ export function ProformaInvoiceDetail({
         branding={branding}
         paymentDetails={paymentDetails}
         documentLabel="Proforma Invoice"
-        documentNumber={proformaInvoice.pi_number}
         party={{
-          heading: "Billed to",
+          heading: "Bill To",
           name: proformaInvoice.client?.name ?? "Deleted client",
           lines: [
             proformaInvoice.client?.company,
             proformaInvoice.client?.email,
-            proformaInvoice.client?.phone,
           ],
         }}
         meta={[
-          { label: "Issue date", value: new Date(proformaInvoice.issue_date).toLocaleDateString() },
-          ...(proformaInvoice.expiry_date
-            ? [{ label: "Valid until", value: new Date(proformaInvoice.expiry_date).toLocaleDateString() }]
-            : []),
+          {
+            label: "Issue Date",
+            value: new Date(proformaInvoice.issue_date).toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            }),
+          },
+          { label: "PI Number", value: proformaInvoice.pi_number },
         ]}
-        title={proformaInvoice.title}
         lines={proformaInvoice.line_items}
         currency={proformaInvoice.currency}
-        totals={
-          <TaxBreakdownBlock
-            hargaJual={proformaInvoice.subtotal - proformaInvoice.discount_amount}
-            currency={proformaInvoice.currency}
-            settings={{
-              dpp_numerator: proformaInvoice.dpp_numerator,
-              dpp_denominator: proformaInvoice.dpp_denominator,
-              ppn_percent: proformaInvoice.ppn_percent,
-              pph_percent: proformaInvoice.pph_percent,
-              retensi_percent: proformaInvoice.retensi_percent,
-              show_dpp: proformaInvoice.show_dpp,
-            }}
-            dense
-          />
-        }
+        totalRows={piTotalRows}
+        total={{ label: "Total", value: fmtPi(piBreakdown.total) }}
         notes={proformaInvoice.notes}
         terms={proformaInvoice.terms_and_conditions}
       />
