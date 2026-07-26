@@ -6,7 +6,6 @@ import type { BrandingSettings, PaymentDetails } from "@/features/templates/type
  * rather than a hunt through five print views.
  */
 export const DOC_ACCENT = "#00A651";
-const DOC_INK = "#1F2933";
 
 /**
  * Backgrounds and coloured rules are stripped by browsers when printing
@@ -16,24 +15,14 @@ const DOC_INK = "#1F2933";
 const EXACT_COLOR = "[print-color-adjust:exact] [-webkit-print-color-adjust:exact]";
 
 /**
- * The two-tone band that frames the top and bottom of every document —
- * accent on the long side, ink on the short side.
+ * The solid accent band that frames the top and bottom of every document.
  */
-function AccentBand({ flipped = false }: { flipped?: boolean }) {
+function AccentBand() {
   return (
-    <div className={`flex h-[7px] w-full ${EXACT_COLOR}`}>
-      {flipped ? (
-        <>
-          <div className="w-[62%]" style={{ backgroundColor: DOC_ACCENT }} />
-          <div className="flex-1" style={{ backgroundColor: DOC_INK }} />
-        </>
-      ) : (
-        <>
-          <div className="flex-1" style={{ backgroundColor: DOC_ACCENT }} />
-          <div className="w-[38%]" style={{ backgroundColor: DOC_INK }} />
-        </>
-      )}
-    </div>
+    <div
+      className={`h-[7px] w-full ${EXACT_COLOR}`}
+      style={{ backgroundColor: DOC_ACCENT }}
+    />
   );
 }
 
@@ -70,17 +59,17 @@ export function DocumentShell({
           <img
             src={logoUrl}
             alt={companyName}
-            className="h-[66px] w-[66px] shrink-0 object-contain"
+            className="h-[82px] w-[82px] shrink-0 object-contain"
           />
         )}
         <div className="min-w-0">
           <p
-            className={`text-[24px] font-extrabold uppercase leading-tight tracking-tight ${EXACT_COLOR}`}
+            className={`text-[29px] font-extrabold uppercase leading-tight tracking-tight ${EXACT_COLOR}`}
             style={{ color: DOC_ACCENT }}
           >
             {documentLabel}
           </p>
-          <h1 className="text-[24px] font-extrabold uppercase leading-tight tracking-tight">
+          <h1 className="text-[29px] font-extrabold uppercase leading-tight tracking-tight">
             {companyName}
           </h1>
         </div>
@@ -91,7 +80,7 @@ export function DocumentShell({
       <div className="pt-6">{children}</div>
 
       <div className="mt-6">
-        <AccentBand flipped />
+        <AccentBand />
       </div>
     </div>
   );
@@ -172,7 +161,7 @@ export function DocumentTable({
   children: React.ReactNode;
 }) {
   return (
-    <table className="mt-6 w-full border-collapse">
+    <table className="mt-10 w-full border-collapse">
       <thead>
         <tr>
           {columns.map((col) => (
@@ -330,11 +319,7 @@ export function DocumentFootnote({
 
       {(hasPayment || hasSignature) && (
         <>
-          <div
-            className={`mt-8 ${EXACT_COLOR}`}
-            style={{ borderTop: `2px solid ${DOC_ACCENT}` }}
-          />
-          <div className="flex items-start justify-between gap-10 break-inside-avoid pt-4">
+          <div className="mt-10 flex items-start justify-between gap-10 break-inside-avoid">
             <div className="min-w-0">
               {hasPayment && (
                 <>
