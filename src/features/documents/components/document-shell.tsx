@@ -64,23 +64,23 @@ export function DocumentShell({
 }: DocumentShellProps) {
   return (
     <div className="hidden text-[#1f2933] print:block">
-      <div className="flex items-center gap-6 pb-5">
+      <div className="flex items-center gap-5 pb-3">
         {logoUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={logoUrl}
             alt={companyName}
-            className="h-[84px] w-[84px] shrink-0 object-contain"
+            className="h-[66px] w-[66px] shrink-0 object-contain"
           />
         )}
         <div className="min-w-0">
           <p
-            className={`text-[15px] font-bold uppercase tracking-[0.08em] ${EXACT_COLOR}`}
+            className={`text-[24px] font-extrabold uppercase leading-tight tracking-tight ${EXACT_COLOR}`}
             style={{ color: DOC_ACCENT }}
           >
             {documentLabel}
           </p>
-          <h1 className="mt-0.5 text-[28px] font-extrabold uppercase leading-tight tracking-tight">
+          <h1 className="text-[24px] font-extrabold uppercase leading-tight tracking-tight">
             {companyName}
           </h1>
         </div>
@@ -88,9 +88,9 @@ export function DocumentShell({
 
       <AccentBand />
 
-      <div className="pt-8">{children}</div>
+      <div className="pt-6">{children}</div>
 
-      <div className="mt-10">
+      <div className="mt-6">
         <AccentBand flipped />
       </div>
     </div>
@@ -172,7 +172,7 @@ export function DocumentTable({
   children: React.ReactNode;
 }) {
   return (
-    <table className="mt-12 w-full border-collapse">
+    <table className="mt-6 w-full border-collapse">
       <thead>
         <tr>
           {columns.map((col) => (
@@ -213,7 +213,7 @@ export function DocumentTableCell({
   const alignClass =
     align === "right" ? "text-right" : align === "center" ? "text-center" : "text-left";
   return (
-    <td className={`py-3 text-[13px] ${alignClass} ${className}`}>{children}</td>
+    <td className={`py-2 text-[13px] ${alignClass} ${className}`}>{children}</td>
   );
 }
 
@@ -229,12 +229,12 @@ export function DocumentTotals({
   total?: { label: string; value: string };
 }) {
   return (
-    <div className="mt-10 flex justify-end">
+    <div className="mt-6 flex justify-end break-inside-avoid">
       <div className="w-[52%] min-w-[280px]">
         {rows.map((row) => (
           <div
             key={row.label}
-            className="flex items-baseline justify-between py-2 text-[13px]"
+            className="flex items-baseline justify-between py-1.5 text-[13px]"
           >
             <span className={row.muted ? "text-gray-500" : "text-gray-800"}>
               {row.label}
@@ -244,7 +244,7 @@ export function DocumentTotals({
         ))}
         {total && (
           <div
-            className={`mt-2 flex items-baseline justify-between pt-3 ${EXACT_COLOR}`}
+            className={`mt-1.5 flex items-baseline justify-between pt-2.5 ${EXACT_COLOR}`}
             style={{ borderTop: `2.5px solid ${DOC_ACCENT}` }}
           >
             <span
@@ -296,7 +296,7 @@ export function DocumentFootnote({
   return (
     <>
       {(notes || terms) && (
-        <div className="mt-10 space-y-4 text-[12px]">
+        <div className="mt-6 space-y-3 break-inside-avoid text-[12px]">
           {notes && (
             <div>
               <p
@@ -331,10 +331,10 @@ export function DocumentFootnote({
       {(hasPayment || hasSignature) && (
         <>
           <div
-            className={`mt-12 ${EXACT_COLOR}`}
+            className={`mt-8 ${EXACT_COLOR}`}
             style={{ borderTop: `2px solid ${DOC_ACCENT}` }}
           />
-          <div className="flex items-start justify-between gap-10 pt-5">
+          <div className="flex items-start justify-between gap-10 break-inside-avoid pt-4">
             <div className="min-w-0">
               {hasPayment && (
                 <>
@@ -390,10 +390,10 @@ export function DocumentFootnote({
                   <img
                     src={signatureUrl}
                     alt={signatoryName ? `Signature of ${signatoryName}` : "Signature"}
-                    className="mx-auto mt-2 h-[72px] w-auto max-w-[220px] object-contain"
+                    className="mx-auto mt-1.5 h-[62px] w-auto max-w-[220px] object-contain"
                   />
                 ) : (
-                  <div className="h-[72px]" />
+                  <div className="h-[62px]" />
                 )}
 
                 <div

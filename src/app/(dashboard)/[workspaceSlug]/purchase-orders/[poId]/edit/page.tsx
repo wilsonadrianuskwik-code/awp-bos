@@ -19,7 +19,13 @@ export default async function EditPurchaseOrderPage({
   const purchaseOrder = await getPurchaseOrderById(poId, workspace.id);
   if (!purchaseOrder) notFound();
 
-  if (purchaseOrder.status !== "draft") {
+  // Mirrors update_purchase_order (00087): locked once goods start
+  // arriving, since edits would contradict what was physically delivered.
+  if (
+    ["cancelled", "partially_received", "received"].includes(
+      purchaseOrder.status
+    )
+  ) {
     redirect(`/${workspaceSlug}/purchase-orders/${poId}`);
   }
 

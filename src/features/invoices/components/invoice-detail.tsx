@@ -291,7 +291,11 @@ export function InvoiceDetail({
                 retensi_percent: invoice.retensi_percent,
               show_dpp: invoice.show_dpp,
               }}
-              editable={invoice.status === "draft"}
+              // Same rule as the builder: editable until a payment lands.
+              editable={
+                !["cancelled", "refunded"].includes(invoice.status) &&
+                (invoice.amount_paid ?? 0) === 0
+              }
             />
 
             <Card id="payments" className="scroll-mt-6">

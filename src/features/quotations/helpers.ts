@@ -22,8 +22,12 @@ export function isTerminalStatus(status: QuotationStatus): boolean {
   );
 }
 
+// Mirrors update_quotation (00087): a quotation stays editable until it
+// reaches a terminal state. A client asking for changes after it was sent
+// is ordinary business, and re-issuing under a new number would break the
+// reference they're already holding.
 export function isEditableStatus(status: QuotationStatus): boolean {
-  return status === "draft" || status === "revision_requested";
+  return !["rejected", "expired", "cancelled"].includes(status);
 }
 
 export function canTransition(

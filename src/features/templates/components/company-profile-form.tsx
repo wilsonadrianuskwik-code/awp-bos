@@ -84,7 +84,11 @@ export function CompanyProfileForm({ workspaceId, companyProfile }: CompanyProfi
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label>Company name</Label>
-            <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} disabled={!canEdit} placeholder="Acme Design Studio" />
+            <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} disabled={!canEdit} placeholder="PT Andalan Warna Prima" />
+            <p className="text-xs text-muted-foreground">
+              Printed as the letterhead on every document. Falls back to the
+              workspace name when blank.
+            </p>
           </div>
           <div className="space-y-2">
             <Label>Email</Label>

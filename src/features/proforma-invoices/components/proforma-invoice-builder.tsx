@@ -150,7 +150,12 @@ export function ProformaInvoiceBuilder({
   const lastSavedRef = useRef<string>("");
   const isFirstRender = useRef(true);
 
-  const isEditable = !proformaInvoice || proformaInvoice.status === "draft";
+  // Mirrors update_proforma_invoice (00087): editable until it's been
+  // cancelled, expired, or converted — once it becomes an Invoice, that
+  // Invoice is the live document.
+  const isEditable =
+    !proformaInvoice ||
+    !["cancelled", "expired", "converted"].includes(proformaInvoice.status);
 
   const submittableLineItems = lineItems.filter(
     (item) => item.description.trim() !== ""

@@ -152,10 +152,11 @@ export function QuotationBuilder({
     null
   );
 
+  // Mirrors update_quotation (00087): editable until a terminal state.
+  // A client asking for changes after it was sent is ordinary business.
   const isEditable =
     !quotation ||
-    quotation.status === "draft" ||
-    quotation.status === "revision_requested";
+    !["rejected", "expired", "cancelled"].includes(quotation.status);
 
   // A freshly-added row (via "Add Package/Add-on/Per-unit") starts with an
   // empty description. It stays visible in its tab so nothing the user

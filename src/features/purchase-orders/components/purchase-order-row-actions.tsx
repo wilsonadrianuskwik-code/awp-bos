@@ -33,7 +33,11 @@ export function PurchaseOrderRowActions({ purchaseOrder }: PurchaseOrderRowActio
   const confirm = useConfirm();
 
   const href = `/${workspace.slug}/purchase-orders/${purchaseOrder.id}`;
-  const editable = purchaseOrder.status === "draft";
+  // Mirrors update_purchase_order (00087): locked once goods start
+  // arriving, since edits would contradict what was physically delivered.
+  const editable = !["cancelled", "partially_received", "received"].includes(
+    purchaseOrder.status
+  );
   const canSend = purchaseOrder.status === "draft";
   const canCancel = ["draft", "sent", "acknowledged"].includes(purchaseOrder.status);
 

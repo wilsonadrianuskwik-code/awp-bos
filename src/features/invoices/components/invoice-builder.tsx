@@ -165,7 +165,13 @@ export function InvoiceBuilder({
     null
   );
 
-  const isEditable = !invoice || invoice.status === "draft";
+  // Mirrors update_invoice (00087): what locks an invoice is money having
+  // moved against it, not it having been sent. A client asking for a
+  // revision after issue is ordinary business.
+  const isEditable =
+    !invoice ||
+    (!["cancelled", "refunded"].includes(invoice.status) &&
+      (invoice.amount_paid ?? 0) === 0);
 
   // A freshly-added row (via "Add Package/Add-on/Per-unit") starts with an
   // empty description. It stays visible in its tab so nothing the user

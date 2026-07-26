@@ -144,7 +144,14 @@ export function PurchaseOrderBuilder({
   const isFirstRender = useRef(true);
   const removedItemRef = useRef<{ item: LineItemInput; index: number } | null>(null);
 
-  const isEditable = !purchaseOrder || purchaseOrder.status === "draft";
+  // Mirrors update_purchase_order (00087): editable until goods start
+  // arriving — changing quantities after a receipt would contradict what
+  // was physically delivered.
+  const isEditable =
+    !purchaseOrder ||
+    !["cancelled", "partially_received", "received"].includes(
+      purchaseOrder.status
+    );
 
   const submittableLineItems = lineItems.filter((item) => item.description.trim() !== "");
 

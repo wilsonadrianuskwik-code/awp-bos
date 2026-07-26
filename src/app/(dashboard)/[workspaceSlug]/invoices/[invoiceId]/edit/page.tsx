@@ -19,7 +19,12 @@ export default async function EditInvoicePage({
   const invoice = await getInvoice(invoiceId, workspace.id);
   if (!invoice) notFound();
 
-  if (invoice.status !== "draft") {
+  // Mirrors update_invoice (00087): only money having moved against the
+  // invoice locks it, not it having been sent.
+  const locked =
+    ["cancelled", "refunded"].includes(invoice.status) ||
+    (invoice.amount_paid ?? 0) > 0;
+  if (locked) {
     redirect(`/${workspaceSlug}/invoices/${invoiceId}`);
   }
 

@@ -56,7 +56,11 @@ export function InvoiceRowActions({ invoice }: InvoiceRowActionsProps) {
   const confirm = useConfirm();
 
   const href = `/${workspace.slug}/invoices/${invoice.id}`;
-  const editable = invoice.status === "draft";
+  // Mirrors update_invoice (00087): what locks an invoice is money having
+  // moved against it, not it having been sent.
+  const editable =
+    !["cancelled", "refunded"].includes(invoice.status) &&
+    (invoice.amount_paid ?? 0) === 0;
   const portalUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/portal/invoices/${invoice.share_token}`;
 
   const canSend = invoice.status === "draft";
