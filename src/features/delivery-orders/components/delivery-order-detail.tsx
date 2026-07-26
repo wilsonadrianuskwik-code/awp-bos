@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { updateDeliveryOrderStatus } from "@/features/delivery-orders/actions";
 import { DELIVERY_ORDER_STATUSES, type DeliveryOrderDetail } from "@/features/delivery-orders/types";
 import { SimplePrintView } from "@/features/documents/components/simple-print-view";
-import { formatIndonesianDate } from "@/features/documents/components/document-letterhead";
 import { PrintButton } from "@/features/documents/components/print-button";
 import type { BrandingSettings, CompanyProfile } from "@/features/templates/types";
 
@@ -160,23 +159,32 @@ export function DeliveryOrderDetailView({
         companyProfile={companyProfile}
         branding={branding}
         documentLabel="Delivery Order"
+        documentNumber={deliveryOrder.do_number}
+        party={{
+          heading: "Deliver to",
+          name: deliveryOrder.client?.name ?? "Deleted client",
+          lines: [deliveryOrder.client?.company],
+        }}
         meta={[
-          { label: "Nomor", value: deliveryOrder.do_number },
           ...(deliveryOrder.delivery_date
-            ? [{ label: "Tanggal", value: formatIndonesianDate(deliveryOrder.delivery_date) }]
+            ? [{ label: "Delivery date", value: new Date(deliveryOrder.delivery_date).toLocaleDateString() }]
             : []),
-          { label: "Kepada", value: deliveryOrder.client?.name ?? "-" },
           ...(deliveryOrder.invoice
             ? [{ label: "Invoice", value: deliveryOrder.invoice.invoice_number }]
             : []),
           ...(deliveryOrder.project
-            ? [{ label: "Proyek", value: deliveryOrder.project.code }]
+            ? [{ label: "Project", value: deliveryOrder.project.code }]
             : []),
         ]}
         lines={deliveryOrder.line_items}
         currency="IDR"
         showPricing={false}
         notes={deliveryOrder.notes}
+        footerNote={
+          deliveryOrder.received_by
+            ? `Received by ${deliveryOrder.received_by}.`
+            : null
+        }
       />
     </>
   );

@@ -17,7 +17,6 @@ import type {
 import type { Activity } from "@/features/activities/types";
 import type { BrandingSettings, CompanyProfile } from "@/features/templates/types";
 import { SimplePrintView } from "@/features/documents/components/simple-print-view";
-import { formatIndonesianDate } from "@/features/documents/components/document-letterhead";
 import { PrintButton } from "@/features/documents/components/print-button";
 
 type PurchaseOrderDetailProps = {
@@ -164,12 +163,23 @@ export function PurchaseOrderDetail({
         companyProfile={companyProfile}
         branding={branding}
         documentLabel="Purchase Order"
+        documentNumber={purchaseOrder.po_number}
+        party={{
+          heading: "Supplier",
+          name: purchaseOrder.supplier?.name ?? "Deleted supplier",
+          lines: [
+            purchaseOrder.supplier?.company,
+            purchaseOrder.supplier?.email,
+            purchaseOrder.supplier?.phone,
+          ],
+        }}
         meta={[
-          { label: "Nomor", value: purchaseOrder.po_number },
-          { label: "Tanggal", value: formatIndonesianDate(purchaseOrder.issue_date) },
-          { label: "Kepada", value: purchaseOrder.supplier?.name ?? "-" },
+          { label: "Issue date", value: new Date(purchaseOrder.issue_date).toLocaleDateString() },
+          ...(purchaseOrder.expected_date
+            ? [{ label: "Expected", value: new Date(purchaseOrder.expected_date).toLocaleDateString() }]
+            : []),
           ...(purchaseOrder.project
-            ? [{ label: "Proyek", value: purchaseOrder.project.code }]
+            ? [{ label: "Project", value: purchaseOrder.project.code }]
             : []),
         ]}
         title={purchaseOrder.title}

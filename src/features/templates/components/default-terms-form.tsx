@@ -91,7 +91,7 @@ export function DefaultTermsForm({ workspaceId, defaultTerms }: DefaultTermsForm
               value={invoiceNotes}
               onChange={(e) => setInvoiceNotes(e.target.value)}
               disabled={!canEdit}
-              placeholder="e.g. Barang yang sudah dibeli tidak dapat dikembalikan"
+              placeholder="e.g. Thank you for your business!"
               rows={3}
             />
           </div>

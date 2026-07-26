@@ -38,3 +38,27 @@ WHERE dt.deleted_at IS NULL
         OR (b->'config'->>'show_page_numbers')::boolean IS TRUE
       )
   );
+
+-- Enable the signature block wherever it exists but was left off (it
+-- shipped disabled by default). It renders the workspace's configured
+-- signatory, and falls back to the blank ruled lines it always drew when
+-- no signatory is set up — so enabling it can't produce a stray empty
+-- signature area for workspaces that haven't configured one.
+UPDATE document_templates dt
+SET blocks = (
+  SELECT jsonb_agg(
+    CASE
+      WHEN block->>'type' = 'signature' AND block->>'enabled' = 'false'
+      THEN jsonb_set(block, '{enabled}', 'true'::jsonb)
+      ELSE block
+    END
+    ORDER BY ord
+  )
+  FROM jsonb_array_elements(dt.blocks) WITH ORDINALITY AS t(block, ord)
+),
+updated_at = now()
+WHERE dt.deleted_at IS NULL
+  AND EXISTS (
+    SELECT 1 FROM jsonb_array_elements(dt.blocks) b
+    WHERE b->>'type' = 'signature' AND b->>'enabled' = 'false'
+  );

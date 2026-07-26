@@ -33,7 +33,6 @@ export default async function ProformaInvoiceDetailRoute({
       logoUrl={workspace.logo_url}
       companyProfile={workspace.settings?.company_profile}
       branding={workspace.settings?.branding}
-      paymentDetails={workspace.settings?.payment_details}
     />
   );
 }

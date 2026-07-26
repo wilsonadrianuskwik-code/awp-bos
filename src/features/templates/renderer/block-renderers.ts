@@ -621,18 +621,18 @@ function renderSignature(block: TemplateBlock, data: DocumentRenderData): string
   const hasConfiguredSignatory = !!(branding?.signatory_name || branding?.signature_url);
 
   const configuredBox = () => `
-    <div style="flex:1; text-align:center;">
+    <div style="width:230px; flex:0 0 230px; text-align:center;">
       <div style="font-size:9pt; font-weight:600; color:var(--t-text);">${escapeHtml(branding?.signature_label || "Hormat kami,")}</div>
-      <div style="position:relative; height:70px; margin-top:6px;">
-        ${branding?.signature_url ? `<img src="${escapeHtml(branding.signature_url)}" alt="${escapeHtml(branding?.signatory_name ?? "Signature")}" style="position:absolute; left:0; right:0; margin:0 auto; height:70px; max-width:100%; object-fit:contain;">` : ""}
-        ${branding?.signatory_company ? `<div style="position:absolute; left:0; right:0; top:50%; transform:translateY(-50%); border:1px solid var(--t-muted); padding:2px 6px; font-size:8.5pt; font-weight:500; color:var(--t-text);">${escapeHtml(branding.signatory_company)}</div>` : ""}
+      <div style="position:relative; height:74px; margin-top:4px;">
+        ${branding?.signatory_company ? `<div style="position:absolute; left:0; right:0; top:50%; transform:translateY(-50%); border:1px solid var(--t-text); padding:3px 6px; font-size:8.5pt; font-weight:600; color:var(--t-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(branding.signatory_company)}</div>` : ""}
+        ${branding?.signature_url ? `<img src="${escapeHtml(branding.signature_url)}" alt="${escapeHtml(branding?.signatory_name ?? "Signature")}" style="position:absolute; left:50%; top:0; transform:translateX(-50%); height:74px; max-width:200px; object-fit:contain; z-index:1;">` : ""}
       </div>
       ${branding?.signatory_name ? `<div style="font-size:9pt; font-weight:600; margin-top:4px; color:var(--t-text);">(${escapeHtml(branding.signatory_name)})</div>` : ""}
       ${branding?.signatory_title ? `<div style="font-size:8pt; color:var(--t-muted);">${escapeHtml(branding.signatory_title)}</div>` : ""}
     </div>`;
 
   const blankBox = (sig: { label: string; show_name_line?: boolean; show_date_line?: boolean; show_title_line?: boolean }) => `
-    <div style="flex:1;">
+    <div style="width:230px; flex:0 0 230px;">
       <div style="border-bottom:1px solid var(--t-text); height:40px;"></div>
       <div style="font-size:9pt; color:var(--t-muted); margin-top:4px;">${escapeHtml(sig.label)}</div>
       ${sig.show_name_line ? `<div style="font-size:8pt; color:var(--t-muted);">Name</div>` : ""}
@@ -648,7 +648,10 @@ function renderSignature(block: TemplateBlock, data: DocumentRenderData): string
 
   if (boxes.length === 0) return "";
 
-  const wrapperStyle = layout === "side_by_side" ? "display:flex; gap:24px;" : "display:flex; flex-direction:column; gap:16px;";
+  const wrapperStyle =
+    layout === "side_by_side"
+      ? "display:flex; justify-content:flex-start; gap:32px;"
+      : "display:flex; flex-direction:column; align-items:flex-start; gap:16px;";
   return `<div style="${wrapperStyle}">${boxes.join("")}</div>`;
 }
 
