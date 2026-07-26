@@ -300,12 +300,18 @@ export function QuotationBuilder({
     if (!saved) return;
 
     const id = quotationId ?? saved.id;
-    const statusResult = await updateQuotationStatus(workspace.id, id, "sent");
-    if (statusResult.error) {
-      toast(statusResult.error, "error");
-      return;
+    // Re-sending an already-issued document is a revision, not a status
+    // change: the transition only applies on the way out of draft. Asking
+    // for sent -> sent is what the RPC (correctly) rejects.
+    const alreadyIssued = !["draft", "revision_requested"].includes(saved.status);
+    if (!alreadyIssued) {
+      const statusResult = await updateQuotationStatus(workspace.id, id, "sent");
+      if (statusResult.error) {
+        toast(statusResult.error, "error");
+        return;
+      }
     }
-    toast("Quotation sent", "success");
+    toast(alreadyIssued ? "Quotation updated and re-sent" : "Quotation sent", "success");
     router.push(`/${workspace.slug}/quotations/${id}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPayload, saveDraft, quotationId, workspace.id, workspace.slug]);

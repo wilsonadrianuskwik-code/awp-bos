@@ -280,12 +280,20 @@ export function ProformaInvoiceBuilder({
     if (!saved) return;
 
     const id = piId ?? saved.id;
-    const statusResult = await updateProformaInvoiceStatus(workspace.id, id, "sent");
-    if (statusResult.error) {
-      toast(statusResult.error, "error");
-      return;
+    const alreadyIssued = saved.status !== "draft";
+    if (!alreadyIssued) {
+      const statusResult = await updateProformaInvoiceStatus(workspace.id, id, "sent");
+      if (statusResult.error) {
+        toast(statusResult.error, "error");
+        return;
+      }
     }
-    toast("Proforma invoice sent", "success");
+    toast(
+      alreadyIssued
+        ? "Proforma invoice updated and re-sent"
+        : "Proforma invoice sent",
+      "success"
+    );
     router.push(`/${workspace.slug}/proforma-invoices/${id}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPayload, saveDraft, piId, workspace.id, workspace.slug]);

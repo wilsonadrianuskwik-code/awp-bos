@@ -329,12 +329,17 @@ export function InvoiceBuilder({
     if (!saved) return;
 
     const id = invoiceId ?? saved.id;
-    const statusResult = await updateInvoiceStatus(workspace.id, id, "sent");
-    if (statusResult.error) {
-      toast(statusResult.error, "error");
-      return;
+    // See the quotation builder: only a draft transitions on send; a
+    // revision to an already-issued invoice just saves and re-notifies.
+    const alreadyIssued = saved.status !== "draft";
+    if (!alreadyIssued) {
+      const statusResult = await updateInvoiceStatus(workspace.id, id, "sent");
+      if (statusResult.error) {
+        toast(statusResult.error, "error");
+        return;
+      }
     }
-    toast("Invoice sent", "success");
+    toast(alreadyIssued ? "Invoice updated and re-sent" : "Invoice sent", "success");
     router.push(`/${workspace.slug}/invoices/${id}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPayload, saveDraft, invoiceId, workspace.id, workspace.slug]);

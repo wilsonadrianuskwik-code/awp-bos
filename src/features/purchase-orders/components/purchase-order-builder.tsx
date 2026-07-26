@@ -278,12 +278,18 @@ export function PurchaseOrderBuilder({
     if (!saved) return;
 
     const id = poId ?? saved.id;
-    const statusResult = await updatePurchaseOrderStatus(workspace.id, id, "sent");
-    if (statusResult.error) {
-      toast(statusResult.error, "error");
-      return;
+    const alreadyIssued = saved.status !== "draft";
+    if (!alreadyIssued) {
+      const statusResult = await updatePurchaseOrderStatus(workspace.id, id, "sent");
+      if (statusResult.error) {
+        toast(statusResult.error, "error");
+        return;
+      }
     }
-    toast("Purchase order sent", "success");
+    toast(
+      alreadyIssued ? "Purchase order updated and re-sent" : "Purchase order sent",
+      "success"
+    );
     router.push(`/${workspace.slug}/purchase-orders/${id}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPayload, saveDraft, poId, workspace.id, workspace.slug]);
