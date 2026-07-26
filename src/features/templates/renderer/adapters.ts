@@ -131,6 +131,18 @@ export function invoiceToRenderData(
       discount_amount: invoice.discount_amount,
       tax_amount: invoice.tax_amount,
       total: invoice.total,
+      // Indonesian breakdown — harga jual is the sum of lines after line
+      // discounts, which is what every downstream figure is derived from.
+      harga_jual: invoice.subtotal - invoice.discount_amount,
+      dpp_amount: invoice.dpp_amount,
+      ppn_amount: invoice.ppn_amount,
+      pph_amount: invoice.pph_amount,
+      retensi_amount: invoice.retensi_amount,
+      dpp_numerator: invoice.dpp_numerator,
+      dpp_denominator: invoice.dpp_denominator,
+      pph_percent: invoice.pph_percent,
+      retensi_percent: invoice.retensi_percent,
+      show_dpp: invoice.show_dpp,
       amount_paid: invoice.amount_paid,
       amount_due: invoice.amount_due,
       notes: invoice.notes ?? undefined,

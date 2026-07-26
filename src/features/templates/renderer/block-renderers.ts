@@ -417,7 +417,19 @@ const TOTALS_ROW_DEFAULTS: Record<string, string> = {
   total: "Total",
   amount_paid: "Amount Paid",
   balance_due: "Balance Due",
+  // Indonesian breakdown (00082/00084). DPP/PPH/Retensi labels carry
+  // their rate because it varies per document; PPN deliberately doesn't,
+  // since it's a regulation constant.
+  harga_jual: "Total Harga Jual",
+  dpp: "DPP",
+  ppn: "PPN",
+  pph: "Potong PPH",
+  retensi: "Potong Retensi",
 };
+
+// Withholdings print in parentheses — the accounting convention for a
+// deduction, matching the paper document.
+const NEGATIVE_TOTALS_ROWS = new Set(["pph", "retensi"]);
 
 function renderTotals(block: TemplateBlock, data: DocumentRenderData): string {
   const rows = cfg<string[]>(block.config, "rows", ["subtotal", "tax", "total"]);
@@ -440,9 +452,37 @@ function renderTotals(block: TemplateBlock, data: DocumentRenderData): string {
         return data.document.amount_paid ?? null;
       case "balance_due":
         return data.document.amount_due ?? null;
+      case "harga_jual":
+        return data.document.harga_jual ?? null;
+      case "dpp":
+        return data.document.dpp_amount ?? null;
+      case "ppn":
+        return data.document.ppn_amount ?? null;
+      case "pph":
+        return data.document.pph_amount ?? null;
+      case "retensi":
+        return data.document.retensi_amount ?? null;
       default:
         return null;
     }
+  };
+
+  // The rate-bearing labels are built from the document's own stored
+  // rates rather than hardcoded, so a document issued under a different
+  // rate keeps printing the rate it was issued under.
+  const dynamicLabel = (row: string, base: string): string => {
+    if (row === "dpp") {
+      const n = data.document.dpp_numerator;
+      const d = data.document.dpp_denominator;
+      return n && d ? `${base} ${n}/${d}` : base;
+    }
+    if (row === "pph" && data.document.pph_percent != null) {
+      return `${base} ${Number(data.document.pph_percent)}%`;
+    }
+    if (row === "retensi" && data.document.retensi_percent != null) {
+      return `${base} ${Number(data.document.retensi_percent)}%`;
+    }
+    return base;
   };
 
   const html = rows
@@ -454,13 +494,22 @@ function renderTotals(block: TemplateBlock, data: DocumentRenderData): string {
       if (row === "tax" && !data.document.tax_amount) return "";
       if (row === "amount_paid" && (data.document.amount_paid ?? 0) === 0) return "";
       if (row === "balance_due" && (data.document.amount_due ?? 0) === 0) return "";
+      // "Not applicable" and "0%" are different statements on a printed
+      // document, so an unset withholding is omitted entirely rather than
+      // printing a misleading zero row.
+      if (row === "pph" && data.document.pph_percent == null) return "";
+      if (row === "retensi" && data.document.retensi_percent == null) return "";
+      if (row === "dpp" && data.document.show_dpp === false) return "";
 
       const value = rowValue(row);
       if (value === null) return "";
 
       const isTotal = row === "total";
-      let label = rowLabels[row] ?? TOTALS_ROW_DEFAULTS[row] ?? row;
+      let label = dynamicLabel(row, rowLabels[row] ?? TOTALS_ROW_DEFAULTS[row] ?? row);
       if (isTotal && currencyInTotal) label = `${label} ${currency}`;
+      const displayValue = NEGATIVE_TOTALS_ROWS.has(row)
+        ? `(${formatCurrency(value, currency)})`
+        : formatCurrency(value, currency);
 
       // Grand total gets a strong rule above it and the heading font,
       // matching the reference's "TOTAL MYR" treatment; the other rows
@@ -468,7 +517,7 @@ function renderTotals(block: TemplateBlock, data: DocumentRenderData): string {
       if (isTotal) {
         return `<div style="display:flex; justify-content:space-between; align-items:baseline; margin-top:8px; padding-top:10px; border-top:2px solid var(--t-primary);"><span style="font-family:var(--t-heading-font); font-weight:var(--t-heading-weight); font-size:12.5pt; text-transform:uppercase; letter-spacing:.5px; color:var(--t-primary);">${escapeHtml(label)}</span><span style="font-family:var(--t-heading-font); font-weight:var(--t-heading-weight); font-size:12.5pt; color:var(--t-primary);">${formatCurrency(value, currency)}</span></div>`;
       }
-      return `<div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; font-size:9.5pt;"><span style="color:var(--t-muted);">${escapeHtml(label)}</span><span style="color:var(--t-text);">${formatCurrency(value, currency)}</span></div>`;
+      return `<div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; font-size:9.5pt;"><span style="color:var(--t-muted);">${escapeHtml(label)}</span><span style="color:var(--t-text);">${displayValue}</span></div>`;
     })
     .join("");
 
@@ -558,11 +607,31 @@ function renderPaymentSummary(block: TemplateBlock, data: DocumentRenderData): s
   return `<table style="width:100%; border-collapse:collapse; font-size:9pt;"><thead><tr>${header}</tr></thead><tbody>${rows}</tbody></table>${total}`;
 }
 
-function renderSignature(block: TemplateBlock, _data: DocumentRenderData): string {
+function renderSignature(block: TemplateBlock, data: DocumentRenderData): string {
   const signatures = cfg<{ label: string; show_name_line?: boolean; show_date_line?: boolean; show_title_line?: boolean }[]>(block.config, "signatures", []);
   const layout = cfg<string>(block.config, "layout", "side_by_side");
+  const branding = data.workspace_branding;
 
-  const box = (sig: { label: string; show_name_line?: boolean; show_date_line?: boolean; show_title_line?: boolean }) => `
+  // When the workspace has configured a signatory (Settings > Branding),
+  // the block renders the real thing — signature image over the company
+  // name, the way a wet signature sits on paper — instead of the blank
+  // ruled lines it used to always draw. The blank-line form is kept for
+  // extra signature boxes the template asks for beyond the configured
+  // one (e.g. a "Received By" counterpart the customer fills in).
+  const hasConfiguredSignatory = !!(branding?.signatory_name || branding?.signature_url);
+
+  const configuredBox = () => `
+    <div style="flex:1; text-align:center;">
+      <div style="font-size:9pt; font-weight:600; color:var(--t-text);">${escapeHtml(branding?.signature_label || "Approved by,")}</div>
+      <div style="position:relative; height:70px; margin-top:6px;">
+        ${branding?.signature_url ? `<img src="${escapeHtml(branding.signature_url)}" alt="${escapeHtml(branding?.signatory_name ?? "Signature")}" style="position:absolute; left:0; right:0; margin:0 auto; height:70px; max-width:100%; object-fit:contain;">` : ""}
+        ${branding?.signatory_company ? `<div style="position:absolute; left:0; right:0; top:50%; transform:translateY(-50%); border:1px solid var(--t-muted); padding:2px 6px; font-size:8.5pt; font-weight:500; color:var(--t-text);">${escapeHtml(branding.signatory_company)}</div>` : ""}
+      </div>
+      ${branding?.signatory_name ? `<div style="font-size:9pt; font-weight:600; margin-top:4px; color:var(--t-text);">(${escapeHtml(branding.signatory_name)})</div>` : ""}
+      ${branding?.signatory_title ? `<div style="font-size:8pt; color:var(--t-muted);">${escapeHtml(branding.signatory_title)}</div>` : ""}
+    </div>`;
+
+  const blankBox = (sig: { label: string; show_name_line?: boolean; show_date_line?: boolean; show_title_line?: boolean }) => `
     <div style="flex:1;">
       <div style="border-bottom:1px solid var(--t-text); height:40px;"></div>
       <div style="font-size:9pt; color:var(--t-muted); margin-top:4px;">${escapeHtml(sig.label)}</div>
@@ -571,8 +640,16 @@ function renderSignature(block: TemplateBlock, _data: DocumentRenderData): strin
       ${sig.show_title_line ? `<div style="font-size:8pt; color:var(--t-muted);">Title</div>` : ""}
     </div>`;
 
+  // The configured signatory takes the first slot; any further slots the
+  // template defines stay blank lines for the other party to sign.
+  const boxes = hasConfiguredSignatory
+    ? [configuredBox(), ...signatures.slice(1).map(blankBox)]
+    : signatures.map(blankBox);
+
+  if (boxes.length === 0) return "";
+
   const wrapperStyle = layout === "side_by_side" ? "display:flex; gap:24px;" : "display:flex; flex-direction:column; gap:16px;";
-  return `<div style="${wrapperStyle}">${signatures.map(box).join("")}</div>`;
+  return `<div style="${wrapperStyle}">${boxes.join("")}</div>`;
 }
 
 const NOTES_HEADING_DEFAULTS: Record<string, string> = {

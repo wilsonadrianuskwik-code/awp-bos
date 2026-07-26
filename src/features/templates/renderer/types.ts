@@ -76,6 +76,19 @@ export type DocumentRenderData = {
     discount_amount: number;
     tax_amount: number;
     total: number;
+    // Indonesian tax breakdown (00082/00084). Present on invoices and
+    // proforma invoices; absent on document types that don't carry it, so
+    // the totals block's new rows simply render nothing for those.
+    harga_jual?: number;
+    dpp_amount?: number;
+    ppn_amount?: number;
+    pph_amount?: number;
+    retensi_amount?: number;
+    dpp_numerator?: number;
+    dpp_denominator?: number;
+    pph_percent?: number | null;
+    retensi_percent?: number | null;
+    show_dpp?: boolean;
     amount_paid?: number;
     amount_due?: number;
     notes?: string;
@@ -99,6 +112,13 @@ export type DocumentRenderData = {
   };
   workspace_branding?: {
     tagline?: string;
+    // Signature block (00083) — the approver's uploaded signature and
+    // who they are, so an issued PDF goes out already signed.
+    signature_url?: string;
+    signature_label?: string;
+    signatory_name?: string;
+    signatory_title?: string;
+    signatory_company?: string;
   };
   // Populated by renderDocumentFragment from the active theme, right
   // before block rendering — the only bit of theme.borders block

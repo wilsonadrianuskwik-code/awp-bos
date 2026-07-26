@@ -75,7 +75,6 @@ export function InvoicePrintView({
             <th className="py-2 text-right">Qty</th>
             <th className="py-2 text-right">Unit Price</th>
             <th className="py-2 text-right">Disc.</th>
-            <th className="py-2 text-right">Tax</th>
             <th className="py-2 text-right">Total</th>
           </tr>
         </thead>
@@ -86,7 +85,7 @@ export function InvoicePrintView({
             return [
               <tr key={`${cat}-header`}>
                 <td
-                  colSpan={6}
+                  colSpan={5}
                   className="pb-1 pt-3 text-xs font-semibold uppercase text-gray-500"
                 >
                   {CATEGORY_LABEL[cat]}
@@ -102,9 +101,6 @@ export function InvoicePrintView({
                   <td className="py-1.5 text-right">{fmt(item.unit_price)}</td>
                   <td className="py-1.5 text-right">
                     {item.discount_percent ? `${item.discount_percent}%` : "-"}
-                  </td>
-                  <td className="py-1.5 text-right">
-                    {item.tax_percent ? `${item.tax_percent}%` : "-"}
                   </td>
                   <td className="py-1.5 text-right font-medium">
                     {fmt(item.line_total)}

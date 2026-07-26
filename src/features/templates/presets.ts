@@ -258,7 +258,18 @@ function defaultInvoiceBlocks(): TemplateBlock[] {
       type: "totals",
       enabled: true,
       config: {
-        rows: ["subtotal", "discount", "tax", "total", "amount_paid", "balance_due"],
+        // Indonesian construction invoicing order. amount_paid/balance_due
+        // stay at the end and hide themselves when nothing is paid.
+        rows: [
+          "harga_jual",
+          "dpp",
+          "ppn",
+          "pph",
+          "retensi",
+          "total",
+          "amount_paid",
+          "balance_due",
+        ],
         width_percent: 42,
         show_currency_in_total_label: true,
       },
@@ -283,7 +294,10 @@ function defaultInvoiceBlocks(): TemplateBlock[] {
     {
       id: blockId("signature"),
       type: "signature",
-      enabled: false,
+      // Renders the workspace's configured signatory (Settings >
+      // Branding) when one exists; blank ruled lines otherwise, which is
+      // what it always did before.
+      enabled: true,
       config: { signatures: [{ label: "Authorized By", show_name_line: true, show_date_line: true, show_title_line: false }], layout: "side_by_side" },
     },
     {
@@ -317,6 +331,11 @@ function toQuotationBlock(b: TemplateBlock): TemplateBlock | null {
   }
   if (b.type === "totals") {
     return { ...b, config: { ...b.config, rows: ["subtotal", "discount", "tax", "total"] } };
+  }
+  if (b.type === "signature") {
+    // A quotation is an offer, not an issued financial document — it
+    // still carries the company signature.
+    return b;
   }
   if (b.type === "payment_info") {
     return null; // quotations show terms via a notes block instead
