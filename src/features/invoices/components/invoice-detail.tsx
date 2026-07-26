@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Building2, Copy, FileText, Printer } from "lucide-react";
+import { Building2, Copy, FileText, Pencil, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -91,6 +91,13 @@ export function InvoiceDetail({
   const canGenerate = !["draft", "cancelled", "refunded"].includes(
     invoice.status
   );
+
+  // Mirrors update_invoice (00087): a sent invoice stays editable because
+  // clients do ask for revisions. Money landing against it is what closes
+  // it, not the act of sending.
+  const isEditable =
+    !["cancelled", "refunded"].includes(invoice.status) &&
+    (invoice.amount_paid ?? 0) === 0;
 
   function handlePrint() {
     const clientName = invoice.client?.name ?? "Client";
@@ -196,6 +203,14 @@ export function InvoiceDetail({
                     },
                   ]}
                 />
+              )}
+              {isEditable && (
+                <Button variant="outline" asChild>
+                  <Link href={`/${workspace.slug}/invoices/${invoice.id}/edit`}>
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Edit
+                  </Link>
+                </Button>
               )}
               <Button variant="outline" onClick={handlePrint}>
                 <Printer className="mr-2 h-4 w-4" />

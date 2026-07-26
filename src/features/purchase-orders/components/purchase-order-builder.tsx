@@ -312,7 +312,14 @@ export function PurchaseOrderBuilder({
   const handleFocusHandled = useCallback(() => setFocusRequest(null), []);
 
   useEffect(() => {
-    if (purchaseOrder && purchaseOrder.status !== "draft") {
+    // Mirrors update_purchase_order (00087): locked once goods start
+    // arriving or the order is cancelled — not merely once it is sent.
+    if (
+      purchaseOrder &&
+      ["cancelled", "partially_received", "received"].includes(
+        purchaseOrder.status
+      )
+    ) {
       router.replace(`/${workspace.slug}/purchase-orders/${purchaseOrder.id}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

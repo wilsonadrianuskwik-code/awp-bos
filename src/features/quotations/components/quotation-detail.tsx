@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Building2, Copy, GitCompare, Printer, Receipt } from "lucide-react";
+import { Building2, Copy, GitCompare, Pencil, Printer, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -14,6 +14,7 @@ import { useToast } from "@/providers/toast-provider";
 import { QuotationLifecycleTimeline } from "./quotation-lifecycle-timeline";
 import { LineItemsTable } from "@/features/line-items/components/line-items-table";
 import { QuotationStatusActions } from "./quotation-status-actions";
+import { isEditableStatus } from "@/features/quotations/helpers";
 import { QuotationSummaryHero } from "./quotation-summary-hero";
 import { QuotationVersionHistory } from "./quotation-version-history";
 import { QuotationVersionDiffDialog } from "./quotation-version-diff-dialog";
@@ -206,6 +207,14 @@ export function QuotationDetail({
                     },
                   ]}
                 />
+              )}
+              {isEditableStatus(quotation.status) && (
+                <Button variant="outline" asChild>
+                  <Link href={`/${workspace.slug}/quotations/${quotation.id}/edit`}>
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Edit
+                  </Link>
+                </Button>
               )}
               <Button variant="outline" onClick={handlePrint}>
                 <Printer className="mr-2 h-4 w-4" />

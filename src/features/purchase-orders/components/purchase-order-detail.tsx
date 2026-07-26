@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { Pencil } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { DetailHeader } from "@/components/shared/detail-header";
@@ -77,9 +80,25 @@ export function PurchaseOrderDetail({
           </span>
         }
         actions={
-          <PrintButton
-            filename={`${purchaseOrder.supplier?.name ?? "Supplier"} - ${purchaseOrder.po_number}`}
-          />
+          <>
+            {/* Mirrors update_purchase_order (00087): a sent or acknowledged
+                PO can still be revised; goods arriving is what locks it. */}
+            {!["cancelled", "partially_received", "received"].includes(
+              purchaseOrder.status
+            ) && (
+              <Button variant="outline" asChild>
+                <Link
+                  href={`/${workspace.slug}/purchase-orders/${purchaseOrder.id}/edit`}
+                >
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit
+                </Link>
+              </Button>
+            )}
+            <PrintButton
+              filename={`${purchaseOrder.supplier?.name ?? "Supplier"} - ${purchaseOrder.po_number}`}
+            />
+          </>
         }
       />
 

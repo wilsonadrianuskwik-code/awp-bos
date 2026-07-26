@@ -31,6 +31,7 @@ import {
 } from "@/features/proforma-invoices/validators";
 import type { LineItemInput } from "@/features/line-items/validators";
 import { computeLineItemTotals } from "@/features/line-items/helpers";
+import { isEditableStatus } from "@/features/proforma-invoices/helpers";
 import type {
   LineItemCategory,
   ClientSummary,
@@ -290,7 +291,7 @@ export function ProformaInvoiceBuilder({
   }, [currentPayload, saveDraft, piId, workspace.id, workspace.slug]);
 
   useEffect(() => {
-    if (proformaInvoice && proformaInvoice.status !== "draft") {
+    if (proformaInvoice && !isEditableStatus(proformaInvoice.status)) {
       router.replace(`/${workspace.slug}/proforma-invoices/${proformaInvoice.id}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

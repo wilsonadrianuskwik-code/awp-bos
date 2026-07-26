@@ -33,6 +33,7 @@ import {
 } from "@/features/quotations/validators";
 import type { LineItemInput } from "@/features/line-items/validators";
 import { computeLineItemTotals } from "@/features/line-items/helpers";
+import { isEditableStatus } from "@/features/quotations/helpers";
 import type {
   LineItemCategory,
   ClientSummary,
@@ -330,14 +331,10 @@ export function QuotationBuilder({
     return () => window.removeEventListener("keydown", handler);
   }, [handleManualSave, handleSendShortcut]);
 
-  // The builder is compose-only: statuses beyond draft/revision_requested
-  // read on the detail page. Redirect instead of rendering dead inputs.
+  // Mirrors update_quotation (00087) and the edit route: a sent quotation
+  // stays editable for revisions; only a dead-end status closes it.
   useEffect(() => {
-    if (
-      quotation &&
-      quotation.status !== "draft" &&
-      quotation.status !== "revision_requested"
-    ) {
+    if (quotation && !isEditableStatus(quotation.status)) {
       router.replace(`/${workspace.slug}/quotations/${quotation.id}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

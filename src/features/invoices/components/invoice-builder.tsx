@@ -367,11 +367,15 @@ export function InvoiceBuilder({
   const [focusRequest, setFocusRequest] = useState<number | null>(null);
   const handleFocusHandled = useCallback(() => setFocusRequest(null), []);
 
-  // The builder is draft-only: a sent/paid/cancelled invoice reads on the
-  // (already redesigned) detail page. Redirect instead of rendering dead
-  // inputs — no viewer-mode to maintain.
+  // Mirrors update_invoice (00087) and the edit route's own guard: a sent
+  // invoice stays editable because clients do ask for revisions. Only
+  // money having moved against it — or a cancel/refund — closes it.
   useEffect(() => {
-    if (invoice && invoice.status !== "draft") {
+    if (
+      invoice &&
+      (["cancelled", "refunded"].includes(invoice.status) ||
+        (invoice.amount_paid ?? 0) > 0)
+    ) {
       router.replace(`/${workspace.slug}/invoices/${invoice.id}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Copy } from "lucide-react";
+import { Copy, Pencil } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { DetailHeader } from "@/components/shared/detail-header";
@@ -21,6 +22,7 @@ import {
 } from "@/features/documents/tax";
 import { PrintButton } from "@/features/documents/components/print-button";
 import { ProformaInvoiceStatusActions } from "./proforma-invoice-status-actions";
+import { isEditableStatus } from "@/features/proforma-invoices/helpers";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { ProformaInvoiceDetail as ProformaInvoiceDetailType } from "@/features/proforma-invoices/types";
 import type { DocumentLink } from "@/features/documents/queries";
@@ -152,6 +154,16 @@ export function ProformaInvoiceDetail({
                 ]}
               />
             )}
+            {isEditableStatus(proformaInvoice.status) && (
+              <Button variant="outline" asChild>
+                <Link
+                  href={`/${workspace.slug}/proforma-invoices/${proformaInvoice.id}/edit`}
+                >
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit
+                </Link>
+              </Button>
+            )}
             <PrintButton
               filename={`${proformaInvoice.client?.name ?? "Client"} - ${proformaInvoice.pi_number}`}
             />
@@ -233,7 +245,7 @@ export function ProformaInvoiceDetail({
               retensi_percent: proformaInvoice.retensi_percent,
               show_dpp: proformaInvoice.show_dpp,
             }}
-            editable={proformaInvoice.status === "draft"}
+            editable={isEditableStatus(proformaInvoice.status)}
           />
 
           <LinkedDocumentsCard links={links} workspaceSlug={workspace.slug} />
