@@ -72,32 +72,40 @@ export function DocumentSignature({ branding }: { branding?: BrandingSettings })
       {/* Fixed width, left-aligned — matching the company's paper
           documents. A stretch-to-fit box would run the company name and
           its rule across the whole page. */}
-      <div className="w-[230px] text-center">
+      <div className="w-[240px] text-center">
         <p className="text-[13px] font-bold">
           {branding?.signature_label || "Hormat kami,"}
         </p>
 
-        {/* The image overlaps the company line the way a wet signature
-            does on paper: company name printed, signed across it. */}
-        <div className="relative mt-1 h-[74px]">
-          {branding?.signatory_company && (
-            <p className="absolute inset-x-0 top-1/2 -translate-y-1/2 truncate border border-black px-1.5 py-[3px] text-[11px] font-semibold">
-              {branding.signatory_company}
-            </p>
-          )}
-          {signatureUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={signatureUrl}
-              alt={name ? `Signature of ${name}` : "Signature"}
-              className="absolute left-1/2 top-0 z-10 h-[74px] max-w-[200px] -translate-x-1/2 object-contain"
-            />
-          )}
-        </div>
+        {/* Stacked rather than overlapped. On paper the stamp is applied
+            across the printed company name, but reproducing that overlap
+            digitally strikes the text through — and a scanned signature
+            often already contains the company stamp, so it doubled up.
+            Leave the company line blank if the image includes it. */}
+        {signatureUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={signatureUrl}
+            alt={name ? `Signature of ${name}` : "Signature"}
+            className="mx-auto mt-1 h-[80px] w-auto max-w-[240px] object-contain"
+          />
+        )}
 
-        {name && <p className="mt-1 text-[13px] font-bold">({name})</p>}
+        {branding?.signatory_company && (
+          <p className="mt-1 truncate text-[12px] font-semibold">
+            {branding.signatory_company}
+          </p>
+        )}
+
+        {name && (
+          <p className="mt-0.5 text-[13px] font-bold underline decoration-black underline-offset-4">
+            ({name})
+          </p>
+        )}
         {branding?.signatory_title && (
-          <p className="text-[11px] text-gray-600">{branding.signatory_title}</p>
+          <p className="mt-0.5 text-[11px] text-gray-600">
+            {branding.signatory_title}
+          </p>
         )}
       </div>
     </div>

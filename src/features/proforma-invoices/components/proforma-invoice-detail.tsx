@@ -20,7 +20,11 @@ import { formatCurrency } from "@/lib/utils/format-currency";
 import type { ProformaInvoiceDetail as ProformaInvoiceDetailType } from "@/features/proforma-invoices/types";
 import type { DocumentLink } from "@/features/documents/queries";
 import type { Activity } from "@/features/activities/types";
-import type { BrandingSettings, CompanyProfile } from "@/features/templates/types";
+import type {
+  BrandingSettings,
+  CompanyProfile,
+  PaymentDetails,
+} from "@/features/templates/types";
 
 const DOCUMENT_LABEL: Record<string, string> = {
   quotation: "Quotation",
@@ -48,6 +52,7 @@ type ProformaInvoiceDetailProps = {
   logoUrl?: string | null;
   companyProfile?: CompanyProfile;
   branding?: BrandingSettings;
+  paymentDetails?: PaymentDetails;
 };
 
 export function ProformaInvoiceDetail({
@@ -58,6 +63,7 @@ export function ProformaInvoiceDetail({
   logoUrl,
   companyProfile,
   branding,
+  paymentDetails,
 }: ProformaInvoiceDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
@@ -210,6 +216,7 @@ export function ProformaInvoiceDetail({
         logoUrl={logoUrl}
         companyProfile={companyProfile}
         branding={branding}
+        paymentDetails={paymentDetails}
         documentLabel="Proforma Invoice"
         documentNumber={proformaInvoice.pi_number}
         party={{

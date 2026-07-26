@@ -27,8 +27,6 @@ import { TaxSettingsCard } from "@/features/documents/components/tax-settings-ca
 import type { DeliveryOrderWithRelations } from "@/features/delivery-orders/types";
 import type { DocumentLink } from "@/features/documents/queries";
 import type { Supplier } from "@/features/suppliers/types";
-import { DocumentRenderView } from "@/features/templates/renderer/components/document-render-view";
-import { invoiceToRenderData } from "@/features/templates/renderer/adapters";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import { getOverdueDays } from "@/lib/utils/date";
 import type { InvoiceDetail as InvoiceDetailType } from "@/features/invoices/types";
@@ -55,7 +53,11 @@ type InvoiceDetailProps = {
     } | null;
   };
   fulfillmentItems: FulfillmentItemWithProgress[];
-  template: DocumentTemplateWithTheme | null;
+  /**
+   * Still fetched by the route, but no longer drives print — see the
+   * print view below. Kept so the designer/preview can use it later.
+   */
+  template?: DocumentTemplateWithTheme | null;
   /** Live package contents by catalog_item_id, for any package line items
       on this invoice — see getPackageBreakdowns. */
   packageBreakdowns?: Record<string, PackageItem[]>;
@@ -71,7 +73,6 @@ export function InvoiceDetail({
   activities,
   workspace: workspaceInfo,
   fulfillmentItems,
-  template,
   packageBreakdowns = {},
   deliveryOrders = [],
   links = [],
@@ -331,19 +332,19 @@ export function InvoiceDetail({
         </div>
       </div>
 
-      <DocumentRenderView
-        template={template}
-        data={invoiceToRenderData(invoice, workspaceInfo, packageBreakdowns)}
-        fallback={
-          <InvoicePrintView
-            invoice={invoice}
-            workspaceName={workspaceInfo.name}
-            logoUrl={workspaceInfo.logo_url}
-            companyProfile={workspaceInfo.settings?.company_profile}
-            branding={workspaceInfo.settings?.branding}
-            paymentDetails={workspaceInfo.settings?.payment_details}
-          />
-        }
+      {/* Printed straight from InvoicePrintView rather than through the
+          template renderer. Proforma Invoices can't have templates at all
+          (document_templates' CHECK excludes them), so routing some types
+          through templates and others through this view guaranteed the
+          two could never look alike — and every document the business
+          sends out has to be visually the same document. */}
+      <InvoicePrintView
+        invoice={invoice}
+        workspaceName={workspaceInfo.name}
+        logoUrl={workspaceInfo.logo_url}
+        companyProfile={workspaceInfo.settings?.company_profile}
+        branding={workspaceInfo.settings?.branding}
+        paymentDetails={workspaceInfo.settings?.payment_details}
       />
 
       <GeneratePurchaseOrderDialog

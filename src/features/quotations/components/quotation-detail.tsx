@@ -23,8 +23,6 @@ import { GeneratePurchaseOrderDialog } from "@/features/documents/components/gen
 import { QuotationPortalAccessCard } from "./quotation-portal-access-card";
 import { PricingSummary } from "@/features/line-items/components/pricing-summary";
 import { QuotationPrintView } from "./quotation-print-view";
-import { DocumentRenderView } from "@/features/templates/renderer/components/document-render-view";
-import { quotationToRenderData } from "@/features/templates/renderer/adapters";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type {
   QuotationDetail as QuotationDetailType,
@@ -54,7 +52,11 @@ type QuotationDetailProps = {
       payment_details?: PaymentDetails;
     } | null;
   };
-  template: DocumentTemplateWithTheme | null;
+  /**
+   * Still fetched by the route, but no longer drives print — see the
+   * print view below. Kept so the designer/preview can use it later.
+   */
+  template?: DocumentTemplateWithTheme | null;
   /** Live package contents by catalog_item_id, for any package line items
       on this quotation — see getPackageBreakdowns. */
   packageBreakdowns?: Record<string, PackageItem[]>;
@@ -68,7 +70,6 @@ export function QuotationDetail({
   versions,
   previousVersion,
   workspace: workspaceInfo,
-  template,
   packageBreakdowns = {},
   suppliers = [],
 }: QuotationDetailProps) {
@@ -352,19 +353,15 @@ export function QuotationDetail({
         </div>
       </div>
 
-      <DocumentRenderView
-        template={template}
-        data={quotationToRenderData(quotation, workspaceInfo, packageBreakdowns)}
-        fallback={
-          <QuotationPrintView
-            quotation={quotation}
-            workspaceName={workspaceInfo.name}
-            logoUrl={workspaceInfo.logo_url}
-            companyProfile={workspaceInfo.settings?.company_profile}
-            branding={workspaceInfo.settings?.branding}
-            paymentDetails={workspaceInfo.settings?.payment_details}
-          />
-        }
+      {/* See InvoiceDetail: printed directly rather than via the template
+          renderer, so all five document types share one layout. */}
+      <QuotationPrintView
+        quotation={quotation}
+        workspaceName={workspaceInfo.name}
+        logoUrl={workspaceInfo.logo_url}
+        companyProfile={workspaceInfo.settings?.company_profile}
+        branding={workspaceInfo.settings?.branding}
+        paymentDetails={workspaceInfo.settings?.payment_details}
       />
 
       <GenerateInvoiceDialog
