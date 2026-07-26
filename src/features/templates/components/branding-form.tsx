@@ -39,7 +39,7 @@ export function BrandingForm({ workspaceId, branding, logoUrl }: BrandingFormPro
   const [logo, setLogo] = useState(logoUrl ?? "");
   const [signatureUrl, setSignatureUrl] = useState(branding.signature_url ?? "");
   const [signatureLabel, setSignatureLabel] = useState(
-    branding.signature_label ?? "Approved by,"
+    branding.signature_label ?? "Hormat kami,"
   );
   const [signatoryName, setSignatoryName] = useState(branding.signatory_name ?? "");
   const [signatoryTitle, setSignatoryTitle] = useState(branding.signatory_title ?? "");
@@ -151,7 +151,7 @@ export function BrandingForm({ workspaceId, branding, logoUrl }: BrandingFormPro
                 value={signatureLabel}
                 onChange={(e) => setSignatureLabel(e.target.value)}
                 disabled={!canEdit}
-                placeholder="Approved by,"
+                placeholder="Hormat kami,"
               />
             </div>
             <div className="space-y-2">

@@ -14,13 +14,14 @@ import { LinkedDocumentsCard } from "@/features/documents/components/linked-docu
 import { TaxSettingsCard } from "@/features/documents/components/tax-settings-card";
 import { TaxBreakdownBlock } from "@/features/documents/components/tax-breakdown";
 import { SimplePrintView } from "@/features/documents/components/simple-print-view";
+import { formatIndonesianDate } from "@/features/documents/components/document-letterhead";
 import { PrintButton } from "@/features/documents/components/print-button";
 import { ProformaInvoiceStatusActions } from "./proforma-invoice-status-actions";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { ProformaInvoiceDetail as ProformaInvoiceDetailType } from "@/features/proforma-invoices/types";
 import type { DocumentLink } from "@/features/documents/queries";
 import type { Activity } from "@/features/activities/types";
-import type { BrandingSettings, CompanyProfile } from "@/features/templates/types";
+import type { BrandingSettings, CompanyProfile, PaymentDetails } from "@/features/templates/types";
 
 const DOCUMENT_LABEL: Record<string, string> = {
   quotation: "Quotation",
@@ -48,6 +49,7 @@ type ProformaInvoiceDetailProps = {
   logoUrl?: string | null;
   companyProfile?: CompanyProfile;
   branding?: BrandingSettings;
+  paymentDetails?: PaymentDetails;
 };
 
 export function ProformaInvoiceDetail({
@@ -58,6 +60,7 @@ export function ProformaInvoiceDetail({
   logoUrl,
   companyProfile,
   branding,
+  paymentDetails,
 }: ProformaInvoiceDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
@@ -210,22 +213,13 @@ export function ProformaInvoiceDetail({
         logoUrl={logoUrl}
         companyProfile={companyProfile}
         branding={branding}
+        paymentDetails={paymentDetails}
         documentLabel="Proforma Invoice"
-        documentNumber={proformaInvoice.pi_number}
-        party={{
-          heading: "Billed to",
-          name: proformaInvoice.client?.name ?? "Deleted client",
-          lines: [
-            proformaInvoice.client?.company,
-            proformaInvoice.client?.email,
-            proformaInvoice.client?.phone,
-          ],
-        }}
         meta={[
-          { label: "Issue date", value: new Date(proformaInvoice.issue_date).toLocaleDateString() },
-          ...(proformaInvoice.expiry_date
-            ? [{ label: "Valid until", value: new Date(proformaInvoice.expiry_date).toLocaleDateString() }]
-            : []),
+          { label: "Nomor", value: proformaInvoice.pi_number },
+          { label: "Tanggal", value: formatIndonesianDate(proformaInvoice.issue_date) },
+          { label: "Kepada", value: proformaInvoice.client?.name ?? "-" },
+          { label: "Nomor PO", value: "-" },
         ]}
         title={proformaInvoice.title}
         lines={proformaInvoice.line_items}
@@ -242,7 +236,7 @@ export function ProformaInvoiceDetail({
               retensi_percent: proformaInvoice.retensi_percent,
               show_dpp: proformaInvoice.show_dpp,
             }}
-            dense
+            boxed
           />
         }
         notes={proformaInvoice.notes}

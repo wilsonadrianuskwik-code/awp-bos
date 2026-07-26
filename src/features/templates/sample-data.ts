@@ -45,7 +45,7 @@ export function getSampleRenderData(documentType: TemplateDocumentType): Documen
       total: 5552.8,
       amount_paid: 0,
       amount_due: 5552.8,
-      notes: "Thank you for your business!",
+      notes: "",
       payment_terms: "Net 30",
     },
     line_items: [

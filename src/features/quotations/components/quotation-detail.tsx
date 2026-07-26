@@ -31,7 +31,12 @@ import type {
   QuotationWithClient,
 } from "@/features/quotations/types";
 import type { Activity } from "@/features/activities/types";
-import type { DocumentTemplateWithTheme, CompanyProfile, BrandingSettings } from "@/features/templates/types";
+import type {
+  DocumentTemplateWithTheme,
+  CompanyProfile,
+  BrandingSettings,
+  PaymentDetails,
+} from "@/features/templates/types";
 import type { PackageItem } from "@/features/catalog/types";
 import type { Supplier } from "@/features/suppliers/types";
 
@@ -43,7 +48,11 @@ type QuotationDetailProps = {
   workspace: {
     name: string;
     logo_url: string | null;
-    settings?: { company_profile?: CompanyProfile; branding?: BrandingSettings } | null;
+    settings?: {
+      company_profile?: CompanyProfile;
+      branding?: BrandingSettings;
+      payment_details?: PaymentDetails;
+    } | null;
   };
   template: DocumentTemplateWithTheme | null;
   /** Live package contents by catalog_item_id, for any package line items
@@ -353,6 +362,7 @@ export function QuotationDetail({
             logoUrl={workspaceInfo.logo_url}
             companyProfile={workspaceInfo.settings?.company_profile}
             branding={workspaceInfo.settings?.branding}
+            paymentDetails={workspaceInfo.settings?.payment_details}
           />
         }
       />

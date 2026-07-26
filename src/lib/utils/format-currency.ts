@@ -29,14 +29,24 @@ function getFormat(currency: string): CurrencyFormat {
   return CURRENCY_FORMATS[currency] ?? { ...DEFAULT_FORMAT, prefix: `${currency} ` };
 }
 
-/** Full formatted amount, e.g. formatCurrency(1250000, "IDR") -> "Rp 1.250.000". */
-export function formatCurrency(amount: number, currency: string): string {
+/**
+ * Full formatted amount, e.g. formatCurrency(1250000, "IDR") -> "Rp 1.250.000".
+ *
+ * `hideSymbol` keeps the currency's own grouping and decimal rules but
+ * drops the prefix — for printed tables whose column header already says
+ * "(Rp)", where repeating the symbol on every row is noise.
+ */
+export function formatCurrency(
+  amount: number,
+  currency: string,
+  options?: { hideSymbol?: boolean }
+): string {
   const format = getFormat(currency);
   const number = new Intl.NumberFormat(format.locale, {
     minimumFractionDigits: format.decimals,
     maximumFractionDigits: format.decimals,
   }).format(amount);
-  return `${format.prefix}${number}`;
+  return options?.hideSymbol ? number : `${format.prefix}${number}`;
 }
 
 /** Just the symbol/prefix, trimmed — for compact use inside input fields. */

@@ -300,6 +300,9 @@
 
 @media print {
   @page {
+    /* Explicit A4 — without a size the browser falls back to its locale
+       default (Letter in en-US), which silently reflows every document. */
+    size: A4 portrait;
     margin: 1.5cm;
   }
   body {

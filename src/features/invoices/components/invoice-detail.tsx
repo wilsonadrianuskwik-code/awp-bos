@@ -34,7 +34,12 @@ import { getOverdueDays } from "@/lib/utils/date";
 import type { InvoiceDetail as InvoiceDetailType } from "@/features/invoices/types";
 import type { Activity } from "@/features/activities/types";
 import type { FulfillmentItemWithProgress } from "@/features/fulfillment/types";
-import type { DocumentTemplateWithTheme, CompanyProfile, BrandingSettings } from "@/features/templates/types";
+import type {
+  DocumentTemplateWithTheme,
+  CompanyProfile,
+  BrandingSettings,
+  PaymentDetails,
+} from "@/features/templates/types";
 import type { PackageItem } from "@/features/catalog/types";
 
 type InvoiceDetailProps = {
@@ -43,7 +48,11 @@ type InvoiceDetailProps = {
   workspace: {
     name: string;
     logo_url: string | null;
-    settings?: { company_profile?: CompanyProfile; branding?: BrandingSettings } | null;
+    settings?: {
+      company_profile?: CompanyProfile;
+      branding?: BrandingSettings;
+      payment_details?: PaymentDetails;
+    } | null;
   };
   fulfillmentItems: FulfillmentItemWithProgress[];
   template: DocumentTemplateWithTheme | null;
@@ -332,6 +341,7 @@ export function InvoiceDetail({
             logoUrl={workspaceInfo.logo_url}
             companyProfile={workspaceInfo.settings?.company_profile}
             branding={workspaceInfo.settings?.branding}
+            paymentDetails={workspaceInfo.settings?.payment_details}
           />
         }
       />

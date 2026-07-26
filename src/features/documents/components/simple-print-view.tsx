@@ -1,9 +1,16 @@
 import {
   DocumentLetterhead,
+  DocumentMeta,
+  DocumentPaymentInfo,
   DocumentSignature,
+  type MetaRow,
 } from "@/features/documents/components/document-letterhead";
 import { formatCurrency } from "@/lib/utils/format-currency";
-import type { BrandingSettings, CompanyProfile } from "@/features/templates/types";
+import type {
+  BrandingSettings,
+  CompanyProfile,
+  PaymentDetails,
+} from "@/features/templates/types";
 
 export type PrintLine = {
   id: string;
@@ -15,47 +22,47 @@ export type PrintLine = {
   line_total?: number;
 };
 
-export type PrintParty = {
-  heading: string;
-  name: string;
-  lines: (string | null | undefined)[];
-};
-
 type SimplePrintViewProps = {
   workspaceName: string;
   logoUrl?: string | null;
   companyProfile?: CompanyProfile;
   branding?: BrandingSettings;
+  paymentDetails?: PaymentDetails;
   documentLabel: string;
-  documentNumber: string;
-  party: PrintParty;
-  meta: { label: string; value: string }[];
+  /** Rendered in the meta block; callers build the rows they need. */
+  meta: MetaRow[];
   title?: string | null;
   lines: PrintLine[];
   currency: string;
   /** Omitted for documents that carry no money (Delivery Orders). */
   showPricing?: boolean;
-  /** Rendered where a totals block belongs — callers pass the tax breakdown. */
+  /** Rendered where the totals belong — callers pass the tax breakdown. */
   totals?: React.ReactNode;
   notes?: string | null;
   terms?: string | null;
-  footerNote?: string | null;
+  /**
+   * Blank rows padded onto the table so it fills the page like the
+   * pre-printed forms this replaces. 0 disables the padding.
+   */
+  minRows?: number;
 };
 
 /**
- * The shared print/PDF layout for document types that don't have a
- * bespoke one (Proforma Invoice, Purchase Order, Delivery Order). Same
- * masthead and signature block as Invoice/Quotation so everything the
- * business sends out looks like it came from one company.
+ * The shared print/PDF layout, styled to match the company's existing
+ * paper documents: framed letterhead, Indonesian label:value meta block,
+ * green-headed bordered item table, then payment details and signature.
+ *
+ * Amounts print with Indonesian digit grouping and no currency symbol —
+ * the column header already says "(Rp)", so repeating it on every row is
+ * noise, and it's what the reference does.
  */
 export function SimplePrintView({
   workspaceName,
   logoUrl,
   companyProfile,
   branding,
+  paymentDetails,
   documentLabel,
-  documentNumber,
-  party,
   meta,
   title,
   lines,
@@ -64,9 +71,12 @@ export function SimplePrintView({
   totals,
   notes,
   terms,
-  footerNote,
+  minRows = 9,
 }: SimplePrintViewProps) {
-  const fmt = (value: number) => formatCurrency(value, currency);
+  const amount = (value: number) =>
+    formatCurrency(value, currency, { hideSymbol: true });
+
+  const blankRowCount = Math.max(0, minRows - lines.length);
 
   return (
     <div className="hidden print:block print:text-black">
@@ -76,60 +86,62 @@ export function SimplePrintView({
         tagline={branding?.tagline}
         companyProfile={companyProfile}
         documentLabel={documentLabel}
-        documentNumber={documentNumber}
       />
 
-      <div className="mt-6 grid grid-cols-2 gap-6 text-sm">
-        <div>
-          <p className="font-semibold text-gray-500">{party.heading}</p>
-          <p className="font-medium">{party.name}</p>
-          {party.lines.filter(Boolean).map((line, i) => (
-            <p key={i}>{line}</p>
-          ))}
-        </div>
-        <div className="text-right">
-          {meta.map((m) => (
-            <p key={m.label}>
-              <span className="text-gray-500">{m.label}: </span>
-              {m.value}
-            </p>
-          ))}
-        </div>
-      </div>
+      <DocumentMeta rows={meta} />
 
-      {title && <h3 className="mt-6 text-lg font-semibold">{title}</h3>}
+      {title && <h3 className="mt-5 text-[15px] font-bold">{title}</h3>}
 
-      <table className="mt-6 w-full text-sm">
+      <table className="mt-5 w-full border-collapse text-[12px]">
         <thead>
-          <tr className="border-b-2 text-left">
-            <th className="py-2">Description</th>
-            <th className="py-2 text-right">Qty</th>
+          <tr className="bg-[#4caf50] text-white">
+            <Th className="w-10 text-center">No.</Th>
+            <Th>Deskripsi</Th>
+            <Th className="w-20 text-center">Jumlah</Th>
+            <Th className="w-20 text-center">Unit</Th>
             {showPricing && (
               <>
-                <th className="py-2 text-right">Unit Price</th>
-                <th className="py-2 text-right">Disc.</th>
-                <th className="py-2 text-right">Total</th>
+                <Th className="w-32 text-center">
+                  Harga (Rp)
+                  <span className="block text-[10px] font-semibold">Exc. PPN</span>
+                </Th>
+                <Th className="w-32 text-center">
+                  Total (Rp)
+                  <span className="block text-[10px] font-semibold">Exc. PPN</span>
+                </Th>
               </>
             )}
           </tr>
         </thead>
         <tbody>
-          {lines.map((item) => (
-            <tr key={item.id} className="border-b">
-              <td className="py-1.5">{item.description}</td>
-              <td className="py-1.5 text-right">
-                {item.quantity}
-                {item.unit ? ` ${item.unit}` : ""}
-              </td>
+          {lines.map((item, i) => (
+            <tr key={item.id}>
+              <Td className="text-center font-semibold">{i + 1}</Td>
+              <Td>{item.description}</Td>
+              <Td className="text-center">{item.quantity}</Td>
+              <Td className="text-center">{item.unit ?? ""}</Td>
               {showPricing && (
                 <>
-                  <td className="py-1.5 text-right">{fmt(item.unit_price ?? 0)}</td>
-                  <td className="py-1.5 text-right">
-                    {item.discount_percent ? `${item.discount_percent}%` : "-"}
-                  </td>
-                  <td className="py-1.5 text-right font-medium">
-                    {fmt(item.line_total ?? 0)}
-                  </td>
+                  <Td className="text-right">{amount(item.unit_price ?? 0)}</Td>
+                  <Td className="text-right">{amount(item.line_total ?? 0)}</Td>
+                </>
+              )}
+            </tr>
+          ))}
+          {/* Padding rows keep the table the same height as the
+              pre-printed form regardless of how many items there are. */}
+          {Array.from({ length: blankRowCount }).map((_, i) => (
+            <tr key={`blank-${i}`}>
+              <Td className="text-center font-semibold">
+                {lines.length + i + 1}
+              </Td>
+              <Td>-</Td>
+              <Td />
+              <Td />
+              {showPricing && (
+                <>
+                  <Td />
+                  <Td />
                 </>
               )}
             </tr>
@@ -137,15 +149,13 @@ export function SimplePrintView({
         </tbody>
       </table>
 
-      {totals && (
-        <div className="mt-4 flex justify-end">
-          <div className="w-72">{totals}</div>
-        </div>
-      )}
+      {totals && <div className="mt-0 flex justify-end">{totals}</div>}
+
+      <DocumentPaymentInfo bankAccounts={paymentDetails?.bank_accounts} />
 
       {notes && (
-        <div className="mt-6 text-sm">
-          <p className="font-semibold">Notes</p>
+        <div className="mt-6 text-[12px]">
+          <p className="font-bold">Catatan</p>
           <div
             className="mt-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
             dangerouslySetInnerHTML={{ __html: notes }}
@@ -154,8 +164,8 @@ export function SimplePrintView({
       )}
 
       {terms && (
-        <div className="mt-4 text-sm">
-          <p className="font-semibold">Terms &amp; Conditions</p>
+        <div className="mt-4 text-[12px]">
+          <p className="font-bold">Syarat &amp; Ketentuan</p>
           <div
             className="mt-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
             dangerouslySetInnerHTML={{ __html: terms }}
@@ -163,11 +173,37 @@ export function SimplePrintView({
         </div>
       )}
 
-      {footerNote && (
-        <p className="mt-8 text-center text-xs text-gray-500">{footerNote}</p>
-      )}
-
       <DocumentSignature branding={branding} />
     </div>
+  );
+}
+
+function Th({
+  children,
+  className = "",
+}: {
+  children?: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <th
+      className={`border border-black px-2 py-1.5 text-center align-middle text-[12px] font-bold ${className}`}
+    >
+      {children}
+    </th>
+  );
+}
+
+function Td({
+  children,
+  className = "",
+}: {
+  children?: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <td className={`h-7 border border-black px-2 py-1 align-middle ${className}`}>
+      {children}
+    </td>
   );
 }

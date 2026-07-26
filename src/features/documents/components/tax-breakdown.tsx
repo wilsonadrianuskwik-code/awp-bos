@@ -12,6 +12,11 @@ type TaxBreakdownProps = {
   settings: TaxSettings;
   /** Compact spacing for the document canvas/print view. */
   dense?: boolean;
+  /**
+   * Bordered-cell presentation for print, matching the company's paper
+   * documents where the totals sit in a ruled box below the item table.
+   */
+  boxed?: boolean;
 };
 
 /**
@@ -30,9 +35,57 @@ export function TaxBreakdownBlock({
   currency,
   settings,
   dense = false,
+  boxed = false,
 }: TaxBreakdownProps) {
   const b = computeTaxBreakdown(hargaJual, settings);
   const rowClass = dense ? "py-1" : "py-1.5";
+
+  if (boxed) {
+    const rows: { label: string; value: string }[] = [
+      { label: "Total Harga Jual", value: formatCurrency(b.hargaJual, currency) },
+      ...(settings.show_dpp
+        ? [{ label: dppLabel(settings), value: formatCurrency(b.dppAmount, currency) }]
+        : []),
+      { label: "PPN", value: formatCurrency(b.ppnAmount, currency) },
+      ...(settings.pph_percent !== null
+        ? [{
+            label: `Potong PPH ${formatPercent(settings.pph_percent)}%`,
+            value: `(${formatCurrency(b.pphAmount, currency)})`,
+          }]
+        : []),
+      ...(settings.retensi_percent !== null
+        ? [{
+            label: `Potong Retensi ${formatPercent(settings.retensi_percent)}%`,
+            value: `(${formatCurrency(b.retensiAmount, currency)})`,
+          }]
+        : []),
+    ];
+
+    return (
+      <table className="border-collapse text-[12px]">
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.label}>
+              <td className="border border-black px-2 py-1 font-bold uppercase">
+                {row.label}
+              </td>
+              <td className="w-36 border border-black px-2 py-1 text-right font-bold tabular-nums">
+                {row.value}
+              </td>
+            </tr>
+          ))}
+          <tr>
+            <td className="border-2 border-double border-black px-2 py-1 font-bold uppercase">
+              Total
+            </td>
+            <td className="w-36 border-2 border-double border-black px-2 py-1 text-right font-bold tabular-nums">
+              {formatCurrency(b.total, currency)}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  }
 
   return (
     <dl className="w-full text-[13px]">

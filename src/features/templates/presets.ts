@@ -311,7 +311,7 @@ function defaultInvoiceBlocks(): TemplateBlock[] {
       id: blockId("footer"),
       type: "footer",
       enabled: true,
-      config: { content: "Thank you for your business!", show_page_numbers: true, page_number_format: "Page {n} of {total}", alignment: "center", border_top: true },
+      config: { content: "", show_page_numbers: false, page_number_format: "Page {n} of {total}", alignment: "center", border_top: true },
     },
   ];
 }

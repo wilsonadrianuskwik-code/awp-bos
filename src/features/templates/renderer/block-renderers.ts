@@ -622,7 +622,7 @@ function renderSignature(block: TemplateBlock, data: DocumentRenderData): string
 
   const configuredBox = () => `
     <div style="flex:1; text-align:center;">
-      <div style="font-size:9pt; font-weight:600; color:var(--t-text);">${escapeHtml(branding?.signature_label || "Approved by,")}</div>
+      <div style="font-size:9pt; font-weight:600; color:var(--t-text);">${escapeHtml(branding?.signature_label || "Hormat kami,")}</div>
       <div style="position:relative; height:70px; margin-top:6px;">
         ${branding?.signature_url ? `<img src="${escapeHtml(branding.signature_url)}" alt="${escapeHtml(branding?.signatory_name ?? "Signature")}" style="position:absolute; left:0; right:0; margin:0 auto; height:70px; max-width:100%; object-fit:contain;">` : ""}
         ${branding?.signatory_company ? `<div style="position:absolute; left:0; right:0; top:50%; transform:translateY(-50%); border:1px solid var(--t-muted); padding:2px 6px; font-size:8.5pt; font-weight:500; color:var(--t-text);">${escapeHtml(branding.signatory_company)}</div>` : ""}
@@ -738,6 +738,10 @@ function renderFooter(block: TemplateBlock, data: DocumentRenderData): string {
   const pageNumberHtml = showPageNumbers
     ? `<div style="font-size:8pt; color:var(--t-muted);">${escapeHtml(format.replace("{n}", "1").replace("{total}", "1"))}</div>`
     : "";
+
+  // Nothing to say — render nothing at all, rather than an empty block
+  // that still draws its top border across the foot of the page.
+  if (!content.trim() && !showPageNumbers) return "";
 
   return `<div style="text-align:${alignment}; ${borderTop ? "border-top:1px solid var(--t-border); padding-top:8px;" : ""} font-size:8pt; color:var(--t-muted);">
     ${content ? `<div>${resolvePlaceholders(content, data)}</div>` : ""}
