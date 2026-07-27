@@ -33,6 +33,9 @@ import {
 } from "@/features/purchase-orders/validators";
 import type { LineItemInput } from "@/features/line-items/validators";
 import { computeLineItemTotals } from "@/features/line-items/helpers";
+import { TaxBreakdownEditor } from "@/features/documents/components/tax-breakdown-editor";
+import { setDocumentTaxSettings } from "@/features/documents/actions";
+import type { TaxSettings } from "@/features/documents/tax";
 import type { LineItemCategory, TemplateWithItems } from "@/features/line-items/types";
 import type { SupplierSummary } from "@/features/suppliers/types";
 import type {
@@ -138,6 +141,19 @@ export function PurchaseOrderBuilder({
   const [insertPaletteOpen, setInsertPaletteOpen] = useState(false);
   const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
 
+  // Tax settings live on the document row, but the builder needs them
+  // before the row exists, so they're held here and persisted right
+  // after the draft saves (see saveDraft below). ppn_percent null means
+  // this document carries no PPN.
+  const [taxSettings, setTaxSettings] = useState<TaxSettings>({
+    dpp_numerator: purchaseOrder?.dpp_numerator ?? 11,
+    dpp_denominator: purchaseOrder?.dpp_denominator ?? 12,
+    ppn_percent: purchaseOrder?.ppn_percent ?? null,
+    pph_percent: purchaseOrder?.pph_percent ?? null,
+    retensi_percent: purchaseOrder?.retensi_percent ?? null,
+    show_dpp: purchaseOrder?.show_dpp ?? true,
+  });
+
   const [isDirty, setIsDirty] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const lastSavedRef = useRef<string>("");
@@ -212,6 +228,23 @@ export function PurchaseOrderBuilder({
 
     if (!poId && result.data) {
       setPoId(result.data.id);
+    }
+
+    // create_/update_ don't carry tax settings, so apply them in the same
+    // save. Sequential rather than parallel: the row must exist first.
+    const savedId = poId ?? result.data?.id;
+    if (savedId) {
+      const taxResult = await setDocumentTaxSettings(
+        workspace.id,
+        "purchase_order",
+        savedId,
+        taxSettings
+      );
+      if (taxResult.error) {
+        setSaveStatus("error");
+        toast(taxResult.error, "error");
+        return null;
+      }
     }
 
     return result.data;
@@ -346,9 +379,6 @@ export function PurchaseOrderBuilder({
     () => (purchaseOrder?.terms_and_conditions ?? defaultTerms ?? "") !== ""
   );
 
-  const [docTax, setDocTax] = useState<number | null>(() =>
-    inferUniform((purchaseOrder?.line_items ?? []).map((li) => li.tax_percent ?? 0))
-  );
   const [docDiscount, setDocDiscount] = useState<number | null>(() =>
     inferUniform((purchaseOrder?.line_items ?? []).map((li) => li.discount_percent ?? 0))
   );
@@ -361,13 +391,10 @@ export function PurchaseOrderBuilder({
       .map((item) => item.unit ?? "")
   );
 
-  function applyDocDefaults(nextTax: number, nextDiscount: number, nextUnit: string) {
+  function applyDocDefaults(_nextTax: number, nextDiscount: number, nextUnit: string) {
     setLineItems((prev) =>
       prev.map((item) => {
         const patch: Partial<LineItemInput> = {};
-        if (docTax === null || (item.tax_percent ?? 0) === docTax) {
-          patch.tax_percent = nextTax;
-        }
         if (docDiscount === null || (item.discount_percent ?? 0) === docDiscount) {
           patch.discount_percent = nextDiscount;
         }
@@ -378,7 +405,6 @@ export function PurchaseOrderBuilder({
         return { ...item, ...patch };
       })
     );
-    setDocTax(nextTax);
     setDocDiscount(nextDiscount);
   }
 
@@ -389,7 +415,7 @@ export function PurchaseOrderBuilder({
   function newFollowingItem(category: LineItemCategory): LineItemInput {
     return {
       ...emptyItem(category),
-      tax_percent: docTax ?? 0,
+      tax_percent: 0,
       discount_percent: docDiscount ?? 0,
     };
   }
@@ -443,7 +469,7 @@ export function PurchaseOrderBuilder({
   function handleInsertCatalogItem(item: LineItemInput) {
     setLineItems((prev) => [
       ...prev,
-      { ...item, tax_percent: docTax ?? 0, discount_percent: docDiscount ?? 0 },
+      { ...item, tax_percent: 0, discount_percent: docDiscount ?? 0 },
     ]);
   }
 
@@ -632,7 +658,6 @@ export function PurchaseOrderBuilder({
             onDeleteEmpty={deleteEmptyLineItem}
             focusIndex={focusRequest}
             onFocusHandled={handleFocusHandled}
-            docTax={docTax}
             docDiscount={docDiscount}
             docUnit={docUnit}
             onApplyDefaults={applyDocDefaults}
@@ -692,32 +717,16 @@ export function PurchaseOrderBuilder({
             )}
           </div>
 
-          <div className="space-y-2.5 self-end text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span className="tabular-nums">{formatCurrency(totals.subtotal, currency)}</span>
-            </div>
-            {totals.discount_amount > 0 && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Discount</span>
-                <span className="tabular-nums text-red-600 dark:text-red-400">
-                  −{formatCurrency(totals.discount_amount, currency)}
-                </span>
-              </div>
-            )}
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                Tax{docTax !== null && docTax > 0 ? ` (${docTax}%)` : ""}
-              </span>
-              <span className="tabular-nums">{formatCurrency(totals.tax_amount, currency)}</span>
-            </div>
-            <div className="flex items-baseline justify-between border-t pt-3">
-              <span className="text-[15px] font-medium">Total</span>
-              <span className="text-3xl font-semibold tabular-nums tracking-tight">
-                {formatCurrency(totals.total, currency)}
-              </span>
-            </div>
-          </div>
+          <TaxBreakdownEditor
+            hargaJual={totals.subtotal - totals.discount_amount}
+            currency={currency}
+            settings={taxSettings}
+            onChange={(next) => {
+              setTaxSettings(next);
+              setIsDirty(true);
+            }}
+            disabled={!isEditable}
+          />
         </div>
       </div>
 

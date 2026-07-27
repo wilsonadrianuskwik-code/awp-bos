@@ -20,6 +20,21 @@ export type PurchaseOrder = {
   project_id: string | null;
   status: PurchaseOrderStatus;
   subtotal: number;
+  // Indonesian tax breakdown (00088). ppn_percent is null when the
+  // document carries no PPN; pph/retensi are null when not applicable,
+  // which is what keeps them off the printed document rather than
+  // showing a misleading zero row.
+  dpp_numerator: number;
+  dpp_denominator: number;
+  ppn_percent: number | null;
+  pph_percent: number | null;
+  retensi_percent: number | null;
+  /** Presentational: whether the DPP line prints. */
+  show_dpp: boolean;
+  dpp_amount: number;
+  ppn_amount: number;
+  pph_amount: number;
+  retensi_amount: number;
   tax_amount: number;
   discount_amount: number;
   total: number;

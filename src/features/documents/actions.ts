@@ -16,7 +16,7 @@ import type { TaxSettings } from "@/features/documents/tax";
  */
 export async function setDocumentTaxSettings(
   workspaceId: string,
-  documentType: "invoice" | "proforma_invoice",
+  documentType: "invoice" | "proforma_invoice" | "quotation" | "purchase_order",
   documentId: string,
   settings: TaxSettings
 ) {

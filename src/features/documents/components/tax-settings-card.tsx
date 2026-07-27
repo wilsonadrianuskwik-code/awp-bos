@@ -110,15 +110,20 @@ export function TaxSettingsCard({
                 </div>
               </Field>
 
-              <Field label="PPN %">
+              {/* Blank means this document carries no PPN — a
+                  PPN-exclusive price — which is not the same as 0%. */}
+              <Field label="PPN % (blank = no PPN)">
                 <Input
                   type="number"
                   min={0}
                   step="0.001"
                   className="h-8"
-                  value={draft.ppn_percent}
+                  value={draft.ppn_percent ?? ""}
                   onChange={(e) =>
-                    patch({ ppn_percent: Number(e.target.value) || 0 })
+                    patch({
+                      ppn_percent:
+                        e.target.value === "" ? null : Number(e.target.value) || 0,
+                    })
                   }
                 />
               </Field>

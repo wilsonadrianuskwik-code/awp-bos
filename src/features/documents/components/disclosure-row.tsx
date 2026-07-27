@@ -31,8 +31,6 @@ const quietField =
 type DisclosureRowProps = {
   item: LineItemInput;
   currency: string;
-  /** The document-level tax default — a line matching it needs no badge. */
-  docTaxDefault?: number;
   /** The live catalog package this line was inserted from, if it's a
       package line — null/undefined for an ordinary line. Its price locks
       the row's unit-price field (the package's own price is the only
@@ -63,7 +61,6 @@ type DisclosureRowProps = {
 export function DisclosureRow({
   item,
   currency,
-  docTaxDefault = 0,
   packageInfo,
   onChange,
   onRemove,
@@ -103,9 +100,8 @@ export function DisclosureRow({
   const rollingLineTotal = useRollingAmount(lineTotal);
 
   const discountPct = item.discount_percent ?? 0;
-  const taxPct = item.tax_percent ?? 0;
+
   const showDiscountBadge = discountPct > 0;
-  const showTaxBadge = taxPct !== docTaxDefault;
 
   return (
     <div
@@ -153,11 +149,6 @@ export function DisclosureRow({
         {showDiscountBadge && (
           <span className="shrink-0 rounded bg-red-50 px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-red-700 dark:bg-red-400/10 dark:text-red-400">
             −{discountPct}%
-          </span>
-        )}
-        {showTaxBadge && (
-          <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-muted-foreground">
-            tax {taxPct}%
           </span>
         )}
 
@@ -270,20 +261,6 @@ export function DisclosureRow({
               value={discountPct}
               onChange={(e) =>
                 onChange({ discount_percent: Number(e.target.value) || 0 })
-              }
-              min={0}
-              max={100}
-              className={cn(quietField, "w-14 border-input/60 text-right")}
-            />
-            %
-          </label>
-          <label className="flex items-center gap-1.5">
-            Tax
-            <input
-              type="number"
-              value={taxPct}
-              onChange={(e) =>
-                onChange({ tax_percent: Number(e.target.value) || 0 })
               }
               min={0}
               max={100}

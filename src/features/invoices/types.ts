@@ -40,7 +40,7 @@ export type Invoice = {
   // the printed document rather than showing a misleading zero row.
   dpp_numerator: number;
   dpp_denominator: number;
-  ppn_percent: number;
+  ppn_percent: number | null;
   pph_percent: number | null;
   retensi_percent: number | null;
   /** Presentational: whether the DPP line prints. */

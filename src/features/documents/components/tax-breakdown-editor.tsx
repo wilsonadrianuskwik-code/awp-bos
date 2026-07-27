@@ -2,7 +2,7 @@
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { TaxBreakdownBlock } from "@/features/documents/components/tax-breakdown";
-import type { TaxSettings } from "@/features/documents/tax";
+import { hasPpn, type TaxSettings } from "@/features/documents/tax";
 
 type TaxBreakdownEditorProps = {
   hargaJual: number;
@@ -37,8 +37,19 @@ export function TaxBreakdownEditor({
       />
 
       <div className="space-y-2 border-t pt-3">
+        {/* PPN-exclusive pricing is a real case, so PPN is a per-document
+            choice like the withholdings — not a constant. */}
+        <Toggle
+          label="PPN"
+          value={settings.ppn_percent}
+          defaultRate={12}
+          disabled={disabled}
+          onChange={(ppn_percent) => onChange({ ...settings, ppn_percent })}
+        />
         {/* Show/hide only — the DPP amount is still computed either way,
-            since PPN is derived from it. */}
+            since PPN is derived from it. DPP has nothing to explain when
+            no PPN is charged, so the choice only appears alongside it. */}
+        {hasPpn(settings) && (
         <label className="flex items-center gap-2 text-[13px]">
           <Checkbox
             checked={settings.show_dpp}
@@ -49,6 +60,7 @@ export function TaxBreakdownEditor({
           />
           Show DPP {settings.dpp_numerator}/{settings.dpp_denominator}
         </label>
+        )}
         <Toggle
           label="Potong PPH"
           value={settings.pph_percent}

@@ -316,9 +316,6 @@ export function ProformaInvoiceBuilder({
     () => (proformaInvoice?.terms_and_conditions ?? "") !== ""
   );
 
-  const [docTax, setDocTax] = useState<number | null>(() =>
-    inferUniform((proformaInvoice?.line_items ?? []).map((li) => li.tax_percent ?? 0))
-  );
   const [docDiscount, setDocDiscount] = useState<number | null>(() =>
     inferUniform((proformaInvoice?.line_items ?? []).map((li) => li.discount_percent ?? 0))
   );
@@ -331,11 +328,10 @@ export function ProformaInvoiceBuilder({
       .map((item) => item.unit ?? "")
   );
 
-  function applyDocDefaults(nextTax: number, nextDiscount: number, nextUnit: string) {
+  function applyDocDefaults(_nextTax: number, nextDiscount: number, nextUnit: string) {
     setLineItems((prev) =>
       prev.map((item) => {
         const patch: Partial<LineItemInput> = {};
-        if (docTax === null || (item.tax_percent ?? 0) === docTax) patch.tax_percent = nextTax;
         if (docDiscount === null || (item.discount_percent ?? 0) === docDiscount)
           patch.discount_percent = nextDiscount;
         // Unit applies to every line unconditionally — there's no
@@ -345,7 +341,6 @@ export function ProformaInvoiceBuilder({
         return { ...item, ...patch };
       })
     );
-    setDocTax(nextTax);
     setDocDiscount(nextDiscount);
   }
 
@@ -358,7 +353,7 @@ export function ProformaInvoiceBuilder({
   }
 
   function newFollowingItem(category: LineItemCategory): LineItemInput {
-    return { ...emptyItem(category), tax_percent: docTax ?? 0, discount_percent: docDiscount ?? 0 };
+    return { ...emptyItem(category), tax_percent: 0, discount_percent: docDiscount ?? 0 };
   }
 
   function addLineItem(category: LineItemCategory) {
@@ -392,7 +387,7 @@ export function ProformaInvoiceBuilder({
   function handleInsertCatalogItem(item: LineItemInput) {
     setLineItems((prev) => [
       ...prev,
-      { ...item, tax_percent: docTax ?? 0, discount_percent: docDiscount ?? 0 },
+      { ...item, tax_percent: 0, discount_percent: docDiscount ?? 0 },
     ]);
   }
 
@@ -580,7 +575,6 @@ export function ProformaInvoiceBuilder({
             onDeleteEmpty={deleteEmptyLineItem}
             focusIndex={focusRequest}
             onFocusHandled={handleFocusHandled}
-            docTax={docTax}
             docDiscount={docDiscount}
             docUnit={docUnit}
             onApplyDefaults={applyDocDefaults}

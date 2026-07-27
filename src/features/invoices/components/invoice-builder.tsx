@@ -419,11 +419,6 @@ export function InvoiceBuilder({
   // their honesty badge. null = the document's lines are mixed. Initial
   // value is inferred from the loaded lines, so an existing uniform
   // draft reads back correctly. No schema involvement.
-  const [docTax, setDocTax] = useState<number | null>(() =>
-    inferUniform(
-      (invoice?.line_items ?? []).map((li) => li.tax_percent ?? 0)
-    )
-  );
   const [docDiscount, setDocDiscount] = useState<number | null>(() =>
     inferUniform(
       (invoice?.line_items ?? []).map((li) => li.discount_percent ?? 0)
@@ -441,15 +436,10 @@ export function InvoiceBuilder({
       .map((item) => item.unit ?? "")
   );
 
-  function applyDocDefaults(nextTax: number, nextDiscount: number, nextUnit: string) {
+  function applyDocDefaults(_nextTax: number, nextDiscount: number, nextUnit: string) {
     setLineItems((prev) =>
       prev.map((item) => {
         const patch: Partial<LineItemInput> = {};
-        // docTax === null means "mixed" — applying from a mixed state
-        // intentionally sets every line (the popover says so).
-        if (docTax === null || (item.tax_percent ?? 0) === docTax) {
-          patch.tax_percent = nextTax;
-        }
         if (
           docDiscount === null ||
           (item.discount_percent ?? 0) === docDiscount
@@ -463,7 +453,6 @@ export function InvoiceBuilder({
         return { ...item, ...patch };
       })
     );
-    setDocTax(nextTax);
     setDocDiscount(nextDiscount);
   }
 
@@ -477,7 +466,7 @@ export function InvoiceBuilder({
   function newFollowingItem(category: LineItemCategory): LineItemInput {
     return {
       ...emptyItem(category),
-      tax_percent: docTax ?? 0,
+      tax_percent: 0,
       discount_percent: docDiscount ?? 0,
     };
   }
@@ -541,7 +530,7 @@ export function InvoiceBuilder({
       ...prev,
       {
         ...item,
-        tax_percent: docTax ?? 0,
+        tax_percent: 0,
         discount_percent: docDiscount ?? 0,
       },
     ]);
@@ -766,7 +755,6 @@ export function InvoiceBuilder({
             onDeleteEmpty={deleteEmptyLineItem}
             focusIndex={focusRequest}
             onFocusHandled={handleFocusHandled}
-            docTax={docTax}
             docDiscount={docDiscount}
             docUnit={docUnit}
             onApplyDefaults={applyDocDefaults}

@@ -13,6 +13,7 @@ import { PurchaseOrderInspector } from "@/features/purchase-orders/components/pu
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { formatCurrency } from "@/lib/utils/format-currency";
+import { computeTaxBreakdown, taxTotalRows } from "@/features/documents/tax";
 import type {
   DocumentRelationship,
   PurchaseOrderDetail as PurchaseOrderDetailType,
@@ -48,6 +49,20 @@ export function PurchaseOrderDetail({
 }: PurchaseOrderDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
+
+  const fmtPo = (value: number) => formatCurrency(value, purchaseOrder.currency);
+  const poSettings = {
+    dpp_numerator: purchaseOrder.dpp_numerator,
+    dpp_denominator: purchaseOrder.dpp_denominator,
+    ppn_percent: purchaseOrder.ppn_percent,
+    pph_percent: purchaseOrder.pph_percent,
+    retensi_percent: purchaseOrder.retensi_percent,
+    show_dpp: purchaseOrder.show_dpp,
+  };
+  const poBreakdown = computeTaxBreakdown(
+    purchaseOrder.subtotal - purchaseOrder.discount_amount,
+    poSettings
+  );
 
   function handleCopyNumber() {
     navigator.clipboard.writeText(purchaseOrder.po_number);
@@ -204,22 +219,8 @@ export function PurchaseOrderDetail({
         ]}
         lines={purchaseOrder.line_items}
         currency={purchaseOrder.currency}
-        totalRows={[
-          { label: "Subtotal", value: formatCurrency(purchaseOrder.subtotal, purchaseOrder.currency) },
-          ...(purchaseOrder.discount_amount > 0
-            ? [{
-                label: "Discount",
-                value: `(${formatCurrency(purchaseOrder.discount_amount, purchaseOrder.currency)})`,
-              }]
-            : []),
-          ...(purchaseOrder.tax_amount > 0
-            ? [{ label: "PPN", value: formatCurrency(purchaseOrder.tax_amount, purchaseOrder.currency) }]
-            : []),
-        ]}
-        total={{
-          label: "Total",
-          value: formatCurrency(purchaseOrder.total, purchaseOrder.currency),
-        }}
+        totalRows={taxTotalRows(poBreakdown, poSettings, fmtPo)}
+        total={{ label: "Total", value: fmtPo(poBreakdown.total) }}
         notes={purchaseOrder.notes}
         terms={purchaseOrder.terms_and_conditions}
       />

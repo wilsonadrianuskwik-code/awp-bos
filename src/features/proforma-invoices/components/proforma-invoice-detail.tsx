@@ -15,11 +15,7 @@ import { LinkedDocumentsCard } from "@/features/documents/components/linked-docu
 import { TaxSettingsCard } from "@/features/documents/components/tax-settings-card";
 import { TaxBreakdownBlock } from "@/features/documents/components/tax-breakdown";
 import { SimplePrintView } from "@/features/documents/components/simple-print-view";
-import {
-  computeTaxBreakdown,
-  dppLabel,
-  formatPercent,
-} from "@/features/documents/tax";
+import { computeTaxBreakdown, taxTotalRows } from "@/features/documents/tax";
 import { PrintButton } from "@/features/documents/components/print-button";
 import { ProformaInvoiceStatusActions } from "./proforma-invoice-status-actions";
 import { isEditableStatus } from "@/features/proforma-invoices/helpers";
@@ -97,25 +93,7 @@ export function ProformaInvoiceDetail({
     proformaInvoice.subtotal - proformaInvoice.discount_amount,
     piSettings
   );
-  const piTotalRows = [
-    { label: "Total Harga Jual", value: fmtPi(piBreakdown.hargaJual) },
-    ...(piSettings.show_dpp
-      ? [{ label: dppLabel(piSettings), value: fmtPi(piBreakdown.dppAmount) }]
-      : []),
-    { label: "PPN", value: fmtPi(piBreakdown.ppnAmount) },
-    ...(piSettings.pph_percent !== null
-      ? [{
-          label: `Potong PPH ${formatPercent(piSettings.pph_percent)}%`,
-          value: `(${fmtPi(piBreakdown.pphAmount)})`,
-        }]
-      : []),
-    ...(piSettings.retensi_percent !== null
-      ? [{
-          label: `Potong Retensi ${formatPercent(piSettings.retensi_percent)}%`,
-          value: `(${fmtPi(piBreakdown.retensiAmount)})`,
-        }]
-      : []),
-  ];
+  const piTotalRows = taxTotalRows(piBreakdown, piSettings, fmtPi);
 
   return (
     <>

@@ -8,6 +8,7 @@ import {
   DocumentTableRow,
   DocumentTotals,
 } from "@/features/documents/components/document-shell";
+import { computeTaxBreakdown, taxTotalRows } from "@/features/documents/tax";
 import type { QuotationDetail } from "@/features/quotations/types";
 import type {
   BrandingSettings,
@@ -26,8 +27,9 @@ type QuotationPrintViewProps = {
 
 /**
  * Quotations keep the plain subtotal/discount/tax totals — they were
- * never moved to the document-level PPN model that Invoices and Proforma
- * Invoices use, so the Indonesian breakdown doesn't apply here.
+ * Totals use the same Indonesian breakdown as every other document
+ * (00088), so a quotation and the invoice generated from it can never
+ * total differently from the same line items.
  */
 export function QuotationPrintView({
   quotation,
@@ -38,6 +40,19 @@ export function QuotationPrintView({
   paymentDetails,
 }: QuotationPrintViewProps) {
   const fmt = (value: number) => formatCurrency(value, quotation.currency);
+
+  const settings = {
+    dpp_numerator: quotation.dpp_numerator,
+    dpp_denominator: quotation.dpp_denominator,
+    ppn_percent: quotation.ppn_percent,
+    pph_percent: quotation.pph_percent,
+    retensi_percent: quotation.retensi_percent,
+    show_dpp: quotation.show_dpp,
+  };
+  const breakdown = computeTaxBreakdown(
+    quotation.subtotal - quotation.discount_amount,
+    settings
+  );
 
   return (
     <DocumentShell
@@ -94,16 +109,8 @@ export function QuotationPrintView({
       </DocumentTable>
 
       <DocumentTotals
-        rows={[
-          { label: "Subtotal", value: fmt(quotation.subtotal) },
-          ...(quotation.discount_amount > 0
-            ? [{ label: "Discount", value: `(${fmt(quotation.discount_amount)})` }]
-            : []),
-          ...(quotation.tax_amount > 0
-            ? [{ label: "PPN", value: fmt(quotation.tax_amount) }]
-            : []),
-        ]}
-        total={{ label: "Total", value: fmt(quotation.total) }}
+        rows={taxTotalRows(breakdown, settings, fmt)}
+        total={{ label: "Total", value: fmt(breakdown.total) }}
       />
 
       <DocumentFootnote

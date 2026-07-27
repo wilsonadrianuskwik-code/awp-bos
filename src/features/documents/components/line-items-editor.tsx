@@ -55,7 +55,6 @@ type LineItemsEditorProps = {
   focusIndex?: number | null;
   onFocusHandled?: () => void;
   /** Document-level defaults — null means the lines are mixed. */
-  docTax?: number | null;
   docDiscount?: number | null;
   /** Document-level unit — null when the lines use different units. */
   docUnit?: string | null;
@@ -68,24 +67,20 @@ type LineItemsEditorProps = {
 // type-11%-into-every-row ERP chore; per-line overrides stay possible
 // via row expand and keep their honesty badge.
 function DocDefaultsControl({
-  docTax,
   docDiscount,
   docUnit,
   onApply,
 }: {
-  docTax: number | null;
   docDiscount: number | null;
   docUnit: string | null;
   onApply: (tax: number, discount: number, unit: string) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [taxInput, setTaxInput] = useState("");
   const [discountInput, setDiscountInput] = useState("");
   const [unitInput, setUnitInput] = useState("");
 
   function handleOpenChange(next: boolean) {
     if (next) {
-      setTaxInput(docTax === null ? "" : String(docTax));
       setDiscountInput(docDiscount === null ? "" : String(docDiscount));
       setUnitInput(docUnit === null ? "" : docUnit);
     }
@@ -93,7 +88,10 @@ function DocDefaultsControl({
   }
 
   function apply() {
-    onApply(Number(taxInput) || 0, Number(discountInput) || 0, unitInput.trim());
+    // Tax is no longer a line-level concept: PPN is set once on the
+    // document's totals block (see TaxBreakdownEditor), so every line is
+    // written tax-free and the breakdown is the only place a rate lives.
+    onApply(0, Number(discountInput) || 0, unitInput.trim());
     setOpen(false);
   }
 
@@ -107,8 +105,6 @@ function DocDefaultsControl({
           type="button"
           className="rounded-md px-2 py-1 text-[13px] tabular-nums text-muted-foreground transition-colors duration-100 hover:bg-muted/60 hover:text-foreground"
         >
-          Tax {docTax === null ? "· mixed" : `${docTax}%`}
-          <span className="mx-1.5 text-muted-foreground/40">·</span>
           Discount {docDiscount === null ? "· mixed" : `${docDiscount}%`}
           <span className="mx-1.5 text-muted-foreground/40">·</span>
           Unit {docUnit === null ? "· mixed" : docUnit || "—"}
@@ -119,35 +115,6 @@ function DocDefaultsControl({
           Document defaults
         </p>
         <div className="mt-3 space-y-2.5">
-          <label className="flex items-center justify-between gap-3 text-sm">
-            <span className="flex items-center gap-2">
-              Tax
-              <button
-                type="button"
-                onClick={() => setTaxInput("11")}
-                className={cn(
-                  "rounded-full border px-2 py-0.5 text-[11px] font-medium transition-colors duration-100",
-                  taxInput === "11"
-                    ? "border-primary/30 bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted"
-                )}
-              >
-                PPN 11%
-              </button>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <input
-                type="number"
-                min={0}
-                max={100}
-                value={taxInput}
-                onChange={(e) => setTaxInput(e.target.value)}
-                placeholder={docTax === null ? "mixed" : "0"}
-                className={fieldClass}
-              />
-              %
-            </span>
-          </label>
           <label className="flex items-center justify-between gap-3 text-sm">
             Discount
             <span className="flex items-center gap-1.5">
@@ -183,7 +150,7 @@ function DocDefaultsControl({
           </label>
         </div>
         <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-          {docTax === null || docDiscount === null
+          {docDiscount === null
             ? "Lines currently differ — applying sets every line to these values."
             : "Applies to lines following the document default; lines you've overridden keep their value."}
         </p>
@@ -216,7 +183,6 @@ export function LineItemsEditor({
   onDeleteEmpty,
   focusIndex,
   onFocusHandled,
-  docTax,
   docDiscount,
   docUnit,
   onApplyDefaults,
@@ -263,7 +229,6 @@ export function LineItemsEditor({
         <div className="flex items-center gap-1">
           {onApplyDefaults && (
             <DocDefaultsControl
-              docTax={docTax === undefined ? 0 : docTax}
               docDiscount={docDiscount === undefined ? 0 : docDiscount}
               docUnit={docUnit === undefined ? "" : docUnit}
               onApply={onApplyDefaults}
@@ -374,7 +339,6 @@ export function LineItemsEditor({
                       key={originalIndex}
                       item={item}
                       currency={currency}
-                      docTaxDefault={docTax ?? 0}
                       packageInfo={catalogItem?.is_package ? catalogItem : null}
                       onChange={(patch) => onUpdate(originalIndex, patch)}
                       onRemove={() => onRemove(originalIndex)}

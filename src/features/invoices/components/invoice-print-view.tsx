@@ -8,7 +8,7 @@ import {
   DocumentTableRow,
   DocumentTotals,
 } from "@/features/documents/components/document-shell";
-import { computeTaxBreakdown, dppLabel, formatPercent } from "@/features/documents/tax";
+import { computeTaxBreakdown, taxTotalRows } from "@/features/documents/tax";
 import type { InvoiceDetail } from "@/features/invoices/types";
 import type {
   BrandingSettings,
@@ -98,29 +98,7 @@ export function InvoicePrintView({
 
       <DocumentTotals
         rows={[
-          { label: "Total Harga Jual", value: fmt(breakdown.hargaJual) },
-          ...(settings.show_dpp
-            ? [{ label: dppLabel(settings), value: fmt(breakdown.dppAmount) }]
-            : []),
-          // No rate on the PPN label: it's a regulation constant, unlike
-          // PPH and Retensi which are negotiated per document.
-          { label: "PPN", value: fmt(breakdown.ppnAmount) },
-          ...(settings.pph_percent !== null
-            ? [
-                {
-                  label: `Potong PPH ${formatPercent(settings.pph_percent)}%`,
-                  value: `(${fmt(breakdown.pphAmount)})`,
-                },
-              ]
-            : []),
-          ...(settings.retensi_percent !== null
-            ? [
-                {
-                  label: `Potong Retensi ${formatPercent(settings.retensi_percent)}%`,
-                  value: `(${fmt(breakdown.retensiAmount)})`,
-                },
-              ]
-            : []),
+          ...taxTotalRows(breakdown, settings, fmt),
           // Payment lines only once money has actually moved.
           ...(invoice.amount_paid > 0
             ? [

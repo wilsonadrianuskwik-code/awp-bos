@@ -3,6 +3,7 @@ import {
   computeTaxBreakdown,
   dppLabel,
   formatPercent,
+  hasPpn,
   type TaxSettings,
 } from "@/features/documents/tax";
 
@@ -33,6 +34,7 @@ export function TaxBreakdownBlock({
 }: TaxBreakdownProps) {
   const b = computeTaxBreakdown(hargaJual, settings);
   const rowClass = dense ? "py-1" : "py-1.5";
+  const ppn = hasPpn(settings);
 
   return (
     <dl className="w-full text-[13px]">
@@ -41,7 +43,7 @@ export function TaxBreakdownBlock({
         label="Total Harga Jual"
         value={formatCurrency(b.hargaJual, currency)}
       />
-      {settings.show_dpp && (
+      {ppn && settings.show_dpp && (
         <Row
           className={rowClass}
           label={dppLabel(settings)}
@@ -52,11 +54,13 @@ export function TaxBreakdownBlock({
           constant here, not a per-document negotiation like PPH and
           Retensi, so printing it invites questions it can't answer. The
           rate still drives the amount. */}
-      <Row
-        className={rowClass}
-        label="PPN"
-        value={formatCurrency(b.ppnAmount, currency)}
-      />
+      {ppn && (
+        <Row
+          className={rowClass}
+          label="PPN"
+          value={formatCurrency(b.ppnAmount, currency)}
+        />
+      )}
       {settings.pph_percent !== null && (
         <Row
           className={rowClass}
