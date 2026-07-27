@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search,
+  FileSearch,
   CornerDownLeft,
   UserCheck,
   FileText,
@@ -12,6 +13,8 @@ import {
 } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { NAV_GROUPS, BOTTOM_ITEMS } from "@/components/layout/sidebar";
+import { searchWorkspace, type SearchHit } from "@/features/search/actions";
+import { useWorkspace } from "@/providers/workspace-provider";
 import { cn } from "@/lib/utils/cn";
 
 type CommandPaletteProps = {
@@ -20,6 +23,9 @@ type CommandPaletteProps = {
   workspaceSlug: string;
 };
 
+/** One character matches too much to be worth a round trip. */
+const MIN_SEARCH_LENGTH = 2;
+
 type Destination = {
   label: string;
   href: string;
@@ -27,11 +33,16 @@ type Destination = {
   group: string;
 };
 
-// ⌘K navigation. Deliberately minimal: it searches the same destinations
-// the sidebar shows (plus quick "create" jumps), so it never surprises —
-// the palette is a faster path to places users already understand.
-export function CommandPalette({ open, onOpenChange, workspaceSlug }: CommandPaletteProps) {
+// ⌘K: the same destinations the sidebar shows, plus quick "create" jumps,
+// plus the records themselves — typing an invoice number or a client name
+// goes straight there instead of to the list page it lives on.
+export function CommandPalette({
+  open,
+  onOpenChange,
+  workspaceSlug,
+}: CommandPaletteProps) {
   const router = useRouter();
+  const { workspace } = useWorkspace();
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -56,11 +67,44 @@ export function CommandPalette({ open, onOpenChange, workspaceSlug }: CommandPal
     return [...nav, ...creates];
   }, []);
 
-  const results = useMemo(() => {
+  const [hits, setHits] = useState<SearchHit[]>([]);
+
+  // Record search runs against the server; nav filtering stays local so
+  // the palette is never waiting to show the thing it already knows.
+  useEffect(() => {
+    const term = query.trim();
+    // Below the threshold the render path ignores `hits` outright, so
+    // there's nothing to clear here — just don't search.
+    if (term.length < MIN_SEARCH_LENGTH) return;
+    let cancelled = false;
+    const timeout = setTimeout(async () => {
+      const result = await searchWorkspace(workspace.id, term);
+      if (!cancelled) setHits(result.data ?? []);
+    }, 180);
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
+  }, [query, workspace.id]);
+
+  const results = useMemo<Destination[]>(() => {
     const q = query.trim().toLowerCase();
     if (!q) return destinations;
-    return destinations.filter((d) => d.label.toLowerCase().includes(q));
-  }, [query, destinations]);
+
+    const navMatches = destinations.filter((d) =>
+      d.label.toLowerCase().includes(q)
+    );
+    if (q.length < MIN_SEARCH_LENGTH) return navMatches;
+    // Records first: if someone typed a document number, that record is
+    // what they want — not the list page whose name happens to match.
+    const recordMatches: Destination[] = hits.map((hit) => ({
+      label: hit.detail ? `${hit.label} · ${hit.detail}` : hit.label,
+      href: `/${hit.routeSegment}/${hit.id}`,
+      icon: FileSearch,
+      group: hit.group,
+    }));
+    return [...recordMatches, ...navMatches];
+  }, [query, destinations, hits]);
 
   useEffect(() => {
     if (open) {
@@ -104,7 +148,7 @@ export function CommandPalette({ open, onOpenChange, workspaceSlug }: CommandPal
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Go to page or create…"
+            placeholder="Search documents, projects, people — or go to a page…"
             className="h-12 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
           <kbd className="hidden rounded border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground sm:block">
@@ -119,7 +163,7 @@ export function CommandPalette({ open, onOpenChange, workspaceSlug }: CommandPal
           ) : (
             results.map((destination, index) => (
               <button
-                key={`${destination.group}-${destination.label}`}
+                key={`${destination.group}-${destination.href}`}
                 type="button"
                 onClick={() => navigateTo(destination)}
                 onMouseEnter={() => setActiveIndex(index)}
