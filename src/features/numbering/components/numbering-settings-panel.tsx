@@ -35,14 +35,14 @@ const DOCUMENT_TYPE_LABEL: Record<NumberingDocumentType, string> = {
 
 /**
  * The built-in standard, and it must stay identical to the fallback in
- * generate_document_number (00078). This panel prefills unsaved rows
+ * generate_document_number (00091). This panel prefills unsaved rows
  * with it, so any drift between the two silently becomes a different
  * numbering scheme the moment someone saves a row — which is exactly how
  * the project code went missing once already (see 00090).
  */
-const DEFAULT_TEMPLATE = "{PREFIX}/AWP-{PROJECT_CODE}/{DD}{MM}{YYYY}-{SEQ:3}";
-const DEFAULT_CADENCE: ResetCadence = "never";
-const DEFAULT_SCOPE: SequenceScope = "project";
+const DEFAULT_TEMPLATE = "{PREFIX}/AWP/{DD}{MM}{YYYY}-{SEQ:3}";
+const DEFAULT_CADENCE: ResetCadence = "yearly";
+const DEFAULT_SCOPE: SequenceScope = "workspace";
 
 /**
  * The prefix each create_* RPC passes as {PREFIX} (00078). Kept here so
