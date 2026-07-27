@@ -19,8 +19,6 @@ import { DocumentFilterBar } from "@/features/documents/components/document-filt
 import {
   REGISTER_COLUMNS,
   buildRegisterRow,
-  downloadCsv,
-  toCsv,
 } from "@/features/documents/register-export";
 
 /** Rows are keyed across types — ids are only unique within a table. */
@@ -131,19 +129,15 @@ export function AllDocumentsPage({
     [documents, selectedIds]
   );
 
+  /**
+   * Hands the current filters (and any tick-box selection) to the export
+   * route, which builds the workbook server-side. The same query runs
+   * again there, so the file can't disagree with what's on screen.
+   */
   function handleExport() {
-    const csv = toCsv(REGISTER_COLUMNS, exportable.map(buildRegisterRow));
-    const project = searchParams.get("project");
-    const type = searchParams.get("type");
-    const scope = [
-      project ? projects.find((p) => p.id === project)?.code : null,
-      type ? DOCUMENT_TYPE_LABEL[type as keyof typeof DOCUMENT_TYPE_LABEL] : null,
-      selectedIds.size > 0 ? "selected" : null,
-    ]
-      .filter(Boolean)
-      .join(" - ");
-    const today = new Date().toISOString().slice(0, 10);
-    downloadCsv(scope ? `Register ${scope} ${today}` : `Register ${today}`, csv);
+    const params = new URLSearchParams(searchParams.toString());
+    if (selectedIds.size > 0) params.set("ids", [...selectedIds].join(","));
+    window.location.href = `/${workspace.slug}/documents/export?${params}`;
   }
 
   return (

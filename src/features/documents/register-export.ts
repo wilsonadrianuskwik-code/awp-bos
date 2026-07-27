@@ -26,80 +26,71 @@ export const REGISTER_COLUMNS = [
   "PLUS/MINUS",
 ] as const;
 
-function formatDate(iso: string | null): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
-}
+/** Index of the first money column — everything from here is numeric. */
+export const FIRST_AMOUNT_COLUMN = 6;
+
+export type RegisterCell = string | number | Date | null;
 
 /**
- * Numbers go out unformatted — no thousands separators, no currency
- * symbol — so the spreadsheet reads them as numbers rather than text.
- * Formatting is the workbook's job; a "Rp 20.020.200" string in a cell
- * that should be summed is worse than useless.
+ * One register row as typed values rather than strings.
+ *
+ * Dates stay Date and amounts stay number so the spreadsheet can sort,
+ * sum and re-format them. Turning them into text at this layer is what
+ * makes an exported register something you can only look at.
  */
-function num(value: number | null | undefined): string {
-  return value == null ? "" : String(value);
-}
-
-export function buildRegisterRow(doc: AnyDocument): string[] {
-  const hargaJual = doc.harga_jual ?? null;
-  const paid = doc.amount_paid ?? null;
+export function registerValues(doc: AnyDocument): RegisterCell[] {
   const total = doc.total ?? null;
+  const paid = doc.amount_paid ?? null;
 
   return [
-    formatDate(doc.issue_date ?? doc.created_at),
-    doc.customer_po_number ?? "",
+    toDate(doc.issue_date ?? doc.created_at),
+    doc.customer_po_number ?? null,
     doc.number,
-    doc.tax_invoice_number ?? "",
-    doc.party ?? "",
-    doc.description ?? "",
-    num(hargaJual),
+    doc.tax_invoice_number ?? null,
+    doc.party ?? null,
+    doc.description ?? null,
+    doc.harga_jual ?? null,
     // PTG DP and BIAYA ADM have no field behind them yet — the column is
     // emitted so the sheet's shape matches, and left for the accountant
     // to fill until we know whether they should alter the total.
-    "",
-    num(doc.dpp_amount),
-    num(doc.ppn_amount),
-    num(doc.pph_amount),
-    num(doc.retensi_amount),
-    "",
-    num(total),
+    null,
+    doc.dpp_amount ?? null,
+    doc.ppn_amount ?? null,
+    doc.pph_amount ?? null,
+    doc.retensi_amount ?? null,
+    null,
+    total,
     // PAYMENT is what the customer has actually paid; TERIMA is the date
     // that payment came in.
-    num(paid),
-    formatDate(doc.payment_date ?? null),
+    paid,
+    toDate(doc.payment_date ?? null),
     // PLUS/MINUS: paid against billed. Negative is short-paid, positive
     // is over-paid, blank when nothing has been paid yet.
-    total != null && paid != null ? String(Math.round((paid - total) * 100) / 100) : "",
+    total != null && paid != null ? Math.round((paid - total) * 100) / 100 : null,
   ];
 }
 
-/**
- * RFC 4180 quoting, with a UTF-8 BOM and semicolon separator.
- *
- * The semicolon is deliberate: Excel picks its field separator from the
- * system list separator, which is ";" under Indonesian regional
- * settings. A comma-separated file opens there as one column per row.
- * The BOM is what makes Excel read it as UTF-8 rather than mangling
- * accented characters.
- */
-export function toCsv(headers: readonly string[], rows: string[][]): string {
-  const escape = (cell: string) =>
-    /[";\n\r]/.test(cell) ? `"${cell.replace(/"/g, '""')}"` : cell;
-  const lines = [headers, ...rows].map((row) => row.map(escape).join(";"));
-  return `﻿${lines.join("\r\n")}`;
+function toDate(iso: string | null | undefined): Date | null {
+  if (!iso) return null;
+  const date = new Date(iso);
+  return Number.isNaN(date.getTime()) ? null : date;
 }
 
-/** Triggers a browser download without a round trip to the server. */
-export function downloadCsv(filename: string, csv: string) {
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename.endsWith(".csv") ? filename : `${filename}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+/** Display form of a cell, for the printed register. */
+export function formatRegisterCell(cell: RegisterCell): string {
+  if (cell == null) return "";
+  if (cell instanceof Date) {
+    return `${String(cell.getDate()).padStart(2, "0")}/${String(
+      cell.getMonth() + 1
+    ).padStart(2, "0")}/${cell.getFullYear()}`;
+  }
+  if (typeof cell === "number") {
+    return new Intl.NumberFormat("id-ID").format(cell);
+  }
+  return cell;
+}
+
+/** The row as strings, for the printed/PDF register table. */
+export function buildRegisterRow(doc: AnyDocument): string[] {
+  return registerValues(doc).map(formatRegisterCell);
 }
