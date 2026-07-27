@@ -269,3 +269,29 @@ export async function recordInvoiceFirstView(
   if (error) return { data: null, error: error.message };
   return { data: data as unknown as Invoice, error: null };
 }
+
+/**
+ * The client's PO number and the Faktur Pajak serial. Separate from
+ * updateInvoice because these are references rather than content: the
+ * serial routinely arrives after the invoice is paid, when
+ * update_invoice's payment guard would refuse the write (see 00092).
+ */
+export async function setInvoiceReferences(
+  workspaceId: string,
+  invoiceId: string,
+  input: { customer_po_number?: string | null; tax_invoice_number?: string | null }
+) {
+  return withWorkspace(workspaceId, "staff", async (ctx) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("set_invoice_references", {
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+      p_invoice_id: invoiceId,
+      p_input: input,
+    });
+    if (error) throw new Error(error.message);
+
+    revalidatePath(`/${ctx.workspaceSlug}/invoices/${invoiceId}`);
+    return data;
+  });
+}

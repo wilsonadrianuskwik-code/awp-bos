@@ -64,7 +64,7 @@ export async function getAllDocuments(
       wants("invoice")
         ? build(
             "invoices",
-            "id, invoice_number, status, total, currency, created_at, client:clients(name)"
+            "id, invoice_number, status, total, currency, created_at, issue_date, title, summary, subtotal, discount_amount, dpp_amount, ppn_amount, pph_amount, retensi_amount, amount_paid, customer_po_number, tax_invoice_number, client:clients(name)"
           )
         : null,
       wants("purchase_order")
@@ -135,6 +135,18 @@ export async function getAllDocuments(
       created_at: r.created_at as string,
       project: projectOf(r),
       party: named(r, "client"),
+      issue_date: r.issue_date as string,
+      description: (r.title as string) || (r.summary as string) || null,
+      // Harga jual is the pre-tax figure the register wants: lines less
+      // line discounts, before any PPN.
+      harga_jual: (r.subtotal as number) - (r.discount_amount as number),
+      dpp_amount: r.dpp_amount as number,
+      ppn_amount: r.ppn_amount as number,
+      pph_amount: r.pph_amount as number,
+      retensi_amount: r.retensi_amount as number,
+      amount_paid: r.amount_paid as number,
+      customer_po_number: (r.customer_po_number as string) ?? null,
+      tax_invoice_number: (r.tax_invoice_number as string) ?? null,
     })),
     ...((purchaseOrders?.data ?? []) as unknown as Row[]).map((r) => ({
       id: r.id as string,

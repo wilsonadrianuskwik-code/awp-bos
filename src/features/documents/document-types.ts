@@ -27,4 +27,18 @@ export type AnyDocument = {
   project: { id: string; code: string; name: string } | null;
   /** Client for sales documents, supplier for purchase orders. */
   party: string | null;
+
+  // Register fields. Populated for invoices — the recap sheet is
+  // invoice-shaped — and left undefined for the other types, whose rows
+  // export with those columns blank rather than being excluded.
+  issue_date?: string | null;
+  description?: string | null;
+  harga_jual?: number | null;
+  dpp_amount?: number | null;
+  ppn_amount?: number | null;
+  pph_amount?: number | null;
+  retensi_amount?: number | null;
+  amount_paid?: number | null;
+  customer_po_number?: string | null;
+  tax_invoice_number?: string | null;
 };

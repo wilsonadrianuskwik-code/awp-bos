@@ -23,6 +23,7 @@ import { GenerateDocumentMenu } from "@/features/documents/components/generate-d
 import { GeneratePurchaseOrderDialog } from "@/features/documents/components/generate-purchase-order-dialog";
 import { LinkedDocumentsCard } from "@/features/documents/components/linked-documents-card";
 import { TaxSettingsCard } from "@/features/documents/components/tax-settings-card";
+import { InvoiceReferencesCard } from "@/features/invoices/components/invoice-references-card";
 import type { DeliveryOrderWithRelations } from "@/features/delivery-orders/types";
 import type { DocumentLink } from "@/features/documents/queries";
 import type { Supplier } from "@/features/suppliers/types";
@@ -300,6 +301,13 @@ export function InvoiceDetail({
           <div className="space-y-6">
             {/* scroll-mt gives the anchor breathing room when the invoice
                 card's "View Payment History" quick action links here. */}
+            <InvoiceReferencesCard
+              workspaceId={workspace.id}
+              invoiceId={invoice.id}
+              customerPoNumber={invoice.customer_po_number}
+              taxInvoiceNumber={invoice.tax_invoice_number}
+            />
+
             <TaxSettingsCard
               workspaceId={workspace.id}
               documentType="invoice"

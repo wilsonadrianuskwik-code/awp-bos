@@ -62,6 +62,9 @@ export type Invoice = {
   summary: string | null;
   payment_terms: string | null;
   notes: string | null;
+  /** Register references (00092) — recorded, never calculated with. */
+  customer_po_number: string | null;
+  tax_invoice_number: string | null;
   share_token: string;
   first_viewed_at: string | null;
   view_count: number;
