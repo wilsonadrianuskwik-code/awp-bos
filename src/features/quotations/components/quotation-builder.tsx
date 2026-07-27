@@ -12,7 +12,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import { formatCurrency } from "@/lib/utils/format-currency";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { useConfirm } from "@/providers/confirm-provider";
@@ -33,6 +32,7 @@ import {
 } from "@/features/quotations/validators";
 import type { LineItemInput } from "@/features/line-items/validators";
 import { computeLineItemTotals } from "@/features/line-items/helpers";
+import { ProjectSelector } from "@/features/projects/components/project-selector";
 import { TaxBreakdownEditor } from "@/features/documents/components/tax-breakdown-editor";
 import { setDocumentTaxSettings } from "@/features/documents/actions";
 import type { TaxSettings } from "@/features/documents/tax";
@@ -663,18 +663,12 @@ export function QuotationBuilder({
               <span className="text-xs text-muted-foreground">
                 Project <span className="text-destructive">*</span>
               </span>
-              <Select value={projectId} onValueChange={setProjectId}>
-                <SelectTrigger className="h-8">
-                  <SelectValue placeholder="Select a project" />
-                </SelectTrigger>
-                <SelectContent>
-                  {projects.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.code} — {p.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <ProjectSelector
+                projects={projects}
+                value={projectId}
+                onChange={setProjectId}
+                clientId={clientId || undefined}
+              />
             </div>
           </div>
 
