@@ -33,7 +33,30 @@ const DOCUMENT_TYPE_LABEL: Record<NumberingDocumentType, string> = {
   payment: "Payment",
 };
 
-const DEFAULT_TEMPLATE = "{PREFIX}-{YYYY}{MM}{DD}-{SEQ:3}";
+/**
+ * The built-in standard, and it must stay identical to the fallback in
+ * generate_document_number (00078). This panel prefills unsaved rows
+ * with it, so any drift between the two silently becomes a different
+ * numbering scheme the moment someone saves a row — which is exactly how
+ * the project code went missing once already (see 00090).
+ */
+const DEFAULT_TEMPLATE = "{PREFIX}/AWP-{PROJECT_CODE}/{DD}{MM}{YYYY}-{SEQ:3}";
+const DEFAULT_CADENCE: ResetCadence = "never";
+const DEFAULT_SCOPE: SequenceScope = "project";
+
+/**
+ * The prefix each create_* RPC passes as {PREFIX} (00078). Kept here so
+ * the preview shows the number that type will really produce, rather
+ * than one hardcoded prefix for every row.
+ */
+const DOCUMENT_TYPE_PREFIX: Record<NumberingDocumentType, string> = {
+  quotation: "QT",
+  proforma_invoice: "PI",
+  invoice: "INV",
+  purchase_order: "PO",
+  delivery_order: "DO",
+  payment: "PAY",
+};
 
 const CADENCE_LABEL: Record<ResetCadence, string> = {
   never: "Never",
@@ -53,7 +76,7 @@ const SCOPE_LABEL: Record<SequenceScope, string> = {
  * (supabase/migrations/00067_document_numbering_v2.sql) but never touches
  * the database counter, so typing in this field costs nothing server-side.
  */
-function previewNumber(template: string): string {
+function previewNumber(template: string, prefix: string): string {
   const now = new Date();
   const yyyy = String(now.getFullYear());
   const yy = yyyy.slice(-2);
@@ -61,7 +84,7 @@ function previewNumber(template: string): string {
   const dd = String(now.getDate()).padStart(2, "0");
 
   let result = template;
-  result = result.replaceAll("{PREFIX}", "PO");
+  result = result.replaceAll("{PREFIX}", prefix);
   result = result.replaceAll("{PROJECT_CODE}", "PRJ001");
   result = result.replaceAll("{YYYY}", yyyy);
   result = result.replaceAll("{YY}", yy);
@@ -103,8 +126,8 @@ export function NumberingSettingsPanel({ workspaceId, templates }: NumberingSett
       const existing = byType.get(type);
       initial[type] = {
         template: existing?.template ?? DEFAULT_TEMPLATE,
-        reset_cadence: existing?.reset_cadence ?? "daily",
-        sequence_scope: existing?.sequence_scope ?? "workspace",
+        reset_cadence: existing?.reset_cadence ?? DEFAULT_CADENCE,
+        sequence_scope: existing?.sequence_scope ?? DEFAULT_SCOPE,
       };
     }
     return initial;
@@ -152,9 +175,26 @@ export function NumberingSettingsPanel({ workspaceId, templates }: NumberingSett
                   placeholder={DEFAULT_TEMPLATE}
                   className="font-mono text-sm"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
+                  {row.template !== DEFAULT_TEMPLATE && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateRow(type, {
+                          template: DEFAULT_TEMPLATE,
+                          reset_cadence: DEFAULT_CADENCE,
+                          sequence_scope: DEFAULT_SCOPE,
+                        })
+                      }
+                      className="rounded-full border px-2 py-0.5 text-[11px] transition-colors duration-100 hover:border-primary/40 hover:text-foreground"
+                    >
+                      Restore standard
+                    </button>
+                  )}
+                  <span>
                   Preview:{" "}
-                  <span className="font-mono text-foreground">{previewNumber(row.template)}</span>
+                  <span className="font-mono text-foreground">{previewNumber(row.template, DOCUMENT_TYPE_PREFIX[type])}</span>
+                  </span>
                 </p>
               </div>
 
