@@ -8,7 +8,10 @@ import type {
   DeliveryOrderWithRelations,
 } from "@/features/delivery-orders/types";
 
-const RELATIONS = "client:clients(id,name,company), invoice:invoices(id,invoice_number), project:projects(id,code,name)";
+// Client and site addresses ride along: the delivery destination
+// defaults to the project site and falls back to the client address.
+const RELATIONS =
+  "client:clients(id,name,company,address), invoice:invoices(id,invoice_number), project:projects(id,code,name,site_address)";
 
 export async function getDeliveryOrders(
   workspaceId: string,

@@ -1,3 +1,4 @@
+import type { PostalAddress } from "@/features/documents/address";
 import type { ClientSummary } from "@/features/line-items/types";
 
 export const DELIVERY_ORDER_STATUSES = [
@@ -10,14 +11,7 @@ export const DELIVERY_ORDER_STATUSES = [
 
 export type DeliveryOrderStatus = (typeof DELIVERY_ORDER_STATUSES)[number];
 
-export type DeliveryAddress = {
-  line1?: string;
-  line2?: string;
-  city?: string;
-  state?: string;
-  postal_code?: string;
-  country?: string;
-} | null;
+export type DeliveryAddress = PostalAddress;
 
 export type DeliveryOrder = {
   id: string;
@@ -46,6 +40,8 @@ export type ProjectSummary = {
   id: string;
   code: string;
   name: string;
+  /** Offered as the delivery destination — usually where goods go. */
+  site_address?: PostalAddress;
 };
 
 export type DeliveryOrderWithRelations = DeliveryOrder & {
@@ -109,4 +105,12 @@ export type CreateDeliveryOrderInput = {
   delivery_address?: DeliveryAddress;
   notes?: string | null;
   line_items: DeliveryOrderLineInput[];
+};
+
+export type UpdateDeliveryOrderInput = {
+  delivery_date?: string | null;
+  /** Explicit null clears the override and falls back to the client. */
+  delivery_address?: DeliveryAddress;
+  received_by?: string | null;
+  notes?: string | null;
 };

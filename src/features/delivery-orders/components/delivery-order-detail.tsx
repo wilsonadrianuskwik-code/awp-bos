@@ -8,7 +8,16 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { updateDeliveryOrderStatus } from "@/features/delivery-orders/actions";
+import {
+  updateDeliveryOrder,
+  updateDeliveryOrderStatus,
+} from "@/features/delivery-orders/actions";
+import {
+  DeliveryAddressField,
+  toDeliveryAddress,
+  type AddressSuggestion,
+} from "@/features/delivery-orders/components/delivery-address-field";
+import { addressLines, formatAddress } from "@/features/documents/address";
 import { DELIVERY_ORDER_STATUSES, type DeliveryOrderDetail } from "@/features/delivery-orders/types";
 import { SimplePrintView } from "@/features/documents/components/simple-print-view";
 import { PrintButton } from "@/features/documents/components/print-button";
@@ -42,6 +51,43 @@ export function DeliveryOrderDetailView({
   const [status, setStatus] = useState(deliveryOrder.status);
   const [receivedBy, setReceivedBy] = useState(deliveryOrder.received_by ?? "");
   const [isPending, startTransition] = useTransition();
+
+  // The delivery destination is editable right up until the DO is
+  // cancelled (mirrors update_delivery_order in 00089): sites get
+  // corrected, and a delivered DO's address is a record worth fixing.
+  const [address, setAddress] = useState(
+    formatAddress(deliveryOrder.delivery_address) ?? ""
+  );
+  const [savedAddress, setSavedAddress] = useState(address);
+  const addressDirty = address.trim() !== savedAddress.trim();
+  const addressEditable = status !== "cancelled";
+
+  const suggestions: AddressSuggestion[] = [
+    ...(deliveryOrder.project?.site_address
+      ? [{
+          label: `Project site — ${deliveryOrder.project.code}`,
+          address: deliveryOrder.project.site_address,
+        }]
+      : []),
+    ...(deliveryOrder.client?.address
+      ? [{ label: `Client — ${deliveryOrder.client.name}`, address: deliveryOrder.client.address }]
+      : []),
+  ];
+
+  function handleSaveAddress() {
+    startTransition(async () => {
+      const result = await updateDeliveryOrder(workspaceId, deliveryOrder.id, {
+        delivery_address: toDeliveryAddress(address),
+      });
+      if (!result.error) setSavedAddress(address);
+    });
+  }
+
+  // What the printed document addresses: the override when set,
+  // otherwise the client's own address.
+  const printAddressLines = deliveryOrder.delivery_address
+    ? addressLines(deliveryOrder.delivery_address)
+    : addressLines(deliveryOrder.client?.address ?? null);
 
   const next = NEXT_STATUS[status];
 
@@ -124,6 +170,32 @@ export function DeliveryOrderDetailView({
           <DetailItem label="Received By" value={deliveryOrder.received_by} />
           <DetailItem label="Notes" value={deliveryOrder.notes} />
         </FieldList>
+
+        <div className="mt-4 border-t pt-4">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            Deliver To
+          </p>
+          <p className="mb-2 mt-1 text-xs text-muted-foreground">
+            Where the goods go. Leave blank to address the client&apos;s own
+            address instead.
+          </p>
+          <DeliveryAddressField
+            value={address}
+            onChange={setAddress}
+            suggestions={suggestions}
+            disabled={!addressEditable}
+          />
+          {addressDirty && addressEditable && (
+            <Button
+              size="sm"
+              className="mt-2"
+              disabled={isPending}
+              onClick={handleSaveAddress}
+            >
+              Save address
+            </Button>
+          )}
+        </div>
       </Card>
 
       <Card className="p-4">
@@ -162,7 +234,7 @@ export function DeliveryOrderDetailView({
         party={{
           heading: "Deliver To",
           name: deliveryOrder.client?.name ?? "Deleted client",
-          lines: [deliveryOrder.client?.company],
+          lines: [deliveryOrder.client?.company, ...printAddressLines],
         }}
         meta={[
           ...(deliveryOrder.delivery_date

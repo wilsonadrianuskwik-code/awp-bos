@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { withWorkspace } from "@/lib/with-workspace";
-import type { CreateDeliveryOrderInput, DeliveryOrderStatus } from "@/features/delivery-orders/types";
+import type {
+  CreateDeliveryOrderInput,
+  DeliveryOrderStatus,
+  UpdateDeliveryOrderInput,
+} from "@/features/delivery-orders/types";
 
 export async function createDeliveryOrder(workspaceId: string, input: CreateDeliveryOrderInput) {
   return withWorkspace(workspaceId, "staff", async (ctx) => {
@@ -62,6 +66,28 @@ export async function deleteDeliveryOrder(workspaceId: string, deliveryOrderId: 
     if (error) throw new Error(error.message);
 
     revalidatePath(`/${ctx.workspaceSlug}/delivery-orders`);
+    return data;
+  });
+}
+
+export async function updateDeliveryOrder(
+  workspaceId: string,
+  deliveryOrderId: string,
+  input: UpdateDeliveryOrderInput
+) {
+  return withWorkspace(workspaceId, "staff", async (ctx) => {
+    const supabase = await createClient();
+    // Only the keys present are changed (00089 reads `p_input ? key`), so
+    // this sends exactly what the caller passed rather than a full row.
+    const { data, error } = await supabase.rpc("update_delivery_order", {
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+      p_do_id: deliveryOrderId,
+      p_input: input,
+    });
+    if (error) throw new Error(error.message);
+
+    revalidatePath(`/${ctx.workspaceSlug}/delivery-orders/${deliveryOrderId}`);
     return data;
   });
 }
