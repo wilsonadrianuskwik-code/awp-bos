@@ -89,7 +89,7 @@ type PurchaseOrderBuilderProps = {
 // Mirrors InvoiceBuilder (@/features/invoices/components/invoice-builder)
 // almost exactly — same autosave/keyboard-shortcut/disclosure machinery
 // from the shared documents/components internals, with a supplier picker
-// + optional project picker in place of the client picker.
+// + project picker in place of the client picker.
 export function PurchaseOrderBuilder({
   purchaseOrder,
   suppliers,
@@ -366,6 +366,7 @@ export function PurchaseOrderBuilder({
 
   const readyReasons: string[] = [];
   if (!supplierId) readyReasons.push("Choose a supplier");
+  if (!projectId) readyReasons.push("Choose a project");
   if (submittableLineItems.length === 0) readyReasons.push("Add at least one item");
 
   const [reviewOpen, setReviewOpen] = useState(false);

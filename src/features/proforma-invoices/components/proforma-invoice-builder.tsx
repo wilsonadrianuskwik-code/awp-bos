@@ -346,6 +346,7 @@ export function ProformaInvoiceBuilder({
 
   const readyReasons: string[] = [];
   if (!clientId) readyReasons.push("Choose a client");
+  if (!projectId) readyReasons.push("Choose a project");
   if (submittableLineItems.length === 0) readyReasons.push("Add at least one item");
 
   function updateLineItem(index: number, patch: Partial<LineItemInput>) {
