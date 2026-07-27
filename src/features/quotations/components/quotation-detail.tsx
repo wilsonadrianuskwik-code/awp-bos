@@ -22,6 +22,7 @@ import { GenerateInvoiceDialog } from "./generate-invoice-dialog";
 import { GenerateDocumentMenu } from "@/features/documents/components/generate-document-menu";
 import { GeneratePurchaseOrderDialog } from "@/features/documents/components/generate-purchase-order-dialog";
 import { QuotationPortalAccessCard } from "./quotation-portal-access-card";
+import { LinkedDocumentsCard } from "@/features/documents/components/linked-documents-card";
 import { PricingSummary } from "@/features/line-items/components/pricing-summary";
 import { QuotationPrintView } from "./quotation-print-view";
 import { formatCurrency } from "@/lib/utils/format-currency";
@@ -38,6 +39,7 @@ import type {
 } from "@/features/templates/types";
 import type { PackageItem } from "@/features/catalog/types";
 import type { Supplier } from "@/features/suppliers/types";
+import type { DocumentLink } from "@/features/documents/queries";
 
 type QuotationDetailProps = {
   quotation: QuotationDetailType;
@@ -63,6 +65,8 @@ type QuotationDetailProps = {
   packageBreakdowns?: Record<string, PackageItem[]>;
   /** Needed only to pick a supplier when generating a Purchase Order. */
   suppliers?: Supplier[];
+  /** Traceability chain — what this quotation came from and produced. */
+  links?: DocumentLink[];
 };
 
 export function QuotationDetail({
@@ -73,6 +77,7 @@ export function QuotationDetail({
   workspace: workspaceInfo,
   packageBreakdowns = {},
   suppliers = [],
+  links = [],
 }: QuotationDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
@@ -323,6 +328,8 @@ export function QuotationDetail({
               itemCount={quotation.line_items.length}
               sticky={false}
             />
+
+            <LinkedDocumentsCard links={links} workspaceSlug={workspace.slug} />
 
             <QuotationPortalAccessCard quotation={quotation} />
 
