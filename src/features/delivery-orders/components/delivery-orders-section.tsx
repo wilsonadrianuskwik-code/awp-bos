@@ -2,31 +2,48 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { createDeliveryOrder } from "@/features/delivery-orders/actions";
+import { DeliveryProgress } from "@/features/delivery-orders/components/delivery-progress";
 import type { DeliveryOrderWithRelations } from "@/features/delivery-orders/types";
+import type { FulfillmentItemWithProgress } from "@/features/fulfillment/types";
 
-type InvoiceLineForDelivery = { id: string; description: string; quantity: number; unit: string | null };
+type InvoiceLineForDelivery = {
+  id: string;
+  description: string;
+  quantity: number;
+  unit: string | null;
+};
 
-// Embedded on the Invoice detail page — fulfillment is tracked primarily
-// from the Invoice, per the architecture (master plan §5.4), while still
-// allowing a Delivery Order to be created standalone elsewhere.
+/**
+ * The single delivery surface on the Invoice detail page: what has been
+ * delivered per line, and the Delivery Orders that delivered it.
+ *
+ * These used to be two separate cards — a Fulfillment tracker and a
+ * Delivery Orders list — showing the same fact from two angles. 00081
+ * already made Delivery Orders the source of truth (marking one
+ * delivered writes the fulfillment events), so the progress read here is
+ * the roll-up of the orders listed below it, not a second thing to keep
+ * in sync by hand.
+ */
 export function DeliveryOrdersSection({
   invoiceId,
   workspaceId,
   workspaceSlug,
   deliveryOrders,
   invoiceLineItems,
+  progressByLine = [],
 }: {
   invoiceId: string;
   workspaceId: string;
   workspaceSlug: string;
   deliveryOrders: DeliveryOrderWithRelations[];
   invoiceLineItems: InvoiceLineForDelivery[];
+  /** Delivered/remaining per invoice line, rolled up from delivered DOs. */
+  progressByLine?: FulfillmentItemWithProgress[];
 }) {
-  const [orders, setOrders] = useState(deliveryOrders);
+  const [orders] = useState(deliveryOrders);
   const [isPending, startTransition] = useTransition();
 
   function handleCreate() {
@@ -47,43 +64,68 @@ export function DeliveryOrdersSection({
   }
 
   return (
-    <Card className="p-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-[15px] font-semibold">Delivery Orders</h3>
-        <Button size="sm" variant="outline" disabled={isPending} onClick={handleCreate}>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[13px] text-muted-foreground">
+          {orders.length === 0
+            ? "Nothing delivered yet."
+            : `${orders.length} delivery order${orders.length === 1 ? "" : "s"}`}
+        </p>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={isPending}
+          onClick={handleCreate}
+        >
           New Delivery Order
         </Button>
       </div>
-      {orders.length === 0 ? (
-        <p className="mt-3 text-[13px] text-muted-foreground">No delivery orders yet.</p>
-      ) : (
-        <>
-          <ul className="mt-3 divide-y">
-            {orders.map((doItem) => (
-              <li key={doItem.id} className="flex items-center justify-between gap-2 py-2 text-[13px]">
-                <Link
-                  href={`/${workspaceSlug}/delivery-orders/${doItem.id}`}
-                  className="font-mono hover:underline"
-                >
-                  {doItem.do_number}
-                </Link>
-                <span className="flex items-center gap-2">
-                  {doItem.delivery_date && (
-                    <span className="text-xs text-muted-foreground">
-                      {doItem.delivery_date}
-                    </span>
-                  )}
-                  <StatusBadge status={doItem.status} />
-                </span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-3 border-t pt-2.5 text-xs text-muted-foreground">
-            Marking a delivery order delivered records its quantities against
-            this invoice&apos;s fulfillment automatically.
-          </p>
-        </>
+
+      {progressByLine.length > 0 && (
+        <div className="space-y-3">
+          {progressByLine.map((line) => (
+            <div key={line.id} className="rounded-lg border p-3">
+              <p className="truncate text-sm font-medium">{line.description}</p>
+              <div className="mt-2">
+                <DeliveryProgress
+                  ordered={line.purchased}
+                  delivered={line.delivered}
+                  remaining={line.remaining}
+                  progressPercent={line.progress_percent}
+                  isOverDelivered={line.is_over_delivered}
+                  unitLabel={line.unit}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
       )}
-    </Card>
+
+      {orders.length > 0 && (
+        <ul className="divide-y border-t">
+          {orders.map((doItem) => (
+            <li
+              key={doItem.id}
+              className="flex items-center justify-between gap-2 py-2 text-[13px]"
+            >
+              <Link
+                href={`/${workspaceSlug}/delivery-orders/${doItem.id}`}
+                className="font-mono hover:underline"
+              >
+                {doItem.do_number}
+              </Link>
+              <span className="flex items-center gap-2">
+                {doItem.delivery_date && (
+                  <span className="text-xs text-muted-foreground">
+                    {doItem.delivery_date}
+                  </span>
+                )}
+                <StatusBadge status={doItem.status} />
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

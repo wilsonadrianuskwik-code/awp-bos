@@ -14,7 +14,6 @@ import {
   Truck,
   ClipboardList,
   PackageCheck,
-  ListChecks,
   BarChart3,
   Settings,
   PanelLeftClose,
@@ -71,11 +70,10 @@ export const NAV_GROUPS = [
   {
     label: "Operations",
     items: [
+      // Delivery Orders are the whole delivery story: the documents
+      // themselves, and the per-line delivered/remaining tally they roll
+      // up to (shown on the invoice they belong to).
       { label: "Delivery Orders", href: "/delivery-orders", icon: PackageCheck, color: "#f97316" },
-      // Per-line-item delivery progress against an invoice. Narrower than
-      // a Delivery Order (which is a real outbound document with its own
-      // number); this is the running tally of what's been delivered.
-      { label: "Fulfillment", href: "/fulfillment", icon: ListChecks, color: "#eab308" },
     ],
   },
   {

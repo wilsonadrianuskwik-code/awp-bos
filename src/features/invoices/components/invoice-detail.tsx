@@ -18,7 +18,6 @@ import { PaymentHistory } from "@/features/invoices/components/payment-history";
 import { InvoiceSummaryHero } from "@/features/invoices/components/invoice-summary-hero";
 import { InvoicePortalAccessCard } from "@/features/invoices/components/invoice-portal-access-card";
 import { InvoicePrintView } from "@/features/invoices/components/invoice-print-view";
-import { InvoiceFulfillmentSection } from "@/features/fulfillment/components/invoice-fulfillment-section";
 import { DeliveryOrdersSection } from "@/features/delivery-orders/components/delivery-orders-section";
 import { GenerateDocumentMenu } from "@/features/documents/components/generate-document-menu";
 import { GeneratePurchaseOrderDialog } from "@/features/documents/components/generate-purchase-order-dialog";
@@ -271,16 +270,25 @@ export function InvoiceDetail({
               </Card>
             )}
 
-            <Card id="fulfillment" className="scroll-mt-6">
+            {/* One delivery surface, not two: the progress readout and the
+                delivery orders that produced it live in the same card. */}
+            <Card id="deliveries" className="scroll-mt-6">
               <CardHeader>
-                <CardTitle className="text-base">Fulfillment</CardTitle>
+                <CardTitle className="text-base">Deliveries</CardTitle>
               </CardHeader>
               <CardContent>
-                <InvoiceFulfillmentSection
+                <DeliveryOrdersSection
                   invoiceId={invoice.id}
-                  invoiceStatus={invoice.status}
-                  lineItems={invoice.line_items}
-                  fulfillmentItems={fulfillmentItems}
+                  workspaceId={workspace.id}
+                  workspaceSlug={workspace.slug}
+                  deliveryOrders={deliveryOrders}
+                  progressByLine={fulfillmentItems}
+                  invoiceLineItems={invoice.line_items.map((li) => ({
+                    id: li.id,
+                    description: li.description,
+                    quantity: li.quantity,
+                    unit: li.unit,
+                  }))}
                 />
               </CardContent>
             </Card>
@@ -321,19 +329,6 @@ export function InvoiceDetail({
                 <PaymentHistory payments={invoice.payments} />
               </CardContent>
             </Card>
-
-            <DeliveryOrdersSection
-              invoiceId={invoice.id}
-              workspaceId={workspace.id}
-              workspaceSlug={workspace.slug}
-              deliveryOrders={deliveryOrders}
-              invoiceLineItems={invoice.line_items.map((li) => ({
-                id: li.id,
-                description: li.description,
-                quantity: li.quantity,
-                unit: li.unit,
-              }))}
-            />
 
             <LinkedDocumentsCard links={links} workspaceSlug={workspace.slug} />
 

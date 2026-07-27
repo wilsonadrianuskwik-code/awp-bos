@@ -23,7 +23,7 @@ import { useConfirm } from "@/providers/confirm-provider";
 import { deleteClient } from "@/features/clients/actions";
 import { getOverdueDays } from "@/lib/utils/date";
 import { PAYMENT_METHOD_LABEL } from "@/features/invoices/helpers";
-import { FulfillmentProgress } from "@/features/fulfillment/components/fulfillment-progress";
+import { DeliveryProgress } from "@/features/delivery-orders/components/delivery-progress";
 import { DetailHeader } from "@/components/shared/detail-header";
 import { FieldList, DetailItem } from "@/components/shared/detail-item";
 import { SummaryHero } from "@/components/shared/summary-hero";
@@ -380,12 +380,10 @@ export function ClientDetail({
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Fulfillment</CardTitle>
+              <CardTitle>Deliveries</CardTitle>
               {fulfillmentItems.length > 0 && (
                 <Button variant="ghost" size="sm" asChild>
-                  <Link href={`/${workspace.slug}/fulfillment?clientId=${client.id}`}>
-                    View All
-                  </Link>
+                  <Link href={`/${workspace.slug}/delivery-orders`}>View All</Link>
                 </Button>
               )}
             </CardHeader>
@@ -394,17 +392,13 @@ export function ClientDetail({
                 <div className="flex flex-col items-center justify-center py-6 text-center">
                   <PackageCheck className="h-8 w-8 text-muted-foreground/50" />
                   <p className="mt-2 text-sm text-muted-foreground">
-                    No fulfillment tracking for this client yet.
+                    Nothing delivered for this client yet.
                   </p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {fulfillmentItems.map((fi) => (
-                    <Link
-                      key={fi.id}
-                      href={`/${workspace.slug}/fulfillment/tracker/${fi.id}`}
-                      className="block rounded-lg border p-3 transition-colors duration-100 hover:border-primary/30 hover:bg-accent/50"
-                    >
+                    <div key={fi.id} className="rounded-lg border p-3">
                       <div className="flex items-center justify-between gap-2">
                         <span className="truncate text-sm font-medium">
                           {fi.description}
@@ -412,8 +406,8 @@ export function ClientDetail({
                         <StatusBadge status={fi.status} />
                       </div>
                       <div className="mt-2">
-                        <FulfillmentProgress
-                          purchased={fi.purchased}
+                        <DeliveryProgress
+                          ordered={fi.purchased}
                           delivered={fi.delivered}
                           remaining={fi.remaining}
                           progressPercent={fi.progress_percent}
@@ -421,7 +415,7 @@ export function ClientDetail({
                           unitLabel={fi.unit}
                         />
                       </div>
-                    </Link>
+                    </div>
                   ))}
                 </div>
               )}

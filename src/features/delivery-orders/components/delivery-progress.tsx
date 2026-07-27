@@ -1,7 +1,7 @@
 import { AlertTriangle } from "lucide-react";
 
-type FulfillmentProgressProps = {
-  purchased: number;
+type DeliveryProgressProps = {
+  ordered: number;
   delivered: number;
   remaining: number;
   progressPercent: number;
@@ -9,25 +9,25 @@ type FulfillmentProgressProps = {
   unitLabel?: string | null;
 };
 
-// Shared bar treatment across the ledger, detail page, invoice-detail
-// section, and client-detail card — same visual convention as the ranked
-// bars in ar-aging-card.tsx/catalog-revenue-card.tsx (h-2 rounded-full
-// track + fill), not a new component pattern.
-export function FulfillmentProgress({
-  purchased,
+// The per-line delivered/remaining bar. Same visual convention as the
+// ranked bars in ar-aging-card.tsx/catalog-revenue-card.tsx (h-2
+// rounded-full track + fill), not a new component pattern.
+export function DeliveryProgress({
+  ordered,
   delivered,
   remaining,
   progressPercent,
   isOverDelivered,
   unitLabel,
-}: FulfillmentProgressProps) {
+}: DeliveryProgressProps) {
   const unit = unitLabel ? ` ${unitLabel}` : "";
 
   return (
     <div className="space-y-1">
       <div className="flex items-baseline justify-between gap-2 text-xs">
         <span className="text-muted-foreground">
-          {delivered} of {purchased}{unit} delivered
+          {delivered} of {ordered}
+          {unit} delivered
           {remaining > 0 ? ` · ${remaining} remaining` : ""}
         </span>
         {isOverDelivered && (
