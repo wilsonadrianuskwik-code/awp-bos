@@ -19,6 +19,7 @@ import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { createSupplierAction } from "@/features/suppliers/actions";
 import type { SupplierSummary } from "@/features/suppliers/types";
+import { mergeById } from "@/lib/utils/merge-by-id";
 
 type SupplierSelectorProps = {
   suppliers: SupplierSummary[];
@@ -35,7 +36,7 @@ export function SupplierSelector({ suppliers, value, onChange }: SupplierSelecto
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [createdSuppliers, setCreatedSuppliers] = useState<SupplierSummary[]>([]);
-  const allSuppliers = [...createdSuppliers, ...suppliers];
+  const allSuppliers = mergeById(createdSuppliers, suppliers);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const selected = allSuppliers.find((s) => s.id === value);

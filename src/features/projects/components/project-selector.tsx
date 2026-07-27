@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils/cn";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { createProjectAction } from "@/features/projects/actions";
+import { mergeById } from "@/lib/utils/merge-by-id";
 
 /** The shape every builder needs to render and pick a project. */
 export type ProjectOption = { id: string; code: string; name: string };
@@ -56,7 +57,7 @@ export function ProjectSelector({
   // held here and merged in — keeps the trigger label and the search list
   // correct without the parent having to re-fetch.
   const [createdProjects, setCreatedProjects] = useState<ProjectOption[]>([]);
-  const allProjects = [...createdProjects, ...projects];
+  const allProjects = mergeById(createdProjects, projects);
 
   const selected = allProjects.find((p) => p.id === value);
   const term = query.trim().toLowerCase();

@@ -19,6 +19,7 @@ import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { createClientAction } from "@/features/clients/actions";
 import type { ClientSummary } from "@/features/line-items/types";
+import { mergeById } from "@/lib/utils/merge-by-id";
 
 type ClientSelectorProps = {
   clients: ClientSummary[];
@@ -36,7 +37,7 @@ export function ClientSelector({ clients, value, onChange }: ClientSelectorProps
   // — this keeps the trigger's selected-label lookup and the search list
   // working for a just-created client without the parent having to re-fetch.
   const [createdClients, setCreatedClients] = useState<ClientSummary[]>([]);
-  const allClients = [...createdClients, ...clients];
+  const allClients = mergeById(createdClients, clients);
 
   const [dialogOpen, setDialogOpen] = useState(false);
 
