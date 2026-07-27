@@ -31,6 +31,31 @@ const SECTIONS: { id: Section; label: string; icon: typeof Building2; descriptio
   { id: "default-terms", label: "Default Terms", icon: FileText, description: "Terms & conditions defaults" },
 ];
 
+// Split by how often they're touched, not by what they configure:
+// Documents holds the panels edited while working, Setup holds the ones
+// configured once when the workspace is set up and rarely revisited.
+// A flat list gave a numbering template the same weight as branding.
+const LINK_GROUPS: {
+  label: string;
+  links: { href: string; label: string; icon: typeof Building2 }[];
+}[] = [
+  {
+    label: "Documents",
+    links: [
+      { href: "/settings/templates", label: "Document Designs", icon: LayoutTemplate },
+      { href: "/settings/themes", label: "Themes", icon: Palette },
+      { href: "/settings/master-data", label: "Master Data", icon: Database },
+    ],
+  },
+  {
+    label: "Setup",
+    links: [
+      { href: "/settings/numbering", label: "Document Numbering", icon: Hash },
+      { href: "/settings/permissions", label: "Permissions", icon: Shield },
+    ],
+  },
+];
+
 type DocumentSettingsNavProps = {
   workspaceId: string;
   companyProfile: CompanyProfile;
@@ -71,48 +96,25 @@ export function DocumentSettingsNav({
           </button>
         ))}
 
-        <div className="my-3 border-t" />
-
-        <Link
-          href={`/${workspace.slug}/settings/templates`}
-          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        >
-          <LayoutTemplate className="h-4 w-4" />
-          <span className="flex-1 text-left">Document Designs</span>
-          <ChevronRight className="h-3.5 w-3.5" />
-        </Link>
-        <Link
-          href={`/${workspace.slug}/settings/themes`}
-          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        >
-          <Palette className="h-4 w-4" />
-          <span className="flex-1 text-left">Themes</span>
-          <ChevronRight className="h-3.5 w-3.5" />
-        </Link>
-        <Link
-          href={`/${workspace.slug}/settings/numbering`}
-          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        >
-          <Hash className="h-4 w-4" />
-          <span className="flex-1 text-left">Document Numbering</span>
-          <ChevronRight className="h-3.5 w-3.5" />
-        </Link>
-        <Link
-          href={`/${workspace.slug}/settings/master-data`}
-          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        >
-          <Database className="h-4 w-4" />
-          <span className="flex-1 text-left">Master Data</span>
-          <ChevronRight className="h-3.5 w-3.5" />
-        </Link>
-        <Link
-          href={`/${workspace.slug}/settings/permissions`}
-          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        >
-          <Shield className="h-4 w-4" />
-          <span className="flex-1 text-left">Permissions</span>
-          <ChevronRight className="h-3.5 w-3.5" />
-        </Link>
+        {LINK_GROUPS.map((group) => (
+          <div key={group.label}>
+            <div className="my-3 border-t" />
+            <p className="px-3 pb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+              {group.label}
+            </p>
+            {group.links.map(({ href, label, icon: Icon }) => (
+              <Link
+                key={href}
+                href={`/${workspace.slug}${href}`}
+                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <Icon className="h-4 w-4" />
+                <span className="flex-1 text-left">{label}</span>
+                <ChevronRight className="h-3.5 w-3.5" />
+              </Link>
+            ))}
+          </div>
+        ))}
       </nav>
 
       <div className="min-w-0 flex-1">
