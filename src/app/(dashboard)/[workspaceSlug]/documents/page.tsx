@@ -9,26 +9,54 @@ import {
 } from "@/features/documents/document-types";
 import { AllDocumentsPage } from "@/features/documents/components/all-documents-page";
 
+type SearchParams = {
+  project?: string;
+  type?: string;
+  q?: string;
+  from?: string;
+  to?: string;
+  min?: string;
+  max?: string;
+  paidFrom?: string;
+  paidTo?: string;
+  status?: string;
+};
+
 export default async function DocumentsRoute({
   params,
   searchParams,
 }: {
   params: Promise<{ workspaceSlug: string }>;
-  searchParams: Promise<{ project?: string; type?: string }>;
+  searchParams: Promise<SearchParams>;
 }) {
   const { workspaceSlug } = await params;
-  const { project, type } = await searchParams;
+  const sp = await searchParams;
   const workspace = await getWorkspaceBySlug(workspaceSlug);
   if (!workspace) notFound();
 
-  // Filters come from the URL, so an unknown value is possible — ignore
-  // it rather than passing it through to the query.
-  const documentType = DOCUMENT_TYPES.includes(type as DocumentType)
-    ? (type as DocumentType)
+  // Filters arrive from the URL, so anything here can be malformed —
+  // an unusable value is dropped rather than passed to the query.
+  const documentType = DOCUMENT_TYPES.includes(sp.type as DocumentType)
+    ? (sp.type as DocumentType)
     : undefined;
+  const number = (value?: string) => {
+    const parsed = Number(value);
+    return value && Number.isFinite(parsed) ? parsed : undefined;
+  };
 
   const [documents, projects] = await Promise.all([
-    getAllDocuments(workspace.id, { projectId: project, documentType }),
+    getAllDocuments(workspace.id, {
+      projectId: sp.project,
+      documentType,
+      search: sp.q,
+      dateFrom: sp.from,
+      dateTo: sp.to,
+      amountMin: number(sp.min),
+      amountMax: number(sp.max),
+      paidFrom: sp.paidFrom,
+      paidTo: sp.paidTo,
+      status: sp.status,
+    }),
     getAllProjects(workspace.id),
   ]);
 

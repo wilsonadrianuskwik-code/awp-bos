@@ -65,10 +65,12 @@ export function buildRegisterRow(doc: AnyDocument): string[] {
     num(doc.retensi_amount),
     "",
     num(total),
-    num(total),
+    // PAYMENT is what the customer has actually paid; TERIMA is the date
+    // that payment came in.
     num(paid),
-    // PLUS/MINUS: what was received against what was billed. Negative
-    // means short-paid, positive means over-paid.
+    formatDate(doc.payment_date ?? null),
+    // PLUS/MINUS: paid against billed. Negative is short-paid, positive
+    // is over-paid, blank when nothing has been paid yet.
     total != null && paid != null ? String(Math.round((paid - total) * 100) / 100) : "",
   ];
 }

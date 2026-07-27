@@ -10,6 +10,18 @@ export type { AnyDocument, DocumentType } from "@/features/documents/document-ty
 export type DocumentFilters = {
   projectId?: string;
   documentType?: DocumentType;
+  /** Free text over document number and client/supplier name. */
+  search?: string;
+  /** Document date range, inclusive, as YYYY-MM-DD. */
+  dateFrom?: string;
+  dateTo?: string;
+  /** Total value range. */
+  amountMin?: number;
+  amountMax?: number;
+  /** Payment received date range, inclusive. Invoices only. */
+  paidFrom?: string;
+  paidTo?: string;
+  status?: string;
 };
 
 /**
@@ -39,12 +51,25 @@ export async function getAllDocuments(
   // and narrowed to one project when that filter is set. A type filtered
   // out is never queried at all.
   function build(table: string, columns: string) {
-    const query = supabase
+    let query = supabase
       .from(table)
       .select(`${columns}, ${PROJECT_JOIN}`)
       .eq("workspace_id", workspaceId)
       .is("deleted_at", null);
-    return projectId ? query.eq("project_id", projectId) : query;
+
+    if (projectId) query = query.eq("project_id", projectId);
+    if (filters.status) query = query.eq("status", filters.status);
+    // created_at is a timestamp; the "to" bound is pushed to the end of
+    // that day so an inclusive range reads the way a user means it.
+    if (filters.dateFrom) query = query.gte("created_at", filters.dateFrom);
+    if (filters.dateTo) query = query.lte("created_at", `${filters.dateTo}T23:59:59.999Z`);
+    // Delivery orders carry no total, so an amount filter would exclude
+    // all of them — which is the right behaviour, but only when the user
+    // actually set one.
+    if (filters.amountMin != null) query = query.gte("total", filters.amountMin);
+    if (filters.amountMax != null) query = query.lte("total", filters.amountMax);
+
+    return query;
   }
 
   const [quotations, proformas, invoices, purchaseOrders, deliveryOrders] =
@@ -64,7 +89,7 @@ export async function getAllDocuments(
       wants("invoice")
         ? build(
             "invoices",
-            "id, invoice_number, status, total, currency, created_at, issue_date, title, summary, subtotal, discount_amount, dpp_amount, ppn_amount, pph_amount, retensi_amount, amount_paid, customer_po_number, tax_invoice_number, client:clients(name)"
+            "id, invoice_number, status, total, currency, created_at, issue_date, title, summary, subtotal, discount_amount, dpp_amount, ppn_amount, pph_amount, retensi_amount, amount_paid, customer_po_number, tax_invoice_number, client:clients(name), payments(payment_date)"
           )
         : null,
       wants("purchase_order")
@@ -101,6 +126,17 @@ export async function getAllDocuments(
     (row[key] as { name: string } | null)?.name ?? null;
   const projectOf = (row: Row) =>
     (row.project as AnyDocument["project"]) ?? null;
+
+  // TERIMA is when the money arrived. With partial payments there are
+  // several dates; the register wants the most recent one.
+  const latestPaymentDate = (row: Row): string | null => {
+    const payments = (row.payments as { payment_date: string }[] | null) ?? [];
+    if (payments.length === 0) return null;
+    return payments
+      .map((p) => p.payment_date)
+      .sort()
+      .at(-1) ?? null;
+  };
 
   const documents: AnyDocument[] = [
     ...((quotations?.data ?? []) as unknown as Row[]).map((r) => ({
@@ -147,6 +183,7 @@ export async function getAllDocuments(
       amount_paid: r.amount_paid as number,
       customer_po_number: (r.customer_po_number as string) ?? null,
       tax_invoice_number: (r.tax_invoice_number as string) ?? null,
+      payment_date: latestPaymentDate(r),
     })),
     ...((purchaseOrders?.data ?? []) as unknown as Row[]).map((r) => ({
       id: r.id as string,
@@ -173,7 +210,34 @@ export async function getAllDocuments(
     })),
   ];
 
-  return documents.sort(
+  // Two filters are applied after the merge rather than pushed down.
+  // Search spans a joined name and the number column, which differs per
+  // table; payment dates come from a nested relation only invoices have.
+  // Both would need five bespoke query shapes to push down, for a set
+  // already narrowed by workspace, project, type and date.
+  let result = documents;
+
+  if (filters.search) {
+    const term = filters.search.trim().toLowerCase();
+    result = result.filter(
+      (doc) =>
+        doc.number.toLowerCase().includes(term) ||
+        (doc.party ?? "").toLowerCase().includes(term) ||
+        (doc.customer_po_number ?? "").toLowerCase().includes(term) ||
+        (doc.tax_invoice_number ?? "").toLowerCase().includes(term)
+    );
+  }
+
+  if (filters.paidFrom || filters.paidTo) {
+    result = result.filter((doc) => {
+      if (!doc.payment_date) return false;
+      if (filters.paidFrom && doc.payment_date < filters.paidFrom) return false;
+      if (filters.paidTo && doc.payment_date > filters.paidTo) return false;
+      return true;
+    });
+  }
+
+  return result.sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 }

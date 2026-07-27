@@ -1,26 +1,21 @@
 "use client";
 
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Download, Printer } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { type ColumnDef } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/shared/data-table";
 import { ListEmpty } from "@/components/shared/list-empty";
 import { StatusBadge } from "@/components/shared/status-badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import {
-  DOCUMENT_TYPES,
+  DOCUMENT_TYPE_LABEL,
+  DOCUMENT_TYPE_ROUTE,
   type AnyDocument,
-  type DocumentType,
 } from "@/features/documents/document-types";
+import { DocumentFilterBar } from "@/features/documents/components/document-filter-bar";
 import {
   REGISTER_COLUMNS,
   buildRegisterRow,
@@ -28,24 +23,8 @@ import {
   toCsv,
 } from "@/features/documents/register-export";
 
-const DOCUMENT_TYPE_LABEL: Record<DocumentType, string> = {
-  quotation: "Quotation",
-  proforma_invoice: "Proforma Invoice",
-  invoice: "Invoice",
-  purchase_order: "Purchase Order",
-  delivery_order: "Delivery Order",
-};
-
-const DOCUMENT_TYPE_ROUTE: Record<DocumentType, string> = {
-  quotation: "quotations",
-  proforma_invoice: "proforma-invoices",
-  invoice: "invoices",
-  purchase_order: "purchase-orders",
-  delivery_order: "delivery-orders",
-};
-
-/** Sentinel: Radix Select can't hold an empty-string value. */
-const ALL = "__all__";
+/** Rows are keyed across types — ids are only unique within a table. */
+const rowKey = (doc: AnyDocument) => `${doc.document_type}:${doc.id}`;
 
 const columns: ColumnDef<AnyDocument, unknown>[] = [
   {
@@ -94,6 +73,18 @@ const columns: ColumnDef<AnyDocument, unknown>[] = [
     },
   },
   {
+    id: "payment_date",
+    header: "Paid On",
+    cell: ({ row }) =>
+      row.original.payment_date
+        ? new Date(row.original.payment_date).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })
+        : "—",
+  },
+  {
     accessorKey: "created_at",
     header: "Created",
     cell: ({ row }) =>
@@ -106,13 +97,11 @@ const columns: ColumnDef<AnyDocument, unknown>[] = [
 ];
 
 /**
- * Every document in the workspace in one table, filterable by project
- * and by type.
+ * Every document in the workspace in one filterable, exportable table.
  *
- * Filters live in the URL rather than component state, so a filtered
- * view is linkable and survives a refresh — that's what lets the project
- * page deep-link straight into "all documents for this project", instead
- * of this being a second, parallel way to browse.
+ * Filters live in the URL (see DocumentFilterBar) and are applied by the
+ * server query. Selection is local state — a tick-box choice is about
+ * "what am I exporting right now", not a view worth linking to.
  */
 export function AllDocumentsPage({
   documents,
@@ -122,33 +111,39 @@ export function AllDocumentsPage({
   projects: { id: string; code: string; name: string }[];
 }) {
   const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const { workspace } = useWorkspace();
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  const projectId = searchParams.get("project") ?? ALL;
-  const documentType = searchParams.get("type") ?? ALL;
+  const statuses = useMemo(
+    () => [...new Set(documents.map((d) => d.status))].sort(),
+    [documents]
+  );
+
+  // Nothing ticked means "everything in view" — the common case is
+  // exporting the filtered set, and forcing a select-all first would be
+  // a step with no decision in it.
+  const exportable = useMemo(
+    () =>
+      selectedIds.size === 0
+        ? documents
+        : documents.filter((doc) => selectedIds.has(rowKey(doc))),
+    [documents, selectedIds]
+  );
 
   function handleExport() {
-    const csv = toCsv(REGISTER_COLUMNS, documents.map(buildRegisterRow));
+    const csv = toCsv(REGISTER_COLUMNS, exportable.map(buildRegisterRow));
+    const project = searchParams.get("project");
+    const type = searchParams.get("type");
     const scope = [
-      projectId !== ALL
-        ? projects.find((p) => p.id === projectId)?.code ?? "project"
-        : null,
-      documentType !== ALL ? DOCUMENT_TYPE_LABEL[documentType as DocumentType] : null,
+      project ? projects.find((p) => p.id === project)?.code : null,
+      type ? DOCUMENT_TYPE_LABEL[type as keyof typeof DOCUMENT_TYPE_LABEL] : null,
+      selectedIds.size > 0 ? "selected" : null,
     ]
       .filter(Boolean)
       .join(" - ");
     const today = new Date().toISOString().slice(0, 10);
     downloadCsv(scope ? `Register ${scope} ${today}` : `Register ${today}`, csv);
-  }
-
-  function setFilter(key: "project" | "type", value: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value === ALL) params.delete(key);
-    else params.set(key, value);
-    const query = params.toString();
-    router.push(query ? `${pathname}?${query}` : pathname);
   }
 
   return (
@@ -158,81 +153,75 @@ export function AllDocumentsPage({
           globals.css) still governs printed documents. */}
       <style>{"@media print { @page { size: A4 landscape; } }"}</style>
 
+      <DocumentFilterBar projects={projects} statuses={statuses} />
+
       <div className="flex flex-wrap items-center gap-3 print:hidden">
-        <Select
-          value={projectId}
-          onValueChange={(v) => setFilter("project", v)}
-        >
-          <SelectTrigger className="h-9 w-[260px]">
-            <SelectValue placeholder="All projects" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ALL}>All projects</SelectItem>
-            {projects.map((p) => (
-              <SelectItem key={p.id} value={p.id}>
-                {p.code} — {p.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={documentType} onValueChange={(v) => setFilter("type", v)}>
-          <SelectTrigger className="h-9 w-[200px]">
-            <SelectValue placeholder="All document types" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ALL}>All document types</SelectItem>
-            {DOCUMENT_TYPES.map((type) => (
-              <SelectItem key={type} value={type}>
-                {DOCUMENT_TYPE_LABEL[type]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
         <span className="text-sm text-muted-foreground">
-          {documents.length} document{documents.length === 1 ? "" : "s"}
+          {selectedIds.size > 0
+            ? `${selectedIds.size} of ${documents.length} selected`
+            : `${documents.length} document${documents.length === 1 ? "" : "s"}`}
         </span>
+        {selectedIds.size > 0 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSelectedIds(new Set())}
+          >
+            Clear selection
+          </Button>
+        )}
 
         <div className="ml-auto flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={handleExport}
-            disabled={documents.length === 0}
+            disabled={exportable.length === 0}
           >
             <Download className="mr-1.5 h-3.5 w-3.5" />
-            Export Excel
+            Export Excel ({exportable.length})
           </Button>
-          <Button variant="outline" size="sm" onClick={() => window.print()}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.print()}
+            disabled={exportable.length === 0}
+          >
             <Printer className="mr-1.5 h-3.5 w-3.5" />
             Print / PDF
           </Button>
         </div>
       </div>
 
-      <RegisterPrintTable documents={documents} />
+      {/* Prints exactly what Export writes — selection included, so a
+          printout and a spreadsheet of the same moment agree. */}
+      <RegisterPrintTable documents={exportable} />
 
       <div className="print:hidden">
-      {documents.length === 0 ? (
-        <ListEmpty
-          message={
-            projectId !== ALL || documentType !== ALL
-              ? "No documents match these filters."
-              : "Documents you create will appear here."
-          }
-        />
-      ) : (
-        <DataTable
-          columns={columns}
-          data={documents}
-          onRowClick={(doc) =>
-            router.push(
-              `/${workspace.slug}/${DOCUMENT_TYPE_ROUTE[doc.document_type]}/${doc.id}`
-            )
-          }
-        />
-      )}
+        {documents.length === 0 ? (
+          <ListEmpty
+            message={
+              searchParams.size > 0
+                ? "No documents match these filters."
+                : "Documents you create will appear here."
+            }
+          />
+        ) : (
+          <DataTable
+            columns={columns}
+            data={documents}
+            selection={{
+              selectedIds,
+              onSelectedIdsChange: setSelectedIds,
+              getId: rowKey,
+            }}
+            onRowClick={(doc) =>
+              router.push(
+                `/${workspace.slug}/${DOCUMENT_TYPE_ROUTE[doc.document_type]}/${doc.id}`
+              )
+            }
+          />
+        )}
       </div>
     </div>
   );
@@ -262,7 +251,7 @@ function RegisterPrintTable({ documents }: { documents: AnyDocument[] }) {
         </thead>
         <tbody>
           {documents.map((doc) => (
-            <tr key={`${doc.document_type}-${doc.id}`}>
+            <tr key={rowKey(doc)}>
               {buildRegisterRow(doc).map((cell, i) => (
                 <td
                   key={REGISTER_COLUMNS[i]}

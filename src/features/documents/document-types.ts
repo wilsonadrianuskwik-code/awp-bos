@@ -39,6 +39,24 @@ export type AnyDocument = {
   pph_amount?: number | null;
   retensi_amount?: number | null;
   amount_paid?: number | null;
+  /** Date of the most recent payment received (register column TERIMA). */
+  payment_date?: string | null;
   customer_po_number?: string | null;
   tax_invoice_number?: string | null;
+};
+
+export const DOCUMENT_TYPE_LABEL: Record<DocumentType, string> = {
+  quotation: "Quotation",
+  proforma_invoice: "Proforma Invoice",
+  invoice: "Invoice",
+  purchase_order: "Purchase Order",
+  delivery_order: "Delivery Order",
+};
+
+export const DOCUMENT_TYPE_ROUTE: Record<DocumentType, string> = {
+  quotation: "quotations",
+  proforma_invoice: "proforma-invoices",
+  invoice: "invoices",
+  purchase_order: "purchase-orders",
+  delivery_order: "delivery-orders",
 };
