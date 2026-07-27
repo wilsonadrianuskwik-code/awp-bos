@@ -96,17 +96,12 @@ export function InvoicePrintView({
         ))}
       </DocumentTable>
 
+      {/* Payment state deliberately stays off the printed invoice: the
+          document states what is billed, and payments recorded against it
+          are tracked in the app. A printed "Balance Due Rp 0" turns an
+          invoice into a receipt, which it isn't. */}
       <DocumentTotals
-        rows={[
-          ...taxTotalRows(breakdown, settings, fmt),
-          // Payment lines only once money has actually moved.
-          ...(invoice.amount_paid > 0
-            ? [
-                { label: "Amount Paid", value: fmt(invoice.amount_paid), muted: true },
-                { label: "Balance Due", value: fmt(invoice.amount_due) },
-              ]
-            : []),
-        ]}
+        rows={taxTotalRows(breakdown, settings, fmt)}
         total={{ label: "Total", value: fmt(breakdown.total) }}
       />
 
