@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Building2,
   UserCheck,
+  Files,
   FileText,
   FileSpreadsheet,
   Receipt,
@@ -48,6 +49,9 @@ export const NAV_GROUPS = [
     label: "Projects",
     items: [
       { label: "Projects", href: "/projects", icon: Building2, color: "#6366f1" },
+      // Every document type in one filterable list — the cross-cutting
+      // view the per-type list pages can't give you.
+      { label: "Documents", href: "/documents", icon: Files, color: "#8b5cf6" },
     ],
   },
   {

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2 } from "lucide-react";
+import { ArrowUpRight, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -170,8 +170,19 @@ export function ProjectDetail({
 
         <TabsContent value="documents">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <CardTitle>Linked Documents</CardTitle>
+              {/* Same documents, in the workspace-wide view with the
+                  project filter already applied — so you can widen to
+                  other projects or narrow to one type from there. */}
+              <Button variant="outline" size="sm" asChild>
+                <Link
+                  href={`/${workspace.slug}/documents?project=${project.id}`}
+                >
+                  Open in Documents
+                  <ArrowUpRight className="ml-1.5 h-3.5 w-3.5" />
+                </Link>
+              </Button>
             </CardHeader>
             <CardContent>
               <ProjectDocumentsTable documents={documents} />
