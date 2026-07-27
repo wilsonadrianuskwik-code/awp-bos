@@ -155,35 +155,55 @@ export function AllDocumentsPage({
 
       <DocumentFilterBar projects={projects} statuses={statuses} />
 
-      <div className="flex flex-wrap items-center gap-3 print:hidden">
-        <span className="text-sm text-muted-foreground">
-          {selectedIds.size > 0
-            ? `${selectedIds.size} of ${documents.length} selected`
-            : `${documents.length} document${documents.length === 1 ? "" : "s"}`}
+      {/* Count and actions sit on the table's top edge rather than as a
+          third stacked bar — the toolbar belongs to the results, not to
+          the filters above it. */}
+      <div className="flex flex-wrap items-center gap-3 border-b pb-2.5 print:hidden">
+        <span className="text-[13px] text-muted-foreground">
+          {selectedIds.size > 0 ? (
+            <>
+              <span className="font-medium text-foreground">
+                {selectedIds.size}
+              </span>{" "}
+              of {documents.length} selected
+            </>
+          ) : (
+            <>
+              <span className="font-medium text-foreground">
+                {documents.length}
+              </span>{" "}
+              document{documents.length === 1 ? "" : "s"}
+            </>
+          )}
         </span>
         {selectedIds.size > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
+            type="button"
             onClick={() => setSelectedIds(new Set())}
+            className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
           >
             Clear selection
-          </Button>
+          </button>
         )}
 
         <div className="ml-auto flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
+            className="h-8"
             onClick={handleExport}
             disabled={exportable.length === 0}
           >
             <Download className="mr-1.5 h-3.5 w-3.5" />
-            Export Excel ({exportable.length})
+            Export Excel
+            <span className="ml-1 text-muted-foreground">
+              ({exportable.length})
+            </span>
           </Button>
           <Button
             variant="outline"
             size="sm"
+            className="h-8"
             onClick={() => window.print()}
             disabled={exportable.length === 0}
           >
