@@ -21,6 +21,7 @@ import { useToast } from "@/providers/toast-provider";
 import { useConfirm } from "@/providers/confirm-provider";
 import { deleteClient } from "@/features/clients/actions";
 import type { Client } from "@/features/clients/types";
+import { formatDate } from "@/lib/utils/date";
 
 const SORT_OPTIONS = [
   { value: "created_at:desc", label: "Newest first" },
@@ -62,7 +63,7 @@ const columns: ColumnDef<Client, unknown>[] = [
   {
     accessorKey: "created_at",
     header: "Created",
-    cell: ({ row }) => new Date(row.getValue("created_at") as string).toLocaleDateString(),
+    cell: ({ row }) => formatDate(row.getValue("created_at") as string),
   },
 ];
 

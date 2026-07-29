@@ -11,3 +11,36 @@ const MS_PER_DAY = 86_400_000;
 export function getOverdueDays(date: string): number {
   return Math.floor((Date.now() - new Date(date).getTime()) / MS_PER_DAY);
 }
+
+/**
+ * A date as dd/mm/yyyy, e.g. 26/07/2026.
+ *
+ * The locale is pinned deliberately. Bare `toLocaleDateString()` uses
+ * whatever locale the runtime has, which is the *server's* during SSR
+ * and the *browser's* after hydration — so a row rendered 7/26/2026 on
+ * the server became 26/07/2026 on the client and React reported a
+ * hydration mismatch. Pinning the format makes both sides agree, and
+ * dd/mm/yyyy is the convention the documents already print in.
+ */
+export function formatDate(date: string | Date | null | undefined): string {
+  if (!date) return "—";
+  const parsed = typeof date === "string" ? new Date(date) : date;
+  if (Number.isNaN(parsed.getTime())) return "—";
+  return parsed.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
+/** The longer form used in document headers, e.g. 26 Jul 2026. */
+export function formatDateLong(date: string | Date | null | undefined): string {
+  if (!date) return "—";
+  const parsed = typeof date === "string" ? new Date(date) : date;
+  if (Number.isNaN(parsed.getTime())) return "—";
+  return parsed.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}

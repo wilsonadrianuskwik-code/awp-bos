@@ -8,6 +8,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { ProjectDocument } from "@/features/projects/queries";
+import { formatDate } from "@/lib/utils/date";
 
 const DOCUMENT_TYPE_LABEL: Record<ProjectDocument["document_type"], string> = {
   quotation: "Quotation",
@@ -57,7 +58,7 @@ const columns: ColumnDef<ProjectDocument, unknown>[] = [
   {
     accessorKey: "created_at",
     header: "Created",
-    cell: ({ row }) => new Date(row.getValue("created_at") as string).toLocaleDateString(),
+    cell: ({ row }) => formatDate(row.getValue("created_at") as string),
   },
 ];
 

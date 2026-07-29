@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils/cn";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import { useWorkspace } from "@/providers/workspace-provider";
 import type { QuotationWithClient } from "@/features/quotations/types";
+import { formatDate } from "@/lib/utils/date";
 
 type QuotationVersionHistoryProps = {
   versions: QuotationWithClient[];
@@ -47,7 +48,7 @@ export function QuotationVersionHistory({
               )}
             </p>
             <p className="text-xs text-muted-foreground">
-              {new Date(v.created_at).toLocaleDateString()}
+              {formatDate(v.created_at)}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2">

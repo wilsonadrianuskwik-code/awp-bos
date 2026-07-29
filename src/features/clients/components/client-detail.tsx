@@ -21,7 +21,7 @@ import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { useConfirm } from "@/providers/confirm-provider";
 import { deleteClient } from "@/features/clients/actions";
-import { getOverdueDays } from "@/lib/utils/date";
+import { getOverdueDays, formatDate } from "@/lib/utils/date";
 import { PAYMENT_METHOD_LABEL } from "@/features/invoices/helpers";
 import { DeliveryProgress } from "@/features/delivery-orders/components/delivery-progress";
 import { DetailHeader } from "@/components/shared/detail-header";
@@ -237,7 +237,7 @@ export function ClientDetail({
                       <div>
                         <p className="font-medium">{q.quotation_number}</p>
                         <p className="text-xs text-muted-foreground">
-                          {new Date(q.created_at).toLocaleDateString()}
+                          {formatDate(q.created_at)}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -295,7 +295,7 @@ export function ClientDetail({
                       <div>
                         <p className="font-medium">{inv.invoice_number}</p>
                         <p className="text-xs text-muted-foreground">
-                          {new Date(inv.created_at).toLocaleDateString()}
+                          {formatDate(inv.created_at)}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -360,7 +360,7 @@ export function ClientDetail({
                           {p.invoice?.invoice_number ?? p.payment_number}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {new Date(p.payment_date).toLocaleDateString()}
+                          {formatDate(p.payment_date)}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">

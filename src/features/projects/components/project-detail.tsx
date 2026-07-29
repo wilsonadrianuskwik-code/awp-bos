@@ -22,6 +22,7 @@ import type { Project, ProjectHealth } from "@/features/projects/types";
 import type { ProjectDocument } from "@/features/projects/queries";
 import type { Activity } from "@/features/activities/types";
 import type { Client } from "@/features/clients/types";
+import { formatDate } from "@/lib/utils/date";
 
 type ProjectDetailProps = {
   project: Project;
@@ -142,7 +143,7 @@ export function ProjectDetail({
                   label="Start Date"
                   value={
                     project.start_date
-                      ? new Date(project.start_date).toLocaleDateString()
+                      ? formatDate(project.start_date)
                       : null
                   }
                 />
@@ -150,7 +151,7 @@ export function ProjectDetail({
                   label="End Date"
                   value={
                     project.end_date
-                      ? new Date(project.end_date).toLocaleDateString()
+                      ? formatDate(project.end_date)
                       : null
                   }
                 />

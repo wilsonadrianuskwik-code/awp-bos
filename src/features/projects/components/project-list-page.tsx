@@ -23,6 +23,7 @@ import { useConfirm } from "@/providers/confirm-provider";
 import { deleteProject } from "@/features/projects/actions";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { Project } from "@/features/projects/types";
+import { formatDate } from "@/lib/utils/date";
 
 const SORT_OPTIONS = [
   { value: "created_at:desc", label: "Newest first" },
@@ -66,13 +67,13 @@ const columns: ColumnDef<Project, unknown>[] = [
     header: "Start Date",
     cell: ({ row }) => {
       const value = row.getValue("start_date") as string | null;
-      return value ? new Date(value).toLocaleDateString() : "—";
+      return value ? formatDate(value) : "—";
     },
   },
   {
     accessorKey: "created_at",
     header: "Created",
-    cell: ({ row }) => new Date(row.getValue("created_at") as string).toLocaleDateString(),
+    cell: ({ row }) => formatDate(row.getValue("created_at") as string),
   },
 ];
 

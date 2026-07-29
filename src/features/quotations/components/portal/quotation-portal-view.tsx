@@ -29,6 +29,7 @@ import {
 } from "@/features/quotations/actions";
 import type { QuotationDetail, QuotationStatus } from "@/features/quotations/types";
 import type { PackageItem } from "@/features/catalog/types";
+import { formatDate } from "@/lib/utils/date";
 
 type QuotationPortalViewProps = {
   shareToken: string;
@@ -161,12 +162,12 @@ export function QuotationPortalView({
         <div className="text-right">
           <p>
             <span className="text-muted-foreground">Issue date: </span>
-            {new Date(quotation.issue_date).toLocaleDateString()}
+            {formatDate(quotation.issue_date)}
           </p>
           {quotation.expiry_date && (
             <p>
               <span className="text-muted-foreground">Valid until: </span>
-              {new Date(quotation.expiry_date).toLocaleDateString()}
+              {formatDate(quotation.expiry_date)}
             </p>
           )}
         </div>

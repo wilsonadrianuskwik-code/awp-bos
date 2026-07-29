@@ -8,6 +8,7 @@ import { useToast } from "@/providers/toast-provider";
 import { useConfirm } from "@/providers/confirm-provider";
 import { revokeInvite } from "@/features/workspace/actions";
 import type { WorkspaceInvite } from "@/features/workspace/types";
+import { formatDate } from "@/lib/utils/date";
 
 type PendingInvitesListProps = {
   workspaceId: string;
@@ -60,7 +61,7 @@ export function PendingInvitesList({
               <p className="font-medium">{invite.email}</p>
               <p className="text-xs text-muted-foreground">
                 Invited as {invite.role} · expires{" "}
-                {new Date(invite.expires_at).toLocaleDateString()}
+                {formatDate(invite.expires_at)}
               </p>
             </div>
             <Button

@@ -7,6 +7,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { ProformaInvoiceWithClient } from "@/features/proforma-invoices/types";
+import { formatDate } from "@/lib/utils/date";
 
 type ProformaInvoiceTableProps = {
   proformaInvoices: ProformaInvoiceWithClient[];
@@ -58,7 +59,7 @@ export function ProformaInvoiceTable({
       accessorKey: "issue_date",
       header: "Issue Date",
       cell: ({ row }) =>
-        new Date(row.original.issue_date).toLocaleDateString(),
+        formatDate(row.original.issue_date),
     },
   ];
 
