@@ -12,33 +12,35 @@
 -- without CASCADE (explicit is safer than a silent cascade wiping
 -- something unintended).
 
--- 1. Deepest children: payments, line items, the generic relationship graph,
---    and the retired fulfillment trackers (still FK'd to invoices/clients
---    even though their UI was removed).
+-- 1. Deepest children: payments, the generic relationship graph, and the
+--    retired fulfillment trackers. fulfillment_items/fulfillment_events
+--    RESTRICT (not CASCADE) against line_items/fulfillment_items, so they
+--    must be cleared *before* line_items, not after.
 DELETE FROM payments;
-DELETE FROM line_items;
 DELETE FROM document_relationships;
 DELETE FROM fulfillment_events;
 DELETE FROM fulfillment_items;
 DELETE FROM fulfillment_deliverables;
 DELETE FROM fulfillment_projects;
+DELETE FROM line_items;
 
 -- 2. Document headers, in dependency order (Delivery Order -> Invoice,
---    Invoice/Proforma/PO all optionally -> Project).
+--    Invoice/Proforma/PO all optionally -> Project). leads stays until
+--    step 3 — clients.source_lead_id still points at it until then.
 DELETE FROM delivery_orders;
 DELETE FROM invoices;
 DELETE FROM proforma_invoices;
 DELETE FROM purchase_orders;
 DELETE FROM quotations;
-DELETE FROM leads;
 
 -- 3. Master data. leads.converted_client_id and clients.source_lead_id
 --    reference each other with no ON DELETE action, so null both out
---    first — otherwise deleting either table first fails on the other's
---    dangling FK.
+--    first — otherwise deleting either table fails on the other's
+--    still-live FK.
 UPDATE leads SET converted_client_id = NULL;
 UPDATE clients SET source_lead_id = NULL;
 
+DELETE FROM leads;
 DELETE FROM projects;
 DELETE FROM suppliers;
 DELETE FROM clients;
