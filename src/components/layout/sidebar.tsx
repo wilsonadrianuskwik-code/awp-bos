@@ -59,7 +59,7 @@ export const NAV_GROUPS = [
     items: [
       { label: "Clients", href: "/clients", icon: UserCheck, color: "#ec4899" },
       { label: "Quotations", href: "/quotations", icon: FileText, color: "#06b6d4" },
-      { label: "Proforma Invoices", href: "/proforma-invoices", icon: FileSpreadsheet, color: "#0ea5e9" },
+      { label: "Proforma Invoices", short: "Proforma", href: "/proforma-invoices", icon: FileSpreadsheet, color: "#0ea5e9" },
       { label: "Invoices", href: "/invoices", icon: Receipt, color: "#10b981" },
       { label: "Payments", href: "/payments", icon: CreditCard, color: "#14b8a6" },
     ],
@@ -68,7 +68,7 @@ export const NAV_GROUPS = [
     label: "Procurement",
     items: [
       { label: "Suppliers", href: "/suppliers", icon: Truck, color: "#eab308" },
-      { label: "Purchase Orders", href: "/purchase-orders", icon: ClipboardList, color: "#f59e0b" },
+      { label: "Purchase Orders", short: "Purchase", href: "/purchase-orders", icon: ClipboardList, color: "#f59e0b" },
     ],
   },
   {
@@ -77,12 +77,12 @@ export const NAV_GROUPS = [
       // Delivery Orders are the whole delivery story: the documents
       // themselves, and the per-line delivered/remaining tally they roll
       // up to (shown on the invoice they belong to).
-      { label: "Delivery Orders", href: "/delivery-orders", icon: PackageCheck, color: "#f97316" },
+      { label: "Delivery Orders", short: "Delivery", href: "/delivery-orders", icon: PackageCheck, color: "#f97316" },
     ],
   },
   {
     label: "Catalog",
-    items: [{ label: "Items & Materials", href: "/catalog", icon: Package, color: "#84cc16" }],
+    items: [{ label: "Items & Materials", short: "Items", href: "/catalog", icon: Package, color: "#84cc16" }],
   },
   {
     label: "Insights",
@@ -93,6 +93,12 @@ export const NAV_GROUPS = [
 export const BOTTOM_ITEMS = [
   { label: "Settings", href: "/settings", icon: Settings, color: "#64748b" },
 ] as const;
+
+/** What the collapsed rail prints under an icon — the short form when
+ *  the name is too long for one line, otherwise the name itself. */
+function railLabel(item: { label: string; short?: string }) {
+  return item.short ?? item.label;
+}
 
 function NavIcon({
   icon: Icon,
@@ -108,7 +114,7 @@ function NavIcon({
   color: string;
 }) {
   return (
-    <span className="relative flex flex-col items-center gap-0.5">
+    <span className="relative flex w-full flex-col items-center gap-1.5">
       <span
         className={cn(
           "grid h-8 w-8 place-items-center rounded-lg transition-all duration-150",
@@ -128,10 +134,15 @@ function NavIcon({
         <Icon className="h-[18px] w-[18px]" />
       </span>
       {collapsed && (
+        // Single line, always: a wrapped label made every other item a
+        // different height and broke the rail's rhythm. Long names get a
+        // short form in NAV_GROUPS; the full one stays as the tooltip.
         <span
           className={cn(
-            "text-[10px] leading-tight transition-colors duration-100",
-            active ? "font-medium text-sidebar-accent-foreground" : "text-sidebar-foreground/60"
+            "max-w-[68px] truncate text-center text-[11px] leading-none tracking-tight transition-colors duration-100",
+            active
+              ? "font-semibold text-sidebar-accent-foreground"
+              : "font-medium text-sidebar-foreground/75"
           )}
         >
           {label}
@@ -183,7 +194,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
                   <NavIcon
                     icon={item.icon}
                     active={isActive(item.href)}
-                    label={item.label}
+                    label={railLabel(item)}
                     color={item.color}
                     collapsed
                   />
@@ -206,7 +217,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
               <NavIcon
                 icon={item.icon}
                 active={isActive(item.href)}
-                label={item.label}
+                label={railLabel(item)}
                 color={item.color}
                 collapsed
               />
