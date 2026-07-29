@@ -3,7 +3,12 @@
 import { type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Calendar } from "lucide-react";
-import { StatusBadge } from "@/components/shared/status-badge";
+import { cn } from "@/lib/utils/cn";
+import {
+  StatusBadge,
+  STATUS_TONE,
+  TONE_ROW_ACCENT,
+} from "@/components/shared/status-badge";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { PurchaseOrderRowActions } from "@/features/purchase-orders/components/purchase-order-row-actions";
 import { formatCurrency } from "@/lib/utils/format-currency";
@@ -24,7 +29,14 @@ export function PurchaseOrderCard({ purchaseOrder }: PurchaseOrderCardProps) {
     <div
       role="button"
       tabIndex={0}
-      className="group relative flex cursor-pointer flex-col rounded-lg border bg-card p-3 shadow-2xs outline-none transition-all duration-150 hover:-translate-y-px hover:border-primary/40 hover:shadow-md focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-ring/30"
+      // The status stripe travels with the card, so a card dragged
+      // across lanes still says what it is mid-flight — and a mis-drop
+      // is visible as a colour that doesn't match its column.
+      className={cn(
+        "group relative flex cursor-pointer flex-col overflow-hidden rounded-lg border bg-card p-3 pl-3.5 shadow-2xs outline-none transition-all duration-150 hover:-translate-y-px hover:border-primary/40 hover:shadow-md focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-ring/30",
+        "before:absolute before:inset-y-0 before:left-0 before:w-1",
+        TONE_ROW_ACCENT[STATUS_TONE[purchaseOrder.status] ?? "neutral"]
+      )}
       onClick={() => router.push(href)}
       onKeyDown={(e: KeyboardEvent) => {
         if (e.key === "Enter") router.push(href);

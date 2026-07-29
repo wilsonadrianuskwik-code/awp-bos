@@ -2,7 +2,7 @@
 
 import { useOptimistic, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { KanbanBoard } from "@/components/shared/kanban-board";
+import { KanbanBoard, type KanbanTone } from "@/components/shared/kanban-board";
 import { Checkbox } from "@/components/ui/checkbox";
 import { InvoiceCard } from "@/features/invoices/components/invoice-card";
 import { RecordPaymentDialog } from "@/features/invoices/components/record-payment-dialog";
@@ -15,11 +15,19 @@ import type { InvoiceStatus, InvoiceWithClient } from "@/features/invoices/types
 // Four workflow lanes, each folding one or two terminal/derived statuses
 // in with a badge (already shown by the reused InvoiceCard's own
 // StatusBadge — the lane just groups them for the board).
-const LANES: { id: string; label: string; statuses: InvoiceStatus[] }[] = [
-  { id: "draft", label: "Draft", statuses: ["draft"] },
-  { id: "sent", label: "Sent", statuses: ["sent", "viewed", "overdue"] },
-  { id: "paid", label: "Paid", statuses: ["paid", "partial"] },
-  { id: "cancelled", label: "Cancelled", statuses: ["cancelled", "refunded"] },
+// Tones follow the money: grey while it's still ours to send, blue once
+// it's with the client, amber while it's owed, green when it's in, red
+// when it never will be.
+const LANES: {
+  id: string;
+  label: string;
+  statuses: InvoiceStatus[];
+  tone: KanbanTone;
+}[] = [
+  { id: "draft", label: "Draft", statuses: ["draft"], tone: "slate" },
+  { id: "sent", label: "Sent", statuses: ["sent", "viewed", "overdue"], tone: "amber" },
+  { id: "paid", label: "Paid", statuses: ["paid", "partial"], tone: "emerald" },
+  { id: "cancelled", label: "Cancelled", statuses: ["cancelled", "refunded"], tone: "red" },
 ];
 
 // Mirrors update_invoice_status's VALID_TRANSITIONS state machine
@@ -118,6 +126,7 @@ export function InvoiceKanbanBoard({
     return {
       id: lane.id,
       label: lane.label,
+      tone: lane.tone,
       items,
       footer:
         items.length > 0

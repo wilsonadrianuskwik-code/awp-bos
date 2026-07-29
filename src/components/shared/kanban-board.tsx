@@ -37,15 +37,45 @@ const snapCenterToCursor: Modifier = ({ activatorEvent, draggingNodeRect, transf
 
 export type KanbanTone = "amber" | "emerald" | "red" | "blue" | "slate";
 
-// Optional per-column color language. Omitted entirely = today's neutral
-// look (used by boards like invoice-kanban-board.tsx that haven't opted
-// in), so this is backward-compatible for every existing caller.
+/**
+ * Per-column colour. A board's columns *are* its lifecycle, so colouring
+ * them is the one place colour carries real meaning: you learn the
+ * pipeline's shape by where the green is, without reading a word.
+ *
+ * Each tone paints three things — a solid rail across the column's top,
+ * a tinted header, and a tinted column body — so a stage is legible from
+ * the far side of the screen but a white card still sits clearly on it.
+ */
+const TONE_RAIL: Record<KanbanTone, string> = {
+  amber: "bg-amber-500",
+  emerald: "bg-emerald-500",
+  red: "bg-red-500",
+  blue: "bg-blue-500",
+  slate: "bg-slate-400 dark:bg-slate-500",
+};
+
 const TONE_HEADER: Record<KanbanTone, string> = {
-  amber: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
-  emerald: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
-  red: "bg-red-500/10 text-red-700 dark:text-red-400",
-  blue: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
-  slate: "bg-slate-500/10 text-slate-600 dark:text-slate-400",
+  amber: "bg-amber-500/[0.12] text-amber-800 dark:text-amber-300",
+  emerald: "bg-emerald-500/[0.12] text-emerald-800 dark:text-emerald-300",
+  red: "bg-red-500/[0.12] text-red-800 dark:text-red-300",
+  blue: "bg-blue-500/[0.12] text-blue-800 dark:text-blue-300",
+  slate: "bg-slate-500/[0.12] text-slate-700 dark:text-slate-300",
+};
+
+const TONE_BODY: Record<KanbanTone, string> = {
+  amber: "bg-amber-500/[0.05]",
+  emerald: "bg-emerald-500/[0.05]",
+  red: "bg-red-500/[0.05]",
+  blue: "bg-blue-500/[0.05]",
+  slate: "bg-slate-500/[0.05]",
+};
+
+const TONE_COUNT: Record<KanbanTone, string> = {
+  amber: "bg-amber-500/20 text-amber-800 dark:text-amber-200",
+  emerald: "bg-emerald-500/20 text-emerald-800 dark:text-emerald-200",
+  red: "bg-red-500/20 text-red-800 dark:text-red-200",
+  blue: "bg-blue-500/20 text-blue-800 dark:text-blue-200",
+  slate: "bg-slate-500/20 text-slate-700 dark:text-slate-200",
 };
 
 export type KanbanColumnDef<TItem> = {
@@ -87,21 +117,39 @@ function KanbanColumn({
         // min-h-0 overrides the flex item default of min-height:auto, which
         // would otherwise let this column's content stretch the whole row
         // taller instead of scrolling inside overflow-y-auto below.
-        "flex h-full min-h-0 w-[252px] shrink-0 flex-col rounded-xl border bg-muted/40 shadow-[0_0_0_0_transparent] transition-[border-color,background-color,box-shadow] duration-200",
-        isOver && "border-primary/40 bg-primary/5 shadow-[inset_0_0_0_1px] shadow-primary/20"
+        "flex h-full min-h-0 w-[252px] shrink-0 flex-col overflow-hidden rounded-xl border shadow-[0_0_0_0_transparent] transition-[border-color,background-color,box-shadow] duration-200",
+        column.tone ? TONE_BODY[column.tone] : "bg-muted/40",
+        isOver && "border-primary/50 bg-primary/5 shadow-[inset_0_0_0_1px] shadow-primary/25"
       )}
     >
+      {/* The rail is what makes a stage identifiable at a glance — the
+          tint alone is too quiet once cards cover most of the column. */}
+      {column.tone && (
+        <div
+          className={cn(
+            "h-1 w-full shrink-0 [print-color-adjust:exact]",
+            TONE_RAIL[column.tone]
+          )}
+        />
+      )}
       {/* Sticky within the column's own scroll container — the header stays
           pinned while a long column's cards scroll underneath it, matching
           the sticky treatment applied to List's table header. */}
       <div
         className={cn(
-          "sticky top-0 z-10 flex items-center gap-2 rounded-t-xl border-b bg-card px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-foreground/80",
-          column.tone && TONE_HEADER[column.tone]
+          "sticky top-0 z-10 flex items-center gap-2 border-b px-3 py-2 text-[11px] font-semibold uppercase tracking-wider",
+          column.tone
+            ? TONE_HEADER[column.tone]
+            : "bg-card text-foreground/80"
         )}
       >
         <span className="truncate">{column.label}</span>
-        <span className="ml-auto shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium normal-case tracking-normal tabular-nums text-muted-foreground">
+        <span
+          className={cn(
+            "ml-auto shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold normal-case tracking-normal tabular-nums",
+            column.tone ? TONE_COUNT[column.tone] : "bg-muted text-muted-foreground"
+          )}
+        >
           {column.count}
         </span>
       </div>

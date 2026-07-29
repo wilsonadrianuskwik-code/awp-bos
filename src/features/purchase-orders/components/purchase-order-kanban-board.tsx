@@ -2,7 +2,7 @@
 
 import { useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { KanbanBoard } from "@/components/shared/kanban-board";
+import { KanbanBoard, type KanbanTone } from "@/components/shared/kanban-board";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PurchaseOrderCard } from "@/features/purchase-orders/components/purchase-order-card";
 import { useWorkspace } from "@/providers/workspace-provider";
@@ -14,13 +14,18 @@ import type { PurchaseOrderStatus, PurchaseOrderWithRelations } from "@/features
 // Draft -> Sent -> Acknowledged -> Partially Received -> Received, plus a
 // Cancelled lane, mirroring the status flow seeded into
 // document_type_registry for purchase_order.
-const LANES: { id: string; label: string; status: PurchaseOrderStatus }[] = [
-  { id: "draft", label: "Draft", status: "draft" },
-  { id: "sent", label: "Sent", status: "sent" },
-  { id: "acknowledged", label: "Acknowledged", status: "acknowledged" },
-  { id: "partially_received", label: "Partially Received", status: "partially_received" },
-  { id: "received", label: "Received", status: "received" },
-  { id: "cancelled", label: "Cancelled", status: "cancelled" },
+const LANES: {
+  id: string;
+  label: string;
+  status: PurchaseOrderStatus;
+  tone: KanbanTone;
+}[] = [
+  { id: "draft", label: "Draft", status: "draft", tone: "slate" },
+  { id: "sent", label: "Sent", status: "sent", tone: "blue" },
+  { id: "acknowledged", label: "Acknowledged", status: "acknowledged", tone: "blue" },
+  { id: "partially_received", label: "Partially Received", status: "partially_received", tone: "amber" },
+  { id: "received", label: "Received", status: "received", tone: "emerald" },
+  { id: "cancelled", label: "Cancelled", status: "cancelled", tone: "red" },
 ];
 
 const VALID_NEXT: Partial<Record<PurchaseOrderStatus, PurchaseOrderStatus[]>> = {
@@ -100,6 +105,7 @@ export function PurchaseOrderKanbanBoard({
     return {
       id: lane.id,
       label: lane.label,
+      tone: lane.tone,
       items,
       footer:
         items.length > 0

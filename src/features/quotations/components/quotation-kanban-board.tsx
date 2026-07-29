@@ -3,7 +3,7 @@
 import { useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { FileOutput } from "lucide-react";
-import { KanbanBoard } from "@/components/shared/kanban-board";
+import { KanbanBoard, type KanbanTone } from "@/components/shared/kanban-board";
 import { Checkbox } from "@/components/ui/checkbox";
 import { QuotationCard } from "@/features/quotations/components/quotation-card";
 import { useWorkspace } from "@/providers/workspace-provider";
@@ -15,11 +15,16 @@ import type { QuotationStatus, QuotationWithClient } from "@/features/quotations
 // Four workflow lanes, each folding one or two terminal/derived statuses
 // in with a badge (already shown by the reused QuotationCard's own
 // StatusBadge — the lane just groups them for the board).
-const LANES: { id: string; label: string; statuses: QuotationStatus[] }[] = [
-  { id: "draft", label: "Draft", statuses: ["draft", "revision_requested"] },
-  { id: "sent", label: "Sent", statuses: ["sent", "viewed", "expired"] },
-  { id: "approved", label: "Approved", statuses: ["approved"] },
-  { id: "rejected", label: "Rejected", statuses: ["rejected", "cancelled"] },
+const LANES: {
+  id: string;
+  label: string;
+  statuses: QuotationStatus[];
+  tone: KanbanTone;
+}[] = [
+  { id: "draft", label: "Draft", statuses: ["draft", "revision_requested"], tone: "slate" },
+  { id: "sent", label: "Sent", statuses: ["sent", "viewed", "expired"], tone: "blue" },
+  { id: "approved", label: "Approved", statuses: ["approved"], tone: "emerald" },
+  { id: "rejected", label: "Rejected", statuses: ["rejected", "cancelled"], tone: "red" },
 ];
 
 // Mirrors update_quotation_status's VALID_TRANSITIONS state machine
@@ -107,6 +112,7 @@ export function QuotationKanbanBoard({
     return {
       id: lane.id,
       label: lane.label,
+      tone: lane.tone,
       items,
       footer:
         items.length > 0
