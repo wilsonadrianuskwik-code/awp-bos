@@ -58,7 +58,7 @@ export function Header({ workspaceSlug, onMobileMenuToggle }: HeaderProps) {
   }
 
   return (
-    <header className="flex h-14 items-center justify-between gap-3 border-b bg-background px-4">
+    <header className="flex h-16 items-center justify-between gap-3 bg-background px-4 md:px-6">
       <div className="flex flex-1 items-center gap-2">
         <Button
           variant="ghost"
@@ -85,11 +85,11 @@ export function Header({ workspaceSlug, onMobileMenuToggle }: HeaderProps) {
         <button
           type="button"
           onClick={() => setPaletteOpen(true)}
-          className="hidden h-8 w-full max-w-64 items-center gap-2 rounded-lg border bg-muted/50 px-2.5 text-[13px] text-muted-foreground transition-all duration-150 hover:border-input hover:bg-card hover:text-foreground hover:shadow-2xs sm:flex"
+          className="hidden h-10 w-full max-w-72 items-center gap-2.5 rounded-full bg-secondary px-4 text-sm text-muted-foreground transition-all duration-150 hover:bg-card hover:text-foreground hover:shadow-card sm:flex"
         >
-          <Search className="h-3.5 w-3.5 shrink-0" />
+          <Search className="h-4 w-4 shrink-0" />
           <span className="flex-1 text-left">Search…</span>
-          <kbd className="rounded border bg-card px-1.5 py-px font-sans text-[10px] font-medium text-muted-foreground">
+          <kbd className="rounded-md bg-background px-1.5 py-0.5 font-sans text-[10px] font-medium text-muted-foreground">
             ⌘K
           </kbd>
         </button>
@@ -111,9 +111,9 @@ export function Header({ workspaceSlug, onMobileMenuToggle }: HeaderProps) {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="relative h-8 w-8 rounded-full ring-2 ring-transparent transition-shadow duration-150 hover:ring-border data-[state=open]:ring-primary/40"
+              className="relative h-10 w-10 rounded-full ring-2 ring-transparent transition-shadow duration-150 hover:ring-border data-[state=open]:ring-primary/40"
             >
-              <Avatar className="h-7 w-7">
+              <Avatar className="h-9 w-9">
                 <AvatarImage
                   src={user?.user_metadata?.avatar_url}
                   alt={user?.user_metadata?.full_name ?? "User"}

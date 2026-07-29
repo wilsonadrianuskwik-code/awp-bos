@@ -93,13 +93,13 @@ export function DataTable<TData>({
   const colSpan = columns.length + (selection ? 1 : 0);
 
   return (
-    <div className="overflow-x-auto rounded-lg border bg-card shadow-2xs">
+    <div className="overflow-x-auto rounded-2xl bg-card shadow-card">
       <table className="w-full caption-bottom">
         <thead className="sticky top-0 z-10 border-b bg-card">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {selection && (
-                <th className="h-9 w-9 px-3 text-left align-middle first:pl-4">
+                <th className="h-12 w-9 px-4 text-left align-middle first:pl-6">
                   <Checkbox
                     checked={
                       allOnPageSelected
@@ -116,7 +116,7 @@ export function DataTable<TData>({
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className="h-9 px-3 text-left align-middle text-[11px] font-medium uppercase tracking-wider text-muted-foreground first:pl-4 last:pr-4"
+                  className="h-12 px-4 text-left align-middle text-[11px] font-semibold uppercase tracking-wider text-muted-foreground first:pl-6 last:pr-6"
                 >
                   {header.isPlaceholder ? null : header.column.getCanSort() ? (
                     <button
@@ -201,7 +201,7 @@ export function DataTable<TData>({
                 >
                   {selection && (
                     <td
-                      className="px-3 py-2.5 align-middle first:pl-4"
+                      className="px-4 py-3.5 align-middle first:pl-6"
                       onClick={(e) => e.stopPropagation()}
                       onClickCapture={(e) => {
                         shiftPressedRef.current = e.shiftKey;
@@ -225,7 +225,7 @@ export function DataTable<TData>({
                   {row.getVisibleCells().map((cell) => (
                     <td
                       key={cell.id}
-                      className="px-3 py-2.5 align-middle first:pl-4 last:pr-4"
+                      className="px-4 py-3.5 align-middle first:pl-6 last:pr-6"
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>

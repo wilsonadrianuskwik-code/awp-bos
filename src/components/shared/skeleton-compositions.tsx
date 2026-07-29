@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function SummaryHeroSkeleton() {
   return (
-    <div className="overflow-hidden rounded-xl border bg-card">
+    <div className="overflow-hidden rounded-2xl bg-card shadow-card">
       <div className="flex flex-col gap-6 p-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex flex-1 flex-wrap items-end gap-x-10 gap-y-4">
           <div>
@@ -32,7 +32,7 @@ export function SummaryHeroSkeleton() {
 
 export function MetricsRibbonSkeleton({ columns = 4 }: { columns?: number }) {
   return (
-    <div className="grid grid-cols-2 divide-x divide-y overflow-hidden rounded-xl border bg-card sm:grid-cols-3 lg:flex lg:divide-y-0">
+    <div className="grid grid-cols-2 divide-x divide-y overflow-hidden rounded-2xl bg-card shadow-card sm:grid-cols-3 lg:flex lg:divide-y-0">
       {Array.from({ length: columns }).map((_, i) => (
         <div key={i} className="min-w-0 p-4 lg:flex-1 lg:p-5">
           <Skeleton className="h-3 w-20" />
@@ -48,7 +48,7 @@ export function CardGridSkeleton({ count = 6 }: { count?: number }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="rounded-xl border bg-card p-5">
+        <div key={i} className="rounded-2xl bg-card p-5 shadow-card">
           <div className="flex items-center justify-between">
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-5 w-16 rounded-full" />
@@ -67,7 +67,7 @@ export function CardGridSkeleton({ count = 6 }: { count?: number }) {
 
 export function TableSkeleton({ rows = 5, columns = 5 }: { rows?: number; columns?: number }) {
   return (
-    <div className="overflow-hidden rounded-xl border bg-card">
+    <div className="overflow-hidden rounded-2xl bg-card shadow-card">
       <div className="border-b px-4 py-3">
         <div className="flex gap-6">
           {Array.from({ length: columns }).map((_, i) => (
@@ -103,7 +103,7 @@ export function KanbanBoardSkeleton({ columns = 4 }: { columns?: number }) {
           </div>
           <div className="flex flex-1 flex-col gap-2 p-2">
             {Array.from({ length: 3 }).map((_, j) => (
-              <div key={j} className="rounded-lg border bg-card p-4">
+              <div key={j} className="rounded-2xl bg-card p-5 shadow-card">
                 <Skeleton className="h-3.5 w-24" />
                 <Skeleton className="mt-2 h-4 w-32" />
                 <div className="mt-3 flex items-center justify-between">
@@ -125,7 +125,7 @@ export function DetailSkeleton() {
       <SummaryHeroSkeleton />
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
-          <div className="rounded-xl border bg-card p-6">
+          <div className="rounded-2xl bg-card p-6 shadow-card">
             <Skeleton className="h-4 w-24" />
             <div className="mt-4 space-y-3">
               {Array.from({ length: 4 }).map((_, i) => (
@@ -137,7 +137,7 @@ export function DetailSkeleton() {
             </div>
           </div>
         </div>
-        <div className="rounded-xl border bg-card p-6">
+        <div className="rounded-2xl bg-card p-6 shadow-card">
           <Skeleton className="h-4 w-20" />
           <div className="mt-4 space-y-3">
             {Array.from({ length: 3 }).map((_, i) => (

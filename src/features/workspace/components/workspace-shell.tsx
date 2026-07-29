@@ -45,7 +45,7 @@ export function WorkspaceShell({
           />
         </div>
         <main className="flex-1 overflow-y-auto print:overflow-visible">
-          <div className="mx-auto w-full max-w-[1400px] p-4 md:p-6 print:max-w-none print:p-0">
+          <div className="mx-auto w-full max-w-[1440px] px-4 pb-10 pt-1 md:px-8 print:max-w-none print:p-0">
             {children}
           </div>
         </main>

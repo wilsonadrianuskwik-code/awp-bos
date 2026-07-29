@@ -59,7 +59,7 @@ export function ActiveProjectsGrid({
         <Link
           key={project.id}
           href={`/${workspaceSlug}/projects/${project.id}`}
-          className="group rounded-lg border bg-card p-4 shadow-2xs transition-colors hover:bg-muted/40"
+          className="group rounded-2xl bg-card p-5 shadow-card transition-colors hover:bg-muted/40"
         >
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">

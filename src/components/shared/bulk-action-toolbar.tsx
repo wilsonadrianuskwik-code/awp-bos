@@ -37,7 +37,7 @@ export function BulkActionToolbar({
   return (
     <div
       className={cn(
-        "fixed bottom-6 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-lg border bg-card px-2 py-1.5 shadow-modal animate-page-enter",
+        "fixed bottom-6 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-2xl bg-card px-2 py-1.5 shadow-modal animate-page-enter",
         className
       )}
     >

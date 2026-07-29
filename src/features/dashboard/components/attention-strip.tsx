@@ -17,7 +17,7 @@ export function AttentionStrip({
 }) {
   if (items.length === 0) {
     return (
-      <div className="flex items-center gap-2 rounded-xl border bg-card px-4 py-3 text-[13px] text-muted-foreground">
+      <div className="flex items-center gap-2.5 rounded-2xl bg-card px-5 py-4 text-sm text-muted-foreground shadow-card">
         <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
         Nothing needs your attention.
       </div>
@@ -25,13 +25,13 @@ export function AttentionStrip({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-xl border border-amber-500/25 bg-amber-500/5 px-3 py-2.5">
-      <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+    <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-amber-500/[0.07] px-4 py-3.5 shadow-card">
+      <AlertTriangle className="mr-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
       {items.map((item) => (
         <Link
           key={item.label}
           href={`/${workspaceSlug}${item.href}`}
-          className="rounded-md border border-amber-500/30 bg-card px-2.5 py-1 text-[13px] font-medium text-amber-700 transition-colors hover:bg-amber-500/10 dark:text-amber-300"
+          className="rounded-full bg-card px-3 py-1.5 text-[13px] font-medium text-amber-700 shadow-card transition-transform duration-150 hover:-translate-y-px dark:text-amber-300"
         >
           <span className="tabular-nums">{item.count}</span> {item.label}
         </Link>
