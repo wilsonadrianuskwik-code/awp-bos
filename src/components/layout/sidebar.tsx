@@ -109,16 +109,21 @@ function NavIcon({
 }) {
   return (
     <span className="relative flex flex-col items-center gap-0.5">
-      {/* On a light rail the old glow read as smudge. Active is now a
-          solid accent tile; per-item colour is kept only as a hover
-          tint, which is enough to keep the modules distinguishable. */}
       <span
         className={cn(
-          "grid h-10 w-10 place-items-center rounded-xl transition-all duration-150",
-          active
-            ? "bg-primary text-primary-foreground shadow-[0_6px_16px_-6px_hsl(var(--primary)/0.7)]"
-            : "text-sidebar-foreground group-hover:text-[var(--nav-color)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_12%,transparent)]"
+          "grid h-8 w-8 place-items-center rounded-lg transition-all duration-150",
+          !active &&
+            "text-sidebar-foreground/70 group-hover:text-[var(--nav-color)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_16%,transparent)] group-hover:shadow-[0_0_0_1px_color-mix(in_srgb,var(--nav-color)_28%,transparent),0_0_10px_2px_color-mix(in_srgb,var(--nav-color)_38%,transparent)]"
         )}
+        style={
+          active
+            ? {
+                backgroundColor: `${color}2e`,
+                color,
+                boxShadow: `0 0 0 1px ${color}40, 0 0 14px 2px ${color}66, 0 0 28px 8px ${color}33`,
+              }
+            : undefined
+        }
       >
         <Icon className="h-[18px] w-[18px]" />
       </span>
@@ -149,12 +154,12 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
 
   if (collapsed) {
     return (
-      <aside className="flex h-full w-[76px] flex-col items-center bg-sidebar text-sidebar-foreground">
+      <aside className="flex h-full w-[72px] flex-col items-center border-r bg-sidebar text-sidebar-foreground">
         {/* Workspace badge */}
-        <div className="flex h-16 w-full items-center justify-center">
+        <div className="flex h-14 w-full items-center justify-center">
           <Link
             href={basePath}
-            className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-sm font-bold text-primary-foreground shadow-[0_8px_20px_-8px_hsl(var(--primary)/0.8)] transition-transform hover:scale-105"
+            className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-sidebar-primary to-indigo-500 text-xs font-bold text-sidebar-primary-foreground shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] transition-transform hover:scale-105"
           >
             {workspaceName.charAt(0).toUpperCase()}
           </Link>
@@ -224,38 +229,39 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
   // Expanded sidebar
   const navItemClass = (href: string) =>
     cn(
-      "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-100",
+      "group relative flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-all duration-100",
       isActive(href)
-        ? // The active item is carried by an accent bar at the rail's
-          // edge plus a blue label — the reference's signature move, and
-          // quieter than filling the whole row.
-          "text-sidebar-accent-foreground before:absolute before:-left-2 before:top-1/2 before:h-6 before:w-1 before:-translate-y-1/2 before:rounded-r-full before:bg-primary"
-        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        ? "text-sidebar-accent-foreground"
+        : "text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
     );
 
   const navIconClass = (href: string) =>
     cn(
-      "grid h-8 w-8 shrink-0 place-items-center rounded-lg transition-all duration-100",
-      isActive(href)
-        ? "text-primary"
-        : "text-sidebar-foreground group-hover:text-[var(--nav-color)]"
+      "grid h-7 w-7 shrink-0 place-items-center rounded-md transition-all duration-100",
+      !isActive(href) &&
+        "text-sidebar-foreground/70 group-hover:text-[var(--nav-color)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_16%,transparent)] group-hover:shadow-[0_0_0_1px_color-mix(in_srgb,var(--nav-color)_28%,transparent),0_0_10px_2px_color-mix(in_srgb,var(--nav-color)_38%,transparent)]"
     );
 
-  // Per-item colour survives only as the hover tint (--nav-color); the
-  // active state is the accent bar, so it needs no inline style.
-  const navIconStyle = (): CSSProperties | undefined => undefined;
+  const navIconStyle = (href: string, color: string): CSSProperties | undefined =>
+    isActive(href)
+      ? {
+          backgroundColor: `${color}2e`,
+          color,
+          boxShadow: `0 0 0 1px ${color}40, 0 0 14px 2px ${color}66, 0 0 28px 8px ${color}33`,
+        }
+      : undefined;
 
   return (
-    <aside className="flex h-full w-64 flex-col bg-sidebar text-sidebar-foreground transition-all duration-200">
-      <div className="flex h-16 items-center justify-between px-4">
+    <aside className="flex h-full w-60 flex-col border-r bg-sidebar text-sidebar-foreground transition-all duration-200">
+      <div className="flex h-14 items-center justify-between px-3">
         <Link
           href={basePath}
           className="-ml-1 flex min-w-0 items-center gap-2.5 rounded-lg py-1 pl-1 pr-2 transition-colors duration-100 hover:bg-sidebar-accent/60"
         >
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-xs font-bold text-primary-foreground shadow-[0_8px_20px_-8px_hsl(var(--primary)/0.8)]">
+          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-sidebar-primary to-indigo-500 text-[11px] font-bold text-sidebar-primary-foreground shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]">
             {workspaceName.charAt(0).toUpperCase()}
           </span>
-          <span className="truncate text-[15px] font-semibold text-foreground">
+          <span className="truncate text-sm font-semibold text-sidebar-accent-foreground">
             {workspaceName}
           </span>
         </Link>
@@ -270,11 +276,11 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
         </Button>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-4 pb-2">
+      <nav className="flex-1 overflow-y-auto px-2 pb-2">
         {NAV_GROUPS.map((group, groupIndex) => (
           <div key={group.label ?? "root"}>
             {group.label ? (
-              <div className="px-3 pb-1.5 pt-5 text-[11px] font-semibold uppercase tracking-wider text-sidebar-foreground/60">
+              <div className="px-2.5 pb-1 pt-4 text-[11px] font-medium uppercase tracking-wider text-sidebar-foreground/45">
                 {group.label}
               </div>
             ) : (
@@ -290,7 +296,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
                 >
                   <span
                     className={navIconClass(item.href)}
-                    style={navIconStyle()}
+                    style={navIconStyle(item.href, item.color)}
                   >
                     <item.icon className="h-4 w-4" />
                   </span>
@@ -302,7 +308,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
         ))}
       </nav>
 
-      <div className="border-t border-sidebar-border p-4">
+      <div className="border-t border-sidebar-border p-2">
         {BOTTOM_ITEMS.map((item) => (
           <Link
             key={item.label}
@@ -312,7 +318,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
           >
             <span
               className={navIconClass(item.href)}
-              style={navIconStyle()}
+              style={navIconStyle(item.href, item.color)}
             >
               <item.icon className="h-4 w-4" />
             </span>

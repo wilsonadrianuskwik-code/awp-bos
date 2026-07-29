@@ -8,9 +8,9 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      // No border: the card is separated from the canvas by shadow
-      // alone, which is what gives the layout its soft, airy read.
-      // print:shadow-none because a shadow renders as grey mush on paper.
+      // Borderless and softly lifted: the card separates from the canvas
+      // by shadow rather than by an edge. print:shadow-none because a
+      // shadow renders as grey mush on paper.
       "rounded-2xl bg-card text-card-foreground shadow-card print:shadow-none",
       className
     )}
@@ -25,7 +25,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6 pb-4", className)}
+    className={cn("flex flex-col space-y-1.5 p-6", className)}
     {...props}
   />
 ));
@@ -37,7 +37,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-base font-semibold leading-none tracking-tight", className)}
+    className={cn("text-[15px] font-semibold leading-none tracking-tight", className)}
     {...props}
   />
 ));

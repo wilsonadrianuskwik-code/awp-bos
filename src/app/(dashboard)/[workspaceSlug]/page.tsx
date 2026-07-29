@@ -66,6 +66,16 @@ export default async function DashboardPage({
 
       <AttentionStrip items={attentionItems} workspaceSlug={workspaceSlug} />
 
+      <div>
+        <h2 className="mb-3 text-[15px] font-semibold">Active Projects</h2>
+        <ActiveProjectsGrid projects={activeProjects} workspaceSlug={workspaceSlug} />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <ActionQueueCard items={actionQueue} workspaceSlug={workspaceSlug} />
+        <RecentActivityCard activities={activities} />
+      </div>
+
       <StatRibbon
         metrics={[
           {
@@ -88,17 +98,6 @@ export default async function DashboardPage({
           },
         ]}
       />
-
-      <div>
-        <h2 className="mb-4 text-lg font-semibold">Active Projects</h2>
-        <ActiveProjectsGrid projects={activeProjects} workspaceSlug={workspaceSlug} />
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <ActionQueueCard items={actionQueue} workspaceSlug={workspaceSlug} />
-        <RecentActivityCard activities={activities} />
-      </div>
-
     </div>
   );
 }

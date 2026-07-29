@@ -3,16 +3,14 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ------------------------------------------------------------------ */
-/* Design system — token layer.                                        */
+/* Meridian design system — token layer.                               */
 /*                                                                     */
-/* Reworked toward the BankDash reference: a soft blue-grey canvas,    */
-/* pure white cards carried by shadow rather than borders, generous    */
-/* corner radius, and one confident blue accent. Status colors stay    */
-/* semantic and live in the StatusBadge tone map, not here.            */
-/*                                                                     */
-/* The sidebar is light in this system, not a dark rail — the airy,    */
-/* single-surface look is the point of the reference, and a dark rail  */
-/* fights it.                                                          */
+/* Neutrals are slate-tinted (hue ~220–224), never pure gray: the      */
+/* slight blue cast is what separates a considered SaaS surface from   */
+/* a default admin template. One accent (cobalt) carries all primary   */
+/* actions and active states; status colors are semantic and live in   */
+/* the StatusBadge tone map, not here. The app canvas is a faint gray  */
+/* so white cards read as raised surfaces without heavy shadows.       */
 /* ------------------------------------------------------------------ */
 
 @theme inline {
@@ -57,36 +55,31 @@
 }
 
 :root {
-  /* Canvas & surfaces. The canvas is a touch bluer and darker than
-     before so white cards separate on shadow alone, with no border. */
-  --background: 220 33% 97%;
-  --foreground: 222 34% 16%;
+  /* Canvas & surfaces */
+  --background: 220 20% 98%;
+  --foreground: 224 24% 11%;
   --card: 0 0% 100%;
-  --card-foreground: 222 34% 16%;
+  --card-foreground: 224 24% 11%;
   --popover: 0 0% 100%;
-  --popover-foreground: 222 34% 16%;
+  --popover-foreground: 224 24% 11%;
 
-  /* Accent — indigo blue. Primary actions, active nav, focus. */
-  --primary: 231 89% 52%;
+  /* Accent — cobalt. Primary actions, active nav, focus. */
+  --primary: 230 84% 54%;
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 220 40% 96%;
-  --secondary-foreground: 222 26% 30%;
-  --muted: 220 40% 96%;
-  --muted-foreground: 221 17% 52%;
-  --accent: 226 100% 97%;
-  --accent-foreground: 231 89% 45%;
+  --secondary: 220 15% 94%;
+  --secondary-foreground: 224 18% 24%;
+  --muted: 220 15% 94%;
+  --muted-foreground: 220 10% 44%;
+  --accent: 220 15% 94%;
+  --accent-foreground: 224 18% 20%;
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
 
-  /* Borders exist for inputs and table rules; cards don't use them. */
-  --border: 220 30% 92%;
-  --input: 220 26% 88%;
-  --ring: 231 89% 52%;
-  /* Drives rounded-sm/md/lg/xl. 12px keeps buttons and inputs friendly
-     without turning small controls into pills; cards opt into a larger
-     radius of their own. */
-  --radius: 0.75rem;
+  --border: 220 14% 90%;
+  --input: 220 13% 86%;
+  --ring: 230 84% 54%;
+  --radius: 0.625rem;
 
   --chart-1: 230 84% 54%;
   --chart-2: 173 58% 39%;
@@ -94,17 +87,18 @@
   --chart-4: 38 92% 50%;
   --chart-5: 340 70% 55%;
 
-  /* Light sidebar: one continuous bright surface from rail to canvas,
-     with the active item carried by an accent bar and blue label
-     rather than by a change of background. */
-  --sidebar-background: 0 0% 100%;
-  --sidebar-foreground: 221 17% 55%;
-  --sidebar-primary: 231 89% 52%;
+  /* The sidebar is a deep ink surface in BOTH themes (ClickUp/Notion
+     convention): the dark rail against a light canvas is the strongest
+     single "enterprise product" signal, and it makes the content area
+     read as the bright, focused workspace. */
+  --sidebar-background: 228 28% 12%;
+  --sidebar-foreground: 222 12% 68%;
+  --sidebar-primary: 228 88% 66%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 226 100% 97%;
-  --sidebar-accent-foreground: 231 89% 45%;
-  --sidebar-border: 220 30% 93%;
-  --sidebar-ring: 231 89% 52%;
+  --sidebar-accent: 226 22% 18%;
+  --sidebar-accent-foreground: 220 25% 96%;
+  --sidebar-border: 226 18% 18%;
+  --sidebar-ring: 228 88% 66%;
 }
 
 .dark {
@@ -139,13 +133,13 @@
 
   /* In dark mode the rail sits a step deeper than the canvas so the
      content area still reads as the raised, focused surface. */
-  --sidebar-background: 224 15% 9%;
-  --sidebar-foreground: 220 12% 62%;
+  --sidebar-background: 226 20% 7%;
+  --sidebar-foreground: 220 12% 66%;
   --sidebar-primary: 228 84% 66%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 228 40% 16%;
-  --sidebar-accent-foreground: 228 84% 78%;
-  --sidebar-border: 224 12% 14%;
+  --sidebar-accent: 224 14% 13%;
+  --sidebar-accent-foreground: 220 14% 92%;
+  --sidebar-border: 224 12% 12%;
   --sidebar-ring: 228 84% 66%;
 }
 
@@ -159,9 +153,8 @@
     0 4px 8px -2px rgba(16, 24, 40, 0.08), 0 12px 24px -6px rgba(16, 24, 40, 0.12);
   --shadow-modal: 0 8px 16px -6px rgba(16, 24, 40, 0.12),
     0 24px 48px -12px rgba(16, 24, 40, 0.28);
-  /* Cards: wide and very soft, so a white card lifts off the blue-grey
-     canvas without a visible edge. This replaces the border they used
-     to rely on. */
+  /* Cards: wide and very soft, so a white card lifts off the canvas
+     without a visible edge. This is what lets them drop their border. */
   --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.03),
     0 8px 24px -8px rgba(16, 24, 40, 0.08);
 }
@@ -170,9 +163,9 @@
     0 4px 8px -2px rgba(0, 0, 0, 0.4), 0 12px 24px -6px rgba(0, 0, 0, 0.5);
   --shadow-modal: 0 8px 16px -6px rgba(0, 0, 0, 0.45),
     0 24px 48px -12px rgba(0, 0, 0, 0.65);
-  /* In dark mode a shadow can't separate surfaces, so cards fall back
-     to a hairline ring. */
-  --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.06);
+  /* A shadow can't separate surfaces on a dark canvas, so the card
+     falls back to the hairline ring it used to draw as a border. */
+  --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.07);
 }
 
 @layer utilities {
