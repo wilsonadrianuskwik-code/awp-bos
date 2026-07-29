@@ -3,7 +3,7 @@ import { getWorkspaceBySlug } from "@/lib/workspace";
 import { getAllClients } from "@/features/clients/queries";
 import { getQuotation } from "@/features/quotations/queries";
 import { getLineItemTemplates } from "@/features/line-items/queries";
-import { getActiveCatalogItems } from "@/features/catalog/queries";
+import { getActiveCatalogItems, getCatalogItemClientPrices } from "@/features/catalog/queries";
 import { getAllProjects } from "@/features/projects/queries";
 import { QuotationBuilder } from "@/features/quotations/components/quotation-builder";
 import { isEditableStatus } from "@/features/quotations/helpers";
@@ -24,11 +24,12 @@ export default async function EditQuotationPage({
     redirect(`/${workspaceSlug}/quotations/${quotationId}`);
   }
 
-  const [clients, templates, catalogItems, projects] = await Promise.all([
+  const [clients, templates, catalogItems, projects, clientPrices] = await Promise.all([
     getAllClients(workspace.id),
     getLineItemTemplates(workspace.id),
     getActiveCatalogItems(workspace.id),
     getAllProjects(workspace.id),
+    getCatalogItemClientPrices(workspace.id),
   ]);
 
   return (
@@ -38,6 +39,7 @@ export default async function EditQuotationPage({
       projects={projects}
       templates={templates}
       catalogItems={catalogItems}
+      clientPrices={clientPrices}
     />
   );
 }

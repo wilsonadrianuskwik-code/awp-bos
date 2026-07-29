@@ -323,6 +323,108 @@ export async function deleteCatalogItem(workspaceId: string, itemId: string) {
   });
 }
 
+export async function setCatalogItemClientPrice(
+  workspaceId: string,
+  catalogItemId: string,
+  clientId: string,
+  unitPrice: number
+) {
+  return withWorkspace(workspaceId, "staff", async (ctx) => {
+    if (!Number.isFinite(unitPrice) || unitPrice < 0) {
+      throw new Error("Price must be a non-negative number");
+    }
+
+    const supabase = await createClient();
+    const { data: item } = await supabase
+      .from("catalog_items")
+      .select("name, is_package")
+      .eq("id", catalogItemId)
+      .eq("workspace_id", ctx.workspaceId)
+      .single();
+    if (!item) throw new Error("Catalog item not found");
+    if (item.is_package) {
+      throw new Error("Packages price as a whole — there's no per-client override");
+    }
+
+    const { data: client } = await supabase
+      .from("clients")
+      .select("name")
+      .eq("id", clientId)
+      .eq("workspace_id", ctx.workspaceId)
+      .single();
+    if (!client) throw new Error("Client not found");
+
+    const { data: row, error } = await supabase
+      .from("catalog_item_client_prices")
+      .upsert(
+        {
+          workspace_id: ctx.workspaceId,
+          catalog_item_id: catalogItemId,
+          client_id: clientId,
+          unit_price: unitPrice,
+          created_by: ctx.userId,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "catalog_item_id,client_id" }
+      )
+      .select("id, catalog_item_id, client_id, unit_price")
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    await createActivity(supabase, {
+      workspaceId: ctx.workspaceId,
+      actorId: ctx.userId,
+      action: "updated",
+      description: `set ${client.name}'s price for "${item.name}" to a custom rate`,
+      entityType: "catalog_item",
+      entityId: catalogItemId,
+    });
+
+    revalidatePath(`/${ctx.workspaceSlug}/catalog/${catalogItemId}`);
+    return { ...row, client_name: client.name };
+  });
+}
+
+export async function removeCatalogItemClientPrice(
+  workspaceId: string,
+  catalogItemId: string,
+  priceId: string
+) {
+  return withWorkspace(workspaceId, "staff", async (ctx) => {
+    const supabase = await createClient();
+
+    const { data: existing } = await supabase
+      .from("catalog_item_client_prices")
+      .select("id, client:clients(name)")
+      .eq("id", priceId)
+      .eq("workspace_id", ctx.workspaceId)
+      .single();
+    if (!existing) throw new Error("Price override not found");
+
+    const { error } = await supabase
+      .from("catalog_item_client_prices")
+      .delete()
+      .eq("id", priceId)
+      .eq("workspace_id", ctx.workspaceId);
+    if (error) throw new Error(error.message);
+
+    const clientName =
+      (existing.client as unknown as { name: string } | null)?.name ?? "this client";
+    await createActivity(supabase, {
+      workspaceId: ctx.workspaceId,
+      actorId: ctx.userId,
+      action: "updated",
+      description: `removed ${clientName}'s custom price, back to the default rate`,
+      entityType: "catalog_item",
+      entityId: catalogItemId,
+    });
+
+    revalidatePath(`/${ctx.workspaceSlug}/catalog/${catalogItemId}`);
+    return { success: true };
+  });
+}
+
 export async function bulkDeleteCatalogItems(workspaceId: string, itemIds: string[]) {
   return withWorkspace(workspaceId, "staff", async (ctx) => {
     const supabase = await createClient();

@@ -41,7 +41,8 @@ import type {
   ProformaInvoice,
   ProformaInvoiceDetail,
 } from "@/features/proforma-invoices/types";
-import type { CatalogItem } from "@/features/catalog/types";
+import type { CatalogItem, CatalogItemClientPrice } from "@/features/catalog/types";
+import { useClientPriceResolver } from "@/features/catalog/use-client-price";
 import type { Project } from "@/features/projects/types";
 import { TaxBreakdownEditor } from "@/features/documents/components/tax-breakdown-editor";
 import { setDocumentTaxSettings } from "@/features/documents/actions";
@@ -83,6 +84,7 @@ type ProformaInvoiceBuilderProps = {
   projects: Project[];
   templates: TemplateWithItems[];
   catalogItems: CatalogItem[];
+  clientPrices?: CatalogItemClientPrice[];
   initialClientId?: string;
 };
 
@@ -92,6 +94,7 @@ export function ProformaInvoiceBuilder({
   projects,
   templates,
   catalogItems,
+  clientPrices = [],
   initialClientId,
 }: ProformaInvoiceBuilderProps) {
   const router = useRouter();
@@ -104,6 +107,7 @@ export function ProformaInvoiceBuilder({
   const [clientId, setClientId] = useState(
     proformaInvoice?.client_id ?? initialClientId ?? ""
   );
+  const priceFor = useClientPriceResolver(clientPrices, clientId);
   const [projectId, setProjectId] = useState(proformaInvoice?.project_id ?? "");
   const [title, setTitle] = useState(proformaInvoice?.title ?? "");
   const [currency, setCurrency] = useState(
@@ -644,6 +648,7 @@ export function ProformaInvoiceBuilder({
         catalogItems={catalogItems}
         templates={templates}
         documentCurrency={currency}
+        priceFor={priceFor}
         onInsertCatalog={handleInsertCatalogItem}
         onInsertTemplate={handleInsertTemplate}
       />

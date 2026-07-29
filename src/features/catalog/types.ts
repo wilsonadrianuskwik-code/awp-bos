@@ -77,6 +77,17 @@ export type CatalogStats = {
   totalValueByCurrency: { currency: string; amount: number }[];
 };
 
+// A per-client price override (00094) — replaces default_unit_price for
+// this one client when this item is inserted into a document they're
+// billed on. Packages have no override concept (see the migration).
+export type CatalogItemClientPrice = {
+  id: string;
+  catalog_item_id: string;
+  client_id: string;
+  client_name: string;
+  unit_price: number;
+};
+
 // Lightweight "where is this used" signal for the detail page — how many
 // issued line items were copied from this catalog item, and how many
 // units in total. Traceability only (catalog_item_id on line_items is

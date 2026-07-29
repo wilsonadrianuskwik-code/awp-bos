@@ -39,7 +39,8 @@ import type {
   TemplateWithItems,
 } from "@/features/line-items/types";
 import type { Invoice, InvoiceDetail } from "@/features/invoices/types";
-import type { CatalogItem } from "@/features/catalog/types";
+import type { CatalogItem, CatalogItemClientPrice } from "@/features/catalog/types";
+import { useClientPriceResolver } from "@/features/catalog/use-client-price";
 import type { Project } from "@/features/projects/types";
 import { TaxBreakdownEditor } from "@/features/documents/components/tax-breakdown-editor";
 import { setDocumentTaxSettings } from "@/features/documents/actions";
@@ -83,6 +84,7 @@ type InvoiceBuilderProps = {
   projects: Project[];
   templates: TemplateWithItems[];
   catalogItems: CatalogItem[];
+  clientPrices?: CatalogItemClientPrice[];
   initialClientId?: string;
   initialProjectId?: string;
   defaultPaymentTerms?: string;
@@ -95,6 +97,7 @@ export function InvoiceBuilder({
   projects,
   templates: initialTemplates,
   catalogItems,
+  clientPrices = [],
   initialClientId,
   initialProjectId,
   defaultPaymentTerms,
@@ -110,6 +113,7 @@ export function InvoiceBuilder({
   const [clientId, setClientId] = useState(
     invoice?.client_id ?? initialClientId ?? ""
   );
+  const priceFor = useClientPriceResolver(clientPrices, clientId);
   const [projectId, setProjectId] = useState(
     invoice?.project_id ?? initialProjectId ?? ""
   );
@@ -850,6 +854,7 @@ export function InvoiceBuilder({
         catalogItems={catalogItems}
         templates={templates}
         documentCurrency={currency}
+        priceFor={priceFor}
         onInsertCatalog={handleInsertCatalogItem}
         onInsertTemplate={handleInsertTemplate}
       />

@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   CatalogFilters,
   CatalogItem,
+  CatalogItemClientPrice,
   CatalogItemUsage,
   CatalogListResult,
   CatalogStats,
@@ -192,6 +193,53 @@ export async function getPackageBreakdownsForPortal(
     .in("id", catalogItemIds);
 
   return Object.fromEntries((data ?? []).map((row) => [row.id, row.package_items]));
+}
+
+// Every customer-price override in the workspace, flat. Builders fetch
+// this once alongside the catalog list and resolve price client-side as
+// the user picks a client — cheap at realistic override volumes, and
+// avoids a round trip every time the client selection changes.
+export async function getCatalogItemClientPrices(
+  workspaceId: string
+): Promise<CatalogItemClientPrice[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("catalog_item_client_prices")
+    .select("id, catalog_item_id, client_id, unit_price, client:clients(name)")
+    .eq("workspace_id", workspaceId);
+
+  if (error) throw error;
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    catalog_item_id: row.catalog_item_id,
+    client_id: row.client_id,
+    unit_price: row.unit_price,
+    client_name: (row.client as unknown as { name: string } | null)?.name ?? "—",
+  }));
+}
+
+// Overrides for one catalog item — feeds the "Customer Pricing" section
+// on its detail page.
+export async function getCatalogItemClientPricesForItem(
+  itemId: string,
+  workspaceId: string
+): Promise<CatalogItemClientPrice[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("catalog_item_client_prices")
+    .select("id, catalog_item_id, client_id, unit_price, client:clients(name)")
+    .eq("workspace_id", workspaceId)
+    .eq("catalog_item_id", itemId)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    catalog_item_id: row.catalog_item_id,
+    client_id: row.client_id,
+    unit_price: row.unit_price,
+    client_name: (row.client as unknown as { name: string } | null)?.name ?? "—",
+  }));
 }
 
 export async function getCatalogItemActivities(itemId: string) {

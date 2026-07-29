@@ -3,7 +3,7 @@ import { getWorkspaceBySlug } from "@/lib/workspace";
 import { getAllClients } from "@/features/clients/queries";
 import { getAllProjects } from "@/features/projects/queries";
 import { getLineItemTemplates } from "@/features/line-items/queries";
-import { getActiveCatalogItems } from "@/features/catalog/queries";
+import { getActiveCatalogItems, getCatalogItemClientPrices } from "@/features/catalog/queries";
 import { ProformaInvoiceBuilder } from "@/features/proforma-invoices/components/proforma-invoice-builder";
 
 export default async function NewProformaInvoicePage({
@@ -18,11 +18,12 @@ export default async function NewProformaInvoicePage({
   const workspace = await getWorkspaceBySlug(workspaceSlug);
   if (!workspace) notFound();
 
-  const [clients, projects, templates, catalogItems] = await Promise.all([
+  const [clients, projects, templates, catalogItems, clientPrices] = await Promise.all([
     getAllClients(workspace.id),
     getAllProjects(workspace.id),
     getLineItemTemplates(workspace.id),
     getActiveCatalogItems(workspace.id),
+    getCatalogItemClientPrices(workspace.id),
   ]);
 
   return (
@@ -31,6 +32,7 @@ export default async function NewProformaInvoicePage({
       projects={projects}
       templates={templates}
       catalogItems={catalogItems}
+      clientPrices={clientPrices}
       initialClientId={clientId}
     />
   );

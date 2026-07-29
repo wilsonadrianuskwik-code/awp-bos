@@ -4,7 +4,7 @@ import { getAllClients } from "@/features/clients/queries";
 import { getAllProjects } from "@/features/projects/queries";
 import { getProformaInvoice } from "@/features/proforma-invoices/queries";
 import { getLineItemTemplates } from "@/features/line-items/queries";
-import { getActiveCatalogItems } from "@/features/catalog/queries";
+import { getActiveCatalogItems, getCatalogItemClientPrices } from "@/features/catalog/queries";
 import { ProformaInvoiceBuilder } from "@/features/proforma-invoices/components/proforma-invoice-builder";
 import { isEditableStatus } from "@/features/proforma-invoices/helpers";
 
@@ -24,11 +24,12 @@ export default async function EditProformaInvoicePage({
     redirect(`/${workspaceSlug}/proforma-invoices/${piId}`);
   }
 
-  const [clients, projects, templates, catalogItems] = await Promise.all([
+  const [clients, projects, templates, catalogItems, clientPrices] = await Promise.all([
     getAllClients(workspace.id),
     getAllProjects(workspace.id),
     getLineItemTemplates(workspace.id),
     getActiveCatalogItems(workspace.id),
+    getCatalogItemClientPrices(workspace.id),
   ]);
 
   return (
@@ -38,6 +39,7 @@ export default async function EditProformaInvoicePage({
       projects={projects}
       templates={templates}
       catalogItems={catalogItems}
+      clientPrices={clientPrices}
     />
   );
 }

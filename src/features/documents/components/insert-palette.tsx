@@ -36,15 +36,16 @@ function pushRecent(id: string) {
 // Same field mapping the catalog picker dialog has always used. A package
 // inserts at its package_price (not the sum of its items) with quantity 1 —
 // the breakdown itself is resolved live from catalog_item_id at render
-// time (DisclosureRow), not stored here.
-function catalogToLineItem(item: CatalogItem): LineItemInput {
+// time (DisclosureRow), not stored here. `unitPrice` is pre-resolved by
+// the caller (default, or this client's override — see priceFor below).
+function catalogToLineItem(item: CatalogItem, unitPrice: number): LineItemInput {
   return {
     category: item.is_package ? "package" : item.default_category,
     description: item.description
       ? `${item.name} — ${item.description}`
       : item.name,
     quantity: 1,
-    unit_price: item.is_package ? (item.package_price ?? 0) : item.default_unit_price,
+    unit_price: unitPrice,
     unit: item.default_unit ?? "",
     discount_percent: 0,
     tax_percent: 0,
@@ -75,11 +76,19 @@ type InsertPaletteProps = {
   catalogItems: CatalogItem[];
   templates: TemplateWithItems[];
   documentCurrency: string;
+  /** Resolves the price to insert/display for a catalog item — the
+   *  default price, or this document's client's override if one exists.
+   *  Falls back to the item's own default price when omitted. */
+  priceFor?: (item: CatalogItem) => number;
   /** Insert one catalog line (already mapped). Palette stays open. */
   onInsertCatalog: (item: LineItemInput) => void;
   /** Insert a template bundle (already mapped). Palette stays open. */
   onInsertTemplate: (items: LineItemInput[]) => void;
 };
+
+function defaultPriceFor(item: CatalogItem): number {
+  return item.is_package ? (item.package_price ?? 0) : item.default_unit_price;
+}
 
 // The unified insert surface: one search over the catalog AND saved
 // templates, ranked Recent → Catalog → Templates (re-inserting a known
@@ -92,6 +101,7 @@ export function InsertPalette({
   catalogItems,
   templates,
   documentCurrency,
+  priceFor = defaultPriceFor,
   onInsertCatalog,
   onInsertTemplate,
 }: InsertPaletteProps) {
@@ -175,7 +185,7 @@ export function InsertPalette({
   function insertRow(row: PaletteRow) {
     if (isDisabled(row)) return;
     if (row.kind === "catalog") {
-      onInsertCatalog(catalogToLineItem(row.item));
+      onInsertCatalog(catalogToLineItem(row.item, priceFor(row.item)));
       pushRecent(row.item.id);
     } else {
       onInsertTemplate(templateToLineItems(row.template));
@@ -293,12 +303,7 @@ export function InsertPalette({
                       <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
                         {disabled
                           ? `${row.item.currency} — this document is ${documentCurrency}`
-                          : formatCurrency(
-                              row.item.is_package
-                                ? (row.item.package_price ?? 0)
-                                : row.item.default_unit_price,
-                              row.item.currency
-                            )}
+                          : formatCurrency(priceFor(row.item), row.item.currency)}
                       </span>
                     )}
                     {flashKey === row.key ? (

@@ -43,7 +43,8 @@ import type {
   TemplateWithItems,
 } from "@/features/line-items/types";
 import type { Quotation, QuotationDetail } from "@/features/quotations/types";
-import type { CatalogItem } from "@/features/catalog/types";
+import type { CatalogItem, CatalogItemClientPrice } from "@/features/catalog/types";
+import { useClientPriceResolver } from "@/features/catalog/use-client-price";
 import type { Project } from "@/features/projects/types";
 
 const CURRENCIES = ["IDR", "USD", "EUR", "GBP", "SGD", "MYR", "AUD", "CAD"];
@@ -84,6 +85,7 @@ type QuotationBuilderProps = {
   projects: Project[];
   templates: TemplateWithItems[];
   catalogItems: CatalogItem[];
+  clientPrices?: CatalogItemClientPrice[];
   initialClientId?: string;
   defaultTermsAndConditions?: string;
   defaultNotes?: string;
@@ -95,6 +97,7 @@ export function QuotationBuilder({
   projects,
   templates: initialTemplates,
   catalogItems,
+  clientPrices = [],
   initialClientId,
   defaultTermsAndConditions,
   defaultNotes,
@@ -111,6 +114,7 @@ export function QuotationBuilder({
   const [clientId, setClientId] = useState(
     quotation?.client_id ?? initialClientId ?? ""
   );
+  const priceFor = useClientPriceResolver(clientPrices, clientId);
   const [projectId, setProjectId] = useState(quotation?.project_id ?? "");
   const [title, setTitle] = useState(quotation?.title ?? "");
   const [summary, setSummary] = useState(quotation?.summary ?? "");
@@ -851,6 +855,7 @@ export function QuotationBuilder({
         catalogItems={catalogItems}
         templates={templates}
         documentCurrency={currency}
+        priceFor={priceFor}
         onInsertCatalog={handleInsertCatalogItem}
         onInsertTemplate={handleInsertTemplate}
       />
