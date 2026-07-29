@@ -68,11 +68,18 @@ export const STATUS_TONE: Record<string, Tone> = {
   // Quotation lifecycle
   draft: "neutral",
   sent: "info",
-  viewed: "special",
+  // Viewed is sent-and-opened: the same state of play, and nothing new
+  // is required of anyone. It shares Sent's colour so the only cards
+  // that stand out in a Sent lane are the ones that actually want
+  // attention — overdue, expired.
+  viewed: "info",
   approved: "success",
   rejected: "danger",
   expired: "attention",
-  cancelled: "neutral",
+  // Cancelled is a dead end, not a resting state: work that stopped and
+  // money that will never arrive. It reads as danger everywhere — badge
+  // and kanban lane alike, since the lane derives from this map.
+  cancelled: "danger",
   revision_requested: "attention",
   // Invoice lifecycle
   partial: "attention",
