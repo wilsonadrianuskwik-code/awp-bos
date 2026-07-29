@@ -7,6 +7,7 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/shared/data-table";
 import { ListEmpty } from "@/components/shared/list-empty";
+import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { formatCurrency } from "@/lib/utils/format-currency";
@@ -42,11 +43,11 @@ const columns: ColumnDef<AnyDocument, unknown>[] = [
     header: "Project",
     cell: ({ row }) =>
       row.original.project ? (
-        <span className="truncate">
-          <span className="font-mono text-xs text-muted-foreground">
+        <span className="flex min-w-0 items-center gap-1.5">
+          <Badge variant="secondary" className="shrink-0 font-mono text-[10px]">
             {row.original.project.code}
-          </span>{" "}
-          {row.original.project.name}
+          </Badge>
+          <span className="truncate">{row.original.project.name}</span>
         </span>
       ) : (
         "—"
