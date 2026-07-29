@@ -11,6 +11,7 @@ import {
   getWorkspaceActivities,
 } from "@/features/dashboard/queries";
 import { GreetingHeader } from "@/features/dashboard/components/greeting-header";
+import { QuickActions } from "@/features/dashboard/components/quick-actions";
 import { AttentionStrip } from "@/features/dashboard/components/attention-strip";
 import { ActiveProjectsGrid } from "@/features/dashboard/components/active-projects-grid";
 import { ActionQueueCard } from "@/features/dashboard/components/action-queue-card";
@@ -63,6 +64,10 @@ export default async function DashboardPage({
   return (
     <div className="space-y-6">
       <GreetingHeader firstName={firstName} />
+
+      {/* Starting work comes before reviewing it: the first thing on the
+          page should be the thing people opened the app to do. */}
+      <QuickActions />
 
       <AttentionStrip items={attentionItems} workspaceSlug={workspaceSlug} />
 
