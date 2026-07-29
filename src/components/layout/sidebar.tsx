@@ -127,8 +127,8 @@ function NavIcon({
           "pointer-events-none absolute left-1/2 top-4 -z-10 h-9 w-9 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[11px]",
           "transition-[opacity,transform] duration-300 [transition-timing-function:var(--spring-standard)] motion-reduce:transition-none",
           active
-            ? "scale-[1.45] opacity-100"
-            : "scale-75 opacity-0 group-hover:scale-125 group-hover:opacity-80"
+            ? "scale-[1.3] opacity-60"
+            : "scale-75 opacity-0 group-hover:scale-110 group-hover:opacity-45"
         )}
         style={{ backgroundColor: color }}
       />
@@ -279,7 +279,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
       ? {
           backgroundColor: color,
           color: "#fff",
-          boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.28), 0 0 18px 0 ${color}80`,
+          boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.28), 0 0 12px 0 ${color}4d`,
         }
       : undefined;
 
