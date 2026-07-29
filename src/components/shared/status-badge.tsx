@@ -39,6 +39,20 @@ const TONE_CLASSES: Record<Tone, string> = {
     "bg-violet-50 text-violet-700 ring-violet-600/20 dark:bg-violet-400/10 dark:text-violet-400 dark:ring-violet-400/20",
 };
 
+/**
+ * The left-edge accent a table row carries for a given tone. Muted well
+ * below the badge — the badge states the status, the stripe only lets
+ * you find it while scanning a long list.
+ */
+export const TONE_ROW_ACCENT: Record<Tone, string> = {
+  neutral: "before:bg-slate-300 dark:before:bg-slate-600",
+  info: "before:bg-blue-500",
+  attention: "before:bg-amber-500",
+  success: "before:bg-emerald-500",
+  danger: "before:bg-red-500",
+  special: "before:bg-violet-500",
+};
+
 export const STATUS_TONE: Record<string, Tone> = {
   // Leads
   new: "info",
@@ -96,7 +110,7 @@ export function StatusBadge({ status, className, label }: StatusBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium capitalize ring-1 ring-inset",
+        "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium capitalize ring-1 ring-inset transition-colors duration-200",
         TONE_CLASSES[tone],
         className
       )}

@@ -149,6 +149,7 @@ export function InvoiceTable({ invoices, selectedIds, onSelectedIdsChange }: Inv
   return (
     <DataTable
       columns={columns}
+      getRowStatus={(invoice) => invoice.status}
       data={invoices}
       onRowClick={(invoice) => router.push(`/${workspace.slug}/invoices/${invoice.id}`)}
       selection={{

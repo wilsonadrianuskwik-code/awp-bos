@@ -207,6 +207,7 @@ export function ProjectListPage({ projects, count }: ProjectListPageProps) {
       ) : (
         <DataTable
           columns={columns}
+          getRowStatus={(project) => project.status}
           data={optimisticProjects}
           onRowClick={(project) => router.push(`/${workspace.slug}/projects/${project.id}`)}
           selection={

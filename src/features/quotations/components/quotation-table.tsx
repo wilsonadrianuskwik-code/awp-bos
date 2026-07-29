@@ -150,6 +150,7 @@ export function QuotationTable({
   return (
     <DataTable
       columns={columns}
+      getRowStatus={(quotation) => quotation.status}
       data={quotations}
       onRowClick={(quotation) =>
         router.push(`/${workspace.slug}/quotations/${quotation.id}`)

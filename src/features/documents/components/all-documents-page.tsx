@@ -223,6 +223,7 @@ export function AllDocumentsPage({
         ) : (
           <DataTable
             columns={columns}
+            getRowStatus={(doc) => doc.status}
             data={documents}
             selection={{
               selectedIds,

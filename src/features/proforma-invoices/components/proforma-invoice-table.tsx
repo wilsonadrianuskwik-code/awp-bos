@@ -66,6 +66,7 @@ export function ProformaInvoiceTable({
   return (
     <DataTable
       columns={columns}
+      getRowStatus={(pi) => pi.status}
       data={proformaInvoices}
       onRowClick={(pi) =>
         router.push(`/${workspace.slug}/proforma-invoices/${pi.id}`)

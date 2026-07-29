@@ -77,6 +77,7 @@ export function ProjectDocumentsTable({ documents }: ProjectDocumentsTableProps)
   return (
     <DataTable
       columns={columns}
+      getRowStatus={(doc) => doc.status}
       data={documents}
       onRowClick={(doc) =>
         router.push(`/${workspace.slug}/${DOCUMENT_TYPE_ROUTE[doc.document_type]}/${doc.id}`)

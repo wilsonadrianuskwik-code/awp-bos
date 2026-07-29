@@ -117,6 +117,7 @@ export function PurchaseOrderTable({
   return (
     <DataTable
       columns={columns}
+      getRowStatus={(purchaseOrder) => purchaseOrder.status}
       data={purchaseOrders}
       onRowClick={(po) => router.push(`/${workspace.slug}/purchase-orders/${po.id}`)}
       selection={{

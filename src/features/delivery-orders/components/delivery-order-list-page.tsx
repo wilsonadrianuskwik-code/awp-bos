@@ -49,6 +49,7 @@ export function DeliveryOrderListPage({
   return (
     <DataTable
       columns={columns}
+      getRowStatus={(deliveryOrder) => deliveryOrder.status}
       data={deliveryOrders}
       onRowClick={(row) => router.push(`/${workspaceSlug}/delivery-orders/${row.id}`)}
     />

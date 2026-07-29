@@ -12,6 +12,7 @@ import { useRef, useState, type KeyboardEvent } from "react";
 import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Checkbox } from "@/components/ui/checkbox";
+import { STATUS_TONE, TONE_ROW_ACCENT } from "@/components/shared/status-badge";
 
 type DataTableSelection<TData> = {
   selectedIds: Set<string>;
@@ -34,6 +35,12 @@ type DataTableProps<TData> = {
   data: TData[];
   onRowClick?: (row: TData) => void;
   selection?: DataTableSelection<TData>;
+  /**
+   * The status each row reports, used to tint its left edge. Optional:
+   * a table with no lifecycle (clients, catalog items) passes nothing
+   * and renders exactly as before.
+   */
+  getRowStatus?: (row: TData) => string | null | undefined;
 };
 
 // List-view table. Density and hierarchy follow the system's table spec:
@@ -45,6 +52,7 @@ export function DataTable<TData>({
   data,
   onRowClick,
   selection,
+  getRowStatus,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   // Recorded from the checkbox cell's capture-phase click, since Radix
@@ -95,7 +103,7 @@ export function DataTable<TData>({
   return (
     <div className="overflow-x-auto rounded-lg border bg-card shadow-2xs">
       <table className="w-full caption-bottom">
-        <thead className="sticky top-0 z-10 border-b bg-card">
+        <thead className="sticky top-0 z-10 border-b bg-muted/50 backdrop-blur-sm">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {selection && (
@@ -152,7 +160,7 @@ export function DataTable<TData>({
             </tr>
           ))}
         </thead>
-        <tbody>
+        <tbody className="stagger-rows">
           {table.getRowModel().rows.length === 0 ? (
             <tr>
               <td
@@ -166,11 +174,19 @@ export function DataTable<TData>({
             table.getRowModel().rows.map((row, rowIndex) => {
               const rowId = selection?.getId(row.original);
               const isSelected = rowId ? selection!.selectedIds.has(rowId) : false;
+              const status = getRowStatus?.(row.original);
+              const tone = status ? STATUS_TONE[status] : undefined;
+
               return (
                 <tr
                   key={row.id}
+                  // The stripe is a ::before on the row rather than an
+                  // extra cell, so it can't disturb column alignment or
+                  // the checkbox/selection geometry.
                   className={cn(
-                    "group border-b text-[13px] transition-colors duration-100 last:border-0 hover:bg-muted/40",
+                    "group relative border-b text-[13px] transition-colors duration-150 last:border-0 hover:bg-muted/50",
+                    "before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:opacity-0 before:transition-opacity before:duration-150",
+                    tone && `${TONE_ROW_ACCENT[tone]} before:opacity-70 group-hover:before:opacity-100`,
                     isSelected && "bg-primary/5",
                     onRowClick &&
                       "cursor-pointer outline-none focus-visible:bg-muted/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/50"
