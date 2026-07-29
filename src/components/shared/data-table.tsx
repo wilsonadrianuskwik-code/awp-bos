@@ -101,15 +101,19 @@ export function DataTable<TData>({
   const colSpan = columns.length + (selection ? 1 : 0);
 
   return (
-    <div className="overflow-x-auto rounded-lg border bg-card shadow-2xs">
-      {/* No w-full: when a table's columns are narrower than the
-          container (short type/status/date columns, few of them), a
-          full-width table dumps all the leftover space into the last
-          column's box — its header text sits at the left with a big
-          blank strip after it, same background, no border, which reads
-          as an extra unlabeled column. Letting the table size to its
-          own content means the border just ends where the columns end
-          instead. */}
+    <div className="inline-block max-w-full overflow-x-auto rounded-lg border bg-card shadow-2xs">
+      {/* No w-full on the table, AND the wrapper itself must not be a
+          plain block element: a block <div> stretches to fill its
+          container width by default regardless of its child's width, so
+          even with the table sized to its own content, a block wrapper
+          would still span the full row — its plain bg-card background
+          sits close enough in tone to the header's faint tint that the
+          leftover space still reads as a continuation of the header, one
+          rounded corner and all. inline-block makes the wrapper (border,
+          background, rounded corners) shrink to the table's actual
+          width, so it ends exactly where the real columns end. max-w-full
+          + overflow-x-auto still handle a table wider than its
+          container. */}
       <table className="caption-bottom">
         <thead className="sticky top-0 z-10 border-b-2 border-primary/25 bg-gradient-to-b from-primary/[0.07] to-primary/[0.02] backdrop-blur-sm">
           {table.getHeaderGroups().map((headerGroup) => (
