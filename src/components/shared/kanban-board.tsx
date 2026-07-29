@@ -87,7 +87,7 @@ function KanbanColumn({
         // min-h-0 overrides the flex item default of min-height:auto, which
         // would otherwise let this column's content stretch the whole row
         // taller instead of scrolling inside overflow-y-auto below.
-        "flex h-full min-h-0 w-72 shrink-0 flex-col rounded-lg border bg-muted/30 shadow-[0_0_0_0_transparent] transition-[border-color,background-color,box-shadow] duration-200",
+        "flex h-full min-h-0 w-[252px] shrink-0 flex-col rounded-xl border bg-muted/40 shadow-[0_0_0_0_transparent] transition-[border-color,background-color,box-shadow] duration-200",
         isOver && "border-primary/40 bg-primary/5 shadow-[inset_0_0_0_1px] shadow-primary/20"
       )}
     >
@@ -96,18 +96,18 @@ function KanbanColumn({
           the sticky treatment applied to List's table header. */}
       <div
         className={cn(
-          "sticky top-0 z-10 flex items-center gap-2 rounded-t-lg border-b bg-card px-3 py-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground",
+          "sticky top-0 z-10 flex items-center gap-2 rounded-t-xl border-b bg-card px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-foreground/80",
           column.tone && TONE_HEADER[column.tone]
         )}
       >
-        <span>{column.label}</span>
-        <span className="rounded bg-muted px-1.5 font-mono text-[10.5px] normal-case tracking-normal text-muted-foreground">
+        <span className="truncate">{column.label}</span>
+        <span className="ml-auto shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium normal-case tracking-normal tabular-nums text-muted-foreground">
           {column.count}
         </span>
       </div>
-      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-2">
+      <div className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto p-1.5">
         {column.count === 0 ? (
-          <div className="flex flex-1 items-center justify-center rounded-md border border-dashed py-8 text-center text-xs text-muted-foreground/70">
+          <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed py-6 text-center text-[11px] text-muted-foreground/60">
             {emptyLabel ?? "Nothing here"}
           </div>
         ) : (
@@ -115,7 +115,7 @@ function KanbanColumn({
         )}
       </div>
       {column.footer && (
-        <div className="border-t px-3 py-2 text-xs font-medium tabular-nums text-muted-foreground">
+        <div className="border-t px-3 py-1.5 text-[11px] font-medium tabular-nums text-muted-foreground">
           {column.footer}
         </div>
       )}

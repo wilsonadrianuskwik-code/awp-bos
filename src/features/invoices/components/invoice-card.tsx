@@ -8,17 +8,8 @@ import { useWorkspace } from "@/providers/workspace-provider";
 import { InvoiceRowActions } from "@/features/invoices/components/invoice-row-actions";
 import { getPaymentProgress } from "@/features/invoices/helpers";
 import { formatCurrency } from "@/lib/utils/format-currency";
-import { getOverdueDays } from "@/lib/utils/date";
+import { formatDateLong, getOverdueDays } from "@/lib/utils/date";
 import type { InvoiceWithClient } from "@/features/invoices/types";
-
-function formatDate(date: string | null) {
-  if (!date) return null;
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
 
 type InvoiceCardProps = {
   invoice: InvoiceWithClient;
@@ -35,75 +26,71 @@ export function InvoiceCard({ invoice }: InvoiceCardProps) {
     <div
       role="button"
       tabIndex={0}
-      className="group relative flex cursor-pointer flex-col rounded-lg border bg-card p-5 shadow-2xs outline-none transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-ring/30"
+      className="group relative flex cursor-pointer flex-col rounded-lg border bg-card p-3 shadow-2xs outline-none transition-all duration-150 hover:-translate-y-px hover:border-primary/40 hover:shadow-md focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-ring/30"
       onClick={() => router.push(href)}
       onKeyDown={(e: KeyboardEvent) => {
         if (e.key === "Enter") router.push(href);
       }}
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <span className="font-mono text-xs text-muted-foreground">
-            {invoice.invoice_number}
-          </span>
-          <h3 className="mt-1 truncate text-sm font-semibold">
-            {invoice.title || invoice.client?.name || "Deleted client"}
-          </h3>
-          <p className="truncate text-xs text-muted-foreground">
-            {invoice.client?.name ?? "Deleted client"}
-            {invoice.client?.company ? ` · ${invoice.client.company}` : ""}
-          </p>
-        </div>
-
-        <div
-          className="flex shrink-0 items-center gap-1"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <InvoiceRowActions invoice={invoice} />
+      {/* Number and status share the top line: in a column already
+          grouped by status, the number is what identifies the card and
+          the badge only qualifies it. */}
+      <div className="flex items-center gap-2">
+        <span className="truncate font-mono text-[11px] text-muted-foreground">
+          {invoice.invoice_number}
+        </span>
+        <div className="ml-auto flex shrink-0 items-center gap-1">
+          <StatusBadge
+            status={invoice.status}
+            label={
+              invoice.status === "overdue" && invoice.due_date
+                ? `${getOverdueDays(invoice.due_date)}d`
+                : undefined
+            }
+          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <InvoiceRowActions invoice={invoice} />
+          </div>
         </div>
       </div>
 
-      <div className="mt-4 flex items-end justify-between">
-        <div>
-          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-            Outstanding Balance
-          </p>
-          <span className="text-2xl font-semibold tabular-nums tracking-tight">
-            {formatCurrency(invoice.amount_due, invoice.currency)}
-          </span>
-        </div>
-        <StatusBadge
-          status={invoice.status}
-          label={
-            invoice.status === "overdue" && invoice.due_date
-              ? `Overdue • ${getOverdueDays(invoice.due_date)}d`
-              : undefined
-          }
-        />
-      </div>
+      <h3 className="mt-1.5 truncate text-[13px] font-semibold leading-snug">
+        {invoice.title || invoice.client?.name || "Deleted client"}
+      </h3>
+      <p className="truncate text-[11px] text-muted-foreground">
+        {invoice.client?.name ?? "Deleted client"}
+      </p>
 
-      <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-        <span>Total {formatCurrency(invoice.total, invoice.currency)}</span>
-        <span>Paid {formatCurrency(invoice.amount_paid, invoice.currency)}</span>
+      {/* Outstanding is the number that matters on an invoice board, so
+          it stays the largest thing — just no longer headline-sized. */}
+      <div className="mt-2.5 flex items-baseline justify-between gap-2">
+        <span className="text-base font-semibold tabular-nums tracking-tight">
+          {formatCurrency(invoice.amount_due, invoice.currency)}
+        </span>
+        <span className="shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">
+          Due
+        </span>
       </div>
 
       {invoice.status === "partial" && (
-        <div className="mt-2">
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-            <div
-              className="h-full rounded-full bg-amber-500"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+        <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-amber-500"
+            style={{ width: `${progress}%` }}
+          />
         </div>
       )}
 
-      <div className="mt-3 flex items-center gap-3 border-t pt-3 text-xs text-muted-foreground">
+      <div className="mt-2 flex items-center gap-2 border-t pt-2 text-[10.5px] text-muted-foreground">
         <span className="flex items-center gap-1">
-          <Calendar className="h-3 w-3" />
-          {formatDate(invoice.issue_date)}
+          <Calendar className="h-3 w-3 shrink-0" />
+          {formatDateLong(invoice.issue_date)}
         </span>
-        {invoice.due_date && <span>Due {formatDate(invoice.due_date)}</span>}
+        {invoice.due_date && (
+          <span className="ml-auto shrink-0">
+            {formatCurrency(invoice.total, invoice.currency)}
+          </span>
+        )}
       </div>
     </div>
   );
