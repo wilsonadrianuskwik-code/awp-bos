@@ -48,27 +48,27 @@ export const NAV_GROUPS = [
   {
     label: "Projects",
     items: [
-      { label: "Projects", href: "/projects", icon: Building2, color: "#6366f1" },
+      { label: "Projects", href: "/projects", icon: Building2, color: "#a855f7" },
       // Every document type in one filterable list — the cross-cutting
       // view the per-type list pages can't give you.
-      { label: "Documents", href: "/documents", icon: Files, color: "#8b5cf6" },
+      { label: "Documents", href: "/documents", icon: Files, color: "#d946ef" },
     ],
   },
   {
     label: "Sales",
     items: [
       { label: "Clients", href: "/clients", icon: UserCheck, color: "#ec4899" },
-      { label: "Quotations", href: "/quotations", icon: FileText, color: "#06b6d4" },
-      { label: "Proforma Invoices", short: "Proforma", href: "/proforma-invoices", icon: FileSpreadsheet, color: "#0ea5e9" },
-      { label: "Invoices", href: "/invoices", icon: Receipt, color: "#10b981" },
-      { label: "Payments", href: "/payments", icon: CreditCard, color: "#14b8a6" },
+      { label: "Quotations", href: "/quotations", icon: FileText, color: "#f43f5e" },
+      { label: "Proforma Invoices", short: "Proforma", href: "/proforma-invoices", icon: FileSpreadsheet, color: "#fb923c" },
+      { label: "Invoices", href: "/invoices", icon: Receipt, color: "#f59e0b" },
+      { label: "Payments", href: "/payments", icon: CreditCard, color: "#eab308" },
     ],
   },
   {
     label: "Procurement",
     items: [
-      { label: "Suppliers", href: "/suppliers", icon: Truck, color: "#eab308" },
-      { label: "Purchase Orders", short: "Purchase", href: "/purchase-orders", icon: ClipboardList, color: "#f59e0b" },
+      { label: "Suppliers", href: "/suppliers", icon: Truck, color: "#84cc16" },
+      { label: "Purchase Orders", short: "Purchase", href: "/purchase-orders", icon: ClipboardList, color: "#22c55e" },
     ],
   },
   {
@@ -77,21 +77,21 @@ export const NAV_GROUPS = [
       // Delivery Orders are the whole delivery story: the documents
       // themselves, and the per-line delivered/remaining tally they roll
       // up to (shown on the invoice they belong to).
-      { label: "Delivery Orders", short: "Delivery", href: "/delivery-orders", icon: PackageCheck, color: "#f97316" },
+      { label: "Delivery Orders", short: "Delivery", href: "/delivery-orders", icon: PackageCheck, color: "#10b981" },
     ],
   },
   {
     label: "Catalog",
-    items: [{ label: "Items & Materials", short: "Items", href: "/catalog", icon: Package, color: "#84cc16" }],
+    items: [{ label: "Items & Materials", short: "Items", href: "/catalog", icon: Package, color: "#14b8a6" }],
   },
   {
     label: "Insights",
-    items: [{ label: "Reports", href: "/reports", icon: BarChart3, color: "#f43f5e" }],
+    items: [{ label: "Reports", href: "/reports", icon: BarChart3, color: "#06b6d4" }],
   },
 ] as const;
 
 export const BOTTOM_ITEMS = [
-  { label: "Settings", href: "/settings", icon: Settings, color: "#64748b" },
+  { label: "Settings", href: "/settings", icon: Settings, color: "#38bdf8" },
 ] as const;
 
 /** What the collapsed rail prints under an icon — the short form when
@@ -114,19 +114,39 @@ function NavIcon({
   color: string;
 }) {
   return (
-    <span className="relative flex w-full flex-col items-center gap-1.5">
+    <span className="relative isolate flex w-full flex-col items-center gap-1.5">
+      {/* The backlight lives on its own blurred layer rather than being a
+          box-shadow on the tile. Two reasons: a blurred element can be
+          scaled and faded on the compositor, where a shadow has to be
+          re-rasterised every frame; and a real bloom spreads past the
+          tile's edge, which is what makes the colour feel lit rather
+          than merely applied. */}
+      <span
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute left-1/2 top-4 -z-10 h-9 w-9 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[11px]",
+          "transition-[opacity,transform] duration-300 [transition-timing-function:var(--spring-standard)] motion-reduce:transition-none",
+          active
+            ? "scale-[1.45] opacity-100"
+            : "scale-75 opacity-0 group-hover:scale-125 group-hover:opacity-80"
+        )}
+        style={{ backgroundColor: color }}
+      />
       <span
         className={cn(
-          "grid h-8 w-8 place-items-center rounded-lg transition-[transform,color,background-color] duration-200 [transition-timing-function:var(--spring-standard)] group-active:scale-90",
+          "relative grid h-8 w-8 place-items-center rounded-lg transition-[transform,color,background-color,box-shadow] duration-200 [transition-timing-function:var(--spring-standard)] group-active:scale-90",
           !active &&
-            "text-sidebar-foreground/70 group-hover:text-[var(--nav-color)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_16%,transparent)] group-hover:shadow-[0_0_0_1px_color-mix(in_srgb,var(--nav-color)_28%,transparent),0_0_10px_2px_color-mix(in_srgb,var(--nav-color)_38%,transparent)]"
+            "text-sidebar-foreground/75 group-hover:text-[var(--nav-color)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_22%,transparent)]"
         )}
         style={
           active
             ? {
-                backgroundColor: `${color}2e`,
-                color,
-                boxShadow: `0 0 0 1px ${color}40, 0 0 14px 2px ${color}66, 0 0 28px 8px ${color}33`,
+                // Saturated fill on the active tile, in the item's own
+                // hue — each module reads as its own place rather than
+                // as one row highlighted in a single house colour.
+                backgroundColor: color,
+                color: "#fff",
+                boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.28)`,
               }
             : undefined
         }
@@ -141,9 +161,10 @@ function NavIcon({
           className={cn(
             "max-w-[68px] truncate text-center text-[11px] leading-none tracking-tight transition-colors duration-100",
             active
-              ? "font-semibold text-sidebar-accent-foreground"
+              ? "font-semibold"
               : "font-medium text-sidebar-foreground/75"
           )}
+          style={active ? { color } : undefined}
         >
           {label}
         </span>
@@ -248,17 +269,17 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
 
   const navIconClass = (href: string) =>
     cn(
-      "grid h-7 w-7 shrink-0 place-items-center rounded-md transition-all duration-100",
+      "grid h-7 w-7 shrink-0 place-items-center rounded-md transition-[transform,color,background-color] duration-200 [transition-timing-function:var(--spring-standard)] group-active:scale-90",
       !isActive(href) &&
-        "text-sidebar-foreground/70 group-hover:text-[var(--nav-color)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_16%,transparent)] group-hover:shadow-[0_0_0_1px_color-mix(in_srgb,var(--nav-color)_28%,transparent),0_0_10px_2px_color-mix(in_srgb,var(--nav-color)_38%,transparent)]"
+        "text-sidebar-foreground/75 group-hover:text-[var(--nav-color)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_22%,transparent)]"
     );
 
   const navIconStyle = (href: string, color: string): CSSProperties | undefined =>
     isActive(href)
       ? {
-          backgroundColor: `${color}2e`,
-          color,
-          boxShadow: `0 0 0 1px ${color}40, 0 0 14px 2px ${color}66, 0 0 28px 8px ${color}33`,
+          backgroundColor: color,
+          color: "#fff",
+          boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.28), 0 0 18px 0 ${color}80`,
         }
       : undefined;
 
