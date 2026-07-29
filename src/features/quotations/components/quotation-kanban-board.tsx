@@ -3,7 +3,10 @@
 import { useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { FileOutput } from "lucide-react";
-import { KanbanBoard, type KanbanTone } from "@/components/shared/kanban-board";
+import {
+  KanbanBoard,
+  kanbanToneForStatus,
+} from "@/components/shared/kanban-board";
 import { Checkbox } from "@/components/ui/checkbox";
 import { QuotationCard } from "@/features/quotations/components/quotation-card";
 import { useWorkspace } from "@/providers/workspace-provider";
@@ -15,16 +18,13 @@ import type { QuotationStatus, QuotationWithClient } from "@/features/quotations
 // Four workflow lanes, each folding one or two terminal/derived statuses
 // in with a badge (already shown by the reused QuotationCard's own
 // StatusBadge — the lane just groups them for the board).
-const LANES: {
-  id: string;
-  label: string;
-  statuses: QuotationStatus[];
-  tone: KanbanTone;
-}[] = [
-  { id: "draft", label: "Draft", statuses: ["draft", "revision_requested"], tone: "slate" },
-  { id: "sent", label: "Sent", statuses: ["sent", "viewed", "expired"], tone: "blue" },
-  { id: "approved", label: "Approved", statuses: ["approved"], tone: "emerald" },
-  { id: "rejected", label: "Rejected", statuses: ["rejected", "cancelled"], tone: "red" },
+// A lane's colour comes from the first status it holds, so a column
+// always matches the cards inside it (see kanbanToneForStatus).
+const LANES: { id: string; label: string; statuses: QuotationStatus[] }[] = [
+  { id: "draft", label: "Draft", statuses: ["draft", "revision_requested"] },
+  { id: "sent", label: "Sent", statuses: ["sent", "viewed", "expired"] },
+  { id: "approved", label: "Approved", statuses: ["approved"] },
+  { id: "rejected", label: "Rejected", statuses: ["rejected", "cancelled"] },
 ];
 
 // Mirrors update_quotation_status's VALID_TRANSITIONS state machine
@@ -112,7 +112,7 @@ export function QuotationKanbanBoard({
     return {
       id: lane.id,
       label: lane.label,
-      tone: lane.tone,
+      tone: kanbanToneForStatus(lane.statuses[0]),
       items,
       footer:
         items.length > 0

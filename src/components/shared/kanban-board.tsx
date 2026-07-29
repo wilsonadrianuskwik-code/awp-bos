@@ -16,6 +16,7 @@ import {
 import { getEventCoordinates } from "@dnd-kit/utilities";
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils/cn";
+import { STATUS_TONE, type Tone } from "@/components/shared/status-badge";
 
 // Centers the drag overlay on the pointer instead of preserving the exact
 // pixel it was grabbed at — see the comment on <DragOverlay> below for why.
@@ -35,7 +36,32 @@ const snapCenterToCursor: Modifier = ({ activatorEvent, draggingNodeRect, transf
   };
 };
 
-export type KanbanTone = "amber" | "emerald" | "red" | "blue" | "slate";
+export type KanbanTone =
+  | "amber"
+  | "emerald"
+  | "red"
+  | "blue"
+  | "slate"
+  | "violet";
+
+/**
+ * A lane's colour is derived from the status it holds, never chosen by
+ * hand — that's the only way a column and the cards inside it can't
+ * disagree. Hand-picking lane tones is exactly how "Sent" ended up an
+ * amber column full of blue cards.
+ */
+const TONE_FROM_STATUS_TONE: Record<Tone, KanbanTone> = {
+  neutral: "slate",
+  info: "blue",
+  attention: "amber",
+  success: "emerald",
+  danger: "red",
+  special: "violet",
+};
+
+export function kanbanToneForStatus(status: string): KanbanTone {
+  return TONE_FROM_STATUS_TONE[STATUS_TONE[status] ?? "neutral"];
+}
 
 /**
  * Per-column colour. A board's columns *are* its lifecycle, so colouring
@@ -52,6 +78,7 @@ const TONE_RAIL: Record<KanbanTone, string> = {
   red: "bg-red-500",
   blue: "bg-blue-500",
   slate: "bg-slate-400 dark:bg-slate-500",
+  violet: "bg-violet-500",
 };
 
 const TONE_HEADER: Record<KanbanTone, string> = {
@@ -60,6 +87,7 @@ const TONE_HEADER: Record<KanbanTone, string> = {
   red: "bg-red-500/[0.12] text-red-800 dark:text-red-300",
   blue: "bg-blue-500/[0.12] text-blue-800 dark:text-blue-300",
   slate: "bg-slate-500/[0.12] text-slate-700 dark:text-slate-300",
+  violet: "bg-violet-500/[0.12] text-violet-800 dark:text-violet-300",
 };
 
 const TONE_BODY: Record<KanbanTone, string> = {
@@ -68,6 +96,7 @@ const TONE_BODY: Record<KanbanTone, string> = {
   red: "bg-red-500/[0.05]",
   blue: "bg-blue-500/[0.05]",
   slate: "bg-slate-500/[0.05]",
+  violet: "bg-violet-500/[0.05]",
 };
 
 const TONE_COUNT: Record<KanbanTone, string> = {
@@ -76,6 +105,7 @@ const TONE_COUNT: Record<KanbanTone, string> = {
   red: "bg-red-500/20 text-red-800 dark:text-red-200",
   blue: "bg-blue-500/20 text-blue-800 dark:text-blue-200",
   slate: "bg-slate-500/20 text-slate-700 dark:text-slate-200",
+  violet: "bg-violet-500/20 text-violet-800 dark:text-violet-200",
 };
 
 export type KanbanColumnDef<TItem> = {

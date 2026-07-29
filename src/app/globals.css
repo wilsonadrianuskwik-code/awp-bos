@@ -227,12 +227,42 @@
   --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.03),
     0 8px 24px -8px rgba(16, 24, 40, 0.08);
 
-  /* One easing curve for everything that enters or grows. A fast start
-     into a long settle is what makes motion feel engineered rather than
-     linear; using the same curve everywhere is what makes the app feel
-     like one product. */
+  /* ---------------------------------------------------------------- */
+  /* Motion: springs, not curves.                                       */
+  /*                                                                    */
+  /* Each of these is a real damped-spring solution sampled into a CSS  */
+  /* linear() easing. That matters for two reasons: the motion actually */
+  /* obeys physics (mass settling, not a designer's guess at a bezier), */
+  /* and it runs entirely on the compositor — no JS, no main-thread     */
+  /* work, nothing to hydrate before an interaction feels right.        */
+  /*                                                                    */
+  /* Four presets, and the choice between them is always "how big is    */
+  /* the thing moving": small controls settle fast, large surfaces slow */
+  /* down, and only things that should feel eager overshoot.            */
+  /* ---------------------------------------------------------------- */
+
+  /* ~260ms. No visible overshoot — presses and hovers, where a bounce
+     reads as sloppy rather than lively. */
+  --spring-crisp: linear(0, 0.031, 0.1075, 0.2093, 0.3217, 0.4345, 0.5411, 0.6374, 0.7214, 0.7924, 0.851, 0.8979, 0.9345, 0.9622, 0.9825, 0.9968, 1.0064, 1.0122, 1.0154, 1.0165, 1.0163, 1.0152, 1.0137, 1.0118, 1.0099, 1.0081, 1);
+
+  /* ~345ms. The default. Settles with the faintest overshoot, which is
+     what separates "animated" from "alive". */
+  --spring-standard: linear(0, 0.029, 0.1007, 0.1963, 0.3025, 0.4097, 0.5118, 0.6051, 0.6875, 0.7584, 0.8178, 0.8666, 0.9057, 0.9364, 0.9599, 0.9775, 0.9902, 0.999, 1.0048, 1.0084, 1.0103, 1.0109, 1.0108, 1.0101, 1.0091, 1.0079, 1);
+
+  /* ~395ms, critically damped. Large surfaces — dialogs, page bodies —
+     where a fast settle looks nervous. */
+  --spring-gentle: linear(0, 0.022, 0.0765, 0.1501, 0.2332, 0.319, 0.403, 0.4825, 0.5558, 0.6219, 0.6807, 0.7322, 0.777, 0.8154, 0.8481, 0.8757, 0.8988, 0.9181, 0.9341, 0.9473, 0.9581, 0.9668, 0.9739, 0.9796, 0.9842, 0.9878, 1);
+
+  /* ~500ms with real overshoot. Used sparingly — a toast arriving, a
+     value that just changed. Never for anything the user is holding. */
+  --spring-bouncy: linear(0, 0.0674, 0.2289, 0.4316, 0.6357, 0.815, 0.9556, 1.0531, 1.1102, 1.1336, 1.1322, 1.1145, 1.0886, 1.0605, 1.0345, 1.0131, 0.9975, 0.9876, 0.9827, 0.9817, 0.9833, 0.9865, 0.9902, 0.9939, 0.9971, 0.9996, 1);
+
+  /* Exits don't get a spring. Something leaving shouldn't ask to be
+     watched settle — it should just be gone. */
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  /* Retained: entrance keyframes that predate the springs. */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  /* For things that leave: quicker, and no overshoot to admire. */
   --ease-in-out-soft: cubic-bezier(0.4, 0, 0.2, 1);
 }
 .dark {
@@ -269,11 +299,13 @@
 @keyframes page-enter {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    /* 4px, not 20: a page that visibly travels reads as slow. This is
+       just enough to register as new content arriving. */
+    transform: translate3d(0, 4px, 0);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
 }
 @keyframes rise-in {
@@ -297,11 +329,11 @@
 @keyframes row-enter {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translate3d(0, 3px, 0);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
 }
 @keyframes shimmer {
@@ -315,13 +347,13 @@
 
 @layer utilities {
   .animate-page-enter {
-    animation: page-enter 0.25s var(--ease-out-expo) both;
+    animation: page-enter 0.34s var(--spring-gentle) both;
   }
   /* Table rows arrive in a short cascade. Capped at 12 steps and 20ms
      apart: past that the last row waits noticeably, which reads as the
      page being slow rather than considered. */
   .stagger-rows > * {
-    animation: row-enter 0.28s var(--ease-out-expo) both;
+    animation: row-enter 0.26s var(--spring-crisp) both;
   }
   .stagger-rows > *:nth-child(1) { animation-delay: 0ms; }
   .stagger-rows > *:nth-child(2) { animation-delay: 20ms; }
@@ -341,7 +373,7 @@
     animation-delay: 0.1s;
   }
   .stagger-rise > * {
-    animation: rise-in 0.35s var(--ease-out-expo) both;
+    animation: rise-in 0.34s var(--spring-standard) both;
   }
   .stagger-rise > *:nth-child(2) {
     animation-delay: 40ms;
@@ -400,9 +432,13 @@
   }
 }
 
-/* Motion discipline: micro-interactions run 150ms ease-out; anything
-   longer feels sluggish in a productivity tool. Users who opt out of
-   motion get an instant UI. */
+/* Motion discipline. Everything above is transform/opacity only, so it
+   runs on the compositor and can't cause layout — an ERP that stutters
+   while a table paints is worse than one that doesn't animate at all.
+   Micro-interactions stay under ~250ms; only large surfaces get longer.
+   Users who opt out of motion get an instant UI, including the springs:
+   the rule below zeroes durations rather than easings, so a spring
+   simply lands at its final value. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

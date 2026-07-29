@@ -117,7 +117,7 @@ function NavIcon({
     <span className="relative flex w-full flex-col items-center gap-1.5">
       <span
         className={cn(
-          "grid h-8 w-8 place-items-center rounded-lg transition-all duration-150",
+          "grid h-8 w-8 place-items-center rounded-lg transition-[transform,color,background-color] duration-200 [transition-timing-function:var(--spring-standard)] group-active:scale-90",
           !active &&
             "text-sidebar-foreground/70 group-hover:text-[var(--nav-color)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_16%,transparent)] group-hover:shadow-[0_0_0_1px_color-mix(in_srgb,var(--nav-color)_28%,transparent),0_0_10px_2px_color-mix(in_srgb,var(--nav-color)_38%,transparent)]"
         )}

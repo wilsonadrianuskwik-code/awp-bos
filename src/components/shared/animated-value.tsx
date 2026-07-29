@@ -36,9 +36,16 @@ export function AnimatedValue({
     const start = performance.now();
     let frame: number;
 
+    // A critically-damped spring's position curve. Against a cubic ease
+    // this arrives sooner and lingers longer at the end, which is what
+    // makes a counter read as a value settling rather than a number
+    // being drawn.
+    const settle = (t: number) => 1 - Math.exp(-6 * t) * (1 + 6 * t);
+    const total = settle(1);
+
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / durationMs);
-      const eased = 1 - Math.pow(1 - t, 3);
+      const eased = settle(t) / total;
       setDisplay(
         value.replace(/\d+/g, (run) => {
           const scaled = String(Math.round(Number(run) * eased));

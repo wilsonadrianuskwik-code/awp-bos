@@ -95,6 +95,15 @@ export const STATUS_TONE: Record<string, Tone> = {
   prepared: "info",
   dispatched: "attention",
   delivered: "success",
+  // Purchase order lifecycle. These were missing, so every PO badge past
+  // "sent" rendered grey — and once lanes derive their colour from the
+  // same map, the whole PO board was grey with it.
+  acknowledged: "special",
+  partially_received: "attention",
+  received: "success",
+  // Project lifecycle
+  planning: "neutral",
+  on_hold: "attention",
 };
 
 type StatusBadgeProps = {

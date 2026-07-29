@@ -103,7 +103,7 @@ export function DataTable<TData>({
   return (
     <div className="overflow-x-auto rounded-lg border bg-card shadow-2xs">
       <table className="w-full caption-bottom">
-        <thead className="sticky top-0 z-10 border-b bg-muted/50 backdrop-blur-sm">
+        <thead className="sticky top-0 z-10 border-b-2 border-primary/25 bg-gradient-to-b from-primary/[0.07] to-primary/[0.02] backdrop-blur-sm">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {selection && (
@@ -124,13 +124,13 @@ export function DataTable<TData>({
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className="h-9 px-3 text-left align-middle text-[11px] font-medium uppercase tracking-wider text-muted-foreground first:pl-4 last:pr-4"
+                  className="h-9 px-3 text-left align-middle text-[11px] font-semibold uppercase tracking-wider text-foreground/70 first:pl-4 last:pr-4"
                 >
                   {header.isPlaceholder ? null : header.column.getCanSort() ? (
                     <button
                       className={cn(
-                        "group inline-flex items-center gap-1 uppercase tracking-wider transition-colors hover:text-foreground",
-                        header.column.getIsSorted() && "text-foreground"
+                        "group inline-flex items-center gap-1 uppercase tracking-wider transition-colors duration-150 hover:text-primary",
+                        header.column.getIsSorted() && "text-primary"
                       )}
                       onClick={header.column.getToggleSortingHandler()}
                     >
@@ -184,9 +184,10 @@ export function DataTable<TData>({
                   // extra cell, so it can't disturb column alignment or
                   // the checkbox/selection geometry.
                   className={cn(
-                    "group relative border-b text-[13px] transition-colors duration-150 last:border-0 hover:bg-muted/50",
-                    "before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:opacity-0 before:transition-opacity before:duration-150",
-                    tone && `${TONE_ROW_ACCENT[tone]} before:opacity-70 group-hover:before:opacity-100`,
+                    "group relative border-b text-[13px] transition-colors duration-150 [transition-timing-function:var(--spring-crisp)] last:border-0 hover:bg-muted/50",
+                    "before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:origin-left before:scale-x-0 before:opacity-0",
+                    "before:transition-[transform,opacity] before:duration-200 before:[transition-timing-function:var(--spring-standard)]",
+                    tone && `${TONE_ROW_ACCENT[tone]} before:scale-x-100 before:opacity-60 hover:before:opacity-100 hover:before:w-[4px]`,
                     isSelected && "bg-primary/5",
                     onRowClick &&
                       "cursor-pointer outline-none focus-visible:bg-muted/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/50"
