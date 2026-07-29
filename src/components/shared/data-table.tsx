@@ -102,7 +102,15 @@ export function DataTable<TData>({
 
   return (
     <div className="overflow-x-auto rounded-lg border bg-card shadow-2xs">
-      <table className="w-full caption-bottom">
+      {/* No w-full: when a table's columns are narrower than the
+          container (short type/status/date columns, few of them), a
+          full-width table dumps all the leftover space into the last
+          column's box — its header text sits at the left with a big
+          blank strip after it, same background, no border, which reads
+          as an extra unlabeled column. Letting the table size to its
+          own content means the border just ends where the columns end
+          instead. */}
+      <table className="caption-bottom">
         <thead className="sticky top-0 z-10 border-b-2 border-primary/25 bg-gradient-to-b from-primary/[0.07] to-primary/[0.02] backdrop-blur-sm">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
