@@ -76,21 +76,28 @@ export function QuickActions() {
           style={{ "--action-color": action.color } as React.CSSProperties}
           className="group relative isolate flex flex-col items-center gap-2 rounded-xl border bg-card px-2 py-3.5 text-center outline-none transition-[transform,border-color] duration-200 [transition-timing-function:var(--spring-standard)] hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--action-color)_45%,transparent)] focus-visible:ring-2 focus-visible:ring-ring/40 motion-reduce:hover:translate-y-0"
         >
-          {/* Same bloom the sidebar uses, so a shortcut lights up the way
-              its module does. Blurred layer, not a box-shadow: it scales
-              and fades on the compositor. */}
           <span
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 top-5 -z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 scale-75 rounded-full opacity-0 blur-[11px] transition-[opacity,transform] duration-300 [transition-timing-function:var(--spring-standard)] group-hover:scale-125 group-hover:opacity-80 motion-reduce:transition-none"
-            style={{ backgroundColor: action.color }}
-          />
-          <span
-            className="grid h-9 w-9 place-items-center rounded-lg transition-colors duration-200"
+            className="relative grid h-9 w-9 place-items-center rounded-lg transition-colors duration-200"
             style={{
               backgroundColor: `color-mix(in srgb, ${action.color} 14%, transparent)`,
               color: action.color,
             }}
           >
+            {/* Same bloom the sidebar uses, so a shortcut lights up the
+                way its module does. Blurred layer, not a box-shadow: it
+                scales and fades on the compositor.
+
+                It lives inside the icon tile and centres on it with
+                top/left-1/2, rather than being offset from the card's top
+                edge — anchoring it to the card meant hard-coding the
+                icon's distance from that edge, and the card's padding and
+                the tile's height had since moved, leaving the bloom 12px
+                high and spilling out over the card's top border. */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 scale-75 rounded-full opacity-0 blur-[11px] transition-[opacity,transform] duration-300 [transition-timing-function:var(--spring-standard)] group-hover:scale-125 group-hover:opacity-80 motion-reduce:transition-none"
+              style={{ backgroundColor: action.color }}
+            />
             <action.icon className="h-[18px] w-[18px]" />
           </span>
           <span className="truncate text-[11px] font-medium leading-none">
