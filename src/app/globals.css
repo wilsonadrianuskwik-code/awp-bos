@@ -471,8 +471,10 @@
     transform: none !important;
   }
   /* The status stripe is a screen affordance for scanning; on paper it
-     reads as a printing artefact. */
-  tr::before {
+     reads as a printing artefact. It hangs off the row's first cell, not
+     the row — a pseudo-element on a <tr> gets wrapped in an anonymous
+     table cell and shifts every column. */
+  tbody td::before {
     display: none !important;
   }
   /* Documents carry accent bands and coloured rules; browsers strip

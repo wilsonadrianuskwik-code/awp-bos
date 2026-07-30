@@ -101,20 +101,8 @@ export function DataTable<TData>({
   const colSpan = columns.length + (selection ? 1 : 0);
 
   return (
-    <div className="inline-block max-w-full overflow-x-auto rounded-lg border bg-card shadow-2xs">
-      {/* No w-full on the table, AND the wrapper itself must not be a
-          plain block element: a block <div> stretches to fill its
-          container width by default regardless of its child's width, so
-          even with the table sized to its own content, a block wrapper
-          would still span the full row — its plain bg-card background
-          sits close enough in tone to the header's faint tint that the
-          leftover space still reads as a continuation of the header, one
-          rounded corner and all. inline-block makes the wrapper (border,
-          background, rounded corners) shrink to the table's actual
-          width, so it ends exactly where the real columns end. max-w-full
-          + overflow-x-auto still handle a table wider than its
-          container. */}
-      <table className="caption-bottom">
+    <div className="overflow-x-auto rounded-lg border bg-card shadow-2xs">
+      <table className="w-full caption-bottom">
         <thead className="sticky top-0 z-10 border-b-2 border-primary/25 bg-gradient-to-b from-primary/[0.07] to-primary/[0.02] backdrop-blur-sm">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
@@ -189,17 +177,32 @@ export function DataTable<TData>({
               const status = getRowStatus?.(row.original);
               const tone = status ? STATUS_TONE[status] : undefined;
 
+              // The status stripe is a pseudo-element on the row's FIRST
+              // CELL, never on the <tr> itself. A table-row may only
+              // contain table-cells, so a ::before attached to a <tr>
+              // gets wrapped by the browser in an *anonymous table
+              // cell* — which claims column 0 and pushes every real <td>
+              // one column to the right, while the header (no
+              // pseudo-element) stays put. The result is a whole table
+              // whose data sits under the wrong headings, plus an
+              // unlabelled blank column at the end. Being absolutely
+              // positioned does not save it: the anonymous cell is
+              // generated during box construction, before layout.
+              // A <td> holds pseudo-elements in normal flow, so hanging
+              // the stripe there is safe. It still resolves against the
+              // <tr>'s `relative`, so it spans the full row height.
+              const stripeClass =
+                "before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:origin-left before:scale-x-0 before:opacity-0 " +
+                "before:transition-[transform,opacity] before:duration-200 before:[transition-timing-function:var(--spring-standard)] " +
+                (tone
+                  ? `${TONE_ROW_ACCENT[tone]} before:scale-x-100 before:opacity-60 group-hover:before:opacity-100 group-hover:before:w-[4px]`
+                  : "");
+
               return (
                 <tr
                   key={row.id}
-                  // The stripe is a ::before on the row rather than an
-                  // extra cell, so it can't disturb column alignment or
-                  // the checkbox/selection geometry.
                   className={cn(
                     "group relative border-b text-[13px] transition-colors duration-150 [transition-timing-function:var(--spring-crisp)] last:border-0 hover:bg-muted/50",
-                    "before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:origin-left before:scale-x-0 before:opacity-0",
-                    "before:transition-[transform,opacity] before:duration-200 before:[transition-timing-function:var(--spring-standard)]",
-                    tone && `${TONE_ROW_ACCENT[tone]} before:scale-x-100 before:opacity-60 hover:before:opacity-100 hover:before:w-[4px]`,
                     isSelected && "bg-primary/5",
                     onRowClick &&
                       "cursor-pointer outline-none focus-visible:bg-muted/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/50"
@@ -230,7 +233,10 @@ export function DataTable<TData>({
                 >
                   {selection && (
                     <td
-                      className="px-3 py-2.5 align-middle first:pl-4"
+                      className={cn(
+                        "px-3 py-2.5 align-middle first:pl-4",
+                        stripeClass
+                      )}
                       onClick={(e) => e.stopPropagation()}
                       onClickCapture={(e) => {
                         shiftPressedRef.current = e.shiftKey;
@@ -251,10 +257,14 @@ export function DataTable<TData>({
                       />
                     </td>
                   )}
-                  {row.getVisibleCells().map((cell) => (
+                  {row.getVisibleCells().map((cell, cellIndex) => (
                     <td
                       key={cell.id}
-                      className="px-3 py-2.5 align-middle first:pl-4 last:pr-4"
+                      className={cn(
+                        "px-3 py-2.5 align-middle first:pl-4 last:pr-4",
+                        // Only when there's no checkbox cell to carry it.
+                        !selection && cellIndex === 0 && stripeClass
+                      )}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
