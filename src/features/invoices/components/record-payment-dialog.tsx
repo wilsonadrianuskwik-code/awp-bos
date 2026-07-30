@@ -96,7 +96,7 @@ export function RecordPaymentDialog({
       const overage = parsed.data.amount - invoice.amount_due;
       const ok = await confirm({
         title: "Payment exceeds the outstanding balance",
-        description: `This payment is ${formatCurrency(overage, invoice.currency)} more than the ${formatCurrency(invoice.amount_due, invoice.currency)} still owed on ${invoice.invoice_number}. Record it anyway?`,
+        description: `This payment is ${formatCurrency(overage)} more than the ${formatCurrency(invoice.amount_due)} still owed on ${invoice.invoice_number}. Record it anyway?`,
         confirmLabel: "Record Payment",
       });
       if (!ok) return;

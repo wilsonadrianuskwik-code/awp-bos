@@ -6,7 +6,7 @@ import { Building2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import type { ProjectHealthCard } from "@/features/dashboard/queries";
 
-function HealthSegment({ label, value, currency }: { label: string; value: number; currency: string }) {
+function HealthSegment({ label, value }: { label: string; value: number }) {
   const filled = value > 0;
   return (
     <div className="min-w-0">
@@ -19,7 +19,7 @@ function HealthSegment({ label, value, currency }: { label: string; value: numbe
       />
       <div className="mt-1 truncate text-[11px] text-muted-foreground">{label}</div>
       <div className="truncate text-[13px] font-medium tabular-nums">
-        {filled ? formatCurrency(value, currency) : "—"}
+        {filled ? formatCurrency(value) : "—"}
       </div>
     </div>
   );
@@ -72,9 +72,9 @@ export function ActiveProjectsGrid({
             <div className="mt-1 truncate text-[12px] text-muted-foreground">{project.clientName}</div>
           )}
           <div className="mt-3 grid grid-cols-3 gap-3">
-            <HealthSegment label="Quoted" value={project.health.quoted_total} currency={project.currency} />
-            <HealthSegment label="Invoiced" value={project.health.invoiced_total} currency={project.currency} />
-            <HealthSegment label="Paid" value={project.health.paid_total} currency={project.currency} />
+            <HealthSegment label="Quoted" value={project.health.quoted_total} />
+            <HealthSegment label="Invoiced" value={project.health.invoiced_total} />
+            <HealthSegment label="Paid" value={project.health.paid_total} />
           </div>
         </Link>
       ))}

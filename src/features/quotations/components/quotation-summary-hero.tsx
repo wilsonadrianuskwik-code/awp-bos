@@ -42,7 +42,7 @@ export function QuotationSummaryHero({
   return (
     <SummaryHero
       primaryLabel="Quoted Total"
-      primaryValue={formatCurrency(quotation.total, quotation.currency)}
+      primaryValue={formatCurrency(quotation.total)}
       secondaryMetrics={[
         { label: "Line Items", value: String(quotation.line_items.length) },
         { label: "Valid Until", value: validUntilValue },

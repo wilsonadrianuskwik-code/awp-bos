@@ -127,10 +127,7 @@ export function InvoiceKanbanBoard({
       items,
       footer:
         items.length > 0
-          ? formatCurrencyAmounts(
-              sumByCurrency(items.map((i) => ({ currency: i.currency, amount: i.total }))),
-              workspace.default_currency
-            )
+          ? formatCurrencyAmounts(sumByCurrency(items.map((i) => ({ currency: i.currency, amount: i.total }))))
           : undefined,
     };
   });

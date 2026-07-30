@@ -5,7 +5,6 @@ import { BarChart3 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { DateRangePicker, type DateRange } from "@/components/ui/date-range-picker";
-import { CurrencySelector } from "@/features/reports/components/currency-selector";
 import { RevenueChart } from "@/features/reports/components/revenue-chart";
 import { ArAgingCard } from "@/features/reports/components/ar-aging-card";
 import { ApAgingCard } from "@/features/reports/components/ap-aging-card";
@@ -28,24 +27,17 @@ function defaultDateRange(): DateRange {
 type ReportsPageProps = {
   workspaceId: string;
   workspaceSlug: string;
-  availableCurrencies: string[];
-  defaultCurrency: string;
+  hasData: boolean;
 };
 
 export function ReportsPage({
   workspaceId,
   workspaceSlug,
-  availableCurrencies,
-  defaultCurrency,
+  hasData,
 }: ReportsPageProps) {
-  const [currency, setCurrency] = useState(
-    availableCurrencies.includes(defaultCurrency)
-      ? defaultCurrency
-      : (availableCurrencies[0] ?? defaultCurrency)
-  );
   const [dateRange, setDateRange] = useState<DateRange>(defaultDateRange);
 
-  if (availableCurrencies.length === 0) {
+  if (!hasData) {
     return (
       <EmptyState
         icon={BarChart3}
@@ -59,11 +51,6 @@ export function ReportsPage({
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3">
         <DateRangePicker value={dateRange} onChange={setDateRange} />
-        <CurrencySelector
-          currencies={availableCurrencies}
-          value={currency}
-          onChange={setCurrency}
-        />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -74,7 +61,6 @@ export function ReportsPage({
           <CardContent>
             <RevenueChart
               workspaceId={workspaceId}
-              currency={currency}
               dateRange={dateRange}
             />
           </CardContent>
@@ -85,7 +71,7 @@ export function ReportsPage({
             <CardTitle className="text-base">AR Aging</CardTitle>
           </CardHeader>
           <CardContent>
-            <ArAgingCard workspaceId={workspaceId} currency={currency} />
+            <ArAgingCard workspaceId={workspaceId} />
           </CardContent>
         </Card>
 
@@ -96,7 +82,6 @@ export function ReportsPage({
           <CardContent>
             <CatalogRevenueCard
               workspaceId={workspaceId}
-              currency={currency}
               dateRange={dateRange}
             />
           </CardContent>
@@ -116,7 +101,7 @@ export function ReportsPage({
             <CardTitle className="text-base">AP Aging</CardTitle>
           </CardHeader>
           <CardContent>
-            <ApAgingCard workspaceId={workspaceId} currency={currency} />
+            <ApAgingCard workspaceId={workspaceId} />
           </CardContent>
         </Card>
 

@@ -43,7 +43,6 @@ type SimplePrintViewProps = {
   party: PrintParty;
   meta: DocumentMetaField[];
   lines: PrintLine[];
-  currency: string;
   /** Omitted for documents that carry no money (Delivery Orders). */
   showPricing?: boolean;
   totalRows?: PrintTotalRow[];
@@ -67,14 +66,13 @@ export function SimplePrintView({
   party,
   meta,
   lines,
-  currency,
   showPricing = true,
   totalRows,
   total,
   notes,
   terms,
 }: SimplePrintViewProps) {
-  const fmt = (value: number) => formatCurrency(value, currency);
+  const fmt = (value: number) => formatCurrency(value);
 
   return (
     <DocumentShell

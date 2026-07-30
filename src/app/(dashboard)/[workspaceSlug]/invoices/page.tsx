@@ -115,10 +115,7 @@ export default async function InvoicesPage({
               { label: "Paid", value: String(stats.paidCount) },
               {
                 label: "Total Value",
-                value: formatCurrencyAmounts(
-                  stats.totalValueByCurrency,
-                  workspace.default_currency
-                ),
+                value: formatCurrencyAmounts(stats.totalValueByCurrency),
               },
             ]}
           />

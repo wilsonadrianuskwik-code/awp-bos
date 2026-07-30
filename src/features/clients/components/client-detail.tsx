@@ -39,7 +39,6 @@ type ClientQuotationSummary = {
   quotation_number: string;
   status: string;
   total: number;
-  currency: string;
   created_at: string;
 };
 
@@ -52,7 +51,6 @@ type ClientInvoiceSummary = {
   total: number;
   amount_paid: number;
   amount_due: number;
-  currency: string;
   due_date: string | null;
   created_at: string;
 };
@@ -63,7 +61,6 @@ type ClientPaymentSummary = {
   id: string;
   payment_number: string;
   amount: number;
-  currency: string;
   payment_method: PaymentMethod;
   payment_date: string;
   invoice: { id: string; invoice_number: string } | null;
@@ -169,17 +166,16 @@ export function ClientDetail({
       />
 
       {(() => {
-        const currency = client.preferred_currency || workspace.default_currency;
         const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
         const totalOutstanding = invoices.reduce((sum, inv) => sum + inv.amount_due, 0);
         if (totalPaid > 0 || totalOutstanding > 0 || invoices.length > 0) {
           return (
             <SummaryHero
               primaryLabel="Lifetime Revenue"
-              primaryValue={formatCurrency(totalPaid, currency)}
+              primaryValue={formatCurrency(totalPaid)}
               primaryTone="success"
               secondaryMetrics={[
-                { label: "Outstanding", value: formatCurrency(totalOutstanding, currency) },
+                { label: "Outstanding", value: formatCurrency(totalOutstanding) },
                 { label: "Invoices", value: String(invoices.length) },
                 { label: "Quotations", value: String(quotations.length) },
               ]}
@@ -242,7 +238,7 @@ export function ClientDetail({
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="tabular-nums">
-                          {formatCurrency(q.total, q.currency)}
+                          {formatCurrency(q.total)}
                         </span>
                         <StatusBadge status={q.status} />
                       </div>
@@ -301,11 +297,11 @@ export function ClientDetail({
                       <div className="flex items-center gap-2">
                         <div className="text-right">
                           <p className="font-semibold tabular-nums">
-                            {formatCurrency(inv.amount_due, inv.currency)}
+                            {formatCurrency(inv.amount_due)}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             of{" "}
-                            {formatCurrency(inv.total, inv.currency)}
+                            {formatCurrency(inv.total)}
                           </p>
                         </div>
                         <StatusBadge
@@ -365,7 +361,7 @@ export function ClientDetail({
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="tabular-nums">
-                          {formatCurrency(p.amount, p.currency)}
+                          {formatCurrency(p.amount)}
                         </span>
                         <Badge variant="secondary">
                           {PAYMENT_METHOD_LABEL[p.payment_method]}
@@ -453,14 +449,6 @@ export function ClientDetail({
                 <DetailItem
                   label="Payment Terms"
                   value={`${client.payment_terms} days`}
-                />
-                <DetailItem
-                  label="Preferred Currency"
-                  value={
-                    client.preferred_currency
-                      ? `${client.preferred_currency} (custom)`
-                      : `${workspace.default_currency} (workspace default)`
-                  }
                 />
               </FieldList>
             </CardContent>

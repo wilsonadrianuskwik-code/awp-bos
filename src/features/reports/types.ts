@@ -21,7 +21,6 @@ export type ArAgingBucket = {
   outstandingAmount: number;
 };
 
-export type AvailableCurrencies = string[];
 
 export type CatalogRevenueRow = {
   catalogItemId: string;

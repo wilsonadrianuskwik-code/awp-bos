@@ -26,11 +26,6 @@ import type { Project } from "@/features/projects/types";
 import type { Client } from "@/features/clients/types";
 import type { WorkspaceMember } from "@/features/workspace/types";
 
-// Same list used by the client/quotation/invoice forms — kept as a local
-// const per this codebase's existing convention rather than a shared
-// module (see those files for the sibling copies).
-const CURRENCIES = ["IDR", "USD", "EUR", "GBP", "SGD", "MYR", "AUD", "CAD"];
-
 type ProjectFormProps = {
   project?: Project;
   clients: Client[];
@@ -146,21 +141,6 @@ export function ProjectForm({ project, clients, members }: ProjectFormProps) {
                 step="0.01"
                 defaultValue={project?.budget ?? ""}
               />
-            </FieldGroup>
-
-            <FieldGroup label="Currency" htmlFor="currency">
-              <Select name="currency" defaultValue={project?.currency ?? workspace.default_currency}>
-                <SelectTrigger id="currency">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CURRENCIES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </FieldGroup>
 
             <FieldGroup label="Assigned To" htmlFor="assigned_to">

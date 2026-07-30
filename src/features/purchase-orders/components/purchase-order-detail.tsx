@@ -50,7 +50,7 @@ export function PurchaseOrderDetail({
   const { workspace } = useWorkspace();
   const { toast } = useToast();
 
-  const fmtPo = (value: number) => formatCurrency(value, purchaseOrder.currency);
+  const fmtPo = (value: number) => formatCurrency(value);
   const poSettings = {
     dpp_numerator: purchaseOrder.dpp_numerator,
     dpp_denominator: purchaseOrder.dpp_denominator,
@@ -124,7 +124,7 @@ export function PurchaseOrderDetail({
               Total
             </p>
             <p className="text-3xl font-semibold tabular-nums tracking-tight">
-              {formatCurrency(purchaseOrder.total, purchaseOrder.currency)}
+              {formatCurrency(purchaseOrder.total)}
             </p>
           </div>
           <PurchaseOrderStatusActions purchaseOrder={purchaseOrder} />
@@ -140,7 +140,6 @@ export function PurchaseOrderDetail({
             <CardContent>
               <LineItemsTable
                 lineItems={purchaseOrder.line_items}
-                currency={purchaseOrder.currency}
               />
             </CardContent>
           </Card>
@@ -218,7 +217,6 @@ export function PurchaseOrderDetail({
           { label: "PO Number", value: purchaseOrder.po_number },
         ]}
         lines={purchaseOrder.line_items}
-        currency={purchaseOrder.currency}
         totalRows={taxTotalRows(poBreakdown, poSettings, fmtPo)}
         total={{ label: "Total", value: fmtPo(poBreakdown.total) }}
         notes={purchaseOrder.notes}

@@ -59,7 +59,7 @@ const columns: ColumnDef<Project, unknown>[] = [
     header: "Budget",
     cell: ({ row }) => {
       const budget = row.original.budget;
-      return budget != null ? formatCurrency(budget, row.original.currency) : "—";
+      return budget != null ? formatCurrency(budget) : "—";
     },
   },
   {

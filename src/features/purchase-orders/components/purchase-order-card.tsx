@@ -69,7 +69,7 @@ export function PurchaseOrderCard({ purchaseOrder }: PurchaseOrderCardProps) {
       </p>
 
       <div className="mt-2.5 text-base font-semibold tabular-nums tracking-tight">
-        {formatCurrency(purchaseOrder.total, purchaseOrder.currency)}
+        {formatCurrency(purchaseOrder.total)}
       </div>
 
       {purchaseOrder.project && (

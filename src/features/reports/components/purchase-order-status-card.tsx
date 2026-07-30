@@ -78,7 +78,7 @@ export function PurchaseOrderStatusCard({ workspaceId }: { workspaceId: string }
               <div className="text-right">
                 {Object.entries(row.totalByCurrency).map(([currency, amount]) => (
                   <p key={currency} className="text-[13px] font-semibold tabular-nums">
-                    {formatCurrency(amount, currency)}
+                    {formatCurrency(amount)}
                   </p>
                 ))}
               </div>

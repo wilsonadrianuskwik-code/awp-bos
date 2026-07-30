@@ -7,6 +7,7 @@ import {
   createProjectSchema,
   updateProjectSchema,
 } from "@/features/projects/validators";
+import { CURRENCY } from "@/lib/utils/format-currency";
 
 function buildSiteAddress(parsed: {
   site_address_line1?: string;
@@ -49,7 +50,7 @@ export async function createProjectAction(
       p_start_date: parsed.data.start_date || null,
       p_end_date: parsed.data.end_date || null,
       p_budget: parsed.data.budget ?? null,
-      p_currency: parsed.data.currency || "USD",
+      p_currency: parsed.data.currency || CURRENCY,
       p_assigned_to: parsed.data.assigned_to || null,
       p_notes: parsed.data.notes || null,
     });

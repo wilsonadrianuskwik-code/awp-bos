@@ -112,10 +112,7 @@ export default async function QuotationsPage({
               { label: "Approved", value: String(stats.approvedCount) },
               {
                 label: "Total Value",
-                value: formatCurrencyAmounts(
-                  stats.totalValueByCurrency,
-                  workspace.default_currency
-                ),
+                value: formatCurrencyAmounts(stats.totalValueByCurrency),
               },
             ]}
           />

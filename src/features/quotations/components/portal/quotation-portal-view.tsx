@@ -180,7 +180,6 @@ export function QuotationPortalView({
         <CardContent>
           <LineItemsTable
             lineItems={quotation.line_items}
-            currency={quotation.currency}
             packageBreakdowns={packageBreakdowns}
           />
         </CardContent>
@@ -194,7 +193,6 @@ export function QuotationPortalView({
             tax_amount: quotation.tax_amount,
             total: quotation.total,
           }}
-          currency={quotation.currency}
           itemCount={quotation.line_items.length}
           sticky={false}
         />

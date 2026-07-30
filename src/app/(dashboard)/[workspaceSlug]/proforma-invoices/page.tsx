@@ -109,10 +109,7 @@ export default async function ProformaInvoicesPage({
               { label: "Accepted", value: String(stats.acceptedCount) },
               {
                 label: "Total Value",
-                value: formatCurrencyAmounts(
-                  stats.totalValueByCurrency,
-                  workspace.default_currency
-                ),
+                value: formatCurrencyAmounts(stats.totalValueByCurrency),
               },
             ]}
           />

@@ -8,7 +8,7 @@ import type { TemplateBlock } from "@/features/templates/types";
 import type { DocumentRenderData, RenderLineItem } from "@/features/templates/renderer/types";
 import { resolvePlaceholders } from "@/features/templates/renderer/placeholders";
 import { escapeHtml, nl2br } from "@/features/templates/renderer/html-utils";
-import { formatCurrency } from "@/lib/utils/format-currency";
+import { formatCurrency, CURRENCY } from "@/lib/utils/format-currency";
 import { evaluateVisibility } from "@/features/templates/renderer/visibility";
 import { STATUS_TONE, TONE_HEX } from "@/components/shared/status-badge";
 
@@ -288,7 +288,6 @@ function renderLineItemsTable(block: TemplateBlock, data: DocumentRenderData): s
   const columnLabels = cfg<Record<string, string>>(block.config, "column_labels", {});
   const showRowNumbers = cfg(block.config, "show_row_numbers", false);
   const alternateShadingConfig = cfg(block.config, "alternate_row_shading", false);
-  const currency = data.document.currency;
   const tableStyle = data.theme_style?.table_style ?? "lined";
   const headerBorder = data.theme_style?.header_border ?? true;
   const alternateShading = alternateShadingConfig || tableStyle === "striped";
@@ -316,13 +315,13 @@ function renderLineItemsTable(block: TemplateBlock, data: DocumentRenderData): s
       case "unit":
         return escapeHtml(item.unit ?? "");
       case "unit_price":
-        return formatCurrency(item.unit_price, currency);
+        return formatCurrency(item.unit_price);
       case "discount":
         return item.discount_percent ? `${item.discount_percent}%` : "";
       case "tax":
         return item.tax_percent ? `${item.tax_percent}%` : "";
       case "total":
-        return formatCurrency(item.line_total, currency);
+        return formatCurrency(item.line_total);
       default:
         return "";
     }
@@ -331,7 +330,7 @@ function renderLineItemsTable(block: TemplateBlock, data: DocumentRenderData): s
   const headerLabel = (c: string): string => {
     const custom = columnLabels[c];
     if (custom) return custom;
-    if (c === "total" && showCurrencyInAmountHeader) return `Amount ${currency}`;
+    if (c === "total" && showCurrencyInAmountHeader) return `Amount ${CURRENCY}`;
     return COLUMN_LABEL_DEFAULTS[c] ?? c;
   };
 
@@ -436,7 +435,6 @@ function renderTotals(block: TemplateBlock, data: DocumentRenderData): string {
   const rowLabels = cfg<Record<string, string>>(block.config, "row_labels", {});
   const widthPercent = cfg(block.config, "width_percent", 42);
   const currencyInTotal = cfg(block.config, "show_currency_in_total_label", false);
-  const currency = data.document.currency;
 
   const rowValue = (row: string): number | null => {
     switch (row) {
@@ -506,16 +504,16 @@ function renderTotals(block: TemplateBlock, data: DocumentRenderData): string {
 
       const isTotal = row === "total";
       let label = dynamicLabel(row, rowLabels[row] ?? TOTALS_ROW_DEFAULTS[row] ?? row);
-      if (isTotal && currencyInTotal) label = `${label} ${currency}`;
+      if (isTotal && currencyInTotal) label = `${label} ${CURRENCY}`;
       const displayValue = NEGATIVE_TOTALS_ROWS.has(row)
-        ? `(${formatCurrency(value, currency)})`
-        : formatCurrency(value, currency);
+        ? `(${formatCurrency(value)})`
+        : formatCurrency(value);
 
       // Grand total gets a strong rule above it and the heading font,
-      // matching the reference's "TOTAL MYR" treatment; the other rows
+      // matching the reference's grand-total treatment; the other rows
       // are quiet muted-label / dark-value pairs.
       if (isTotal) {
-        return `<div style="display:flex; justify-content:space-between; align-items:baseline; margin-top:8px; padding-top:10px; border-top:2px solid var(--t-primary);"><span style="font-family:var(--t-heading-font); font-weight:var(--t-heading-weight); font-size:12.5pt; text-transform:uppercase; letter-spacing:.5px; color:var(--t-primary);">${escapeHtml(label)}</span><span style="font-family:var(--t-heading-font); font-weight:var(--t-heading-weight); font-size:12.5pt; color:var(--t-primary);">${formatCurrency(value, currency)}</span></div>`;
+        return `<div style="display:flex; justify-content:space-between; align-items:baseline; margin-top:8px; padding-top:10px; border-top:2px solid var(--t-primary);"><span style="font-family:var(--t-heading-font); font-weight:var(--t-heading-weight); font-size:12.5pt; text-transform:uppercase; letter-spacing:.5px; color:var(--t-primary);">${escapeHtml(label)}</span><span style="font-family:var(--t-heading-font); font-weight:var(--t-heading-weight); font-size:12.5pt; color:var(--t-primary);">${formatCurrency(value)}</span></div>`;
       }
       return `<div style="display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; font-size:9.5pt;"><span style="color:var(--t-muted);">${escapeHtml(label)}</span><span style="color:var(--t-text);">${displayValue}</span></div>`;
     })
@@ -584,7 +582,6 @@ function renderPaymentSummary(block: TemplateBlock, data: DocumentRenderData): s
   const payments = data.payments ?? [];
   if (payments.length === 0) return "";
 
-  const currency = data.document.currency;
   const labelFor: Record<string, string> = { date: "Date", method: "Method", reference: "Reference", amount: "Amount" };
 
   const header = columns.map((c) => `<th style="text-align:${c === "amount" ? "right" : "left"}; font-size:8pt; text-transform:uppercase; letter-spacing:.4px; color:var(--t-muted); padding:8px 6px; border-bottom:1px solid var(--t-border);">${labelFor[c]}</th>`).join("");
@@ -592,7 +589,7 @@ function renderPaymentSummary(block: TemplateBlock, data: DocumentRenderData): s
     .map((p) => {
       const cells = columns
         .map((c) => {
-          const v = c === "amount" ? formatCurrency(p.amount, currency) : c === "date" ? p.date : c === "method" ? p.method : p.reference ?? "";
+          const v = c === "amount" ? formatCurrency(p.amount) : c === "date" ? p.date : c === "method" ? p.method : p.reference ?? "";
           return `<td class="${c === "amount" ? "tpl-num" : ""}" style="padding:7px 6px; text-align:${c === "amount" ? "right" : "left"};">${escapeHtml(v)}</td>`;
         })
         .join("");
@@ -601,7 +598,7 @@ function renderPaymentSummary(block: TemplateBlock, data: DocumentRenderData): s
     .join("");
 
   const total = showTotal
-    ? `<div class="tpl-num" style="text-align:right; font-family:var(--t-heading-font); font-weight:var(--t-heading-weight); margin-top:6px; color:var(--t-primary);">Total Paid: ${formatCurrency(payments.reduce((sum, p) => sum + p.amount, 0), currency)}</div>`
+    ? `<div class="tpl-num" style="text-align:right; font-family:var(--t-heading-font); font-weight:var(--t-heading-weight); margin-top:6px; color:var(--t-primary);">Total Paid: ${formatCurrency(payments.reduce((sum, p) => sum + p.amount, 0))}</div>`
     : "";
 
   return `<table style="width:100%; border-collapse:collapse; font-size:9pt;"><thead><tr>${header}</tr></thead><tbody>${rows}</tbody></table>${total}`;

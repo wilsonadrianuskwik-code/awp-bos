@@ -99,7 +99,7 @@ export function InvoicePortalView({
       .catch(() => {});
   }, [shareToken]);
 
-  const fmt = (value: number) => formatCurrency(value, invoice.currency);
+  const fmt = (value: number) => formatCurrency(value);
 
   return (
     <div className="mx-auto min-h-screen max-w-3xl bg-background px-4 py-10">
@@ -151,7 +151,6 @@ export function InvoicePortalView({
         <CardContent>
           <LineItemsTable
             lineItems={invoice.line_items}
-            currency={invoice.currency}
             packageBreakdowns={invoice.packageBreakdowns}
           />
         </CardContent>
@@ -165,7 +164,6 @@ export function InvoicePortalView({
             tax_amount: invoice.tax_amount,
             total: invoice.total,
           }}
-          currency={invoice.currency}
           itemCount={invoice.line_items.length}
           sticky={false}
         />

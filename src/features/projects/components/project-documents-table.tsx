@@ -52,7 +52,7 @@ const columns: ColumnDef<ProjectDocument, unknown>[] = [
     header: "Total",
     cell: ({ row }) => {
       const { total, currency } = row.original;
-      return total != null && currency ? formatCurrency(total, currency) : "—";
+      return total != null && currency ? formatCurrency(total) : "—";
     },
   },
   {

@@ -12,7 +12,7 @@ type InvoiceSummaryHeroProps = {
 };
 
 export function InvoiceSummaryHero({ invoice, actions }: InvoiceSummaryHeroProps) {
-  const fmt = (value: number) => formatCurrency(value, invoice.currency);
+  const fmt = (value: number) => formatCurrency(value);
   const progress = getPaymentProgress(invoice.amount_paid, invoice.total);
   const isPaid = invoice.status === "paid";
   const isOverdue = invoice.status === "overdue";

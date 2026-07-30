@@ -75,7 +75,6 @@ type InsertPaletteProps = {
   onOpenChange: (open: boolean) => void;
   catalogItems: CatalogItem[];
   templates: TemplateWithItems[];
-  documentCurrency: string;
   /** Resolves the price to insert/display for a catalog item — the
    *  default price, or this document's client's override if one exists.
    *  Falls back to the item's own default price when omitted. */
@@ -92,15 +91,13 @@ function defaultPriceFor(item: CatalogItem): number {
 
 // The unified insert surface: one search over the catalog AND saved
 // templates, ranked Recent → Catalog → Templates (re-inserting a known
-// item is the most common act). Currency-mismatched items stay visible
-// but disabled with the reason inline — honesty over tidiness. Enter
-// inserts and keeps the palette open for rapid multi-insert.
+// item is the most common act). Enter inserts and keeps the palette open
+// for rapid multi-insert.
 export function InsertPalette({
   open,
   onOpenChange,
   catalogItems,
   templates,
-  documentCurrency,
   priceFor = defaultPriceFor,
   onInsertCatalog,
   onInsertTemplate,
@@ -161,13 +158,7 @@ export function InsertPalette({
     return [...recentRows, ...catalogRows, ...templateRows];
   }, [query, recents, catalogItems, templates]);
 
-  function isDisabled(row: PaletteRow): boolean {
-    return row.kind === "catalog" && row.item.currency !== documentCurrency;
-  }
-
-  const enabledIndexes = rows
-    .map((row, i) => (isDisabled(row) ? -1 : i))
-    .filter((i) => i >= 0);
+  const enabledIndexes = rows.map((_row, i) => i);
 
   function step(dir: 1 | -1) {
     if (enabledIndexes.length === 0) return;
@@ -183,7 +174,6 @@ export function InsertPalette({
   }
 
   function insertRow(row: PaletteRow) {
-    if (isDisabled(row)) return;
     if (row.kind === "catalog") {
       onInsertCatalog(catalogToLineItem(row.item, priceFor(row.item)));
       pushRecent(row.item.id);
@@ -256,7 +246,6 @@ export function InsertPalette({
             </p>
           ) : (
             rows.map((row, index) => {
-              const disabled = isDisabled(row);
               const section = sectionFor(index);
               return (
                 <div key={row.key}>
@@ -268,16 +257,13 @@ export function InsertPalette({
                   <button
                     id={`insert-row-${index}`}
                     type="button"
-                    disabled={disabled}
                     onClick={() => insertRow(row)}
-                    onMouseEnter={() => !disabled && setActiveIndex(index)}
+                    onMouseEnter={() => setActiveIndex(index)}
                     className={cn(
                       "flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-[13px] transition-colors duration-100",
-                      disabled
-                        ? "cursor-not-allowed opacity-50"
-                        : index === activeIndex
-                          ? "bg-accent text-accent-foreground"
-                          : "text-foreground/80"
+                      index === activeIndex
+                        ? "bg-accent text-accent-foreground"
+                        : "text-foreground/80"
                     )}
                   >
                     {row.kind === "catalog" ? (
@@ -301,9 +287,7 @@ export function InsertPalette({
                     </span>
                     {row.kind === "catalog" && (
                       <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
-                        {disabled
-                          ? `${row.item.currency} — this document is ${documentCurrency}`
-                          : formatCurrency(priceFor(row.item), row.item.currency)}
+                        {formatCurrency(priceFor(row.item))}
                       </span>
                     )}
                     {flashKey === row.key ? (
@@ -312,8 +296,7 @@ export function InsertPalette({
                         Inserted
                       </span>
                     ) : (
-                      index === activeIndex &&
-                      !disabled && (
+                      index === activeIndex && (
                         <CornerDownLeft className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                       )
                     )}

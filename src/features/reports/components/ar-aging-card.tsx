@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getArAgingAction } from "@/features/reports/actions";
-import { formatCurrency } from "@/lib/utils/format-currency";
+import { formatCurrency, CURRENCY } from "@/lib/utils/format-currency";
 import type { ArAgingBucket } from "@/features/reports/types";
 
 const BUCKET_LABEL: Record<string, string> = {
@@ -14,10 +14,9 @@ const BUCKET_LABEL: Record<string, string> = {
 
 type ArAgingCardProps = {
   workspaceId: string;
-  currency: string;
 };
 
-export function ArAgingCard({ workspaceId, currency }: ArAgingCardProps) {
+export function ArAgingCard({ workspaceId }: ArAgingCardProps) {
   const [buckets, setBuckets] = useState<ArAgingBucket[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +26,7 @@ export function ArAgingCard({ workspaceId, currency }: ArAgingCardProps) {
     setIsLoading(true);
     setError(null);
 
-    getArAgingAction(workspaceId, { currency }).then((result) => {
+    getArAgingAction(workspaceId, { currency: CURRENCY }).then((result) => {
       if (cancelled) return;
       if (result.error) {
         setError(result.error);
@@ -41,7 +40,7 @@ export function ArAgingCard({ workspaceId, currency }: ArAgingCardProps) {
     return () => {
       cancelled = true;
     };
-  }, [workspaceId, currency]);
+  }, [workspaceId]);
 
   const maxAmount = Math.max(0, ...buckets.map((b) => b.outstandingAmount));
   const totalOutstanding = buckets.reduce((sum, b) => sum + b.outstandingAmount, 0);
@@ -58,7 +57,7 @@ export function ArAgingCard({ workspaceId, currency }: ArAgingCardProps) {
         <p className="py-8 text-center text-sm text-destructive">{error}</p>
       ) : totalOutstanding === 0 ? (
         <p className="py-8 text-center text-sm text-muted-foreground">
-          No outstanding balances in {currency}.
+          No outstanding balances in rupiah.
         </p>
       ) : (
         <div className="space-y-3">
@@ -86,7 +85,7 @@ export function ArAgingCard({ workspaceId, currency }: ArAgingCardProps) {
                   />
                 </div>
                 <p className="mt-1 text-sm font-semibold tabular-nums">
-                  {formatCurrency(bucket.outstandingAmount, currency)}
+                  {formatCurrency(bucket.outstandingAmount)}
                 </p>
               </div>
             );

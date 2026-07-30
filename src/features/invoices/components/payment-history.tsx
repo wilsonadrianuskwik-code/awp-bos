@@ -77,7 +77,7 @@ export function PaymentHistory({ payments }: PaymentHistoryProps) {
             </div>
             <div className="flex items-center gap-1.5">
               <p className="font-semibold tabular-nums">
-                {formatCurrency(payment.amount, payment.currency)}
+                {formatCurrency(payment.amount)}
               </p>
               <Badge variant="secondary">
                 {PAYMENT_METHOD_LABEL[payment.payment_method]}

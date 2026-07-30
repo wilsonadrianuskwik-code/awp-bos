@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getWorkspaceBySlug } from "@/lib/workspace";
 import { PageHeader } from "@/components/shared/page-header";
-import { getAvailableCurrencies } from "@/features/reports/queries";
+import { hasReportData } from "@/features/reports/queries";
 import { ReportsPage } from "@/features/reports/components/reports-page";
 
 export default async function ReportsRoute({
@@ -13,7 +13,7 @@ export default async function ReportsRoute({
   const workspace = await getWorkspaceBySlug(workspaceSlug);
   if (!workspace) notFound();
 
-  const availableCurrencies = await getAvailableCurrencies(workspace.id);
+  const hasData = await hasReportData(workspace.id);
 
   return (
     <div className="space-y-6">
@@ -24,8 +24,7 @@ export default async function ReportsRoute({
       <ReportsPage
         workspaceId={workspace.id}
         workspaceSlug={workspaceSlug}
-        availableCurrencies={availableCurrencies}
-        defaultCurrency={workspace.default_currency}
+        hasData={hasData}
       />
     </div>
   );

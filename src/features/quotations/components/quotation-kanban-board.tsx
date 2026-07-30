@@ -116,10 +116,7 @@ export function QuotationKanbanBoard({
       items,
       footer:
         items.length > 0
-          ? formatCurrencyAmounts(
-              sumByCurrency(items.map((q) => ({ currency: q.currency, amount: q.total }))),
-              workspace.default_currency
-            )
+          ? formatCurrencyAmounts(sumByCurrency(items.map((q) => ({ currency: q.currency, amount: q.total }))))
           : undefined,
     };
   });

@@ -24,7 +24,6 @@ type ReviewSendOverlayProps = {
   meta: { label: string; value: string }[];
   items: LineItemInput[];
   totals: LineItemTotals;
-  currency: string;
   sending: boolean;
   onSend: () => void;
 };
@@ -46,7 +45,6 @@ export function ReviewSendOverlay({
   meta,
   items,
   totals,
-  currency,
   sending,
   onSend,
 }: ReviewSendOverlayProps) {
@@ -95,10 +93,10 @@ export function ReviewSendOverlay({
                     </span>
                     <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
                       {item.quantity} ×{" "}
-                      {formatCurrency(item.unit_price, currency)}
+                      {formatCurrency(item.unit_price)}
                     </span>
                     <span className="w-28 shrink-0 text-right tabular-nums">
-                      {formatCurrency(amount, currency)}
+                      {formatCurrency(amount)}
                     </span>
                   </div>
                 );
@@ -108,27 +106,27 @@ export function ReviewSendOverlay({
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
                 <span className="tabular-nums">
-                  {formatCurrency(totals.subtotal, currency)}
+                  {formatCurrency(totals.subtotal)}
                 </span>
               </div>
               {totals.discount_amount > 0 && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Discount</span>
                   <span className="tabular-nums text-red-600 dark:text-red-400">
-                    −{formatCurrency(totals.discount_amount, currency)}
+                    −{formatCurrency(totals.discount_amount)}
                   </span>
                 </div>
               )}
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Tax</span>
                 <span className="tabular-nums">
-                  {formatCurrency(totals.tax_amount, currency)}
+                  {formatCurrency(totals.tax_amount)}
                 </span>
               </div>
               <div className="flex items-baseline justify-between border-t pt-2">
                 <span className="font-medium">Total</span>
                 <span className="text-lg font-semibold tabular-nums">
-                  {formatCurrency(totals.total, currency)}
+                  {formatCurrency(totals.total)}
                 </span>
               </div>
             </div>
@@ -159,7 +157,7 @@ export function ReviewSendOverlay({
                 <div className="flex justify-between gap-3 border-t pt-2">
                   <span className="text-muted-foreground">Total</span>
                   <span className="font-semibold tabular-nums">
-                    {formatCurrency(totals.total, currency)}
+                    {formatCurrency(totals.total)}
                   </span>
                 </div>
               </div>

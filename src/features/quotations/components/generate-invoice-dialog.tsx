@@ -158,12 +158,11 @@ export function GenerateInvoiceDialog({
 
               <LineItemsTable
                 lineItems={quotation.line_items}
-                currency={quotation.currency}
               />
 
               <div className="flex justify-between rounded-lg border p-3 font-semibold">
                 <span>Total</span>
-                <span>{formatCurrency(quotation.total, quotation.currency)}</span>
+                <span>{formatCurrency(quotation.total)}</span>
               </div>
             </div>
 

@@ -4,13 +4,6 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { BackButton } from "@/components/shared/back-button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -45,8 +38,8 @@ import type { Project } from "@/features/projects/types";
 import { TaxBreakdownEditor } from "@/features/documents/components/tax-breakdown-editor";
 import { setDocumentTaxSettings } from "@/features/documents/actions";
 import type { TaxSettings } from "@/features/documents/tax";
+import { CURRENCY } from "@/lib/utils/format-currency";
 
-const CURRENCIES = ["IDR", "USD", "EUR", "GBP", "SGD", "MYR", "AUD", "CAD"];
 
 function emptyItem(category: LineItemCategory): LineItemInput {
   return {
@@ -119,11 +112,8 @@ export function InvoiceBuilder({
   );
   const [title, setTitle] = useState(invoice?.title ?? "");
   const [summary, setSummary] = useState(invoice?.summary ?? "");
-  const [currency, setCurrency] = useState(
-    invoice?.currency ??
-      clients.find((c) => c.id === initialClientId)?.preferred_currency ??
-      workspace.default_currency
-  );
+  // Rupiah-only app: no picker, no per-document currency.
+  const currency = CURRENCY;
   const [issueDate, setIssueDate] = useState(invoice?.issue_date ?? todayISO());
   const [dueDate, setDueDate] = useState(invoice?.due_date ?? "");
   const [paymentTerms, setPaymentTerms] = useState(
@@ -585,7 +575,6 @@ export function InvoiceBuilder({
         saveStatus={saveStatus}
         isDirty={isDirty}
         total={totals.total}
-        currency={currency}
         isPending={isPending}
         onCancel={handleCancel}
         onSave={() => startTransition(() => handleManualSave())}
@@ -678,11 +667,8 @@ export function InvoiceBuilder({
                 <ClientSelector
                   clients={clients}
                   value={clientId}
-                  onChange={(id, client) => {
+                  onChange={(id) => {
                     setClientId(id);
-                    setCurrency(
-                      client.preferred_currency ?? workspace.default_currency
-                    );
                     setChangingClient(false);
                   }}
                 />
@@ -720,21 +706,6 @@ export function InvoiceBuilder({
                 className="h-8"
               />
             </div>
-            <div className="grid grid-cols-[96px_1fr] items-center gap-3">
-              <span className="text-xs text-muted-foreground">Currency</span>
-              <Select value={currency} onValueChange={setCurrency}>
-                <SelectTrigger className="h-8">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CURRENCIES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
           </div>
         </div>
 
@@ -742,7 +713,6 @@ export function InvoiceBuilder({
         <div className="mt-10 border-t pt-8">
           <LineItemsEditor
             itemsByCategory={itemsByCategory}
-            currency={currency}
             catalogItemsById={catalogItemsById}
             onAdd={addLineItem}
             onUpdate={updateLineItem}
@@ -817,7 +787,6 @@ export function InvoiceBuilder({
 
           <TaxBreakdownEditor
             hargaJual={totals.subtotal - totals.discount_amount}
-            currency={currency}
             settings={taxSettings}
             onChange={(next) => {
               setTaxSettings(next);
@@ -844,7 +813,6 @@ export function InvoiceBuilder({
         ]}
         items={submittableLineItems}
         totals={totals}
-        currency={currency}
         sending={isPending}
         onSend={() => startTransition(() => handleSendShortcut())}
       />
@@ -853,7 +821,6 @@ export function InvoiceBuilder({
         onOpenChange={setInsertPaletteOpen}
         catalogItems={catalogItems}
         templates={templates}
-        documentCurrency={currency}
         priceFor={priceFor}
         onInsertCatalog={handleInsertCatalogItem}
         onInsertTemplate={handleInsertTemplate}

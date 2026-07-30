@@ -106,10 +106,7 @@ export default async function PurchaseOrdersPage({
               { label: "Received", value: String(stats.receivedCount) },
               {
                 label: "Total Value",
-                value: formatCurrencyAmounts(
-                  stats.totalValueByCurrency,
-                  workspace.default_currency
-                ),
+                value: formatCurrencyAmounts(stats.totalValueByCurrency),
               },
             ]}
           />

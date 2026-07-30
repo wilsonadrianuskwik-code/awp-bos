@@ -58,11 +58,11 @@ export function ProjectProfitabilityCard({
                   <span className="text-muted-foreground">{row.projectName}</span>
                 </Link>
               </td>
-              <td className="py-2 pr-3 text-right tabular-nums">{formatCurrency(row.invoicedTotal, row.currency)}</td>
-              <td className="py-2 pr-3 text-right tabular-nums">{formatCurrency(row.paidTotal, row.currency)}</td>
-              <td className="py-2 pr-3 text-right tabular-nums">{formatCurrency(row.poCostTotal, row.currency)}</td>
+              <td className="py-2 pr-3 text-right tabular-nums">{formatCurrency(row.invoicedTotal)}</td>
+              <td className="py-2 pr-3 text-right tabular-nums">{formatCurrency(row.paidTotal)}</td>
+              <td className="py-2 pr-3 text-right tabular-nums">{formatCurrency(row.poCostTotal)}</td>
               <td className="py-2 text-right tabular-nums">
-                {row.budget != null ? formatCurrency(row.budget, row.currency) : "—"}
+                {row.budget != null ? formatCurrency(row.budget) : "—"}
               </td>
             </tr>
           ))}

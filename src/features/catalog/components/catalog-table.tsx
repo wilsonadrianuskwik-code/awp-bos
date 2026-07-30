@@ -98,12 +98,9 @@ export function CatalogTable({
       enableSorting: true,
       cell: ({ row }) => (
         <span className="text-[13px] font-medium tabular-nums">
-          {formatCurrency(
-            row.original.is_package
+          {formatCurrency(row.original.is_package
               ? (row.original.package_price ?? 0)
-              : row.original.default_unit_price,
-            row.original.currency
-          )}
+              : row.original.default_unit_price)}
           {row.original.default_unit && (
             <span className="ml-1 font-normal text-muted-foreground">
               / {row.original.default_unit}

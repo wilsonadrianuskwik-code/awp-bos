@@ -18,12 +18,12 @@ import { useToast } from "@/providers/toast-provider";
 import { setCatalogItemClientPrice } from "@/features/catalog/actions";
 import type { ClientSummary } from "@/features/line-items/types";
 import type { CatalogItemClientPrice } from "@/features/catalog/types";
+import { CURRENCY } from "@/lib/utils/format-currency";
 
 type ClientPriceDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   catalogItemId: string;
-  currency: string;
   clients: ClientSummary[];
   onSaved: (price: CatalogItemClientPrice) => void;
 };
@@ -35,7 +35,6 @@ export function ClientPriceDialog({
   open,
   onOpenChange,
   catalogItemId,
-  currency,
   clients,
   onSaved,
 }: ClientPriceDialogProps) {
@@ -108,7 +107,7 @@ export function ClientPriceDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="client-price">Price ({currency})</Label>
+              <Label htmlFor="client-price">Price ({CURRENCY})</Label>
               <Input
                 id="client-price"
                 type="number"

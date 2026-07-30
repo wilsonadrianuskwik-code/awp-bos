@@ -250,7 +250,6 @@ export function DeliveryOrderDetailView({
           { label: "DO Number", value: deliveryOrder.do_number },
         ]}
         lines={deliveryOrder.line_items}
-        currency="IDR"
         showPricing={false}
         notes={deliveryOrder.notes}
       />

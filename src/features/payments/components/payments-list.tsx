@@ -36,17 +36,15 @@ const PAGE_SIZE = 20;
 type PaymentsListProps = {
   payments: PaymentWithContext[];
   count: number;
-  currencies: string[];
 };
 
-export function PaymentsList({ payments, count, currencies }: PaymentsListProps) {
+export function PaymentsList({ payments, count }: PaymentsListProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { workspace } = useWorkspace();
 
   const urlSearch = searchParams.get("q") ?? "";
-  const currency = searchParams.get("currency") ?? "all";
   const method = searchParams.get("method") ?? "all";
   const page = Math.max(1, Number(searchParams.get("page") ?? "1"));
   const dateRange: DateRange = {
@@ -100,7 +98,7 @@ export function PaymentsList({ payments, count, currencies }: PaymentsListProps)
       header: "Amount",
       cell: ({ row }) => (
         <span className="font-medium tabular-nums">
-          {formatCurrency(row.getValue("amount"), row.original.currency)}
+          {formatCurrency(row.getValue("amount"))}
         </span>
       ),
     },
@@ -162,23 +160,6 @@ export function PaymentsList({ payments, count, currencies }: PaymentsListProps)
             setParams({ from: range.from || null, to: range.to || null, page: null })
           }
         />
-
-        <Select
-          value={currency}
-          onValueChange={(v) => setParams({ currency: v === "all" ? null : v, page: null })}
-        >
-          <SelectTrigger className="h-9 w-full sm:w-36">
-            <SelectValue placeholder="Currency" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All currencies</SelectItem>
-            {currencies.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
 
         <Select
           value={method}

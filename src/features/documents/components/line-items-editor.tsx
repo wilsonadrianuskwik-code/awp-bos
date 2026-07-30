@@ -33,7 +33,6 @@ type LineItemsEditorProps = {
     LineItemCategory,
     { item: LineItemInput; originalIndex: number }[]
   >;
-  currency: string;
   /** Catalog items by id, so a package line (via item.catalog_item_id) can
       show its live breakdown. Omit if the caller has no catalog context. */
   catalogItemsById?: Record<string, CatalogItem>;
@@ -170,7 +169,6 @@ function DocDefaultsControl({
 // per-category buttons.
 export function LineItemsEditor({
   itemsByCategory,
-  currency,
   catalogItemsById,
   onAdd,
   onUpdate,
@@ -338,7 +336,6 @@ export function LineItemsEditor({
                     <DisclosureRow
                       key={originalIndex}
                       item={item}
-                      currency={currency}
                       packageInfo={catalogItem?.is_package ? catalogItem : null}
                       onChange={(patch) => onUpdate(originalIndex, patch)}
                       onRemove={() => onRemove(originalIndex)}

@@ -32,20 +32,18 @@ export const LINE_ITEM_GRID_COLS =
 
 type LineItemRowProps = {
   item: LineItemInput;
-  currency: string;
   onChange: (patch: Partial<LineItemInput>) => void;
   onRemove: () => void;
 };
 
 export function LineItemRow({
   item,
-  currency,
   onChange,
   onRemove,
 }: LineItemRowProps) {
   const Icon = CATEGORY_ICON[item.category];
   const descriptionMissing = !item.description.trim();
-  const currencyPrefix = getCurrencyPrefix(currency);
+  const currencyPrefix = getCurrencyPrefix();
 
   const itemSubtotal = item.quantity * item.unit_price;
   const discount = itemSubtotal * ((item.discount_percent ?? 0) / 100);
@@ -163,7 +161,7 @@ export function LineItemRow({
       <div className="col-span-2 flex items-center justify-between border-t pt-2 md:col-span-1 md:justify-end md:border-t-0 md:pt-0">
         <FieldLabel className="md:hidden">Total</FieldLabel>
         <span className="font-bold tabular-nums tracking-tight md:text-right md:text-sm">
-          {formatCurrency(total, currency)}
+          {formatCurrency(total)}
         </span>
       </div>
 

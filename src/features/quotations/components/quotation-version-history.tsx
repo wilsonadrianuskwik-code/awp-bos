@@ -53,7 +53,7 @@ export function QuotationVersionHistory({
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <span className="text-sm tabular-nums">
-              {formatCurrency(v.total, v.currency)}
+              {formatCurrency(v.total)}
             </span>
             <StatusBadge status={v.status} />
           </div>

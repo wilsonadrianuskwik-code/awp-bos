@@ -109,10 +109,7 @@ export function PurchaseOrderKanbanBoard({
       items,
       footer:
         items.length > 0
-          ? formatCurrencyAmounts(
-              sumByCurrency(items.map((po) => ({ currency: po.currency, amount: po.total }))),
-              workspace.default_currency
-            )
+          ? formatCurrencyAmounts(sumByCurrency(items.map((po) => ({ currency: po.currency, amount: po.total }))))
           : undefined,
     };
   });

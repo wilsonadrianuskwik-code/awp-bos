@@ -4,13 +4,6 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { BackButton } from "@/components/shared/back-button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -44,8 +37,8 @@ import type {
   PurchaseOrderDetail,
 } from "@/features/purchase-orders/types";
 import type { CatalogItem } from "@/features/catalog/types";
+import { CURRENCY } from "@/lib/utils/format-currency";
 
-const CURRENCIES = ["IDR", "USD", "EUR", "GBP", "SGD", "MYR", "AUD", "CAD"];
 
 function emptyItem(category: LineItemCategory): LineItemInput {
   return {
@@ -112,11 +105,8 @@ export function PurchaseOrderBuilder({
   );
   const [projectId, setProjectId] = useState(purchaseOrder?.project_id ?? "");
   const [title, setTitle] = useState(purchaseOrder?.title ?? "");
-  const [currency, setCurrency] = useState(
-    purchaseOrder?.currency ??
-      suppliers.find((s) => s.id === initialSupplierId)?.preferred_currency ??
-      workspace.default_currency
-  );
+  // Rupiah-only app: no picker, no per-document currency.
+  const currency = CURRENCY;
   const [issueDate, setIssueDate] = useState(purchaseOrder?.issue_date ?? todayISO());
   const [expectedDate, setExpectedDate] = useState(purchaseOrder?.expected_date ?? "");
   const [termsAndConditions, setTermsAndConditions] = useState(
@@ -517,7 +507,6 @@ export function PurchaseOrderBuilder({
         saveStatus={saveStatus}
         isDirty={isDirty}
         total={totals.total}
-        currency={currency}
         isPending={isPending}
         onCancel={handleCancel}
         onSave={() => startTransition(() => handleManualSave())}
@@ -580,9 +569,8 @@ export function PurchaseOrderBuilder({
                 <SupplierSelector
                   suppliers={suppliers}
                   value={supplierId}
-                  onChange={(id, supplier) => {
+                  onChange={(id) => {
                     setSupplierId(id);
-                    setCurrency(supplier.preferred_currency ?? workspace.default_currency);
                     setChangingSupplier(false);
                   }}
                 />
@@ -620,28 +608,12 @@ export function PurchaseOrderBuilder({
                 className="h-8"
               />
             </div>
-            <div className="grid grid-cols-[96px_1fr] items-center gap-3">
-              <span className="text-xs text-muted-foreground">Currency</span>
-              <Select value={currency} onValueChange={setCurrency}>
-                <SelectTrigger className="h-8">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CURRENCIES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
           </div>
         </div>
 
         <div className="mt-10 border-t pt-8">
           <LineItemsEditor
             itemsByCategory={itemsByCategory}
-            currency={currency}
             catalogItemsById={catalogItemsById}
             onAdd={addLineItem}
             onUpdate={updateLineItem}
@@ -713,7 +685,6 @@ export function PurchaseOrderBuilder({
 
           <TaxBreakdownEditor
             hargaJual={totals.subtotal - totals.discount_amount}
-            currency={currency}
             settings={taxSettings}
             onChange={(next) => {
               setTaxSettings(next);
@@ -740,7 +711,6 @@ export function PurchaseOrderBuilder({
         ]}
         items={submittableLineItems}
         totals={totals}
-        currency={currency}
         sending={isPending}
         onSend={() => startTransition(() => handleSendShortcut())}
       />
@@ -749,7 +719,6 @@ export function PurchaseOrderBuilder({
         onOpenChange={setInsertPaletteOpen}
         catalogItems={catalogItems}
         templates={templates}
-        documentCurrency={currency}
         onInsertCatalog={handleInsertCatalogItem}
         onInsertTemplate={handleInsertTemplate}
       />

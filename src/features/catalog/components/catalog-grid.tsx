@@ -99,10 +99,7 @@ export function CatalogGrid({ items, selectedIds, onSelectedIdsChange }: Catalog
             <div className="mt-3 flex items-end justify-between">
               <div>
                 <span className="text-lg font-semibold tabular-nums tracking-tight">
-                  {formatCurrency(
-                    item.is_package ? (item.package_price ?? 0) : item.default_unit_price,
-                    item.currency
-                  )}
+                  {formatCurrency(item.is_package ? (item.package_price ?? 0) : item.default_unit_price)}
                 </span>
                 {item.default_unit && (
                   <span className="ml-1 text-xs text-muted-foreground">

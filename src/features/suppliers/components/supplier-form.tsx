@@ -6,13 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   FormSection,
   FormGrid,
   FieldGroup,
@@ -22,11 +15,6 @@ import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { createSupplierAction, updateSupplier } from "@/features/suppliers/actions";
 import type { Supplier } from "@/features/suppliers/types";
-
-// Same list used by the client/quotation/invoice forms — kept as a local
-// const per this codebase's existing convention rather than a shared
-// module.
-const CURRENCIES = ["IDR", "USD", "EUR", "GBP", "SGD", "MYR", "AUD", "CAD"];
 
 type SupplierFormProps = {
   supplier?: Supplier;
@@ -107,23 +95,6 @@ export function SupplierForm({ supplier }: SupplierFormProps) {
               />
             </FieldGroup>
 
-            <FieldGroup label="Preferred Currency" htmlFor="preferred_currency">
-              <Select
-                name="preferred_currency"
-                defaultValue={supplier?.preferred_currency ?? workspace.default_currency}
-              >
-                <SelectTrigger id="preferred_currency">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CURRENCIES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FieldGroup>
           </FormGrid>
         </FormSection>
 

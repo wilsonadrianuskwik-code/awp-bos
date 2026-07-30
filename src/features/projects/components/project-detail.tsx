@@ -115,7 +115,7 @@ export function ProjectDetail({
               <CardTitle>Health</CardTitle>
             </CardHeader>
             <CardContent>
-              <ProjectHealthStrip health={health} currency={project.currency} />
+              <ProjectHealthStrip health={health} />
             </CardContent>
           </Card>
 
@@ -135,7 +135,7 @@ export function ProjectDetail({
                   label="Budget"
                   value={
                     project.budget != null
-                      ? formatCurrency(project.budget, project.currency)
+                      ? formatCurrency(project.budget)
                       : null
                   }
                 />
@@ -200,22 +200,19 @@ export function ProjectDetail({
               <FieldList>
                 <DetailItem
                   label="Quoted Total"
-                  value={formatCurrency(health.quoted_total, project.currency)}
+                  value={formatCurrency(health.quoted_total)}
                 />
                 <DetailItem
                   label="Invoiced Total"
-                  value={formatCurrency(health.invoiced_total, project.currency)}
+                  value={formatCurrency(health.invoiced_total)}
                 />
                 <DetailItem
                   label="Paid Total"
-                  value={formatCurrency(health.paid_total, project.currency)}
+                  value={formatCurrency(health.paid_total)}
                 />
                 <DetailItem
                   label="Outstanding"
-                  value={formatCurrency(
-                    Math.max(0, health.invoiced_total - health.paid_total),
-                    project.currency
-                  )}
+                  value={formatCurrency(Math.max(0, health.invoiced_total - health.paid_total))}
                 />
                 <DetailItem
                   label="Deliveries"

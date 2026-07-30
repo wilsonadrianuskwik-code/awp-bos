@@ -16,7 +16,6 @@ type TaxSettingsCardProps = {
   documentType: "invoice" | "proforma_invoice";
   documentId: string;
   hargaJual: number;
-  currency: string;
   settings: TaxSettings;
   /** Issued documents keep the rates they were issued under. */
   editable: boolean;
@@ -33,7 +32,6 @@ export function TaxSettingsCard({
   documentType,
   documentId,
   hargaJual,
-  currency,
   settings,
   editable,
 }: TaxSettingsCardProps) {
@@ -79,7 +77,6 @@ export function TaxSettingsCard({
       <CardContent className="space-y-4">
         <TaxBreakdownBlock
           hargaJual={hargaJual}
-          currency={currency}
           settings={draft}
         />
 

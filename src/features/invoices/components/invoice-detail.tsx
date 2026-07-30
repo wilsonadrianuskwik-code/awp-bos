@@ -101,7 +101,7 @@ export function InvoiceDetail({
 
   function handlePrint() {
     const clientName = invoice.client?.name ?? "Client";
-    const total = formatCurrency(invoice.total ?? 0, invoice.currency);
+    const total = formatCurrency(invoice.total ?? 0);
     const filename = sanitizeFilename(`${clientName} - ${invoice.invoice_number} - ${total}`);
     const prevTitle = document.title;
     document.title = filename;
@@ -241,7 +241,6 @@ export function InvoiceDetail({
               <CardContent>
                 <LineItemsTable
                   lineItems={invoice.line_items}
-                  currency={invoice.currency}
                   packageBreakdowns={packageBreakdowns}
                 />
               </CardContent>
@@ -313,7 +312,6 @@ export function InvoiceDetail({
               documentType="invoice"
               documentId={invoice.id}
               hargaJual={invoice.subtotal - invoice.discount_amount}
-              currency={invoice.currency}
               settings={{
                 dpp_numerator: invoice.dpp_numerator,
                 dpp_denominator: invoice.dpp_denominator,

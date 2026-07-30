@@ -97,7 +97,7 @@ export function QuotationDetail({
 
   function handlePrint() {
     const clientName = quotation.client?.name ?? "Client";
-    const total = formatCurrency(quotation.total ?? 0, quotation.currency);
+    const total = formatCurrency(quotation.total ?? 0);
     const filename = sanitizeFilename(`${clientName} - ${quotation.quotation_number} - ${total}`);
     const prevTitle = document.title;
     document.title = filename;
@@ -248,7 +248,6 @@ export function QuotationDetail({
               <CardContent>
                 <LineItemsTable
                   lineItems={quotation.line_items}
-                  currency={quotation.currency}
                   packageBreakdowns={packageBreakdowns}
                 />
               </CardContent>
@@ -324,7 +323,6 @@ export function QuotationDetail({
                 tax_amount: quotation.tax_amount,
                 total: quotation.total,
               }}
-              currency={quotation.currency}
               itemCount={quotation.line_items.length}
               sticky={false}
             />

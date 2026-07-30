@@ -20,7 +20,6 @@ type BuilderCommandBarProps = {
   isDirty: boolean;
   /** Live grand total, recomputed by the parent on every edit. */
   total: number;
-  currency: string;
   isPending: boolean;
   /** Send-readiness: empty array = ready (green dot). Reasons show on
       hover of the dot, and when Send is clicked while unready. */
@@ -42,7 +41,6 @@ export function BuilderCommandBar({
   saveStatus,
   isDirty,
   total,
-  currency,
   isPending,
   readyReasons = [],
   onCancel,
@@ -80,7 +78,7 @@ export function BuilderCommandBar({
           className="text-[15px] font-semibold tabular-nums tracking-tight"
           title="Current total"
         >
-          {formatCurrency(rolling, currency)}
+          {formatCurrency(rolling)}
         </span>
 
         <span className="hidden text-xs text-muted-foreground 2xl:block">

@@ -1,16 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   FormSection,
   FormGrid,
@@ -20,13 +13,7 @@ import {
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { createClientAction, updateClient } from "@/features/clients/actions";
-import { CURRENCY_MODES } from "@/features/clients/validators";
 import type { Client } from "@/features/clients/types";
-
-// Same list used by the quotation/invoice builders and workspace profile —
-// kept as a local const per this codebase's existing convention rather than
-// a shared module (see those files for the sibling copies).
-const CURRENCIES = ["IDR", "USD", "EUR", "GBP", "SGD", "MYR", "AUD", "CAD"];
 
 type ClientFormProps = {
   client?: Client;
@@ -39,10 +26,6 @@ export function ClientForm({ client }: ClientFormProps) {
   const { toast } = useToast();
 
   const isEditing = !!client;
-
-  const [currencyMode, setCurrencyMode] = useState<(typeof CURRENCY_MODES)[number]>(
-    client?.preferred_currency ? "custom" : "workspace_default"
-  );
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -117,48 +100,6 @@ export function ClientForm({ client }: ClientFormProps) {
               />
             </FieldGroup>
 
-            <FieldGroup label="Currency" htmlFor="currency_mode">
-              <Select
-                name="currency_mode"
-                value={currencyMode}
-                onValueChange={(v) => setCurrencyMode(v as (typeof CURRENCY_MODES)[number])}
-              >
-                <SelectTrigger id="currency_mode">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="workspace_default">
-                    Use workspace default ({workspace.default_currency})
-                  </SelectItem>
-                  <SelectItem value="custom">Custom currency</SelectItem>
-                </SelectContent>
-              </Select>
-            </FieldGroup>
-
-            {currencyMode === "custom" && (
-              <FieldGroup
-                label="Preferred Currency"
-                htmlFor="preferred_currency"
-                required
-                hint="New quotations and invoices for this client will default to this currency."
-              >
-                <Select
-                  name="preferred_currency"
-                  defaultValue={client?.preferred_currency ?? workspace.default_currency}
-                >
-                  <SelectTrigger id="preferred_currency">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CURRENCIES.map((c) => (
-                      <SelectItem key={c} value={c}>
-                        {c}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FieldGroup>
-            )}
           </FormGrid>
         </FormSection>
 

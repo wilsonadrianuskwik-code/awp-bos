@@ -102,7 +102,7 @@ export function ActivityTimeline({ activities }: ActivityTimelineProps) {
                     </span>
                   </p>
                   <p className="text-muted-foreground">
-                    {formatCurrency(payment.amount, payment.currency)} via{" "}
+                    {formatCurrency(payment.amount)} via{" "}
                     {PAYMENT_METHOD_LABEL[payment.payment_method] ??
                       payment.payment_method}
                   </p>

@@ -99,7 +99,7 @@ export function PurchaseOrderTable({
       enableSorting: true,
       cell: ({ row }) => (
         <span className="text-[13px] font-medium tabular-nums">
-          {formatCurrency(row.original.total, row.original.currency)}
+          {formatCurrency(row.original.total)}
         </span>
       ),
     },

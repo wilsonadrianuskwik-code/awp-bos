@@ -33,7 +33,7 @@ export function InvoicePrintView({
   branding,
   paymentDetails,
 }: InvoicePrintViewProps) {
-  const fmt = (value: number) => formatCurrency(value, invoice.currency);
+  const fmt = (value: number) => formatCurrency(value);
 
   const settings = {
     dpp_numerator: invoice.dpp_numerator,

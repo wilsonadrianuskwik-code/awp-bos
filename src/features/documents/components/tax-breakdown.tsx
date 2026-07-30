@@ -9,7 +9,6 @@ import {
 
 type TaxBreakdownProps = {
   hargaJual: number;
-  currency: string;
   settings: TaxSettings;
   /** Compact spacing for the document canvas/print view. */
   dense?: boolean;
@@ -28,7 +27,6 @@ type TaxBreakdownProps = {
  */
 export function TaxBreakdownBlock({
   hargaJual,
-  currency,
   settings,
   dense = false,
 }: TaxBreakdownProps) {
@@ -41,13 +39,13 @@ export function TaxBreakdownBlock({
       <Row
         className={rowClass}
         label="Total Harga Jual"
-        value={formatCurrency(b.hargaJual, currency)}
+        value={formatCurrency(b.hargaJual)}
       />
       {ppn && settings.show_dpp && (
         <Row
           className={rowClass}
           label={dppLabel(settings)}
-          value={formatCurrency(b.dppAmount, currency)}
+          value={formatCurrency(b.dppAmount)}
         />
       )}
       {/* Label carries no rate: the PPN percentage is a regulation
@@ -58,27 +56,27 @@ export function TaxBreakdownBlock({
         <Row
           className={rowClass}
           label="PPN"
-          value={formatCurrency(b.ppnAmount, currency)}
+          value={formatCurrency(b.ppnAmount)}
         />
       )}
       {settings.pph_percent !== null && (
         <Row
           className={rowClass}
           label={`Potong PPH ${formatPercent(settings.pph_percent)}%`}
-          value={`(${formatCurrency(b.pphAmount, currency)})`}
+          value={`(${formatCurrency(b.pphAmount)})`}
         />
       )}
       {settings.retensi_percent !== null && (
         <Row
           className={rowClass}
           label={`Potong Retensi ${formatPercent(settings.retensi_percent)}%`}
-          value={`(${formatCurrency(b.retensiAmount, currency)})`}
+          value={`(${formatCurrency(b.retensiAmount)})`}
         />
       )}
       <div className="mt-1 flex items-baseline justify-between gap-6 border-t-2 border-double pt-2">
         <dt className="text-[11px] font-semibold uppercase tracking-wider">Total</dt>
         <dd className="text-base font-bold tabular-nums">
-          {formatCurrency(b.total, currency)}
+          {formatCurrency(b.total)}
         </dd>
       </div>
     </dl>

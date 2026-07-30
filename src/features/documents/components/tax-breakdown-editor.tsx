@@ -6,7 +6,6 @@ import { hasPpn, type TaxSettings } from "@/features/documents/tax";
 
 type TaxBreakdownEditorProps = {
   hargaJual: number;
-  currency: string;
   settings: TaxSettings;
   onChange: (settings: TaxSettings) => void;
   disabled?: boolean;
@@ -23,7 +22,6 @@ type TaxBreakdownEditorProps = {
  */
 export function TaxBreakdownEditor({
   hargaJual,
-  currency,
   settings,
   onChange,
   disabled,
@@ -32,7 +30,6 @@ export function TaxBreakdownEditor({
     <div className="space-y-3 self-end">
       <TaxBreakdownBlock
         hargaJual={hargaJual}
-        currency={currency}
         settings={settings}
       />
 

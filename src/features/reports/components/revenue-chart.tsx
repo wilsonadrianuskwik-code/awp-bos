@@ -12,7 +12,7 @@ import {
 } from "recharts";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getRevenueByPeriodAction } from "@/features/reports/actions";
-import { formatCurrency } from "@/lib/utils/format-currency";
+import { formatCurrency, CURRENCY } from "@/lib/utils/format-currency";
 import type { DateRange } from "@/components/ui/date-range-picker";
 import type { ReportGranularity, RevenuePeriodPoint } from "@/features/reports/types";
 
@@ -37,11 +37,10 @@ function formatPeriodLabel(period: string, granularity: ReportGranularity): stri
 
 type RevenueChartProps = {
   workspaceId: string;
-  currency: string;
   dateRange: DateRange;
 };
 
-export function RevenueChart({ workspaceId, currency, dateRange }: RevenueChartProps) {
+export function RevenueChart({ workspaceId, dateRange }: RevenueChartProps) {
   const rangeDays = daysBetween(dateRange.from, dateRange.to);
   const dailyAllowed = rangeDays <= MAX_DAYS_FOR_DAILY_GRANULARITY;
 
@@ -64,7 +63,7 @@ export function RevenueChart({ workspaceId, currency, dateRange }: RevenueChartP
     setError(null);
 
     getRevenueByPeriodAction(workspaceId, {
-      currency,
+      currency: CURRENCY,
       granularity,
       fromDate: dateRange.from,
       toDate: dateRange.to,
@@ -82,7 +81,7 @@ export function RevenueChart({ workspaceId, currency, dateRange }: RevenueChartP
     return () => {
       cancelled = true;
     };
-  }, [workspaceId, currency, granularity, dateRange.from, dateRange.to]);
+  }, [workspaceId, granularity, dateRange.from, dateRange.to]);
 
   const chartData = points.map((p) => ({
     label: formatPeriodLabel(p.period, granularity),
@@ -134,11 +133,11 @@ export function RevenueChart({ workspaceId, currency, dateRange }: RevenueChartP
                 tick={{ fontSize: 12 }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={(v) => formatCurrency(v, currency)}
+                tickFormatter={(v) => formatCurrency(v)}
                 width={80}
               />
               <Tooltip
-                formatter={(value) => formatCurrency(Number(value), currency)}
+                formatter={(value) => formatCurrency(Number(value))}
               />
               <Bar dataKey="total" fill="currentColor" radius={[4, 4, 0, 0]} className="text-primary" />
             </BarChart>

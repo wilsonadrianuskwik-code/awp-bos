@@ -4,13 +4,6 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { BackButton } from "@/components/shared/back-button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -46,8 +39,8 @@ import type { Quotation, QuotationDetail } from "@/features/quotations/types";
 import type { CatalogItem, CatalogItemClientPrice } from "@/features/catalog/types";
 import { useClientPriceResolver } from "@/features/catalog/use-client-price";
 import type { Project } from "@/features/projects/types";
+import { CURRENCY } from "@/lib/utils/format-currency";
 
-const CURRENCIES = ["IDR", "USD", "EUR", "GBP", "SGD", "MYR", "AUD", "CAD"];
 
 function emptyItem(category: LineItemCategory): LineItemInput {
   return {
@@ -118,11 +111,8 @@ export function QuotationBuilder({
   const [projectId, setProjectId] = useState(quotation?.project_id ?? "");
   const [title, setTitle] = useState(quotation?.title ?? "");
   const [summary, setSummary] = useState(quotation?.summary ?? "");
-  const [currency, setCurrency] = useState(
-    quotation?.currency ??
-      clients.find((c) => c.id === initialClientId)?.preferred_currency ??
-      workspace.default_currency
-  );
+  // Rupiah-only app: no picker, no per-document currency.
+  const currency = CURRENCY;
   const [issueDate, setIssueDate] = useState(quotation?.issue_date ?? todayISO());
   const [expiryDate, setExpiryDate] = useState(quotation?.expiry_date ?? "");
   const [terms, setTerms] = useState(
@@ -564,7 +554,6 @@ export function QuotationBuilder({
         saveStatus={saveStatus}
         isDirty={isDirty}
         total={totals.total}
-        currency={currency}
         isPending={isPending}
         onCancel={handleCancel}
         onSave={() => startTransition(() => handleManualSave())}
@@ -653,11 +642,8 @@ export function QuotationBuilder({
                 <ClientSelector
                   clients={clients}
                   value={clientId}
-                  onChange={(id, client) => {
+                  onChange={(id) => {
                     setClientId(id);
-                    setCurrency(
-                      client.preferred_currency ?? workspace.default_currency
-                    );
                     setChangingClient(false);
                   }}
                 />
@@ -695,21 +681,6 @@ export function QuotationBuilder({
                 className="h-8"
               />
             </div>
-            <div className="grid grid-cols-[96px_1fr] items-center gap-3">
-              <span className="text-xs text-muted-foreground">Currency</span>
-              <Select value={currency} onValueChange={setCurrency}>
-                <SelectTrigger className="h-8">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CURRENCIES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
           </div>
         </div>
 
@@ -717,7 +688,6 @@ export function QuotationBuilder({
         <div className="mt-10 border-t pt-8">
           <LineItemsEditor
             itemsByCategory={itemsByCategory}
-            currency={currency}
             catalogItemsById={catalogItemsById}
             onAdd={addLineItem}
             onUpdate={updateLineItem}
@@ -818,7 +788,6 @@ export function QuotationBuilder({
 
           <TaxBreakdownEditor
             hargaJual={totals.subtotal - totals.discount_amount}
-            currency={currency}
             settings={taxSettings}
             onChange={(next) => {
               setTaxSettings(next);
@@ -845,7 +814,6 @@ export function QuotationBuilder({
         ]}
         items={submittableLineItems}
         totals={totals}
-        currency={currency}
         sending={isPending}
         onSend={() => startTransition(() => handleSendShortcut())}
       />
@@ -854,7 +822,6 @@ export function QuotationBuilder({
         onOpenChange={setInsertPaletteOpen}
         catalogItems={catalogItems}
         templates={templates}
-        documentCurrency={currency}
         priceFor={priceFor}
         onInsertCatalog={handleInsertCatalogItem}
         onInsertTemplate={handleInsertTemplate}

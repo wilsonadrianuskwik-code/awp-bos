@@ -84,7 +84,7 @@ export function InvoiceCard({ invoice }: InvoiceCardProps) {
           it stays the largest thing — just no longer headline-sized. */}
       <div className="mt-2.5 flex items-baseline justify-between gap-2">
         <span className="text-base font-semibold tabular-nums tracking-tight">
-          {formatCurrency(invoice.amount_due, invoice.currency)}
+          {formatCurrency(invoice.amount_due)}
         </span>
         <span className="shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">
           Due
@@ -107,7 +107,7 @@ export function InvoiceCard({ invoice }: InvoiceCardProps) {
         </span>
         {invoice.due_date && (
           <span className="ml-auto shrink-0">
-            {formatCurrency(invoice.total, invoice.currency)}
+            {formatCurrency(invoice.total)}
           </span>
         )}
       </div>

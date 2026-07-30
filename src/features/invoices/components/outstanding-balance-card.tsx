@@ -8,7 +8,7 @@ type OutstandingBalanceCardProps = {
 };
 
 export function OutstandingBalanceCard({ invoice }: OutstandingBalanceCardProps) {
-  const fmt = (value: number) => formatCurrency(value, invoice.currency);
+  const fmt = (value: number) => formatCurrency(value);
   const progress = getPaymentProgress(invoice.amount_paid, invoice.total);
 
   return (

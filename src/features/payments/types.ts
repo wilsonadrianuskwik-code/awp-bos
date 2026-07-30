@@ -16,7 +16,6 @@ export type PaymentFilters = {
   search?: string;
   from?: string;
   to?: string;
-  currency?: string;
   method?: PaymentMethod | "all";
   clientId?: string;
   page?: number;

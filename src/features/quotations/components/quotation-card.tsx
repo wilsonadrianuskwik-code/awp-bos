@@ -74,7 +74,7 @@ export function QuotationCard({ quotation }: QuotationCardProps) {
       </p>
 
       <div className="mt-2.5 text-base font-semibold tabular-nums tracking-tight">
-        {formatCurrency(quotation.total, quotation.currency)}
+        {formatCurrency(quotation.total)}
       </div>
 
       <div className="mt-2 flex items-center gap-2 border-t pt-2 text-[10.5px] text-muted-foreground">

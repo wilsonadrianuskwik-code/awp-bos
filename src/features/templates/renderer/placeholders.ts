@@ -81,7 +81,7 @@ function getByPath(context: Record<string, unknown>, path: string): unknown {
   }, context);
 }
 
-function applyFilter(value: unknown, filterExpr: string, currency: string): string {
+function applyFilter(value: unknown, filterExpr: string): string {
   const [name, arg] = filterExpr.split(":").map((s) => s.trim().replace(/^"|"$/g, ""));
 
   switch (name) {
@@ -91,7 +91,7 @@ function applyFilter(value: unknown, filterExpr: string, currency: string): stri
       return String(value ?? "").toLowerCase();
     case "currency": {
       const amount = typeof value === "number" ? value : Number(value ?? 0);
-      return formatCurrency(amount, currency);
+      return formatCurrency(amount);
     }
     case "date": {
       if (!value) return "";
@@ -130,7 +130,7 @@ export function resolvePlaceholders(text: string, data: DocumentRenderData): str
 
   return text.replace(PLACEHOLDER_PATTERN, (_match, path: string, filterExpr?: string) => {
     const value = getByPath(context, path);
-    if (filterExpr) return applyFilter(value, filterExpr, data.document.currency);
+    if (filterExpr) return applyFilter(value, filterExpr);
     if (value === undefined || value === null) return "";
     return String(value);
   });

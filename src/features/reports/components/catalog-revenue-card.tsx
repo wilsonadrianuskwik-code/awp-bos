@@ -3,20 +3,18 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getCatalogRevenueAction } from "@/features/reports/actions";
-import { formatCurrency } from "@/lib/utils/format-currency";
+import { formatCurrency, CURRENCY } from "@/lib/utils/format-currency";
 import { useWorkspace } from "@/providers/workspace-provider";
 import type { CatalogRevenueRow } from "@/features/reports/types";
 import type { DateRange } from "@/components/ui/date-range-picker";
 
 type CatalogRevenueCardProps = {
   workspaceId: string;
-  currency: string;
   dateRange: DateRange;
 };
 
 export function CatalogRevenueCard({
   workspaceId,
-  currency,
   dateRange,
 }: CatalogRevenueCardProps) {
   const { workspace } = useWorkspace();
@@ -30,7 +28,7 @@ export function CatalogRevenueCard({
     setError(null);
 
     getCatalogRevenueAction(workspaceId, {
-      currency,
+      currency: CURRENCY,
       fromDate: dateRange.from,
       toDate: dateRange.to,
     }).then((result) => {
@@ -47,7 +45,7 @@ export function CatalogRevenueCard({
     return () => {
       cancelled = true;
     };
-  }, [workspaceId, currency, dateRange.from, dateRange.to]);
+  }, [workspaceId, dateRange.from, dateRange.to]);
 
   const maxTotal = Math.max(0, ...rows.map((r) => r.total));
 
@@ -90,7 +88,7 @@ export function CatalogRevenueCard({
                   />
                 </div>
                 <p className="mt-1 text-sm font-semibold tabular-nums">
-                  {formatCurrency(row.total, currency)}
+                  {formatCurrency(row.total)}
                 </p>
               </div>
             );

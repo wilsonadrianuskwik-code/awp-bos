@@ -6,7 +6,6 @@ import { formatCurrency } from "@/lib/utils/format-currency";
 
 type PricingSummaryProps = {
   totals: LineItemTotals;
-  currency: string;
   itemCount: number;
   sticky?: boolean;
 };
@@ -52,11 +51,10 @@ function useRollingAmount(value: number, durationMs = 350): number {
 
 export function PricingSummary({
   totals,
-  currency,
   itemCount,
   sticky = true,
 }: PricingSummaryProps) {
-  const fmt = (value: number) => formatCurrency(value, currency);
+  const fmt = (value: number) => formatCurrency(value);
   const rollingTotal = useRollingAmount(totals.total);
 
   return (

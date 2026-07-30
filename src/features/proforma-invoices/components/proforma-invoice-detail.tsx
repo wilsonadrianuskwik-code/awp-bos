@@ -80,7 +80,7 @@ export function ProformaInvoiceDetail({
     proformaInvoice.status === "accepted" && !proformaInvoice.generated_invoice_id;
 
   const fmtPi = (value: number) =>
-    formatCurrency(value, proformaInvoice.currency);
+    formatCurrency(value);
   const piSettings = {
     dpp_numerator: proformaInvoice.dpp_numerator,
     dpp_denominator: proformaInvoice.dpp_denominator,
@@ -156,7 +156,7 @@ export function ProformaInvoiceDetail({
               Total
             </p>
             <p className="text-2xl font-semibold tabular-nums tracking-tight">
-              {formatCurrency(proformaInvoice.total, proformaInvoice.currency)}
+              {formatCurrency(proformaInvoice.total)}
             </p>
           </div>
           <ProformaInvoiceStatusActions proformaInvoice={proformaInvoice} />
@@ -172,7 +172,6 @@ export function ProformaInvoiceDetail({
             <CardContent>
               <LineItemsTable
                 lineItems={proformaInvoice.line_items}
-                currency={proformaInvoice.currency}
               />
             </CardContent>
           </Card>
@@ -214,7 +213,6 @@ export function ProformaInvoiceDetail({
             documentType="proforma_invoice"
             documentId={proformaInvoice.id}
             hargaJual={proformaInvoice.subtotal - proformaInvoice.discount_amount}
-            currency={proformaInvoice.currency}
             settings={{
               dpp_numerator: proformaInvoice.dpp_numerator,
               dpp_denominator: proformaInvoice.dpp_denominator,
@@ -267,7 +265,6 @@ export function ProformaInvoiceDetail({
           { label: "PI Number", value: proformaInvoice.pi_number },
         ]}
         lines={proformaInvoice.line_items}
-        currency={proformaInvoice.currency}
         totalRows={piTotalRows}
         total={{ label: "Total", value: fmtPi(piBreakdown.total) }}
         notes={proformaInvoice.notes}

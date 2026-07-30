@@ -109,10 +109,7 @@ export default async function CatalogPage({
               { label: "Inactive", value: String(stats.inactiveCount) },
               {
                 label: "Active Catalog Value",
-                value: formatCurrencyAmounts(
-                  stats.totalValueByCurrency,
-                  workspace.default_currency
-                ),
+                value: formatCurrencyAmounts(stats.totalValueByCurrency),
               },
             ]}
           />

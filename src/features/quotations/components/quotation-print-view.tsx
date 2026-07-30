@@ -39,7 +39,7 @@ export function QuotationPrintView({
   branding,
   paymentDetails,
 }: QuotationPrintViewProps) {
-  const fmt = (value: number) => formatCurrency(value, quotation.currency);
+  const fmt = (value: number) => formatCurrency(value);
 
   const settings = {
     dpp_numerator: quotation.dpp_numerator,

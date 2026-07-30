@@ -165,10 +165,7 @@ export function CatalogDetail({
 
       <SummaryHero
         primaryLabel={item.is_package ? "Package Price" : "Default Price"}
-        primaryValue={formatCurrency(
-          item.is_package ? (item.package_price ?? 0) : item.default_unit_price,
-          item.currency
-        )}
+        primaryValue={formatCurrency(item.is_package ? (item.package_price ?? 0) : item.default_unit_price)}
         secondaryMetrics={[
           { label: "Type", value: ITEM_TYPE_LABEL[item.item_type] },
           ...(item.is_package
@@ -190,10 +187,7 @@ export function CatalogDetail({
               <FieldList>
                 <DetailItem
                   label={item.is_package ? "Package Price" : "Default Price"}
-                  value={formatCurrency(
-                    item.is_package ? (item.package_price ?? 0) : item.default_unit_price,
-                    item.currency
-                  )}
+                  value={formatCurrency(item.is_package ? (item.package_price ?? 0) : item.default_unit_price)}
                 />
                 <DetailItem label="Currency" value={item.currency} />
                 {!item.is_package && (
@@ -243,7 +237,7 @@ export function CatalogDetail({
                 {prices.length === 0 ? (
                   <p className="text-sm text-muted-foreground">
                     Every client pays the default price
-                    {" "}({formatCurrency(item.default_unit_price, item.currency)}).
+                    {" "}({formatCurrency(item.default_unit_price)}).
                     Add an override for a client who gets a different rate.
                   </p>
                 ) : (
@@ -259,7 +253,7 @@ export function CatalogDetail({
                         </span>
                         <span className="flex shrink-0 items-center gap-3">
                           <span className="text-sm tabular-nums">
-                            {formatCurrency(price.unit_price, item.currency)}
+                            {formatCurrency(price.unit_price)}
                           </span>
                           {can("staff") && (
                             <Button
@@ -298,7 +292,6 @@ export function CatalogDetail({
         open={priceDialogOpen}
         onOpenChange={setPriceDialogOpen}
         catalogItemId={item.id}
-        currency={item.currency}
         clients={clients}
         onSaved={(price) =>
           setPrices((prev) => [price, ...prev.filter((p) => p.id !== price.id)])

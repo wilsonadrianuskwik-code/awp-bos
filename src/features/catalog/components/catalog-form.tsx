@@ -20,7 +20,7 @@ import {
   FormActions,
 } from "@/components/shared/form";
 import { cn } from "@/lib/utils/cn";
-import { formatCurrency } from "@/lib/utils/format-currency";
+import { formatCurrency, CURRENCY } from "@/lib/utils/format-currency";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { createCatalogItem, updateCatalogItem } from "@/features/catalog/actions";
@@ -28,7 +28,6 @@ import { ITEM_TYPES } from "@/features/catalog/types";
 import type { CatalogItem, ItemType, PackageItem } from "@/features/catalog/types";
 import type { ItemCategory, SimpleLookup } from "@/features/master-data/queries";
 
-const CURRENCIES = ["USD", "EUR", "GBP", "SGD", "MYR", "IDR", "AUD", "CAD"];
 
 const ITEM_TYPE_LABEL: Record<ItemType, string> = {
   product: "Product",
@@ -59,7 +58,8 @@ export function CatalogForm({
   const isEditing = !!item;
 
   const [isPackage, setIsPackage] = useState(item?.is_package ?? false);
-  const [currency, setCurrency] = useState(item?.currency ?? workspace.default_currency);
+  // Rupiah-only app: still submitted, because the column is NOT NULL.
+  const currency = CURRENCY;
   const [packagePrice, setPackagePrice] = useState(
     item?.package_price != null ? String(item.package_price) : ""
   );
@@ -199,21 +199,6 @@ export function CatalogForm({
             </Select>
           </FieldGroup>
 
-          <FieldGroup label="Currency" htmlFor="currency_display" required>
-            <Select value={currency} onValueChange={setCurrency}>
-              <SelectTrigger id="currency_display">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {CURRENCIES.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FieldGroup>
-
           {isPackage ? (
             <FieldGroup label="Package Price" htmlFor="package_price" required>
               <Input
@@ -334,7 +319,6 @@ export function CatalogForm({
           <PackageItemsEditor
             items={packageItems}
             products={products}
-            currency={currency}
             packagePrice={packagePrice}
             onUpdate={updatePackageItem}
             onRemove={removePackageItem}
@@ -392,7 +376,6 @@ function TypeCard({
 function PackageItemsEditor({
   items,
   products,
-  currency,
   packagePrice,
   onUpdate,
   onRemove,
@@ -401,7 +384,6 @@ function PackageItemsEditor({
 }: {
   items: PackageItem[];
   products: CatalogItem[];
-  currency: string;
   packagePrice: string;
   onUpdate: (index: number, patch: Partial<PackageItem>) => void;
   onRemove: (index: number) => void;
@@ -531,7 +513,7 @@ function PackageItemsEditor({
           </ul>
           <div className="mt-2.5 flex justify-between border-t pt-2.5 text-sm font-semibold">
             <span>Package price</span>
-            <span className="tabular-nums">{formatCurrency(priceNum, currency)}</span>
+            <span className="tabular-nums">{formatCurrency(priceNum)}</span>
           </div>
         </div>
       )}

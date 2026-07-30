@@ -85,18 +85,18 @@ export default async function DashboardPage({
         metrics={[
           {
             label: "This Month's Revenue",
-            value: formatCurrencyAmounts(revenueSummary.totalByCurrency, workspace.default_currency),
+            value: formatCurrencyAmounts(revenueSummary.totalByCurrency),
             href: `/${workspaceSlug}/reports`,
           },
           {
             label: "Open Invoices",
-            value: formatCurrencyAmounts(invoiceSummary.amountDueByCurrency, workspace.default_currency),
+            value: formatCurrencyAmounts(invoiceSummary.amountDueByCurrency),
             description: `${invoiceSummary.openCount} outstanding`,
             href: `/${workspaceSlug}/invoices`,
           },
           {
             label: "Overdue",
-            value: formatCurrencyAmounts(overdueSummary.amountOverdueByCurrency, workspace.default_currency),
+            value: formatCurrencyAmounts(overdueSummary.amountOverdueByCurrency),
             description: overdueSummary.overdueCount > 0 ? `${overdueSummary.overdueCount} need chasing` : "All clear",
             href: `/${workspaceSlug}/invoices?status=overdue`,
             tone: overdueSummary.overdueCount > 0 ? "danger" : "default",

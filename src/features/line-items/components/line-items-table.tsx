@@ -14,7 +14,6 @@ const CATEGORIES: LineItemCategory[] = ["package", "add_on", "per_unit"];
 
 type LineItemsTableProps = {
   lineItems: LineItem[];
-  currency: string;
   /** Live package contents by catalog_item_id — see getPackageBreakdowns.
       A line item whose catalog_item_id has an entry here renders its
       breakdown beneath the row, for internal staff visibility (the same
@@ -22,8 +21,8 @@ type LineItemsTableProps = {
   packageBreakdowns?: Record<string, PackageItem[]>;
 };
 
-export function LineItemsTable({ lineItems, currency, packageBreakdowns = {} }: LineItemsTableProps) {
-  const fmt = (value: number) => formatCurrency(value, currency);
+export function LineItemsTable({ lineItems, packageBreakdowns = {} }: LineItemsTableProps) {
+  const fmt = (value: number) => formatCurrency(value);
 
   return (
     <div className="space-y-6">

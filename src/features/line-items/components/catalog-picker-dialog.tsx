@@ -62,7 +62,7 @@ export function CatalogPickerDialog({
                       )}
                     </div>
                     <p className="truncate text-xs text-muted-foreground">
-                      {formatCurrency(price, item.currency)}
+                      {formatCurrency(price)}
                       {item.default_unit ? ` / ${item.default_unit}` : ""}
                     </p>
                     {mismatched && (

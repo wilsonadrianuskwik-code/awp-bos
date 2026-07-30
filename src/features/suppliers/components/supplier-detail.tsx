@@ -106,14 +106,6 @@ export function SupplierDetail({ supplier, activities }: SupplierDetailProps) {
                 <DetailItem label="Billing Email" value={supplier.billing_email} />
                 <DetailItem label="Tax ID" value={supplier.tax_id} />
                 <DetailItem label="Payment Terms" value={`${supplier.payment_terms} days`} />
-                <DetailItem
-                  label="Preferred Currency"
-                  value={
-                    supplier.preferred_currency
-                      ? `${supplier.preferred_currency} (custom)`
-                      : `${workspace.default_currency} (workspace default)`
-                  }
-                />
               </FieldList>
               {supplier.notes && (
                 <div className="mt-4 border-t pt-3">

@@ -30,7 +30,6 @@ const quietField =
 
 type DisclosureRowProps = {
   item: LineItemInput;
-  currency: string;
   /** The live catalog package this line was inserted from, if it's a
       package line — null/undefined for an ordinary line. Its price locks
       the row's unit-price field (the package's own price is the only
@@ -60,7 +59,6 @@ type DisclosureRowProps = {
 // surfaces as a badge at rest, so nothing changes the money invisibly.
 export function DisclosureRow({
   item,
-  currency,
   packageInfo,
   onChange,
   onRemove,
@@ -72,7 +70,7 @@ export function DisclosureRow({
 }: DisclosureRowProps) {
   const [expanded, setExpanded] = useState(false);
   const descRef = useRef<HTMLInputElement>(null);
-  const currencyPrefix = getCurrencyPrefix(currency);
+  const currencyPrefix = getCurrencyPrefix();
   const isPackageLine = !!packageInfo;
 
   // Focus request from the parent (Enter-to-compose landed a new row, or
@@ -203,7 +201,7 @@ export function DisclosureRow({
               ever appears in the doc-level control and the totals block
               below, never here. */}
           <span className="w-28 shrink-0 text-right text-[15px] font-medium tabular-nums tracking-tight">
-            {formatCurrency(rollingLineTotal, currency)}
+            {formatCurrency(rollingLineTotal)}
           </span>
 
           {/* Row controls — whisper until hovered (always visible on touch). */}

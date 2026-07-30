@@ -3,13 +3,12 @@ import type { ProjectHealth } from "@/features/projects/types";
 
 type ProjectHealthStripProps = {
   health: ProjectHealth;
-  currency: string;
 };
 
 // A simple 4-segment strip — Quoted / Invoiced / Paid / Delivered — no
 // chart library, just labeled numbers with a lightweight proportional bar
 // underneath each so relative scale is still legible at a glance.
-export function ProjectHealthStrip({ health, currency }: ProjectHealthStripProps) {
+export function ProjectHealthStrip({ health }: ProjectHealthStripProps) {
   const segments = [
     { label: "Quoted", value: health.quoted_total, tone: "bg-blue-500" },
     { label: "Invoiced", value: health.invoiced_total, tone: "bg-amber-500" },
@@ -32,7 +31,7 @@ export function ProjectHealthStrip({ health, currency }: ProjectHealthStripProps
             {s.label}
           </p>
           <p className="text-lg font-semibold tabular-nums">
-            {s.display ?? formatCurrency(s.value, currency)}
+            {s.display ?? formatCurrency(s.value)}
           </p>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div

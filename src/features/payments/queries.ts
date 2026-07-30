@@ -8,20 +8,6 @@ import type {
 const INVOICE_JOIN =
   "invoice:invoices(id,invoice_number,status,client:clients(id,name))";
 
-// Currencies actually used in this workspace's payments, for the filter
-// dropdown — not a fixed hardcoded list (which would silently omit any
-// currency a client actually paid in that wasn't anticipated).
-export async function getPaymentCurrencies(workspaceId: string): Promise<string[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("payments")
-    .select("currency")
-    .eq("workspace_id", workspaceId)
-    .is("deleted_at", null);
-
-  return [...new Set((data ?? []).map((r) => r.currency))].sort();
-}
-
 /**
  * Workspace-wide payments ledger. `payments.workspace_id` is a direct
  * column (not just reachable through invoice_id), so scoping is a plain
@@ -100,7 +86,6 @@ async function getPaymentsForInvoiceIds(
   }
   if (filters.from) query = query.gte("payment_date", filters.from);
   if (filters.to) query = query.lte("payment_date", filters.to);
-  if (filters.currency) query = query.eq("currency", filters.currency);
   if (filters.method && filters.method !== "all") {
     query = query.eq("payment_method", filters.method);
   }

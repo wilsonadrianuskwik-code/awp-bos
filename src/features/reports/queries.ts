@@ -10,7 +10,6 @@ import {
 import type {
   ApAgingBucket,
   ArAgingBucket,
-  AvailableCurrencies,
   CatalogRevenueRow,
   DeliveryPerformanceRow,
   FulfillmentOverviewRow,
@@ -203,36 +202,37 @@ export async function getFulfillmentOverview(
 }
 
 /**
- * Distinct currencies actually present in the workspace's invoices and
- * payments — used to populate the report currency selector. A plain
- * query, not an RPC: no date-range grouping is needed, so this stays the
- * same shape as every other queries.ts function in this codebase (the
- * Dashboard convention), rather than a third reporting RPC.
+ * Whether this workspace has anything to report on at all — the Reports
+ * page shows an empty state until at least one invoice or payment exists.
+ *
+ * This replaces the old getAvailableCurrencies: the page used the length
+ * of that currency list purely as a "is there any data" proxy, and now
+ * that everything is rupiah the list would always be exactly ["IDR"] and
+ * the proxy would never read empty. A plain existence check says what was
+ * actually meant, and only needs one row from each table rather than
+ * every currency value in the workspace.
  */
-export async function getAvailableCurrencies(
-  workspaceId: string
-): Promise<AvailableCurrencies> {
+export async function hasReportData(workspaceId: string): Promise<boolean> {
   const supabase = await createClient();
 
-  const [{ data: invoiceCurrencies }, { data: paymentCurrencies }] =
-    await Promise.all([
-      supabase
-        .from("invoices")
-        .select("currency")
-        .eq("workspace_id", workspaceId)
-        .is("deleted_at", null),
-      supabase
-        .from("payments")
-        .select("currency")
-        .eq("workspace_id", workspaceId)
-        .is("deleted_at", null),
-    ]);
+  const [{ data: invoice }, { data: payment }] = await Promise.all([
+    supabase
+      .from("invoices")
+      .select("id")
+      .eq("workspace_id", workspaceId)
+      .is("deleted_at", null)
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("payments")
+      .select("id")
+      .eq("workspace_id", workspaceId)
+      .is("deleted_at", null)
+      .limit(1)
+      .maybeSingle(),
+  ]);
 
-  const currencies = new Set<string>();
-  for (const row of invoiceCurrencies ?? []) currencies.add(row.currency);
-  for (const row of paymentCurrencies ?? []) currencies.add(row.currency);
-
-  return Array.from(currencies).sort();
+  return !!invoice || !!payment;
 }
 
 /**

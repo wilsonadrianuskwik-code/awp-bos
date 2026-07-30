@@ -51,7 +51,7 @@ export function ProformaInvoiceTable({
       header: "Total",
       cell: ({ row }) => (
         <span className="tabular-nums">
-          {formatCurrency(row.original.total, row.original.currency)}
+          {formatCurrency(row.original.total)}
         </span>
       ),
     },

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getApAgingAction } from "@/features/reports/actions";
-import { formatCurrency } from "@/lib/utils/format-currency";
+import { formatCurrency, CURRENCY } from "@/lib/utils/format-currency";
 import type { ApAgingBucket } from "@/features/reports/types";
 
 const BUCKET_LABEL: Record<string, string> = {
@@ -12,7 +12,7 @@ const BUCKET_LABEL: Record<string, string> = {
   "61+": "61+ days",
 };
 
-export function ApAgingCard({ workspaceId, currency }: { workspaceId: string; currency: string }) {
+export function ApAgingCard({ workspaceId }: { workspaceId: string }) {
   const [buckets, setBuckets] = useState<ApAgingBucket[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +22,7 @@ export function ApAgingCard({ workspaceId, currency }: { workspaceId: string; cu
     setIsLoading(true);
     setError(null);
 
-    getApAgingAction(workspaceId, { currency }).then((result) => {
+    getApAgingAction(workspaceId, { currency: CURRENCY }).then((result) => {
       if (cancelled) return;
       if (result.error) {
         setError(result.error);
@@ -36,7 +36,7 @@ export function ApAgingCard({ workspaceId, currency }: { workspaceId: string; cu
     return () => {
       cancelled = true;
     };
-  }, [workspaceId, currency]);
+  }, [workspaceId]);
 
   const maxAmount = Math.max(0, ...buckets.map((b) => b.outstandingAmount));
   const totalOutstanding = buckets.reduce((sum, b) => sum + b.outstandingAmount, 0);
@@ -53,7 +53,7 @@ export function ApAgingCard({ workspaceId, currency }: { workspaceId: string; cu
         <p className="py-8 text-center text-sm text-destructive">{error}</p>
       ) : totalOutstanding === 0 ? (
         <p className="py-8 text-center text-sm text-muted-foreground">
-          No outstanding purchase order balances in {currency}.
+          No outstanding purchase order balances in rupiah.
         </p>
       ) : (
         <div className="space-y-3">
@@ -71,7 +71,7 @@ export function ApAgingCard({ workspaceId, currency }: { workspaceId: string; cu
                   <div className="h-full rounded-full bg-amber-500" style={{ width: `${widthPercent}%` }} />
                 </div>
                 <p className="mt-1 text-sm font-semibold tabular-nums">
-                  {formatCurrency(bucket.outstandingAmount, currency)}
+                  {formatCurrency(bucket.outstandingAmount)}
                 </p>
               </div>
             );
