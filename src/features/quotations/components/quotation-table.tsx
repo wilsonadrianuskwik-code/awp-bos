@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, OnChangeFn, SortingState } from "@tanstack/react-table";
 import { DataTable } from "@/components/shared/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useWorkspace } from "@/providers/workspace-provider";
@@ -23,12 +23,16 @@ type QuotationTableProps = {
   quotations: QuotationWithClient[];
   selectedIds: Set<string>;
   onSelectedIdsChange: (ids: Set<string>) => void;
+  sorting?: SortingState;
+  onSortingChange?: OnChangeFn<SortingState>;
 };
 
 export function QuotationTable({
   quotations,
   selectedIds,
   onSelectedIdsChange,
+  sorting,
+  onSortingChange,
 }: QuotationTableProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
@@ -160,6 +164,8 @@ export function QuotationTable({
         onSelectedIdsChange,
         getId: (quotation) => quotation.id,
       }}
+      sorting={sorting}
+      onSortingChange={onSortingChange}
     />
   );
 }

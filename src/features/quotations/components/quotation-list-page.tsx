@@ -17,6 +17,7 @@ import {
 import { StatusTabs } from "@/components/shared/status-tabs";
 import { ViewToggle, type ListView } from "@/components/shared/view-toggle";
 import { QuotationTable } from "@/features/quotations/components/quotation-table";
+import { makeSortingHandler, sortParamToState } from "@/lib/utils/table-sort";
 import { QuotationKanbanBoard } from "@/features/quotations/components/quotation-kanban-board";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -102,6 +103,12 @@ export function QuotationListPage({ quotations, count }: QuotationListPageProps)
     },
     [router, pathname, searchParams]
   );
+
+  // Drives the table's clickable column headers off the same `sort` param
+  // as the dropdown, rather than letting DataTable's own client-side sort
+  // quietly reorder only the current page.
+  const sorting = sortParamToState(sort);
+  const onSortingChange = makeSortingHandler(sort, setParams);
 
   useEffect(() => {
     if (search === urlSearch) return;
@@ -262,6 +269,8 @@ export function QuotationListPage({ quotations, count }: QuotationListPageProps)
           quotations={optimisticQuotations}
           selectedIds={selectedIds}
           onSelectedIdsChange={setSelectedIds}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
         />
       ) : (
         <QuotationKanbanBoard

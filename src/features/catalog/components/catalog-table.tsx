@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, OnChangeFn, SortingState } from "@tanstack/react-table";
 import { DataTable } from "@/components/shared/data-table";
 import { Badge } from "@/components/ui/badge";
 import { useWorkspace } from "@/providers/workspace-provider";
@@ -34,12 +34,16 @@ type CatalogTableProps = {
   items: CatalogItem[];
   selectedIds: Set<string>;
   onSelectedIdsChange: (ids: Set<string>) => void;
+  sorting?: SortingState;
+  onSortingChange?: OnChangeFn<SortingState>;
 };
 
 export function CatalogTable({
   items,
   selectedIds,
   onSelectedIdsChange,
+  sorting,
+  onSortingChange,
 }: CatalogTableProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
@@ -48,6 +52,8 @@ export function CatalogTable({
     {
       id: "name",
       header: "Name",
+      accessorFn: (row) => row.name,
+      enableSorting: true,
       cell: ({ row }) => (
         <div className="min-w-0">
           <div className="flex items-center gap-1.5 truncate text-[13px] font-medium">
@@ -146,6 +152,8 @@ export function CatalogTable({
         onSelectedIdsChange,
         getId: (item) => item.id,
       }}
+      sorting={sorting}
+      onSortingChange={onSortingChange}
     />
   );
 }

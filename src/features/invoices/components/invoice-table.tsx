@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, OnChangeFn, SortingState } from "@tanstack/react-table";
 import { DataTable } from "@/components/shared/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useWorkspace } from "@/providers/workspace-provider";
@@ -24,9 +24,20 @@ type InvoiceTableProps = {
   invoices: InvoiceWithClient[];
   selectedIds: Set<string>;
   onSelectedIdsChange: (ids: Set<string>) => void;
+  // Both optional and only meaningful together — see DataTable's own
+  // sorting/onSortingChange doc. Omitted by any future caller that isn't
+  // backed by a paginated, server-sorted query.
+  sorting?: SortingState;
+  onSortingChange?: OnChangeFn<SortingState>;
 };
 
-export function InvoiceTable({ invoices, selectedIds, onSelectedIdsChange }: InvoiceTableProps) {
+export function InvoiceTable({
+  invoices,
+  selectedIds,
+  onSelectedIdsChange,
+  sorting,
+  onSortingChange,
+}: InvoiceTableProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
 
@@ -148,6 +159,8 @@ export function InvoiceTable({ invoices, selectedIds, onSelectedIdsChange }: Inv
         onSelectedIdsChange,
         getId: (invoice) => invoice.id,
       }}
+      sorting={sorting}
+      onSortingChange={onSortingChange}
     />
   );
 }

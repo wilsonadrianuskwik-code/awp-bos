@@ -15,6 +15,7 @@ import {
 import { StatusTabs } from "@/components/shared/status-tabs";
 import { ViewToggle, type ListView } from "@/components/shared/view-toggle";
 import { PurchaseOrderTable } from "@/features/purchase-orders/components/purchase-order-table";
+import { makeSortingHandler, sortParamToState } from "@/lib/utils/table-sort";
 import { PurchaseOrderKanbanBoard } from "@/features/purchase-orders/components/purchase-order-kanban-board";
 import type { PurchaseOrderWithRelations } from "@/features/purchase-orders/types";
 
@@ -76,6 +77,12 @@ export function PurchaseOrderListPage({ purchaseOrders, count }: PurchaseOrderLi
     [router, pathname, searchParams]
   );
 
+  // Drives the table's clickable column headers off the same `sort` param
+  // as the dropdown, rather than letting DataTable's own client-side sort
+  // quietly reorder only the current page.
+  const sorting = sortParamToState(sort);
+  const onSortingChange = makeSortingHandler(sort, setParams);
+
   useEffect(() => {
     if (search === urlSearch) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -127,6 +134,8 @@ export function PurchaseOrderListPage({ purchaseOrders, count }: PurchaseOrderLi
           purchaseOrders={purchaseOrders}
           selectedIds={selectedIds}
           onSelectedIdsChange={setSelectedIds}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
         />
       ) : (
         <PurchaseOrderKanbanBoard

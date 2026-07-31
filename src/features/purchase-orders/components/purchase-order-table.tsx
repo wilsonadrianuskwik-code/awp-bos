@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, OnChangeFn, SortingState } from "@tanstack/react-table";
 import { DataTable } from "@/components/shared/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useWorkspace } from "@/providers/workspace-provider";
@@ -22,12 +22,16 @@ type PurchaseOrderTableProps = {
   purchaseOrders: PurchaseOrderWithRelations[];
   selectedIds: Set<string>;
   onSelectedIdsChange: (ids: Set<string>) => void;
+  sorting?: SortingState;
+  onSortingChange?: OnChangeFn<SortingState>;
 };
 
 export function PurchaseOrderTable({
   purchaseOrders,
   selectedIds,
   onSelectedIdsChange,
+  sorting,
+  onSortingChange,
 }: PurchaseOrderTableProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
@@ -125,6 +129,8 @@ export function PurchaseOrderTable({
         onSelectedIdsChange,
         getId: (po) => po.id,
       }}
+      sorting={sorting}
+      onSortingChange={onSortingChange}
     />
   );
 }

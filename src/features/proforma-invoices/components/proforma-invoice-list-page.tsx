@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { StatusTabs } from "@/components/shared/status-tabs";
 import { ProformaInvoiceTable } from "@/features/proforma-invoices/components/proforma-invoice-table";
+import { makeSortingHandler, sortParamToState } from "@/lib/utils/table-sort";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { useConfirm } from "@/providers/confirm-provider";
@@ -90,6 +91,12 @@ export function ProformaInvoiceListPage({
     },
     [router, pathname, searchParams]
   );
+
+  // Drives the table's clickable column headers off the same `sort` param
+  // as the dropdown, rather than letting DataTable's own client-side sort
+  // quietly reorder only the current page.
+  const sorting = sortParamToState(sort);
+  const onSortingChange = makeSortingHandler(sort, setParams);
 
   useEffect(() => {
     if (search === urlSearch) return;
@@ -184,6 +191,8 @@ export function ProformaInvoiceListPage({
           proformaInvoices={optimisticList}
           selectedIds={selectedIds}
           onSelectedIdsChange={setSelectedIds}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
         />
       )}
 

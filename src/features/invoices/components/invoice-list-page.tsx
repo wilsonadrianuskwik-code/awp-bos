@@ -17,6 +17,7 @@ import {
 import { StatusTabs } from "@/components/shared/status-tabs";
 import { ViewToggle, type ListView } from "@/components/shared/view-toggle";
 import { InvoiceTable } from "@/features/invoices/components/invoice-table";
+import { makeSortingHandler, sortParamToState } from "@/lib/utils/table-sort";
 import { InvoiceKanbanBoard } from "@/features/invoices/components/invoice-kanban-board";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -115,6 +116,12 @@ export function InvoiceListPage({ invoices, count }: InvoiceListPageProps) {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, [search, urlSearch, setParams]);
+
+  // Drives the table's clickable column headers off the same `sort` param
+  // as the dropdown above, rather than letting DataTable's own client-side
+  // sort quietly reorder only the current page.
+  const sorting = sortParamToState(sort);
+  const onSortingChange = makeSortingHandler(sort, setParams);
 
   const totalPages = Math.max(1, Math.ceil(count / PAGE_SIZE));
   const selected = optimisticInvoices.filter((i) => selectedIds.has(i.id));
@@ -262,6 +269,8 @@ export function InvoiceListPage({ invoices, count }: InvoiceListPageProps) {
           invoices={optimisticInvoices}
           selectedIds={selectedIds}
           onSelectedIdsChange={setSelectedIds}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
         />
       ) : (
         <InvoiceKanbanBoard

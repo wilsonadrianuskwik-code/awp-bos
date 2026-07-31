@@ -17,6 +17,7 @@ import {
 import { StatusTabs } from "@/components/shared/status-tabs";
 import { ViewToggle } from "@/components/shared/view-toggle";
 import { CatalogTable } from "@/features/catalog/components/catalog-table";
+import { makeSortingHandler, sortParamToState } from "@/lib/utils/table-sort";
 import { CatalogGrid } from "@/features/catalog/components/catalog-grid";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -114,6 +115,12 @@ export function CatalogListPage({ items, count }: CatalogListPageProps) {
     },
     [router, pathname, searchParams]
   );
+
+  // Drives the table's clickable column headers off the same `sort` param
+  // as the dropdown, rather than letting DataTable's own client-side sort
+  // quietly reorder only the current page.
+  const sorting = sortParamToState(sort);
+  const onSortingChange = makeSortingHandler(sort, setParams);
 
   useEffect(() => {
     if (search === urlSearch) return;
@@ -290,6 +297,8 @@ export function CatalogListPage({ items, count }: CatalogListPageProps) {
           items={optimisticItems}
           selectedIds={selectedIds}
           onSelectedIdsChange={setSelectedIds}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
         />
       ) : (
         <CatalogGrid

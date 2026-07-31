@@ -6,6 +6,7 @@ import {
   getSortedRowModel,
   useReactTable,
   type ColumnDef,
+  type OnChangeFn,
   type SortingState,
 } from "@tanstack/react-table";
 import { useRef, useState, type KeyboardEvent } from "react";
@@ -41,6 +42,20 @@ type DataTableProps<TData> = {
    * and renders exactly as before.
    */
   getRowStatus?: (row: TData) => string | null | undefined;
+  /**
+   * Server-driven sort, for a table backed by a paginated, server-sorted
+   * query. Pass both together and DataTable stops sorting rows itself —
+   * its own getSortedRowModel only ever sees whatever page was fetched,
+   * so left uncontrolled it can only reorder the rows already on screen,
+   * not the underlying dataset a click on a header implies. Instead it
+   * reports the click upward via onSortingChange so the caller can turn
+   * it into a query param and refetch the real order from the server.
+   * Omit both for a table that loads its entire dataset at once (no
+   * pagination) — there every row is already on screen, so client-side
+   * sorting is correct on its own and this is unnecessary.
+   */
+  sorting?: SortingState;
+  onSortingChange?: OnChangeFn<SortingState>;
 };
 
 // List-view table. Density and hierarchy follow the system's table spec:
@@ -53,8 +68,12 @@ export function DataTable<TData>({
   onRowClick,
   selection,
   getRowStatus,
+  sorting: controlledSorting,
+  onSortingChange,
 }: DataTableProps<TData>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [localSorting, setLocalSorting] = useState<SortingState>([]);
+  const isControlled = controlledSorting !== undefined;
+  const sorting = isControlled ? controlledSorting : localSorting;
   // Recorded from the checkbox cell's capture-phase click, since Radix
   // Checkbox's onCheckedChange doesn't hand back the native event — capture
   // fires before the checkbox's own click handling, so this is always set
@@ -66,7 +85,12 @@ export function DataTable<TData>({
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
+    onSortingChange: isControlled ? onSortingChange : setLocalSorting,
+    // Tells the table the data it was handed is already in the right
+    // order (the server's), so it should render sorting affordances from
+    // `sorting` without re-deriving order from getSortedRowModel — the
+    // other half of not sorting only the current page in place.
+    manualSorting: isControlled,
     state: { sorting },
   });
 
