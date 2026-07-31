@@ -43,12 +43,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/02062026-204', 404325000, 'IDR',
         'bank_transfer', '2026-06-02',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-06-02'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -62,12 +62,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/02072026-208', 789000, 'IDR',
         'bank_transfer', '2026-07-02',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-07-02'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -81,12 +81,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/03072026-209', 13805000, 'IDR',
         'bank_transfer', '2026-07-03',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-07-03'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -100,12 +100,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/06072026-210', 980000, 'IDR',
         'bank_transfer', '2026-07-06',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-07-06'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -119,12 +119,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/06072026-211', 2120000, 'IDR',
         'bank_transfer', '2026-07-06',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-07-06'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -138,12 +138,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/06072026-212', 39040000, 'IDR',
         'bank_transfer', '2026-07-06',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-07-06'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -157,12 +157,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/08072026-213', 2920000, 'IDR',
         'bank_transfer', '2026-07-08',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-07-08'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -176,12 +176,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/11072026-214', 1516250, 'IDR',
         'bank_transfer', '2026-07-11',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-07-11'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -195,12 +195,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/14072026-215', 11540000, 'IDR',
         'bank_transfer', '2026-07-14',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-07-14'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -214,12 +214,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/16072026-216', 120000, 'IDR',
         'bank_transfer', '2026-07-16',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-07-16'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -233,12 +233,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/17062026-205-Rev1', 3075000, 'IDR',
         'bank_transfer', '2026-06-17',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-06-17'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -252,12 +252,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/19052026-201', 407605000, 'IDR',
         'bank_transfer', '2026-05-19',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-05-19'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -271,12 +271,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/19062026-206', 3600000, 'IDR',
         'bank_transfer', '2026-06-19',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-06-19'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -290,12 +290,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/20072026-217', 152900000, 'IDR',
         'bank_transfer', '2026-07-20',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-07-20'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -309,12 +309,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/21072026-218', 2160000, 'IDR',
         'bank_transfer', '2026-07-21',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-07-21'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -328,12 +328,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/24062026-207', 520000, 'IDR',
         'bank_transfer', '2026-06-24',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-06-24'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -347,12 +347,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/24072026-219', 4112680, 'IDR',
         'bank_transfer', '2026-07-24',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-07-24'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -366,12 +366,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/29052026-202', 2880000, 'IDR',
         'bank_transfer', '2026-05-29',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-05-29'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -385,12 +385,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/29072026-220', 7681520, 'IDR',
         'bank_transfer', '2026-07-29',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-07-29'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -404,12 +404,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/29072026-221', 110830000, 'IDR',
         'bank_transfer', '2026-07-29',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-07-29'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -423,12 +423,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/30052026-203', 14433000, 'IDR',
         'bank_transfer', '2026-05-30',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-05-30'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -442,12 +442,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/30062026-206', 15620000, 'IDR',
         'bank_transfer', '2026-06-30',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-06-30'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
@@ -461,12 +461,12 @@ BEGIN
       INSERT INTO public.payments (
         workspace_id, invoice_id, payment_number, amount, currency,
         payment_method, payment_date, notes, recorded_by
-      ) VALUES (
+      , created_at) VALUES (
         v_workspace_id, v_invoice_id, 'HIST-PI-AWP-P/30062026-207', 69500000, 'IDR',
         'bank_transfer', '2026-06-30',
         'Backfilled from historical import (00095) -- payment date assumed = issue date.',
         v_actor_id
-      );
+      , ('2026-06-30'::timestamp AT TIME ZONE 'Asia/Jakarta'));
     END IF;
   END;
 
