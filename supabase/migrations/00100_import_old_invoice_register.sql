@@ -266,29 +266,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2021/001', 'paid', 'IDR',
       '2021-08-16', 'LAMPU', 14615000.00, 0, 1, 1,
       10.000, NULL, NULL, 14615000.00, 1461500.00,
       0.00, 0.00, 1461500.00, 16076500.00, 16076500.00, '2021-10-09'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":2,"no_seri_fpn":"010.007-21.29048871","stated":{"dpp":14615000.0,"ppn":1461500.0,"total":16076500.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":2,"no_seri_fpn":"010.007-21.29048871","stated":{"dpp":14615000.0,"ppn":1461500.0,"total":16076500.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2021-08-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'LAMPU', 1, 14615000.00
+      'LAMPU', 1, 14615000.00, ('2021-08-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2021-001-1', 16076500.00, 'IDR',
-      'bank_transfer', '2021-10-09', 'Imported from historical register (row 2)', v_actor_id
+      'bank_transfer', '2021-10-09', 'Imported from historical register (row 2)', v_actor_id, ('2021-10-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -302,29 +302,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2021/002', 'paid', 'IDR',
       '2021-08-16', 'BATH TUB', 90870000.00, 0, 1, 1,
       10.000, 2.000, NULL, 90870000.00, 9087000.00,
       1817400.00, 0.00, 9087000.00, 98139600.00, 98139600.00, '2021-09-09'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":3,"no_seri_fpn":"010.007-21.29048872","stated":{"dpp":90870000.0,"ppn":9087000.0,"pph":1817400.0,"total":98139600.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":3,"no_seri_fpn":"010.007-21.29048872","stated":{"dpp":90870000.0,"ppn":9087000.0,"pph":1817400.0,"total":98139600.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2021-08-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'BATH TUB', 1, 90870000.00
+      'BATH TUB', 1, 90870000.00, ('2021-08-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2021-002-1', 98139600.00, 'IDR',
-      'bank_transfer', '2021-09-09', 'Imported from historical register (row 3)', v_actor_id
+      'bank_transfer', '2021-09-09', 'Imported from historical register (row 3)', v_actor_id, ('2021-09-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -338,29 +338,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2021/003', 'paid', 'IDR',
       '2021-08-20', 'MARKA 50%', 57422995.45, 0, 1, 1,
       10.000, NULL, NULL, 57422995.45, 5742299.55,
       0.00, 0.00, 5742299.55, 63165295.00, 63165295.00, '2021-10-09'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":4,"no_seri_fpn":"010.007-21.29048873","stated":{"dpp":57422995.0,"ppn":5742300.0,"total":63165295.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":4,"no_seri_fpn":"010.007-21.29048873","stated":{"dpp":57422995.0,"ppn":5742300.0,"total":63165295.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2021-08-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'MARKA 50%', 1, 57422995.45
+      'MARKA 50%', 1, 57422995.45, ('2021-08-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2021-003-1', 63165295.00, 'IDR',
-      'bank_transfer', '2021-10-09', 'Imported from historical register (row 4)', v_actor_id
+      'bank_transfer', '2021-10-09', 'Imported from historical register (row 4)', v_actor_id, ('2021-10-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -374,29 +374,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2021/004', 'paid', 'IDR',
       '2021-08-26', 'PVC', 11344000.00, 0, 1, 1,
       10.000, NULL, NULL, 11344000.00, 1134400.00,
       0.00, 0.00, 1134400.00, 12478400.00, 12478400.00, '2021-10-15'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":5,"no_seri_fpn":"010.007-21.29048874","stated":{"dpp":11344000.0,"ppn":1134400.0,"total":12478400.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":5,"no_seri_fpn":"010.007-21.29048874","stated":{"dpp":11344000.0,"ppn":1134400.0,"total":12478400.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2021-08-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PVC', 1, 11344000.00
+      'PVC', 1, 11344000.00, ('2021-08-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2021-004-1', 12478400.00, 'IDR',
-      'bank_transfer', '2021-10-15', 'Imported from historical register (row 5)', v_actor_id
+      'bank_transfer', '2021-10-15', 'Imported from historical register (row 5)', v_actor_id, ('2021-10-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -410,29 +410,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2021/005', 'paid', 'IDR',
       '2021-09-03', 'FLOOR DRAIN', 4140000.00, 0, 1, 1,
       10.000, NULL, NULL, 4140000.00, 414000.00,
       0.00, 0.00, 414000.00, 4554000.00, 4554000.00, '2021-09-24'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":6,"no_seri_fpn":"010.007-21.29048875","stated":{"dpp":4140000.0,"ppn":414000.0,"total":4554000.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":6,"no_seri_fpn":"010.007-21.29048875","stated":{"dpp":4140000.0,"ppn":414000.0,"total":4554000.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2021-09-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'FLOOR DRAIN', 1, 4140000.00
+      'FLOOR DRAIN', 1, 4140000.00, ('2021-09-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2021-005-1', 4554000.00, 'IDR',
-      'bank_transfer', '2021-09-24', 'Imported from historical register (row 6)', v_actor_id
+      'bank_transfer', '2021-09-24', 'Imported from historical register (row 6)', v_actor_id, ('2021-09-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -446,29 +446,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2021/006', 'paid', 'IDR',
       '2021-09-13', 'BATH TUB 7', 15925000.00, 0, 1, 1,
       10.000, NULL, NULL, 15925000.00, 1592500.00,
       0.00, 0.00, 1592500.00, 17517500.00, 17517500.00, '2021-09-24'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":7,"no_seri_fpn":"010.007-21.29048876","biaya_adm":"400RB DENDA MASK","stated":{"dpp":15925000.0,"ppn":1592500.0,"total":17517500.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":7,"no_seri_fpn":"010.007-21.29048876","biaya_adm":"400RB DENDA MASK","stated":{"dpp":15925000.0,"ppn":1592500.0,"total":17517500.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2021-09-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'BATH TUB 7', 1, 15925000.00
+      'BATH TUB 7', 1, 15925000.00, ('2021-09-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2021-006-1', 17517500.00, 'IDR',
-      'bank_transfer', '2021-09-24', 'Imported from historical register (row 7)', v_actor_id
+      'bank_transfer', '2021-09-24', 'Imported from historical register (row 7)', v_actor_id, ('2021-09-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -482,29 +482,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2021/007', 'paid', 'IDR',
       '2021-09-14', 'LABOUR BATH TUB 7', 1386368.93, 0, 1, 1,
       10.000, 2.525, NULL, 1386368.93, 138636.89,
       35005.82, 0.00, 138636.89, 1490000.00, 1490000.00, '2022-06-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":8,"no_seri_fpn":"010.007-21.29048877","stated":{"dpp":1750000.0,"ppn":175000.0,"pph":35000.0,"total":1490000.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL","base adjusted 1386363.64 -> 1386368.92 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":8,"no_seri_fpn":"010.007-21.29048877","stated":{"dpp":1750000.0,"ppn":175000.0,"pph":35000.0,"total":1490000.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL","base adjusted 1386363.64 -> 1386368.92 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2021-09-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'LABOUR BATH TUB 7', 1, 1386368.93
+      'LABOUR BATH TUB 7', 1, 1386368.93, ('2021-09-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2021-007-1', 1490000.00, 'IDR',
-      'bank_transfer', '2022-06-10', 'Imported from historical register (row 8)', v_actor_id
+      'bank_transfer', '2022-06-10', 'Imported from historical register (row 8)', v_actor_id, ('2022-06-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -518,29 +518,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2021/008', 'paid', 'IDR',
       '2021-09-27', 'WATERPROFING RUKAN', 70657500.00, 0, 1, 1,
       10.000, 2.000, NULL, 70657500.00, 7065750.00,
       1413150.00, 0.00, 7065750.00, 76310100.00, 76310100.00, '2021-10-15'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":9,"no_seri_fpn":"010.007-21.29048878","stated":{"dpp":70657500.0,"ppn":7065750.0,"pph":1413150.0,"total":76310100.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":9,"no_seri_fpn":"010.007-21.29048878","stated":{"dpp":70657500.0,"ppn":7065750.0,"pph":1413150.0,"total":76310100.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2021-09-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'WATERPROFING RUKAN', 1, 70657500.00
+      'WATERPROFING RUKAN', 1, 70657500.00, ('2021-09-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2021-008-1', 76310100.00, 'IDR',
-      'bank_transfer', '2021-10-15', 'Imported from historical register (row 9)', v_actor_id
+      'bank_transfer', '2021-10-15', 'Imported from historical register (row 9)', v_actor_id, ('2021-10-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -554,29 +554,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2021/009', 'paid', 'IDR',
       '2021-10-06', 'MARKA 49%', 91329159.26, 0, 1, 1,
       10.000, 2.000, NULL, 91329159.26, 9132915.93,
       1826583.19, 0.00, 9132915.93, 98635492.00, 98635492.00, '2021-11-09'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":10,"no_seri_fpn":"010.007-21.29048879","stated":{"dpp":91329159.0,"ppn":9132916.0,"pph":1826583.0,"total":98635492.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":10,"no_seri_fpn":"010.007-21.29048879","stated":{"dpp":91329159.0,"ppn":9132916.0,"pph":1826583.0,"total":98635492.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2021-10-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'MARKA 49%', 1, 91329159.26
+      'MARKA 49%', 1, 91329159.26, ('2021-10-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2021-009-1', 98635492.00, 'IDR',
-      'bank_transfer', '2021-11-09', 'Imported from historical register (row 10)', v_actor_id
+      'bank_transfer', '2021-11-09', 'Imported from historical register (row 10)', v_actor_id, ('2021-11-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -590,29 +590,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2021/010', 'paid', 'IDR',
       '2021-10-06', 'VIEWING DECK RGE', 7892987.04, 0, 1, 1,
       10.000, 2.000, NULL, 7892987.04, 789298.70,
       157859.74, 0.00, 789298.70, 8524426.00, 8524426.00, '2021-11-05'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":11,"no_seri_fpn":"010.007-21.29048880","stated":{"dpp":7892987.0,"ppn":789299.0,"pph":157859.0,"total":8524426.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":11,"no_seri_fpn":"010.007-21.29048880","stated":{"dpp":7892987.0,"ppn":789299.0,"pph":157859.0,"total":8524426.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2021-10-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'VIEWING DECK RGE', 1, 7892987.04
+      'VIEWING DECK RGE', 1, 7892987.04, ('2021-10-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2021-010-1', 8524426.00, 'IDR',
-      'bank_transfer', '2021-11-05', 'Imported from historical register (row 11)', v_actor_id
+      'bank_transfer', '2021-11-05', 'Imported from historical register (row 11)', v_actor_id, ('2021-11-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -626,29 +626,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2021/011', 'paid', 'IDR',
       '2021-10-12', '6BOX LED', 10800000.00, 0, 1, 1,
       10.000, NULL, NULL, 10800000.00, 1080000.00,
       0.00, 0.00, 1080000.00, 11880000.00, 11880000.00, '2021-11-04'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":12,"no_seri_fpn":"010.007-21.29048881","stated":{"dpp":10800000.0,"ppn":1080000.0,"total":11880000.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":12,"no_seri_fpn":"010.007-21.29048881","stated":{"dpp":10800000.0,"ppn":1080000.0,"total":11880000.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2021-10-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '6BOX LED', 1, 10800000.00
+      '6BOX LED', 1, 10800000.00, ('2021-10-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2021-011-1', 11880000.00, 'IDR',
-      'bank_transfer', '2021-11-04', 'Imported from historical register (row 12)', v_actor_id
+      'bank_transfer', '2021-11-04', 'Imported from historical register (row 12)', v_actor_id, ('2021-11-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -662,29 +662,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2021/012', 'paid', 'IDR',
       '2021-10-11', '30% DP CAT', 80458445.45, 0, 1, 1,
       10.000, NULL, NULL, 80458445.45, 8045844.55,
       0.00, 0.00, 8045844.55, 88504290.00, 88504290.00, '2021-12-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":13,"stated":{"dpp":80458445.0,"ppn":8045844.0,"total":88504290.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":13,"stated":{"dpp":80458445.0,"ppn":8045844.0,"total":88504290.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2021-10-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '30% DP CAT', 1, 80458445.45
+      '30% DP CAT', 1, 80458445.45, ('2021-10-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2021-012-1', 88504290.00, 'IDR',
-      'bank_transfer', '2021-12-10', 'Imported from historical register (row 13)', v_actor_id
+      'bank_transfer', '2021-12-10', 'Imported from historical register (row 13)', v_actor_id, ('2021-12-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -698,29 +698,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2021/013', 'paid', 'IDR',
       '2021-10-22', 'CAT NIPPON', 187736372.73, 0, 1, 1,
       10.000, NULL, NULL, 187736372.73, 18773637.27,
       0.00, 0.00, 18773637.27, 206510010.00, 206510010.00, '2021-11-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":14,"no_seri_fpn":"010.007-21.29048882","stated":{"dpp":187736372.0,"ppn":18773637.0,"total":206510010.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":14,"no_seri_fpn":"010.007-21.29048882","stated":{"dpp":187736372.0,"ppn":18773637.0,"total":206510010.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2021-10-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'CAT NIPPON', 1, 187736372.73
+      'CAT NIPPON', 1, 187736372.73, ('2021-10-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2021-013-1', 206510010.00, 'IDR',
-      'bank_transfer', '2021-11-30', 'Imported from historical register (row 14)', v_actor_id
+      'bank_transfer', '2021-11-30', 'Imported from historical register (row 14)', v_actor_id, ('2021-11-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -734,29 +734,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2021/014', 'paid', 'IDR',
       '2021-12-13', 'PROGRESS 1 NEW ALI', 453158051.45, 0, 1, 1,
       10.000, 2.000, 5.000, 453158051.45, 45315805.15,
       9063161.03, 22657902.57, 45315805.15, 466752793.00, 466752793.00, '2021-12-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":15,"no_seri_fpn":"010.007-21.29048883","stated":{"dpp":453158051.0,"ppn":45315805.0,"pph":9063161.0,"retensi":22657903.0,"total":466752793.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":15,"no_seri_fpn":"010.007-21.29048883","stated":{"dpp":453158051.0,"ppn":45315805.0,"pph":9063161.0,"retensi":22657903.0,"total":466752793.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2021-12-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 1 NEW ALI', 1, 453158051.45
+      'PROGRESS 1 NEW ALI', 1, 453158051.45, ('2021-12-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2021-014-1', 466752793.00, 'IDR',
-      'bank_transfer', '2021-12-30', 'Imported from historical register (row 15)', v_actor_id
+      'bank_transfer', '2021-12-30', 'Imported from historical register (row 15)', v_actor_id, ('2021-12-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -770,29 +770,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/001', 'paid', 'IDR',
       '2022-01-03', 'DPCOATING BATU ALM+KAYU ULIN', 23698110.00, 0, 1, 1,
       10.000, NULL, NULL, 23698110.00, 2369811.00,
       0.00, 0.00, 2369811.00, 26067921.00, 26067921.00, '2022-11-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":16,"no_seri_fpn":"010.002-22.33486541","stated":{"dpp":23698110.0,"ppn":2369811.0,"total":26067921.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":16,"no_seri_fpn":"010.002-22.33486541","stated":{"dpp":23698110.0,"ppn":2369811.0,"total":26067921.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-01-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'DPCOATING BATU ALM+KAYU ULIN', 1, 23698110.00
+      'DPCOATING BATU ALM+KAYU ULIN', 1, 23698110.00, ('2022-01-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-001-1', 26067921.00, 'IDR',
-      'bank_transfer', '2022-11-03', 'Imported from historical register (row 16)', v_actor_id
+      'bank_transfer', '2022-11-03', 'Imported from historical register (row 16)', v_actor_id, ('2022-11-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -806,29 +806,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/002', 'paid', 'IDR',
       '2022-01-21', 'COATING BATU ALM+KAYU ULIN', 48795443.29, 0, 1, 1,
       10.000, 2.971, NULL, 48795443.29, 4879544.33,
       1449712.62, 0.00, 4879544.33, 52225275.00, 52225275.00, '2022-11-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":17,"no_seri_fpn":"010.002-22.33486542","stated":{"dpp":48795590.0,"ppn":4879559.0,"pph":1449874.0,"total":52225275.0},"import_notes":["base adjusted 48795590.00 -> 48795443.29 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":17,"no_seri_fpn":"010.002-22.33486542","stated":{"dpp":48795590.0,"ppn":4879559.0,"pph":1449874.0,"total":52225275.0},"import_notes":["base adjusted 48795590.00 -> 48795443.29 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-01-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'COATING BATU ALM+KAYU ULIN', 1, 48795443.29
+      'COATING BATU ALM+KAYU ULIN', 1, 48795443.29, ('2022-01-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-002-1', 52225275.00, 'IDR',
-      'bank_transfer', '2022-11-03', 'Imported from historical register (row 17)', v_actor_id
+      'bank_transfer', '2022-11-03', 'Imported from historical register (row 17)', v_actor_id, ('2022-11-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -842,29 +842,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/003', 'paid', 'IDR',
       '2022-01-19', 'MOWILEX', 1240000.00, 0, 1, 1,
       10.000, NULL, NULL, 1240000.00, 124000.00,
       0.00, 0.00, 124000.00, 1364000.00, 1364000.00, '2022-10-02'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":18,"no_seri_fpn":"010.002-22.33486543","stated":{"dpp":1240000.0,"ppn":124000.0,"total":1364000.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":18,"no_seri_fpn":"010.002-22.33486543","stated":{"dpp":1240000.0,"ppn":124000.0,"total":1364000.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-01-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'MOWILEX', 1, 1240000.00
+      'MOWILEX', 1, 1240000.00, ('2022-01-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-003-1', 1364000.00, 'IDR',
-      'bank_transfer', '2022-10-02', 'Imported from historical register (row 18)', v_actor_id
+      'bank_transfer', '2022-10-02', 'Imported from historical register (row 18)', v_actor_id, ('2022-10-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -878,29 +878,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/004', 'paid', 'IDR',
       '2022-01-22', 'PROGRESS 2 NEW ALI', 308785801.99, 0, 1, 1,
       10.000, 1.563, 5.000, 308785801.99, 30878580.20,
       4826322.09, 15439290.10, 30878580.20, 319398770.00, 319398770.00, '2022-11-02'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":19,"no_seri_fpn":"010.002-22.33486544","stated":{"dpp":308786089.0,"ppn":30878609.0,"pph":4826623.0,"retensi":15439304.0,"total":319398770.0},"import_notes":["base adjusted 308786089.00 -> 308785801.99 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":19,"no_seri_fpn":"010.002-22.33486544","stated":{"dpp":308786089.0,"ppn":30878609.0,"pph":4826623.0,"retensi":15439304.0,"total":319398770.0},"import_notes":["base adjusted 308786089.00 -> 308785801.99 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-01-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 2 NEW ALI', 1, 308785801.99
+      'PROGRESS 2 NEW ALI', 1, 308785801.99, ('2022-01-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-004-1', 319398770.00, 'IDR',
-      'bank_transfer', '2022-11-02', 'Imported from historical register (row 19)', v_actor_id
+      'bank_transfer', '2022-11-02', 'Imported from historical register (row 19)', v_actor_id, ('2022-11-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -914,29 +914,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/005', 'paid', 'IDR',
       '2022-02-18', '6BOX LED', 10800000.00, 0, 1, 1,
       10.000, NULL, NULL, 10800000.00, 1080000.00,
       0.00, 0.00, 1080000.00, 11880000.00, 11880000.00, '2022-10-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":20,"no_seri_fpn":"010.002-22.33486545","stated":{"dpp":10800000.0,"ppn":1080000.0,"total":11880000.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":20,"no_seri_fpn":"010.002-22.33486545","stated":{"dpp":10800000.0,"ppn":1080000.0,"total":11880000.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-02-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '6BOX LED', 1, 10800000.00
+      '6BOX LED', 1, 10800000.00, ('2022-02-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-005-1', 11880000.00, 'IDR',
-      'bank_transfer', '2022-10-03', 'Imported from historical register (row 20)', v_actor_id
+      'bank_transfer', '2022-10-03', 'Imported from historical register (row 20)', v_actor_id, ('2022-10-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -950,29 +950,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/006', 'paid', 'IDR',
       '2022-03-14', '2BOX LED', 3600000.00, 0, 1, 1,
       10.000, NULL, NULL, 3600000.00, 360000.00,
       0.00, 0.00, 360000.00, 3960000.00, 3960000.00, '2022-03-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":21,"no_seri_fpn":"010.002-22.33486546","stated":{"dpp":3600000.0,"ppn":360000.0,"total":3960000.0},"import_notes":["invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":21,"no_seri_fpn":"010.002-22.33486546","stated":{"dpp":3600000.0,"ppn":360000.0,"total":3960000.0},"import_notes":["invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id, ('2022-03-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '2BOX LED', 1, 3600000.00
+      '2BOX LED', 1, 3600000.00, ('2022-03-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-006-1', 3960000.00, 'IDR',
-      'bank_transfer', '2022-03-30', 'Imported from historical register (row 21)', v_actor_id
+      'bank_transfer', '2022-03-30', 'Imported from historical register (row 21)', v_actor_id, ('2022-03-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -986,29 +986,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/007', 'paid', 'IDR',
       '2022-03-16', '1P5400, 1PVGP RARE TALENT', 1439090.91, 0, 1, 1,
       10.000, NULL, NULL, 1439090.91, 143909.09,
       0.00, 0.00, 143909.09, 1583000.00, 1583000.00, '2022-12-05'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":22,"no_seri_fpn":"010.002-22.33486547","stated":{"dpp":1439091.0,"ppn":143909.0,"total":1583000.0},"import_notes":["invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":22,"no_seri_fpn":"010.002-22.33486547","stated":{"dpp":1439091.0,"ppn":143909.0,"total":1583000.0},"import_notes":["invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id, ('2022-03-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '1P5400, 1PVGP RARE TALENT', 1, 1439090.91
+      '1P5400, 1PVGP RARE TALENT', 1, 1439090.91, ('2022-03-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-007-1', 1583000.00, 'IDR',
-      'bank_transfer', '2022-12-05', 'Imported from historical register (row 22)', v_actor_id
+      'bank_transfer', '2022-12-05', 'Imported from historical register (row 22)', v_actor_id, ('2022-12-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1022,29 +1022,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/008', 'paid', 'IDR',
       '2022-03-17', '5 NIPPE280', 323000.00, 0, 1, 1,
       10.000, NULL, NULL, 323000.00, 32300.00,
       0.00, 0.00, 32300.00, 355300.00, 355300.00, '2022-10-05'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":23,"no_seri_fpn":"010.002-22.33486548","stated":{"dpp":323000.0,"ppn":32300.0,"total":355300.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":23,"no_seri_fpn":"010.002-22.33486548","stated":{"dpp":323000.0,"ppn":32300.0,"total":355300.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-03-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '5 NIPPE280', 1, 323000.00
+      '5 NIPPE280', 1, 323000.00, ('2022-03-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-008-1', 355300.00, 'IDR',
-      'bank_transfer', '2022-10-05', 'Imported from historical register (row 23)', v_actor_id
+      'bank_transfer', '2022-10-05', 'Imported from historical register (row 23)', v_actor_id, ('2022-10-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1058,29 +1058,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/009', 'paid', 'IDR',
       '2022-03-17', '3 PFP241 , 5 MX94', 16173500.00, 0, 1, 1,
       10.000, NULL, NULL, 16173500.00, 1617350.00,
       0.00, 0.00, 1617350.00, 17790850.00, 17790850.00, '2022-10-05'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":24,"no_seri_fpn":"011.002-22.33486549","stated":{"dpp":16173500.0,"ppn":1617350.0,"total":17790850.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":24,"no_seri_fpn":"011.002-22.33486549","stated":{"dpp":16173500.0,"ppn":1617350.0,"total":17790850.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-03-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '3 PFP241 , 5 MX94', 1, 16173500.00
+      '3 PFP241 , 5 MX94', 1, 16173500.00, ('2022-03-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-009-1', 17790850.00, 'IDR',
-      'bank_transfer', '2022-10-05', 'Imported from historical register (row 24)', v_actor_id
+      'bank_transfer', '2022-10-05', 'Imported from historical register (row 24)', v_actor_id, ('2022-10-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1094,29 +1094,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/010', 'paid', 'IDR',
       '2022-03-17', '5 PFP241 , 10 MX94', 30183000.00, 0, 1, 1,
       10.000, NULL, NULL, 30183000.00, 3018300.00,
       0.00, 0.00, 3018300.00, 33201300.00, 33201300.00, '2022-10-05'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":25,"no_seri_fpn":"011.002-22.33486550","stated":{"dpp":30183000.0,"ppn":3018300.0,"total":33201300.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":25,"no_seri_fpn":"011.002-22.33486550","stated":{"dpp":30183000.0,"ppn":3018300.0,"total":33201300.0},"import_notes":["invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-03-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '5 PFP241 , 10 MX94', 1, 30183000.00
+      '5 PFP241 , 10 MX94', 1, 30183000.00, ('2022-03-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-010-1', 33201300.00, 'IDR',
-      'bank_transfer', '2022-10-05', 'Imported from historical register (row 25)', v_actor_id
+      'bank_transfer', '2022-10-05', 'Imported from historical register (row 25)', v_actor_id, ('2022-10-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1130,29 +1130,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/011', 'paid', 'IDR',
       '2022-03-17', '3 PFP241 , 8 MX94, 3 NIPPE280', 22403900.00, 0, 1, 1,
       10.000, NULL, NULL, 22403900.00, 2240390.00,
       0.00, 0.00, 2240390.00, 24644290.00, 24644290.00, '2022-10-05'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":26,"no_seri_fpn":"011.002-22.33486551","biaya_adm":"Rp 2,000","stated":{"dpp":22403900.0,"ppn":2240390.0,"total":24644290.0},"import_notes":["invoice number not in source; placeholder assigned","source figure Rp 75,989,740 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":26,"no_seri_fpn":"011.002-22.33486551","biaya_adm":"Rp 2,000","stated":{"dpp":22403900.0,"ppn":2240390.0,"total":24644290.0},"import_notes":["invoice number not in source; placeholder assigned","source figure Rp 75,989,740 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id, ('2022-03-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '3 PFP241 , 8 MX94, 3 NIPPE280', 1, 22403900.00
+      '3 PFP241 , 8 MX94, 3 NIPPE280', 1, 22403900.00, ('2022-03-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-011-1', 24644290.00, 'IDR',
-      'bank_transfer', '2022-10-05', 'Imported from historical register (row 26)', v_actor_id
+      'bank_transfer', '2022-10-05', 'Imported from historical register (row 26)', v_actor_id, ('2022-10-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1166,29 +1166,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/012', 'partial', 'IDR',
       '2022-03-17', '3 PFP241, 5 MX94, 20NIPPE280', 17465500.00, 0, 1, 1,
       10.000, NULL, NULL, 17465500.00, 1746550.00,
       0.00, 0.00, 1746550.00, 19212050.00, 19210050.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":27,"no_seri_fpn":"011.002-22.33486552","biaya_adm":"Rp 2,000","stated":{"dpp":17465500.0,"ppn":1746550.0,"total":19212050.0},"import_notes":["invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":27,"no_seri_fpn":"011.002-22.33486552","biaya_adm":"Rp 2,000","stated":{"dpp":17465500.0,"ppn":1746550.0,"total":19212050.0},"import_notes":["invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id, ('2022-03-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '3 PFP241, 5 MX94, 20NIPPE280', 1, 17465500.00
+      '3 PFP241, 5 MX94, 20NIPPE280', 1, 17465500.00, ('2022-03-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-012-1', 19210050.00, 'IDR',
-      'bank_transfer', '2022-10-05', 'Imported from historical register (row 27)', v_actor_id
+      'bank_transfer', '2022-10-05', 'Imported from historical register (row 27)', v_actor_id, ('2022-10-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1202,29 +1202,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/013', 'paid', 'IDR',
       '2022-03-23', '100M2 COATING BATU ALAM', 6109074.75, 0, 1, 1,
       10.000, 1.964, NULL, 6109074.75, 610907.48,
       119982.23, 0.00, 610907.48, 6600000.00, 6600000.00, '2022-08-18'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":28,"no_seri_fpn":"010.002-22.33486553","stated":{"dpp":6000000.0,"ppn":600000.0,"pph":120000.0,"total":6600000.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL","base adjusted 6109090.91 -> 6109074.75 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":28,"no_seri_fpn":"010.002-22.33486553","stated":{"dpp":6000000.0,"ppn":600000.0,"pph":120000.0,"total":6600000.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL","base adjusted 6109090.91 -> 6109074.75 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","invoice number not in source; placeholder assigned","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-03-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '100M2 COATING BATU ALAM', 1, 6109074.75
+      '100M2 COATING BATU ALAM', 1, 6109074.75, ('2022-03-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-013-1', 6600000.00, 'IDR',
-      'bank_transfer', '2022-08-18', 'Imported from historical register (row 28)', v_actor_id
+      'bank_transfer', '2022-08-18', 'Imported from historical register (row 28)', v_actor_id, ('2022-08-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1238,29 +1238,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/014', 'partial', 'IDR',
       '2022-03-26', 'PROGRESS 3 NEW ALI', 158131360.57, 0, 1, 1,
       10.000, 0.595, 5.000, 158131360.57, 15813136.06,
       940881.60, 7906568.03, 15813136.06, 165097047.00, 150225077.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":29,"no_seri_fpn":"010.002-22.33486554","stated":{"dpp":158131660.0,"ppn":15813166.0,"pph":941196.0,"retensi":7906583.0,"total":165097047.0},"import_notes":["base adjusted 158131660.00 -> 158131360.57 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":29,"no_seri_fpn":"010.002-22.33486554","stated":{"dpp":158131660.0,"ppn":15813166.0,"pph":941196.0,"retensi":7906583.0,"total":165097047.0},"import_notes":["base adjusted 158131660.00 -> 158131360.57 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id, ('2022-03-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 3 NEW ALI', 1, 158131360.57
+      'PROGRESS 3 NEW ALI', 1, 158131360.57, ('2022-03-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-014-1', 150225077.00, 'IDR',
-      'bank_transfer', '2022-05-27', 'Imported from historical register (row 29)', v_actor_id
+      'bank_transfer', '2022-05-27', 'Imported from historical register (row 29)', v_actor_id, ('2022-05-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1274,29 +1274,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/015', 'partial', 'IDR',
       '2022-03-30', 'CAT PSAR BUAH NANGKA', 183984314.82, 0, 1, 1,
       10.000, 2.000, NULL, 183984314.82, 18398431.48,
       3679686.30, 0.00, 18398431.48, 198703060.00, 195029420.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":30,"no_seri_fpn":"010.002-22.33486555","biaya_adm":"Rp 2,900","stated":{"dpp":183987000.0,"ppn":18398700.0,"pph":3679740.0,"total":198703060.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL","base adjusted 183984363.64 -> 183984314.81 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":30,"no_seri_fpn":"010.002-22.33486555","biaya_adm":"Rp 2,900","stated":{"dpp":183987000.0,"ppn":18398700.0,"pph":3679740.0,"total":198703060.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL","base adjusted 183984363.64 -> 183984314.81 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id, ('2022-03-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'CAT PSAR BUAH NANGKA', 1, 183984314.82
+      'CAT PSAR BUAH NANGKA', 1, 183984314.82, ('2022-03-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-015-1', 195029420.00, 'IDR',
-      'bank_transfer', '2022-12-04', 'Imported from historical register (row 30)', v_actor_id
+      'bank_transfer', '2022-12-04', 'Imported from historical register (row 30)', v_actor_id, ('2022-12-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1310,29 +1310,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/016', 'partial', 'IDR',
       '2022-03-31', '10 NIPPE280', 646000.00, 0, 1, 1,
       10.000, NULL, NULL, 646000.00, 64600.00,
       0.00, 0.00, 64600.00, 710600.00, 708600.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":31,"no_seri_fpn":"010.002-22.33486556","biaya_adm":"Rp 2,000","stated":{"dpp":646000.0,"ppn":64600.0,"total":710600.0},"import_notes":["invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":31,"no_seri_fpn":"010.002-22.33486556","biaya_adm":"Rp 2,000","stated":{"dpp":646000.0,"ppn":64600.0,"total":710600.0},"import_notes":["invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id, ('2022-03-31'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10 NIPPE280', 1, 646000.00
+      '10 NIPPE280', 1, 646000.00, ('2022-03-31'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-016-1', 708600.00, 'IDR',
-      'bank_transfer', '2022-06-03', 'Imported from historical register (row 31)', v_actor_id
+      'bank_transfer', '2022-06-03', 'Imported from historical register (row 31)', v_actor_id, ('2022-06-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1346,29 +1346,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/017', 'paid', 'IDR',
       '2022-04-18', 'ADD WORK NEW ALI', 19135985.47, 0, 1, 1,
       11.000, 0.900, NULL, 19135985.47, 2104958.40,
       172223.87, 0.00, 2104958.40, 21068720.00, 21068720.00, '2022-05-13'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":32,"no_seri_fpn":"010.002-22.33486557","stated":{"dpp":19136000.0,"ppn":2104960.0,"pph":172240.0,"total":21068720.0},"unattributed_rows":[{"note":"register stated Rp 33,619,253 here; trimmed to the balance outstanding","amount":33619253.0,"date":"2022-05-13"}],"import_notes":["base adjusted 19136000.00 -> 19135985.47 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":32,"no_seri_fpn":"010.002-22.33486557","stated":{"dpp":19136000.0,"ppn":2104960.0,"pph":172240.0,"total":21068720.0},"unattributed_rows":[{"note":"register stated Rp 33,619,253 here; trimmed to the balance outstanding","amount":33619253.0,"date":"2022-05-13"}],"import_notes":["base adjusted 19136000.00 -> 19135985.47 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id, ('2022-04-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'ADD WORK NEW ALI', 1, 19135985.47
+      'ADD WORK NEW ALI', 1, 19135985.47, ('2022-04-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-017-1', 21068720.00, 'IDR',
-      'bank_transfer', '2022-05-13', 'Imported from historical register (row 32)', v_actor_id
+      'bank_transfer', '2022-05-13', 'Imported from historical register (row 32)', v_actor_id, ('2022-05-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1382,29 +1382,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/018', 'partial', 'IDR',
       '2022-05-09', '3P MX94 LEAF GREEN', 5808900.00, 0, 1, 1,
       11.000, NULL, NULL, 5808900.00, 638979.00,
       0.00, 0.00, 638979.00, 6447879.00, 6445879.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":33,"no_seri_fpn":"010.002-22.33486558","biaya_adm":"Rp 2,000","stated":{"dpp":5808900.0,"ppn":638979.0,"total":6447879.0},"import_notes":["invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":33,"no_seri_fpn":"010.002-22.33486558","biaya_adm":"Rp 2,000","stated":{"dpp":5808900.0,"ppn":638979.0,"total":6447879.0},"import_notes":["invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id, ('2022-05-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '3P MX94 LEAF GREEN', 1, 5808900.00
+      '3P MX94 LEAF GREEN', 1, 5808900.00, ('2022-05-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-018-1', 6445879.00, 'IDR',
-      'bank_transfer', '2022-07-05', 'Imported from historical register (row 33)', v_actor_id
+      'bank_transfer', '2022-07-05', 'Imported from historical register (row 33)', v_actor_id, ('2022-07-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1418,29 +1418,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'OLD/2022/019', 'partial', 'IDR',
       '2022-05-31', '10P ECO EAR-4001', 7470000.00, 0, 1, 1,
       11.000, NULL, NULL, 7470000.00, 821700.00,
       0.00, 0.00, 821700.00, 8291700.00, 8289700.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":34,"no_seri_fpn":"010.002-22.33486559","biaya_adm":"Rp 2,000","stated":{"dpp":7470000.0,"ppn":821700.0,"total":8291700.0},"import_notes":["invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":34,"no_seri_fpn":"010.002-22.33486559","biaya_adm":"Rp 2,000","stated":{"dpp":7470000.0,"ppn":821700.0,"total":8291700.0},"import_notes":["invoice number not in source; placeholder assigned"]}}'::jsonb, v_actor_id, ('2022-05-31'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10P ECO EAR-4001', 1, 7470000.00
+      '10P ECO EAR-4001', 1, 7470000.00, ('2022-05-31'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-OLD-2022-019-1', 8289700.00, 'IDR',
-      'bank_transfer', '2022-07-22', 'Imported from historical register (row 34)', v_actor_id
+      'bank_transfer', '2022-07-22', 'Imported from historical register (row 34)', v_actor_id, ('2022-07-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1454,29 +1454,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6560/AWP/2022', 'paid', 'IDR',
       '2022-06-10', '5BH PADLOCK', 637500.00, 0, 1, 1,
       11.000, NULL, NULL, 637500.00, 70125.00,
       0.00, 0.00, 70125.00, 707625.00, 707625.00, '2022-08-07'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":35,"no_seri_fpn":"010.002-22.33486560","stated":{"dpp":637500.0,"ppn":70125.0,"total":707625.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":35,"no_seri_fpn":"010.002-22.33486560","stated":{"dpp":637500.0,"ppn":70125.0,"total":707625.0}}}'::jsonb, v_actor_id, ('2022-06-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '5BH PADLOCK', 1, 637500.00
+      '5BH PADLOCK', 1, 637500.00, ('2022-06-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6560-AWP-2022-1', 707625.00, 'IDR',
-      'bank_transfer', '2022-08-07', 'Imported from historical register (row 35)', v_actor_id
+      'bank_transfer', '2022-08-07', 'Imported from historical register (row 35)', v_actor_id, ('2022-08-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1490,53 +1490,53 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6561/AWP/2022', 'partial', 'IDR',
       '2022-06-21', 'DP TAKE OVER TOWER A', 464686022.96, 0, 1, 1,
       11.075, NULL, NULL, 464686022.96, 51463977.04,
       0.00, 0.00, 51463977.04, 516150000.00, 516050000.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":36,"no_seri_fpn":"010.002-22.33486561","stated":{"dpp":465000000.0,"ppn":51500000.0,"total":516150000.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":36,"no_seri_fpn":"010.002-22.33486561","stated":{"dpp":465000000.0,"ppn":51500000.0,"total":516150000.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL"]}}'::jsonb, v_actor_id, ('2022-06-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'DP TAKE OVER TOWER A', 1, 464686022.96
+      'DP TAKE OVER TOWER A', 1, 464686022.96, ('2022-06-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6561-AWP-2022-1', 198560179.00, 'IDR',
-      'bank_transfer', '2022-06-24', 'Imported from historical register (row 36)', v_actor_id
+      'bank_transfer', '2022-06-24', 'Imported from historical register (row 36)', v_actor_id, ('2022-06-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6561-AWP-2022-2', 89964063.00, 'IDR',
-      'bank_transfer', '2022-06-28', 'Imported from historical register (row 36)', v_actor_id
+      'bank_transfer', '2022-06-28', 'Imported from historical register (row 36)', v_actor_id, ('2022-06-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6561-AWP-2022-3', 176475758.00, 'IDR',
-      'bank_transfer', '2022-07-04', 'Imported from historical register (row 36)', v_actor_id
+      'bank_transfer', '2022-07-04', 'Imported from historical register (row 36)', v_actor_id, ('2022-07-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6561-AWP-2022-4', 51050000.00, 'IDR',
-      'bank_transfer', '2022-08-07', 'Imported from historical register (row 36)', v_actor_id
+      'bank_transfer', '2022-08-07', 'Imported from historical register (row 36)', v_actor_id, ('2022-08-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1550,29 +1550,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6562/AWP/2022', 'paid', 'IDR',
       '2022-06-30', 'PROGRESS 1 TAKE OVER TOWER A', 229996972.48, 0, 1, 1,
       11.000, 2.000, NULL, 229996972.48, 25299666.97,
       4599939.45, 0.00, 25299666.97, 250696700.00, 250696700.00, '2022-07-06'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":41,"no_seri_fpn":"010.002-22.33486562","stated":{"dpp":229996972.0,"ppn":25299667.0,"pph":4599939.0,"total":250696700.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":41,"no_seri_fpn":"010.002-22.33486562","stated":{"dpp":229996972.0,"ppn":25299667.0,"pph":4599939.0,"total":250696700.0}}}'::jsonb, v_actor_id, ('2022-06-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 1 TAKE OVER TOWER A', 1, 229996972.48
+      'PROGRESS 1 TAKE OVER TOWER A', 1, 229996972.48, ('2022-06-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6562-AWP-2022-1', 250696700.00, 'IDR',
-      'bank_transfer', '2022-07-06', 'Imported from historical register (row 41)', v_actor_id
+      'bank_transfer', '2022-07-06', 'Imported from historical register (row 41)', v_actor_id, ('2022-07-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1586,29 +1586,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6563/AWP/2022', 'paid', 'IDR',
       '2022-07-04', 'PROGRESS 2 TAKE OVER TOWER A', 65677550.46, 0, 1, 1,
       11.000, 2.000, NULL, 65677550.46, 7224530.55,
       1313551.01, 0.00, 7224530.55, 71588530.00, 71588530.00, '2022-07-22'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":42,"no_seri_fpn":"010.002-22.33486563","stated":{"dpp":65677550.0,"ppn":7224531.0,"pph":1313551.0,"total":71588530.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":42,"no_seri_fpn":"010.002-22.33486563","stated":{"dpp":65677550.0,"ppn":7224531.0,"pph":1313551.0,"total":71588530.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-07-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 2 TAKE OVER TOWER A', 1, 65677550.46
+      'PROGRESS 2 TAKE OVER TOWER A', 1, 65677550.46, ('2022-07-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6563-AWP-2022-1', 71588530.00, 'IDR',
-      'bank_transfer', '2022-07-22', 'Imported from historical register (row 42)', v_actor_id
+      'bank_transfer', '2022-07-22', 'Imported from historical register (row 42)', v_actor_id, ('2022-07-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1622,29 +1622,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6564/AWP/2022', 'paid', 'IDR',
       '2022-07-11', 'PROGRESS 3 TAKE OVER TOWER A', 66813297.24, 0, 1, 1,
       11.000, 2.000, NULL, 66813297.24, 7349462.70,
       1336265.94, 0.00, 7349462.70, 72826494.00, 72826494.00, '2022-07-15'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":43,"no_seri_fpn":"010.002-22.33486564","stated":{"dpp":66813297.0,"ppn":7349463.0,"pph":1336266.0,"total":72826494.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":43,"no_seri_fpn":"010.002-22.33486564","stated":{"dpp":66813297.0,"ppn":7349463.0,"pph":1336266.0,"total":72826494.0}}}'::jsonb, v_actor_id, ('2022-07-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 3 TAKE OVER TOWER A', 1, 66813297.24
+      'PROGRESS 3 TAKE OVER TOWER A', 1, 66813297.24, ('2022-07-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6564-AWP-2022-1', 72826494.00, 'IDR',
-      'bank_transfer', '2022-07-15', 'Imported from historical register (row 43)', v_actor_id
+      'bank_transfer', '2022-07-15', 'Imported from historical register (row 43)', v_actor_id, ('2022-07-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1658,29 +1658,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6565/AWP/2022', 'paid', 'IDR',
       '2022-07-11', 'FURNITURE 1', 197600000.00, 0, 1, 1,
       11.000, NULL, NULL, 197600000.00, 21736000.00,
       0.00, 0.00, 21736000.00, 219336000.00, 219336000.00, '2022-12-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":44,"no_seri_fpn":"010.002-22.33486565","no_po_customer":"9000474900","stated":{"dpp":197600000.0,"ppn":21736000.0,"total":219336000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":44,"no_seri_fpn":"010.002-22.33486565","no_po_customer":"9000474900","stated":{"dpp":197600000.0,"ppn":21736000.0,"total":219336000.0}}}'::jsonb, v_actor_id, ('2022-07-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'FURNITURE 1', 1, 197600000.00
+      'FURNITURE 1', 1, 197600000.00, ('2022-07-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6565-AWP-2022-1', 219336000.00, 'IDR',
-      'bank_transfer', '2022-12-08', 'Imported from historical register (row 44)', v_actor_id
+      'bank_transfer', '2022-12-08', 'Imported from historical register (row 44)', v_actor_id, ('2022-12-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1694,29 +1694,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6566/AWP/2022', 'paid', 'IDR',
       '2022-07-18', 'PROGRESS 4 TAKE OVER TOWER A', 123220545.87, 0, 1, 1,
       11.000, 2.000, NULL, 123220545.87, 13554260.05,
       2464410.92, 0.00, 13554260.05, 134310395.00, 134310395.00, '2022-07-22'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":45,"no_seri_fpn":"010.002-22.33486566","stated":{"dpp":123220546.0,"ppn":13554260.0,"pph":2464411.0,"total":134310395.0},"unattributed_rows":[{"note":"PROGRESS 2","amount":71588530.0},{"note":"WT-D8 PROGRES 4","amount":6393750.0}]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":45,"no_seri_fpn":"010.002-22.33486566","stated":{"dpp":123220546.0,"ppn":13554260.0,"pph":2464411.0,"total":134310395.0},"unattributed_rows":[{"note":"PROGRESS 2","amount":71588530.0},{"note":"WT-D8 PROGRES 4","amount":6393750.0}]}}'::jsonb, v_actor_id, ('2022-07-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 4 TAKE OVER TOWER A', 1, 123220545.87
+      'PROGRESS 4 TAKE OVER TOWER A', 1, 123220545.87, ('2022-07-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6566-AWP-2022-1', 134310395.00, 'IDR',
-      'bank_transfer', '2022-07-22', 'Imported from historical register (row 45)', v_actor_id
+      'bank_transfer', '2022-07-22', 'Imported from historical register (row 45)', v_actor_id, ('2022-07-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1730,29 +1730,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6567/AWP/2022', 'paid', 'IDR',
       '2022-07-25', 'PROGRESS 5 TAKE OVER TOWER A', 140467094.50, 0, 1, 1,
       11.000, 2.000, NULL, 140467094.50, 15451380.40,
       2809341.89, 0.00, 15451380.40, 153109133.00, 153109133.00, '2022-07-29'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":49,"no_seri_fpn":"010.002-22.33486567","stated":{"dpp":140467095.0,"ppn":15451380.0,"pph":2809342.0,"total":153109133.0},"import_notes":["stored rates reproduce TOTAL to within Rp 0.01"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":49,"no_seri_fpn":"010.002-22.33486567","stated":{"dpp":140467095.0,"ppn":15451380.0,"pph":2809342.0,"total":153109133.0},"import_notes":["stored rates reproduce TOTAL to within Rp 0.01"]}}'::jsonb, v_actor_id, ('2022-07-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 5 TAKE OVER TOWER A', 1, 140467094.50
+      'PROGRESS 5 TAKE OVER TOWER A', 1, 140467094.50, ('2022-07-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6567-AWP-2022-1', 153109133.00, 'IDR',
-      'bank_transfer', '2022-07-29', 'Imported from historical register (row 49)', v_actor_id
+      'bank_transfer', '2022-07-29', 'Imported from historical register (row 49)', v_actor_id, ('2022-07-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1766,29 +1766,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6568/AWP/2022', 'paid', 'IDR',
       '2022-07-27', 'CONSTRUCTION MATERIAL', 44399000.00, 0, 1, 1,
       11.000, NULL, NULL, 44399000.00, 4883890.00,
       0.00, 0.00, 4883890.00, 49282890.00, 49282890.00, '2022-08-02'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":50,"no_seri_fpn":"010.002-22.33486568","stated":{"dpp":44399999.0,"ppn":4883890.0,"total":49282890.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":50,"no_seri_fpn":"010.002-22.33486568","stated":{"dpp":44399999.0,"ppn":4883890.0,"total":49282890.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL"]}}'::jsonb, v_actor_id, ('2022-07-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'CONSTRUCTION MATERIAL', 1, 44399000.00
+      'CONSTRUCTION MATERIAL', 1, 44399000.00, ('2022-07-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6568-AWP-2022-1', 49282890.00, 'IDR',
-      'bank_transfer', '2022-08-02', 'Imported from historical register (row 50)', v_actor_id
+      'bank_transfer', '2022-08-02', 'Imported from historical register (row 50)', v_actor_id, ('2022-08-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1802,29 +1802,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6569/AWP/2022', 'paid', 'IDR',
       '2022-08-01', 'PROGRESS 6 TAKE OVER TOWER A', 73284060.55, 0, 1, 1,
       11.000, 2.000, NULL, 73284060.55, 8061246.66,
       1465681.21, 0.00, 8061246.66, 79879626.00, 79879626.00, '2022-09-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":51,"no_seri_fpn":"010.002-22.33486569","stated":{"dpp":73284060.0,"ppn":8061247.0,"pph":1465681.0,"total":79879626.0},"unattributed_rows":[{"note":"unallocated credit stated in register","amount":6393750.0,"date":"2022-08-01"}]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":51,"no_seri_fpn":"010.002-22.33486569","stated":{"dpp":73284060.0,"ppn":8061247.0,"pph":1465681.0,"total":79879626.0},"unattributed_rows":[{"note":"unallocated credit stated in register","amount":6393750.0,"date":"2022-08-01"}]}}'::jsonb, v_actor_id, ('2022-08-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 6 TAKE OVER TOWER A', 1, 73284060.55
+      'PROGRESS 6 TAKE OVER TOWER A', 1, 73284060.55, ('2022-08-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6569-AWP-2022-1', 79879626.00, 'IDR',
-      'bank_transfer', '2022-09-08', 'Imported from historical register (row 51)', v_actor_id
+      'bank_transfer', '2022-09-08', 'Imported from historical register (row 51)', v_actor_id, ('2022-09-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1838,29 +1838,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6570/AWP/2022', 'paid', 'IDR',
       '2022-08-04', 'FURNITURE 2', 175800000.00, 0, 1, 1,
       11.000, NULL, NULL, 175800000.00, 19338000.00,
       0.00, 0.00, 19338000.00, 195138000.00, 195138000.00, '2022-08-19'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":54,"no_seri_fpn":"010.002-22.33486570","no_po_customer":"9000474900","stated":{"dpp":175800000.0,"ppn":19338000.0,"total":195138000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":54,"no_seri_fpn":"010.002-22.33486570","no_po_customer":"9000474900","stated":{"dpp":175800000.0,"ppn":19338000.0,"total":195138000.0}}}'::jsonb, v_actor_id, ('2022-08-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'FURNITURE 2', 1, 175800000.00
+      'FURNITURE 2', 1, 175800000.00, ('2022-08-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6570-AWP-2022-1', 195138000.00, 'IDR',
-      'bank_transfer', '2022-08-19', 'Imported from historical register (row 54)', v_actor_id
+      'bank_transfer', '2022-08-19', 'Imported from historical register (row 54)', v_actor_id, ('2022-08-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1874,29 +1874,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6571/AWP/2022', 'paid', 'IDR',
       '2022-08-04', 'RETENSI NEW ALI (NO FAKTUR PPN)', 46003790.00, 0, 1, 1,
       0.000, NULL, NULL, 46003790.00, 0.00,
       0.00, 0.00, 0.00, 46003790.00, 46003790.00, '2022-09-16'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":55,"no_seri_fpn":"010.002-22.33486571","stated":{"dpp":46003790.0,"total":46003790.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":55,"no_seri_fpn":"010.002-22.33486571","stated":{"dpp":46003790.0,"total":46003790.0}}}'::jsonb, v_actor_id, ('2022-08-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI NEW ALI (NO FAKTUR PPN)', 1, 46003790.00
+      'RETENSI NEW ALI (NO FAKTUR PPN)', 1, 46003790.00, ('2022-08-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6571-AWP-2022-1', 46003790.00, 'IDR',
-      'bank_transfer', '2022-09-16', 'Imported from historical register (row 55)', v_actor_id
+      'bank_transfer', '2022-09-16', 'Imported from historical register (row 55)', v_actor_id, ('2022-09-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1910,29 +1910,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6572/AWP/2022', 'paid', 'IDR',
       '2022-08-08', 'PROGRESS 7 TAKE OVER TOWER A', 76341781.65, 0, 1, 1,
       11.000, 2.000, NULL, 76341781.65, 8397595.98,
       1526835.63, 0.00, 8397595.98, 83212542.00, 83212542.00, '2022-08-19'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":56,"no_seri_fpn":"010.002-22.33486572","stated":{"dpp":76341782.0,"ppn":8397596.0,"pph":1526835.0,"total":83212542.0},"unattributed_rows":[{"note":"unallocated credit stated in register","amount":6393750.0,"date":"2022-08-08"}]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":56,"no_seri_fpn":"010.002-22.33486572","stated":{"dpp":76341782.0,"ppn":8397596.0,"pph":1526835.0,"total":83212542.0},"unattributed_rows":[{"note":"unallocated credit stated in register","amount":6393750.0,"date":"2022-08-08"}]}}'::jsonb, v_actor_id, ('2022-08-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 7 TAKE OVER TOWER A', 1, 76341781.65
+      'PROGRESS 7 TAKE OVER TOWER A', 1, 76341781.65, ('2022-08-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6572-AWP-2022-1', 83212542.00, 'IDR',
-      'bank_transfer', '2022-08-19', 'Imported from historical register (row 56)', v_actor_id
+      'bank_transfer', '2022-08-19', 'Imported from historical register (row 56)', v_actor_id, ('2022-08-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1946,29 +1946,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6573/AWP/2022', 'partial', 'IDR',
       '2022-08-15', 'PROGRESS 8 TAKE OVER TOWER A', 111652124.77, 0, 1, 1,
       11.000, 2.000, NULL, 111652124.77, 12281733.72,
       2233042.50, 0.00, 12281733.72, 121700816.00, 121352066.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":59,"no_seri_fpn":"010.002-22.33486573","stated":{"dpp":111652124.0,"ppn":12281734.0,"pph":2233042.0,"total":121700816.0},"unattributed_rows":[{"note":"WT-D8","amount":1918125.0}],"import_notes":["stored rates reproduce TOTAL to within Rp 0.01"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":59,"no_seri_fpn":"010.002-22.33486573","stated":{"dpp":111652124.0,"ppn":12281734.0,"pph":2233042.0,"total":121700816.0},"unattributed_rows":[{"note":"WT-D8","amount":1918125.0}],"import_notes":["stored rates reproduce TOTAL to within Rp 0.01"]}}'::jsonb, v_actor_id, ('2022-08-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 8 TAKE OVER TOWER A', 1, 111652124.77
+      'PROGRESS 8 TAKE OVER TOWER A', 1, 111652124.77, ('2022-08-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6573-AWP-2022-1', 121352066.00, 'IDR',
-      'bank_transfer', '2022-08-26', 'Imported from historical register (row 59)', v_actor_id
+      'bank_transfer', '2022-08-26', 'Imported from historical register (row 59)', v_actor_id, ('2022-08-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -1982,21 +1982,21 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6574/AWP/2022', 'sent', 'IDR',
       '2022-08-19', 'DP PAINTING CM RAPP', 226016500.00, 0, 1, 1,
       11.000, NULL, NULL, 226016500.00, 24861815.00,
       0.00, 0.00, 24861815.00, 250878315.00, 0.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":62,"no_seri_fpn":"010.002-22.33486574","stated":{"dpp":226016500.0,"ppn":24861815.0,"total":250878315.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":62,"no_seri_fpn":"010.002-22.33486574","stated":{"dpp":226016500.0,"ppn":24861815.0,"total":250878315.0}}}'::jsonb, v_actor_id, ('2022-08-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'DP PAINTING CM RAPP', 1, 226016500.00
+      'DP PAINTING CM RAPP', 1, 226016500.00, ('2022-08-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2010,29 +2010,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6575/AWP/2022', 'paid', 'IDR',
       '2022-08-22', 'PERBAIKAN MESS EUCALYPTUS', 283499575.96, 0, 1, 1,
       11.000, 2.000, 5.000, 283499575.96, 31184953.36,
       5669991.52, 14174978.80, 31184953.36, 294839559.00, 294839559.00, '2022-09-02'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":63,"no_seri_fpn":"010.002-22.33486575","stated":{"dpp":283499577.0,"ppn":31184953.0,"pph":5669992.0,"retensi":14174979.0,"total":294839559.0},"import_notes":["base adjusted 283499577.00 -> 283499575.96 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":63,"no_seri_fpn":"010.002-22.33486575","stated":{"dpp":283499577.0,"ppn":31184953.0,"pph":5669992.0,"retensi":14174979.0,"total":294839559.0},"import_notes":["base adjusted 283499577.00 -> 283499575.96 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2022-08-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PERBAIKAN MESS EUCALYPTUS', 1, 283499575.96
+      'PERBAIKAN MESS EUCALYPTUS', 1, 283499575.96, ('2022-08-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6575-AWP-2022-1', 294839559.00, 'IDR',
-      'bank_transfer', '2022-09-02', 'Imported from historical register (row 63)', v_actor_id
+      'bank_transfer', '2022-09-02', 'Imported from historical register (row 63)', v_actor_id, ('2022-09-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2046,29 +2046,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6576/AWP/2022', 'paid', 'IDR',
       '2022-08-22', 'PROGRESS 9 TAKE OVER TOWER A', 163408322.02, 0, 1, 1,
       11.000, 2.000, NULL, 163408322.02, 17974915.42,
       3268166.44, 0.00, 17974915.42, 178115071.00, 178115071.00, '2022-08-26'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":64,"no_seri_fpn":"010.002-22.33486576","stated":{"dpp":163408322.0,"ppn":17974915.0,"pph":3268166.0,"total":178115071.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":64,"no_seri_fpn":"010.002-22.33486576","stated":{"dpp":163408322.0,"ppn":17974915.0,"pph":3268166.0,"total":178115071.0}}}'::jsonb, v_actor_id, ('2022-08-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 9 TAKE OVER TOWER A', 1, 163408322.02
+      'PROGRESS 9 TAKE OVER TOWER A', 1, 163408322.02, ('2022-08-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6576-AWP-2022-1', 178115071.00, 'IDR',
-      'bank_transfer', '2022-08-26', 'Imported from historical register (row 64)', v_actor_id
+      'bank_transfer', '2022-08-26', 'Imported from historical register (row 64)', v_actor_id, ('2022-08-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2082,29 +2082,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6577/AWP/2022', 'paid', 'IDR',
       '2022-08-29', 'PROGRESS 1 TAKE OVER CM BLOK4', 127411791.35, 0, 1, 1,
       11.000, 2.000, 5.000, 127411791.35, 14015297.05,
       2548235.83, 6370589.57, 14015297.05, 132508263.00, 132508263.00, '2022-09-09'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":65,"no_seri_fpn":"010.002-22.33486577","stated":{"dpp":127411792.0,"ppn":14015297.0,"pph":2548236.0,"retensi":6370590.0,"total":132508263.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":65,"no_seri_fpn":"010.002-22.33486577","stated":{"dpp":127411792.0,"ppn":14015297.0,"pph":2548236.0,"retensi":6370590.0,"total":132508263.0}}}'::jsonb, v_actor_id, ('2022-08-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 1 TAKE OVER CM BLOK4', 1, 127411791.35
+      'PROGRESS 1 TAKE OVER CM BLOK4', 1, 127411791.35, ('2022-08-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6577-AWP-2022-1', 132508263.00, 'IDR',
-      'bank_transfer', '2022-09-09', 'Imported from historical register (row 65)', v_actor_id
+      'bank_transfer', '2022-09-09', 'Imported from historical register (row 65)', v_actor_id, ('2022-09-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2118,29 +2118,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6578/AWP/2022', 'paid', 'IDR',
       '2022-08-29', 'PROGRESS 10 TAKE OVER TOWER A', 82801550.46, 0, 1, 1,
       11.000, 2.000, NULL, 82801550.46, 9108170.55,
       1656031.01, 0.00, 9108170.55, 90253690.00, 90253690.00, '2022-09-07'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":66,"no_seri_fpn":"010.002-22.33486578","stated":{"dpp":82801550.0,"ppn":9108171.0,"pph":1656031.0,"total":90253690.0},"unattributed_rows":[{"note":"unallocated credit stated in register","amount":1918125.0,"date":"2022-08-29"}],"import_notes":["register states invoice number 6577/AWP/2022, already used by an earlier row; stored as 6578/AWP/2022"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":66,"no_seri_fpn":"010.002-22.33486578","stated":{"dpp":82801550.0,"ppn":9108171.0,"pph":1656031.0,"total":90253690.0},"unattributed_rows":[{"note":"unallocated credit stated in register","amount":1918125.0,"date":"2022-08-29"}],"import_notes":["register states invoice number 6577/AWP/2022, already used by an earlier row; stored as 6578/AWP/2022"]}}'::jsonb, v_actor_id, ('2022-08-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 10 TAKE OVER TOWER A', 1, 82801550.46
+      'PROGRESS 10 TAKE OVER TOWER A', 1, 82801550.46, ('2022-08-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6578-AWP-2022-1', 90253690.00, 'IDR',
-      'bank_transfer', '2022-09-07', 'Imported from historical register (row 66)', v_actor_id
+      'bank_transfer', '2022-09-07', 'Imported from historical register (row 66)', v_actor_id, ('2022-09-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2154,29 +2154,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6579/AWP/2022', 'paid', 'IDR',
       '2022-08-30', '32BH DOOR', 46400000.00, 0, 1, 1,
       11.000, NULL, NULL, 46400000.00, 5104000.00,
       0.00, 0.00, 5104000.00, 51504000.00, 51504000.00, '2022-09-07'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":69,"no_seri_fpn":"010.002-22.33486579","stated":{"dpp":46400000.0,"ppn":5104000.0,"total":51504000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":69,"no_seri_fpn":"010.002-22.33486579","stated":{"dpp":46400000.0,"ppn":5104000.0,"total":51504000.0}}}'::jsonb, v_actor_id, ('2022-08-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '32BH DOOR', 1, 46400000.00
+      '32BH DOOR', 1, 46400000.00, ('2022-08-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6579-AWP-2022-1', 51504000.00, 'IDR',
-      'bank_transfer', '2022-09-07', 'Imported from historical register (row 69)', v_actor_id
+      'bank_transfer', '2022-09-07', 'Imported from historical register (row 69)', v_actor_id, ('2022-09-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2190,29 +2190,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6580/AWP/2022', 'paid', 'IDR',
       '2022-09-05', 'PROGRESS 11 TAKE OVER TOWER A', 79616494.50, 0, 1, 1,
       11.000, 2.000, NULL, 79616494.50, 8757814.40,
       1592329.89, 0.00, 8757814.40, 86781979.00, 86781979.00, '2022-09-14'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":70,"no_seri_fpn":"010.002-22.33486580","stated":{"dpp":79616495.0,"ppn":8757814.0,"pph":1592330.0,"total":86781979.0},"unattributed_rows":[{"note":"D8 PROGRESS X","amount":1918125.0}],"import_notes":["stored rates reproduce TOTAL to within Rp 0.01"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":70,"no_seri_fpn":"010.002-22.33486580","stated":{"dpp":79616495.0,"ppn":8757814.0,"pph":1592330.0,"total":86781979.0},"unattributed_rows":[{"note":"D8 PROGRESS X","amount":1918125.0}],"import_notes":["stored rates reproduce TOTAL to within Rp 0.01"]}}'::jsonb, v_actor_id, ('2022-09-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 11 TAKE OVER TOWER A', 1, 79616494.50
+      'PROGRESS 11 TAKE OVER TOWER A', 1, 79616494.50, ('2022-09-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6580-AWP-2022-1', 86781979.00, 'IDR',
-      'bank_transfer', '2022-09-14', 'Imported from historical register (row 70)', v_actor_id
+      'bank_transfer', '2022-09-14', 'Imported from historical register (row 70)', v_actor_id, ('2022-09-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2226,29 +2226,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6581/AWP/2022', 'paid', 'IDR',
       '2022-09-09', 'PROGRESS 2 TAKE OVER CM BLOK4', 142431564.42, 0, 1, 1,
       11.000, 2.000, 5.000, 142431564.42, 15667472.09,
       2848631.29, 7121578.22, 15667472.09, 148128827.00, 148128827.00, '2022-09-23'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":73,"no_seri_fpn":"010.002-22.33486581","stated":{"dpp":142431564.0,"ppn":15667472.0,"pph":2848631.0,"retensi":7121578.0,"total":148128827.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":73,"no_seri_fpn":"010.002-22.33486581","stated":{"dpp":142431564.0,"ppn":15667472.0,"pph":2848631.0,"retensi":7121578.0,"total":148128827.0}}}'::jsonb, v_actor_id, ('2022-09-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 2 TAKE OVER CM BLOK4', 1, 142431564.42
+      'PROGRESS 2 TAKE OVER CM BLOK4', 1, 142431564.42, ('2022-09-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6581-AWP-2022-1', 148128827.00, 'IDR',
-      'bank_transfer', '2022-09-23', 'Imported from historical register (row 73)', v_actor_id
+      'bank_transfer', '2022-09-23', 'Imported from historical register (row 73)', v_actor_id, ('2022-09-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2262,29 +2262,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6582/AWP/2022', 'paid', 'IDR',
       '2022-09-09', 'CONSTRUCTION MATERIAL 150P FL,30 V', 196680000.00, 0, 1, 1,
       11.000, NULL, NULL, 196680000.00, 21634800.00,
       0.00, 0.00, 21634800.00, 218314800.00, 218314800.00, '2022-09-26'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":74,"no_seri_fpn":"010.002-22.33486582","stated":{"dpp":196680000.0,"ppn":21634800.0,"total":218314800.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":74,"no_seri_fpn":"010.002-22.33486582","stated":{"dpp":196680000.0,"ppn":21634800.0,"total":218314800.0}}}'::jsonb, v_actor_id, ('2022-09-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'CONSTRUCTION MATERIAL 150P FL,30 V', 1, 196680000.00
+      'CONSTRUCTION MATERIAL 150P FL,30 V', 1, 196680000.00, ('2022-09-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6582-AWP-2022-1', 218314800.00, 'IDR',
-      'bank_transfer', '2022-09-26', 'Imported from historical register (row 74)', v_actor_id
+      'bank_transfer', '2022-09-26', 'Imported from historical register (row 74)', v_actor_id, ('2022-09-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2298,29 +2298,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6583/AWP/2022', 'paid', 'IDR',
       '2022-09-12', 'PROGRESS 12 TAKE OVER TOWER A', 77468414.68, 0, 1, 1,
       11.000, 2.000, NULL, 77468414.68, 8521525.61,
       1549368.29, 0.00, 8521525.61, 84440572.00, 84440572.00, '2022-09-26'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":75,"no_seri_fpn":"010.002-22.33486583","stated":{"dpp":77468414.0,"ppn":8521526.0,"pph":1549368.0,"total":84440572.0},"unattributed_rows":[{"note":"unallocated credit stated in register","amount":1918125.0,"date":"2022-09-12"}]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":75,"no_seri_fpn":"010.002-22.33486583","stated":{"dpp":77468414.0,"ppn":8521526.0,"pph":1549368.0,"total":84440572.0},"unattributed_rows":[{"note":"unallocated credit stated in register","amount":1918125.0,"date":"2022-09-12"}]}}'::jsonb, v_actor_id, ('2022-09-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 12 TAKE OVER TOWER A', 1, 77468414.68
+      'PROGRESS 12 TAKE OVER TOWER A', 1, 77468414.68, ('2022-09-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6583-AWP-2022-1', 84440572.00, 'IDR',
-      'bank_transfer', '2022-09-26', 'Imported from historical register (row 75)', v_actor_id
+      'bank_transfer', '2022-09-26', 'Imported from historical register (row 75)', v_actor_id, ('2022-09-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2334,29 +2334,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6584/AWP/2022', 'paid', 'IDR',
       '2022-09-19', 'PROGRESS 13 TAKE OVER TOWER A', 88842454.13, 0, 1, 1,
       11.000, 2.000, NULL, 88842454.13, 9772669.95,
       1776849.08, 0.00, 9772669.95, 96838275.00, 96838275.00, '2022-09-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":78,"no_seri_fpn":"010.002-22.33486584","stated":{"dpp":88842454.0,"ppn":9772670.0,"pph":1776849.0,"total":96838275.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":78,"no_seri_fpn":"010.002-22.33486584","stated":{"dpp":88842454.0,"ppn":9772670.0,"pph":1776849.0,"total":96838275.0}}}'::jsonb, v_actor_id, ('2022-09-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 13 TAKE OVER TOWER A', 1, 88842454.13
+      'PROGRESS 13 TAKE OVER TOWER A', 1, 88842454.13, ('2022-09-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6584-AWP-2022-1', 96838275.00, 'IDR',
-      'bank_transfer', '2022-09-30', 'Imported from historical register (row 78)', v_actor_id
+      'bank_transfer', '2022-09-30', 'Imported from historical register (row 78)', v_actor_id, ('2022-09-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2370,29 +2370,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6585/AWP/2022', 'paid', 'IDR',
       '2022-09-20', 'PROGRESS 3 TAKE OVER CM BLOK4', 119855775.00, 0, 1, 1,
       11.000, 2.000, 5.000, 119855775.00, 13184135.25,
       2397115.50, 5992788.75, 13184135.25, 124650006.00, 124650006.00, '2022-09-28'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":79,"no_seri_fpn":"010.002-22.33486585","stated":{"dpp":119855774.0,"ppn":13184135.0,"pph":2397115.0,"retensi":5992789.0,"total":124650006.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":79,"no_seri_fpn":"010.002-22.33486585","stated":{"dpp":119855774.0,"ppn":13184135.0,"pph":2397115.0,"retensi":5992789.0,"total":124650006.0}}}'::jsonb, v_actor_id, ('2022-09-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 3 TAKE OVER CM BLOK4', 1, 119855775.00
+      'PROGRESS 3 TAKE OVER CM BLOK4', 1, 119855775.00, ('2022-09-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6585-AWP-2022-1', 124650006.00, 'IDR',
-      'bank_transfer', '2022-09-28', 'Imported from historical register (row 79)', v_actor_id
+      'bank_transfer', '2022-09-28', 'Imported from historical register (row 79)', v_actor_id, ('2022-09-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2406,29 +2406,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6586/AWP/2022', 'paid', 'IDR',
       '2022-09-16', 'CONSTRUCTION MATERIAL 4PFL,4P5200', 16672000.00, 0, 1, 1,
       11.000, NULL, NULL, 16672000.00, 1833920.00,
       0.00, 0.00, 1833920.00, 18505920.00, 18505920.00, '2022-09-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":80,"no_seri_fpn":"010.002-22.33486586","stated":{"dpp":16672000.0,"ppn":1833920.0,"total":18505920.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":80,"no_seri_fpn":"010.002-22.33486586","stated":{"dpp":16672000.0,"ppn":1833920.0,"total":18505920.0}}}'::jsonb, v_actor_id, ('2022-09-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'CONSTRUCTION MATERIAL 4PFL,4P5200', 1, 16672000.00
+      'CONSTRUCTION MATERIAL 4PFL,4P5200', 1, 16672000.00, ('2022-09-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6586-AWP-2022-1', 18505920.00, 'IDR',
-      'bank_transfer', '2022-09-30', 'Imported from historical register (row 80)', v_actor_id
+      'bank_transfer', '2022-09-30', 'Imported from historical register (row 80)', v_actor_id, ('2022-09-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2442,29 +2442,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6587/AWP/2022', 'paid', 'IDR',
       '2022-09-20', 'CONSTRUCTION MATERIAL SOCKET,HANNOCHS', 1760000.00, 0, 1, 1,
       11.000, NULL, NULL, 1760000.00, 193600.00,
       0.00, 0.00, 193600.00, 1953600.00, 1953600.00, '2022-09-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":81,"no_seri_fpn":"010.002-22.33486587","stated":{"dpp":1760000.0,"ppn":193600.0,"total":1953600.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":81,"no_seri_fpn":"010.002-22.33486587","stated":{"dpp":1760000.0,"ppn":193600.0,"total":1953600.0}}}'::jsonb, v_actor_id, ('2022-09-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'CONSTRUCTION MATERIAL SOCKET,HANNOCHS', 1, 1760000.00
+      'CONSTRUCTION MATERIAL SOCKET,HANNOCHS', 1, 1760000.00, ('2022-09-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6587-AWP-2022-1', 1953600.00, 'IDR',
-      'bank_transfer', '2022-09-30', 'Imported from historical register (row 81)', v_actor_id
+      'bank_transfer', '2022-09-30', 'Imported from historical register (row 81)', v_actor_id, ('2022-09-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2478,29 +2478,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6588/AWP/2022', 'paid', 'IDR',
       '2022-09-26', 'ADDITIONAL WORKS MESS EUCALYPTUS', 107539213.46, 0, 1, 1,
       11.000, 2.000, 5.000, 107539213.46, 11829313.48,
       2150784.27, 5376960.67, 11829313.48, 111840782.00, 111840782.00, '2022-10-07'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":82,"no_seri_fpn":"010.002-22.33486588","stated":{"dpp":107539213.0,"ppn":11829313.0,"pph":2150784.0,"retensi":5376961.0,"total":111840782.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":82,"no_seri_fpn":"010.002-22.33486588","stated":{"dpp":107539213.0,"ppn":11829313.0,"pph":2150784.0,"retensi":5376961.0,"total":111840782.0}}}'::jsonb, v_actor_id, ('2022-09-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'ADDITIONAL WORKS MESS EUCALYPTUS', 1, 107539213.46
+      'ADDITIONAL WORKS MESS EUCALYPTUS', 1, 107539213.46, ('2022-09-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6588-AWP-2022-1', 111840782.00, 'IDR',
-      'bank_transfer', '2022-10-07', 'Imported from historical register (row 82)', v_actor_id
+      'bank_transfer', '2022-10-07', 'Imported from historical register (row 82)', v_actor_id, ('2022-10-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2514,29 +2514,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6589/AWP/2022', 'paid', 'IDR',
       '2022-09-26', 'PROGRESS 14 TAKE OVER TOWER A', 219377339.45, 0, 1, 1,
       11.000, 2.000, NULL, 219377339.45, 24131507.34,
       4387546.79, 0.00, 24131507.34, 239121300.00, 239121300.00, '2022-10-07'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":83,"no_seri_fpn":"010.002-22.33486589","stated":{"dpp":219377339.0,"ppn":24131507.0,"pph":4387547.0,"total":239121300.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":83,"no_seri_fpn":"010.002-22.33486589","stated":{"dpp":219377339.0,"ppn":24131507.0,"pph":4387547.0,"total":239121300.0}}}'::jsonb, v_actor_id, ('2022-09-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 14 TAKE OVER TOWER A', 1, 219377339.45
+      'PROGRESS 14 TAKE OVER TOWER A', 1, 219377339.45, ('2022-09-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6589-AWP-2022-1', 239121300.00, 'IDR',
-      'bank_transfer', '2022-10-07', 'Imported from historical register (row 83)', v_actor_id
+      'bank_transfer', '2022-10-07', 'Imported from historical register (row 83)', v_actor_id, ('2022-10-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2550,29 +2550,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '6590/AWP/2022', 'paid', 'IDR',
       '2022-09-23', 'TILE CERAMIC; ANY; 60X60 CM-NATRIN 6000', 900000.00, 0, 1, 1,
       11.000, NULL, NULL, 900000.00, 99000.00,
       0.00, 0.00, 99000.00, 999000.00, 999000.00, '2022-10-14'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":84,"no_seri_fpn":"010.002-22.33486590","stated":{"dpp":900000.0,"ppn":99000.0,"total":999000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":84,"no_seri_fpn":"010.002-22.33486590","stated":{"dpp":900000.0,"ppn":99000.0,"total":999000.0}}}'::jsonb, v_actor_id, ('2022-09-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'TILE CERAMIC; ANY; 60X60 CM-NATRIN 6000', 1, 900000.00
+      'TILE CERAMIC; ANY; 60X60 CM-NATRIN 6000', 1, 900000.00, ('2022-09-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-6590-AWP-2022-1', 999000.00, 'IDR',
-      'bank_transfer', '2022-10-14', 'Imported from historical register (row 84)', v_actor_id
+      'bank_transfer', '2022-10-14', 'Imported from historical register (row 84)', v_actor_id, ('2022-10-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2586,29 +2586,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8892/AWP/2022', 'paid', 'IDR',
       '2022-09-25', '13EA LAMP;SAMCOM;ETL 210H-4LA', 16900000.00, 0, 1, 1,
       11.000, NULL, NULL, 16900000.00, 1859000.00,
       0.00, 0.00, 1859000.00, 18759000.00, 18759000.00, '2022-10-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":85,"no_seri_fpn":"010.006-22.59848892","stated":{"dpp":16900000.0,"ppn":1859000.0,"total":18759000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":85,"no_seri_fpn":"010.006-22.59848892","stated":{"dpp":16900000.0,"ppn":1859000.0,"total":18759000.0}}}'::jsonb, v_actor_id, ('2022-09-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '13EA LAMP;SAMCOM;ETL 210H-4LA', 1, 16900000.00
+      '13EA LAMP;SAMCOM;ETL 210H-4LA', 1, 16900000.00, ('2022-09-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8892-AWP-2022-1', 18759000.00, 'IDR',
-      'bank_transfer', '2022-10-21', 'Imported from historical register (row 85)', v_actor_id
+      'bank_transfer', '2022-10-21', 'Imported from historical register (row 85)', v_actor_id, ('2022-10-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2622,29 +2622,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8891/AWP/2022', 'paid', 'IDR',
       '2022-10-03', 'PROGRESS 15 TAKE OVER TOWER A', 86027720.18, 0, 1, 1,
       11.000, 2.000, NULL, 86027720.18, 9463049.22,
       1720554.40, 0.00, 9463049.22, 93770215.00, 93770215.00, '2022-10-14'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":86,"no_seri_fpn":"010.002-22.33486591","stated":{"dpp":86027720.0,"ppn":9463049.0,"pph":1720554.0,"total":93770215.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":86,"no_seri_fpn":"010.002-22.33486591","stated":{"dpp":86027720.0,"ppn":9463049.0,"pph":1720554.0,"total":93770215.0}}}'::jsonb, v_actor_id, ('2022-10-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 15 TAKE OVER TOWER A', 1, 86027720.18
+      'PROGRESS 15 TAKE OVER TOWER A', 1, 86027720.18, ('2022-10-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8891-AWP-2022-1', 93770215.00, 'IDR',
-      'bank_transfer', '2022-10-14', 'Imported from historical register (row 86)', v_actor_id
+      'bank_transfer', '2022-10-14', 'Imported from historical register (row 86)', v_actor_id, ('2022-10-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2658,29 +2658,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8893/AWP/2022', 'paid', 'IDR',
       '2022-10-07', 'GANTI KULIT FURNITURE TWA', 175005000.00, 0, 1, 1,
       11.000, 2.000, 5.000, 175005000.00, 19250550.00,
       3500100.00, 8750250.00, 19250550.00, 182005200.00, 182005200.00, '2022-10-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":87,"no_seri_fpn":"010.006-22.59848893","stated":{"dpp":175005000.0,"ppn":19250550.0,"pph":3500100.0,"retensi":8750250.0,"total":182005200.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":87,"no_seri_fpn":"010.006-22.59848893","stated":{"dpp":175005000.0,"ppn":19250550.0,"pph":3500100.0,"retensi":8750250.0,"total":182005200.0}}}'::jsonb, v_actor_id, ('2022-10-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'GANTI KULIT FURNITURE TWA', 1, 175005000.00
+      'GANTI KULIT FURNITURE TWA', 1, 175005000.00, ('2022-10-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8893-AWP-2022-1', 182005200.00, 'IDR',
-      'bank_transfer', '2022-10-21', 'Imported from historical register (row 87)', v_actor_id
+      'bank_transfer', '2022-10-21', 'Imported from historical register (row 87)', v_actor_id, ('2022-10-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2694,29 +2694,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8894/AWP/2022', 'paid', 'IDR',
       '2022-10-10', '64EA MIRROR', 23360000.00, 0, 1, 1,
       11.000, NULL, NULL, 23360000.00, 2569600.00,
       0.00, 0.00, 2569600.00, 25929600.00, 25929600.00, '2022-10-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":88,"no_seri_fpn":"010.006-22.59848894","stated":{"dpp":23360000.0,"ppn":2569600.0,"total":25929600.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":88,"no_seri_fpn":"010.006-22.59848894","stated":{"dpp":23360000.0,"ppn":2569600.0,"total":25929600.0}}}'::jsonb, v_actor_id, ('2022-10-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '64EA MIRROR', 1, 23360000.00
+      '64EA MIRROR', 1, 23360000.00, ('2022-10-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8894-AWP-2022-1', 25929600.00, 'IDR',
-      'bank_transfer', '2022-10-21', 'Imported from historical register (row 88)', v_actor_id
+      'bank_transfer', '2022-10-21', 'Imported from historical register (row 88)', v_actor_id, ('2022-10-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2730,29 +2730,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8895/AWP/2022', 'paid', 'IDR',
       '2022-10-11', 'REWORK FURNITURE TWA', 54960000.00, 0, 1, 1,
       11.000, 2.000, 5.000, 54960000.00, 6045600.00,
       1099200.00, 2748000.00, 6045600.00, 57158400.00, 57158400.00, '2022-10-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":89,"no_seri_fpn":"010.006-22.59848895","stated":{"dpp":54960000.0,"ppn":6045600.0,"pph":1099200.0,"retensi":2748000.0,"total":57158400.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":89,"no_seri_fpn":"010.006-22.59848895","stated":{"dpp":54960000.0,"ppn":6045600.0,"pph":1099200.0,"retensi":2748000.0,"total":57158400.0}}}'::jsonb, v_actor_id, ('2022-10-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'REWORK FURNITURE TWA', 1, 54960000.00
+      'REWORK FURNITURE TWA', 1, 54960000.00, ('2022-10-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8895-AWP-2022-1', 57158400.00, 'IDR',
-      'bank_transfer', '2022-10-21', 'Imported from historical register (row 89)', v_actor_id
+      'bank_transfer', '2022-10-21', 'Imported from historical register (row 89)', v_actor_id, ('2022-10-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2766,29 +2766,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8896/AWP/2022', 'paid', 'IDR',
       '2022-10-10', 'PROGRESS 16 TAKE OVER TOWER A', 117957262.39, 0, 1, 1,
       11.000, 2.000, NULL, 117957262.39, 12975298.86,
       2359145.25, 0.00, 12975298.86, 128573416.00, 128573416.00, '2022-10-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":90,"no_seri_fpn":"010.006-22.59848896","stated":{"dpp":117957262.0,"ppn":12975299.0,"pph":2359145.0,"total":128573416.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":90,"no_seri_fpn":"010.006-22.59848896","stated":{"dpp":117957262.0,"ppn":12975299.0,"pph":2359145.0,"total":128573416.0}}}'::jsonb, v_actor_id, ('2022-10-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 16 TAKE OVER TOWER A', 1, 117957262.39
+      'PROGRESS 16 TAKE OVER TOWER A', 1, 117957262.39, ('2022-10-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8896-AWP-2022-1', 128573416.00, 'IDR',
-      'bank_transfer', '2022-10-21', 'Imported from historical register (row 90)', v_actor_id
+      'bank_transfer', '2022-10-21', 'Imported from historical register (row 90)', v_actor_id, ('2022-10-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2802,29 +2802,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8897/AWP/2022', 'paid', 'IDR',
       '2022-10-12', 'TAKE OVER PLESTER ACI NEW CM2', 224964608.65, 0, 1, 1,
       11.000, 2.000, 5.000, 224964608.65, 24746106.95,
       4499292.17, 11248230.43, 24746106.95, 233963193.00, 233963193.00, '2022-10-28'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":91,"no_seri_fpn":"010.006-22.59848897","stated":{"dpp":224964608.0,"ppn":24746107.0,"pph":4499292.0,"retensi":11248230.0,"total":233963193.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":91,"no_seri_fpn":"010.006-22.59848897","stated":{"dpp":224964608.0,"ppn":24746107.0,"pph":4499292.0,"retensi":11248230.0,"total":233963193.0}}}'::jsonb, v_actor_id, ('2022-10-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'TAKE OVER PLESTER ACI NEW CM2', 1, 224964608.65
+      'TAKE OVER PLESTER ACI NEW CM2', 1, 224964608.65, ('2022-10-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8897-AWP-2022-1', 233963193.00, 'IDR',
-      'bank_transfer', '2022-10-28', 'Imported from historical register (row 91)', v_actor_id
+      'bank_transfer', '2022-10-28', 'Imported from historical register (row 91)', v_actor_id, ('2022-10-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2838,29 +2838,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8898/AWP/2022', 'paid', 'IDR',
       '2022-10-17', 'PROGRESS 17 TAKE OVER TOWER A', 132524618.35, 0, 1, 1,
       11.000, 2.000, NULL, 132524618.35, 14577708.02,
       2650492.37, 0.00, 14577708.02, 144451834.00, 144451834.00, '2022-10-28'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":92,"no_seri_fpn":"010.006-22.59848898","stated":{"dpp":132524618.0,"ppn":14577708.0,"pph":2650492.0,"total":144451834.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":92,"no_seri_fpn":"010.006-22.59848898","stated":{"dpp":132524618.0,"ppn":14577708.0,"pph":2650492.0,"total":144451834.0}}}'::jsonb, v_actor_id, ('2022-10-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 17 TAKE OVER TOWER A', 1, 132524618.35
+      'PROGRESS 17 TAKE OVER TOWER A', 1, 132524618.35, ('2022-10-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8898-AWP-2022-1', 144451834.00, 'IDR',
-      'bank_transfer', '2022-10-28', 'Imported from historical register (row 92)', v_actor_id
+      'bank_transfer', '2022-10-28', 'Imported from historical register (row 92)', v_actor_id, ('2022-10-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2874,29 +2874,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8899/AWP/2022', 'paid', 'IDR',
       '2022-10-24', 'PROGRESS 18 TAKE OVER TOWER A', 63715096.33, 0, 1, 1,
       11.000, 2.000, NULL, 63715096.33, 7008660.60,
       1274301.93, 0.00, 7008660.60, 69449455.00, 69449455.00, '2022-11-04'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":93,"no_seri_fpn":"010.006-22.59848899","stated":{"dpp":63715096.0,"ppn":7008661.0,"pph":1274302.0,"total":69449455.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":93,"no_seri_fpn":"010.006-22.59848899","stated":{"dpp":63715096.0,"ppn":7008661.0,"pph":1274302.0,"total":69449455.0}}}'::jsonb, v_actor_id, ('2022-10-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 18 TAKE OVER TOWER A', 1, 63715096.33
+      'PROGRESS 18 TAKE OVER TOWER A', 1, 63715096.33, ('2022-10-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8899-AWP-2022-1', 69449455.00, 'IDR',
-      'bank_transfer', '2022-11-04', 'Imported from historical register (row 93)', v_actor_id
+      'bank_transfer', '2022-11-04', 'Imported from historical register (row 93)', v_actor_id, ('2022-11-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2910,29 +2910,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8900/AWP/2022', 'paid', 'IDR',
       '2022-11-02', 'PROGRESS 1 INFRASTRUCTURE NEW CM 2 S', 152499331.73, 0, 1, 1,
       11.000, 2.000, 5.000, 152499331.73, 16774926.49,
       3049986.63, 7624966.59, 16774926.49, 158599305.00, 158599305.00, '2022-11-11'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":94,"no_seri_fpn":"010.006-22.59848900","stated":{"dpp":152499332.0,"ppn":16774927.0,"pph":3049987.0,"retensi":7624967.0,"total":158599305.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":94,"no_seri_fpn":"010.006-22.59848900","stated":{"dpp":152499332.0,"ppn":16774927.0,"pph":3049987.0,"retensi":7624967.0,"total":158599305.0}}}'::jsonb, v_actor_id, ('2022-11-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 1 INFRASTRUCTURE NEW CM 2 S', 1, 152499331.73
+      'PROGRESS 1 INFRASTRUCTURE NEW CM 2 S', 1, 152499331.73, ('2022-11-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8900-AWP-2022-1', 158599305.00, 'IDR',
-      'bank_transfer', '2022-11-11', 'Imported from historical register (row 94)', v_actor_id
+      'bank_transfer', '2022-11-11', 'Imported from historical register (row 94)', v_actor_id, ('2022-11-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2946,29 +2946,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8901/AWP/2022', 'paid', 'IDR',
       '2022-11-02', 'PROGRESS 1 OUTSTANDING NEW CM 2 S BLOK 3&4', 1240997884.61, 0, 1, 1,
       11.000, 2.000, 5.000, 1240997884.61, 136509767.31,
       24819957.69, 62049894.23, 136509767.31, 1290637800.00, 1290637800.00, '2022-11-11'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":95,"no_seri_fpn":"010.006-22.59848901","stated":{"dpp":1240997885.0,"ppn":136509767.0,"pph":24819958.0,"retensi":62049894.0,"total":1290637800.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":95,"no_seri_fpn":"010.006-22.59848901","stated":{"dpp":1240997885.0,"ppn":136509767.0,"pph":24819958.0,"retensi":62049894.0,"total":1290637800.0}}}'::jsonb, v_actor_id, ('2022-11-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 1 OUTSTANDING NEW CM 2 S BLOK 3&4', 1, 1240997884.61
+      'PROGRESS 1 OUTSTANDING NEW CM 2 S BLOK 3&4', 1, 1240997884.61, ('2022-11-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8901-AWP-2022-1', 1290637800.00, 'IDR',
-      'bank_transfer', '2022-11-11', 'Imported from historical register (row 95)', v_actor_id
+      'bank_transfer', '2022-11-11', 'Imported from historical register (row 95)', v_actor_id, ('2022-11-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -2982,29 +2982,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8902/AWP/2022', 'paid', 'IDR',
       '2022-11-01', 'PROGRESS 19 TAKE OVER TOWER A', 86512314.68, 0, 1, 1,
       11.000, 2.000, NULL, 86512314.68, 9516354.61,
       1730246.29, 0.00, 9516354.61, 94298423.00, 94298423.00, '2022-12-15'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":96,"no_seri_fpn":"010.006-22.59848902","stated":{"dpp":86512314.0,"ppn":9516355.0,"pph":1730246.0,"total":94298423.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":96,"no_seri_fpn":"010.006-22.59848902","stated":{"dpp":86512314.0,"ppn":9516355.0,"pph":1730246.0,"total":94298423.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-11-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 19 TAKE OVER TOWER A', 1, 86512314.68
+      'PROGRESS 19 TAKE OVER TOWER A', 1, 86512314.68, ('2022-11-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8902-AWP-2022-1', 94298423.00, 'IDR',
-      'bank_transfer', '2022-12-15', 'Imported from historical register (row 96)', v_actor_id
+      'bank_transfer', '2022-12-15', 'Imported from historical register (row 96)', v_actor_id, ('2022-12-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3018,29 +3018,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8903/AWP/2022', 'paid', 'IDR',
       '2022-11-04', 'FENCE APARTMENT 5 FL TOWER B', 39675000.00, 0, 1, 1,
       11.000, 2.000, 5.000, 39675000.00, 4364250.00,
       793500.00, 1983750.00, 4364250.00, 41262000.00, 41262000.00, '2022-12-15'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":97,"no_seri_fpn":"010.006-22.59848903","stated":{"dpp":39675000.0,"ppn":4364250.0,"pph":793500.0,"retensi":1983750.0,"total":41262000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":97,"no_seri_fpn":"010.006-22.59848903","stated":{"dpp":39675000.0,"ppn":4364250.0,"pph":793500.0,"retensi":1983750.0,"total":41262000.0}}}'::jsonb, v_actor_id, ('2022-11-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'FENCE APARTMENT 5 FL TOWER B', 1, 39675000.00
+      'FENCE APARTMENT 5 FL TOWER B', 1, 39675000.00, ('2022-11-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8903-AWP-2022-1', 41262000.00, 'IDR',
-      'bank_transfer', '2022-12-15', 'Imported from historical register (row 97)', v_actor_id
+      'bank_transfer', '2022-12-15', 'Imported from historical register (row 97)', v_actor_id, ('2022-12-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3054,29 +3054,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8904/AWP/2022', 'paid', 'IDR',
       '2022-11-10', 'UPGRADE WORK MESS EUCA PHASE 6 BLOK 1', 28256354.81, 0, 1, 1,
       11.000, 2.000, 5.000, 28256354.81, 3108199.03,
       565127.10, 1412817.74, 3108199.03, 29386609.00, 29386609.00, '2022-12-15'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":98,"no_seri_fpn":"010.006-22.59848904","stated":{"dpp":28256355.0,"ppn":3108199.0,"pph":565127.0,"retensi":1412818.0,"total":29386609.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":98,"no_seri_fpn":"010.006-22.59848904","stated":{"dpp":28256355.0,"ppn":3108199.0,"pph":565127.0,"retensi":1412818.0,"total":29386609.0}}}'::jsonb, v_actor_id, ('2022-11-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'UPGRADE WORK MESS EUCA PHASE 6 BLOK 1', 1, 28256354.81
+      'UPGRADE WORK MESS EUCA PHASE 6 BLOK 1', 1, 28256354.81, ('2022-11-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8904-AWP-2022-1', 29386609.00, 'IDR',
-      'bank_transfer', '2022-12-15', 'Imported from historical register (row 98)', v_actor_id
+      'bank_transfer', '2022-12-15', 'Imported from historical register (row 98)', v_actor_id, ('2022-12-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3090,29 +3090,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8905/AWP/2022', 'paid', 'IDR',
       '2022-11-07', 'PROGRESS 20 TAKE OVER TOWER A', 14584832.11, 0, 1, 1,
       11.000, 2.000, NULL, 14584832.11, 1604331.53,
       291696.64, 0.00, 1604331.53, 15897467.00, 15897467.00, '2022-12-15'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":99,"no_seri_fpn":"010.006-22.59848905","stated":{"dpp":14584832.0,"ppn":1604332.0,"pph":291697.0,"total":15897467.0},"unattributed_rows":[{"note":"register stated Rp 67,997,139 here; trimmed to the balance outstanding","amount":67997139.0,"date":"2022-12-15"}]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":99,"no_seri_fpn":"010.006-22.59848905","stated":{"dpp":14584832.0,"ppn":1604332.0,"pph":291697.0,"total":15897467.0},"unattributed_rows":[{"note":"register stated Rp 67,997,139 here; trimmed to the balance outstanding","amount":67997139.0,"date":"2022-12-15"}]}}'::jsonb, v_actor_id, ('2022-11-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 20 TAKE OVER TOWER A', 1, 14584832.11
+      'PROGRESS 20 TAKE OVER TOWER A', 1, 14584832.11, ('2022-11-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8905-AWP-2022-1', 15897467.00, 'IDR',
-      'bank_transfer', '2022-12-15', 'Imported from historical register (row 99)', v_actor_id
+      'bank_transfer', '2022-12-15', 'Imported from historical register (row 99)', v_actor_id, ('2022-12-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3126,29 +3126,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8906/AWP/2022', 'paid', 'IDR',
       '2022-11-11', 'PROGRESS 1 ROOF WORK APARTMENT 5 FL TWRB', 136701528.85, 0, 1, 1,
       11.000, 2.000, 5.000, 136701528.85, 15037168.17,
       2734030.58, 6835076.44, 15037168.17, 142169590.00, 142169590.00, '2022-11-25'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":100,"no_seri_fpn":"010.006-22.59848906","stated":{"dpp":136701529.0,"ppn":15037168.0,"pph":2734031.0,"retensi":6835076.0,"total":142169590.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":100,"no_seri_fpn":"010.006-22.59848906","stated":{"dpp":136701529.0,"ppn":15037168.0,"pph":2734031.0,"retensi":6835076.0,"total":142169590.0}}}'::jsonb, v_actor_id, ('2022-11-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 1 ROOF WORK APARTMENT 5 FL TWRB', 1, 136701528.85
+      'PROGRESS 1 ROOF WORK APARTMENT 5 FL TWRB', 1, 136701528.85, ('2022-11-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8906-AWP-2022-1', 142169590.00, 'IDR',
-      'bank_transfer', '2022-11-25', 'Imported from historical register (row 100)', v_actor_id
+      'bank_transfer', '2022-11-25', 'Imported from historical register (row 100)', v_actor_id, ('2022-11-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3162,29 +3162,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8907/AWP/2022', 'paid', 'IDR',
       '2022-11-24', 'CONTSTRUCTION MATERIAL; APARTMENT 5 FL', 16599500.00, 0, 1, 1,
       11.000, NULL, NULL, 16599500.00, 1825945.00,
       0.00, 0.00, 1825945.00, 18425445.00, 18425445.00, '2022-12-09'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":101,"no_seri_fpn":"010.006-22.59848907","stated":{"dpp":16599500.0,"ppn":1825945.0,"total":18425445.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":101,"no_seri_fpn":"010.006-22.59848907","stated":{"dpp":16599500.0,"ppn":1825945.0,"total":18425445.0}}}'::jsonb, v_actor_id, ('2022-11-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'CONTSTRUCTION MATERIAL; APARTMENT 5 FL', 1, 16599500.00
+      'CONTSTRUCTION MATERIAL; APARTMENT 5 FL', 1, 16599500.00, ('2022-11-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8907-AWP-2022-1', 18425445.00, 'IDR',
-      'bank_transfer', '2022-12-09', 'Imported from historical register (row 101)', v_actor_id
+      'bank_transfer', '2022-12-09', 'Imported from historical register (row 101)', v_actor_id, ('2022-12-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3198,29 +3198,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8908/AWP/2022', 'partial', 'IDR',
       '2022-12-02', 'DP TOWER B LABOR', 890690000.00, 0, 1, 1,
       11.000, NULL, NULL, 890690000.00, 97975900.00,
       0.00, 0.00, 97975900.00, 988665900.00, 559545450.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":102,"no_seri_fpn":"010.006-22.59848908","no_po_customer":"9000621887","stated":{"dpp":890690000.0,"ppn":97975900.0,"total":988665900.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":102,"no_seri_fpn":"010.006-22.59848908","no_po_customer":"9000621887","stated":{"dpp":890690000.0,"ppn":97975900.0,"total":988665900.0}}}'::jsonb, v_actor_id, ('2022-12-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'DP TOWER B LABOR', 1, 890690000.00
+      'DP TOWER B LABOR', 1, 890690000.00, ('2022-12-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8908-AWP-2022-1', 559545450.00, 'IDR',
-      'bank_transfer', '2022-12-12', 'Imported from historical register (row 102)', v_actor_id
+      'bank_transfer', '2022-12-12', 'Imported from historical register (row 102)', v_actor_id, ('2022-12-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3234,29 +3234,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8909/AWP/2022', 'paid', 'IDR',
       '2022-12-05', 'PROGRESS 2 ROOF WORK APARTMENT 5 FL TWRB', 135684131.73, 0, 1, 1,
       11.000, 2.000, 5.000, 135684131.73, 14925254.49,
       2713682.63, 6784206.59, 14925254.49, 141111497.00, 141111496.00, '2022-12-16'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":103,"no_seri_fpn":"010.006-22.59848909","stated":{"dpp":135684132.0,"ppn":14925255.0,"pph":2713683.0,"retensi":6784207.0,"total":141111497.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":103,"no_seri_fpn":"010.006-22.59848909","stated":{"dpp":135684132.0,"ppn":14925255.0,"pph":2713683.0,"retensi":6784207.0,"total":141111497.0}}}'::jsonb, v_actor_id, ('2022-12-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 2 ROOF WORK APARTMENT 5 FL TWRB', 1, 135684131.73
+      'PROGRESS 2 ROOF WORK APARTMENT 5 FL TWRB', 1, 135684131.73, ('2022-12-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8909-AWP-2022-1', 141111496.00, 'IDR',
-      'bank_transfer', '2022-12-16', 'Imported from historical register (row 103)', v_actor_id
+      'bank_transfer', '2022-12-16', 'Imported from historical register (row 103)', v_actor_id, ('2022-12-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3270,29 +3270,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8910/AWP/2022', 'paid', 'IDR',
       '2022-12-07', 'PROGRESS 2 INFRASTRUCTURE NEW CM 2 S', 152499331.73, 0, 1, 1,
       11.000, 2.000, 5.000, 152499331.73, 16774926.49,
       3049986.63, 7624966.59, 16774926.49, 158599305.00, 158599305.00, '2022-12-16'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":104,"no_seri_fpn":"010.006-22.59848910","stated":{"dpp":152499332.0,"ppn":16774927.0,"pph":3049987.0,"retensi":7624967.0,"total":158599305.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":104,"no_seri_fpn":"010.006-22.59848910","stated":{"dpp":152499332.0,"ppn":16774927.0,"pph":3049987.0,"retensi":7624967.0,"total":158599305.0}}}'::jsonb, v_actor_id, ('2022-12-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 2 INFRASTRUCTURE NEW CM 2 S', 1, 152499331.73
+      'PROGRESS 2 INFRASTRUCTURE NEW CM 2 S', 1, 152499331.73, ('2022-12-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8910-AWP-2022-1', 158599305.00, 'IDR',
-      'bank_transfer', '2022-12-16', 'Imported from historical register (row 104)', v_actor_id
+      'bank_transfer', '2022-12-16', 'Imported from historical register (row 104)', v_actor_id, ('2022-12-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3306,29 +3306,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8911/AWP/2022', 'paid', 'IDR',
       '2022-12-10', '1LOT CONSTRUCTION MATERIAL TWA', 63948000.00, 0, 1, 1,
       11.000, NULL, NULL, 63948000.00, 7034280.00,
       0.00, 0.00, 7034280.00, 70982280.00, 70982280.00, '2022-12-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":105,"no_seri_fpn":"010.006-22.59848911","stated":{"dpp":63948000.0,"ppn":7034280.0,"total":70982280.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":105,"no_seri_fpn":"010.006-22.59848911","stated":{"dpp":63948000.0,"ppn":7034280.0,"total":70982280.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-12-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '1LOT CONSTRUCTION MATERIAL TWA', 1, 63948000.00
+      '1LOT CONSTRUCTION MATERIAL TWA', 1, 63948000.00, ('2022-12-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8911-AWP-2022-1', 70982280.00, 'IDR',
-      'bank_transfer', '2022-12-30', 'Imported from historical register (row 105)', v_actor_id
+      'bank_transfer', '2022-12-30', 'Imported from historical register (row 105)', v_actor_id, ('2022-12-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3342,29 +3342,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8912/AWP/2022', 'paid', 'IDR',
       '2022-12-19', 'PROGRESS 2 OUTSTANDING NEW CM 2 S BLOK 3&4', 413665961.54, 0, 1, 1,
       11.000, 2.000, 5.000, 413665961.54, 45503255.77,
       8273319.23, 20683298.08, 45503255.77, 430212600.00, 430212600.00, '2022-12-23'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":106,"no_seri_fpn":"010.006-22.59848911","stated":{"dpp":413665961.0,"ppn":45503256.0,"pph":8273319.0,"retensi":20683298.0,"total":430212600.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":106,"no_seri_fpn":"010.006-22.59848911","stated":{"dpp":413665961.0,"ppn":45503256.0,"pph":8273319.0,"retensi":20683298.0,"total":430212600.0}}}'::jsonb, v_actor_id, ('2022-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 2 OUTSTANDING NEW CM 2 S BLOK 3&4', 1, 413665961.54
+      'PROGRESS 2 OUTSTANDING NEW CM 2 S BLOK 3&4', 1, 413665961.54, ('2022-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8912-AWP-2022-1', 430212600.00, 'IDR',
-      'bank_transfer', '2022-12-23', 'Imported from historical register (row 106)', v_actor_id
+      'bank_transfer', '2022-12-23', 'Imported from historical register (row 106)', v_actor_id, ('2022-12-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3378,29 +3378,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8913/AWP/2022', 'paid', 'IDR',
       '2022-12-14', '324CAN PLATONE 8000', 68040000.00, 0, 1, 1,
       11.000, NULL, NULL, 68040000.00, 7484400.00,
       0.00, 0.00, 7484400.00, 75524400.00, 75524400.00, '2022-12-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":107,"no_seri_fpn":"010.006-22.59848913","stated":{"dpp":68040000.0,"ppn":7484400.0,"total":75524400.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":107,"no_seri_fpn":"010.006-22.59848913","stated":{"dpp":68040000.0,"ppn":7484400.0,"total":75524400.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '324CAN PLATONE 8000', 1, 68040000.00
+      '324CAN PLATONE 8000', 1, 68040000.00, ('2022-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8913-AWP-2022-1', 75524400.00, 'IDR',
-      'bank_transfer', '2022-12-30', 'Imported from historical register (row 107)', v_actor_id
+      'bank_transfer', '2022-12-30', 'Imported from historical register (row 107)', v_actor_id, ('2022-12-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3414,29 +3414,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8914/AWP/2022', 'paid', 'IDR',
       '2022-12-14', '60CAN PLATONE 8000 BLACK', 12600000.00, 0, 1, 1,
       11.000, NULL, NULL, 12600000.00, 1386000.00,
       0.00, 0.00, 1386000.00, 13986000.00, 13986000.00, '2022-12-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":108,"no_seri_fpn":"010.006-22.59848914","stated":{"dpp":12600000.0,"ppn":1386000.0,"total":13986000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":108,"no_seri_fpn":"010.006-22.59848914","stated":{"dpp":12600000.0,"ppn":1386000.0,"total":13986000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '60CAN PLATONE 8000 BLACK', 1, 12600000.00
+      '60CAN PLATONE 8000 BLACK', 1, 12600000.00, ('2022-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8914-AWP-2022-1', 13986000.00, 'IDR',
-      'bank_transfer', '2022-12-30', 'Imported from historical register (row 108)', v_actor_id
+      'bank_transfer', '2022-12-30', 'Imported from historical register (row 108)', v_actor_id, ('2022-12-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3450,29 +3450,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8915/AWP/2022', 'paid', 'IDR',
       '2022-12-14', '180CAN PLATONE 8000 BLACK', 37800000.00, 0, 1, 1,
       11.000, NULL, NULL, 37800000.00, 4158000.00,
       0.00, 0.00, 4158000.00, 41958000.00, 41958000.00, '2022-12-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":109,"no_seri_fpn":"010.006-22.59848915","stated":{"dpp":37800000.0,"ppn":4158000.0,"total":41958000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":109,"no_seri_fpn":"010.006-22.59848915","stated":{"dpp":37800000.0,"ppn":4158000.0,"total":41958000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '180CAN PLATONE 8000 BLACK', 1, 37800000.00
+      '180CAN PLATONE 8000 BLACK', 1, 37800000.00, ('2022-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8915-AWP-2022-1', 41958000.00, 'IDR',
-      'bank_transfer', '2022-12-30', 'Imported from historical register (row 109)', v_actor_id
+      'bank_transfer', '2022-12-30', 'Imported from historical register (row 109)', v_actor_id, ('2022-12-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3486,29 +3486,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8916/AWP/2022', 'paid', 'IDR',
       '2022-12-14', '200CAN PLATONE 8000 BLACK', 42000000.00, 0, 1, 1,
       11.000, NULL, NULL, 42000000.00, 4620000.00,
       0.00, 0.00, 4620000.00, 46620000.00, 46620000.00, '2022-12-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":110,"no_seri_fpn":"010.006-22.59848916","stated":{"dpp":42000000.0,"ppn":4620000.0,"total":46620000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":110,"no_seri_fpn":"010.006-22.59848916","stated":{"dpp":42000000.0,"ppn":4620000.0,"total":46620000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '200CAN PLATONE 8000 BLACK', 1, 42000000.00
+      '200CAN PLATONE 8000 BLACK', 1, 42000000.00, ('2022-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8916-AWP-2022-1', 46620000.00, 'IDR',
-      'bank_transfer', '2022-12-30', 'Imported from historical register (row 110)', v_actor_id
+      'bank_transfer', '2022-12-30', 'Imported from historical register (row 110)', v_actor_id, ('2022-12-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3522,29 +3522,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8917/AWP/2022', 'paid', 'IDR',
       '2022-12-14', '800CAN PLATONE 8000', 168000000.00, 0, 1, 1,
       11.000, NULL, NULL, 168000000.00, 18480000.00,
       0.00, 0.00, 18480000.00, 186480000.00, 186480000.00, '2022-12-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":111,"no_seri_fpn":"010.006-22.59848917","stated":{"dpp":168000000.0,"ppn":18480000.0,"total":186480000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":111,"no_seri_fpn":"010.006-22.59848917","stated":{"dpp":168000000.0,"ppn":18480000.0,"total":186480000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '800CAN PLATONE 8000', 1, 168000000.00
+      '800CAN PLATONE 8000', 1, 168000000.00, ('2022-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8917-AWP-2022-1', 186480000.00, 'IDR',
-      'bank_transfer', '2022-12-30', 'Imported from historical register (row 111)', v_actor_id
+      'bank_transfer', '2022-12-30', 'Imported from historical register (row 111)', v_actor_id, ('2022-12-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3558,29 +3558,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8918/AWP/2022', 'paid', 'IDR',
       '2022-12-14', '200CAN PLATONE 8000 TRAFFIC GREEN', 22200000.00, 0, 1, 1,
       110.000, NULL, NULL, 22200000.00, 24420000.00,
       0.00, 0.00, 24420000.00, 46620000.00, 46620000.00, '2022-12-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":112,"no_seri_fpn":"010.006-22.59848918","stated":{"dpp":4200000.0,"ppn":4620000.0,"total":46620000.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":112,"no_seri_fpn":"010.006-22.59848918","stated":{"dpp":4200000.0,"ppn":4620000.0,"total":46620000.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '200CAN PLATONE 8000 TRAFFIC GREEN', 1, 22200000.00
+      '200CAN PLATONE 8000 TRAFFIC GREEN', 1, 22200000.00, ('2022-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8918-AWP-2022-1', 46620000.00, 'IDR',
-      'bank_transfer', '2022-12-30', 'Imported from historical register (row 112)', v_actor_id
+      'bank_transfer', '2022-12-30', 'Imported from historical register (row 112)', v_actor_id, ('2022-12-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3594,29 +3594,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8919/AWP/2022', 'paid', 'IDR',
       '2022-12-14', '100CAN PLATONE 8000 TRAFFIC GREEN', 21000000.00, 0, 1, 1,
       11.000, NULL, NULL, 21000000.00, 2310000.00,
       0.00, 0.00, 2310000.00, 23310000.00, 23310000.00, '2022-12-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":113,"no_seri_fpn":"010.006-22.59848919","stated":{"dpp":21000000.0,"ppn":2310000.0,"total":23310000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":113,"no_seri_fpn":"010.006-22.59848919","stated":{"dpp":21000000.0,"ppn":2310000.0,"total":23310000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2022-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '100CAN PLATONE 8000 TRAFFIC GREEN', 1, 21000000.00
+      '100CAN PLATONE 8000 TRAFFIC GREEN', 1, 21000000.00, ('2022-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8919-AWP-2022-1', 23310000.00, 'IDR',
-      'bank_transfer', '2022-12-30', 'Imported from historical register (row 113)', v_actor_id
+      'bank_transfer', '2022-12-30', 'Imported from historical register (row 113)', v_actor_id, ('2022-12-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3630,29 +3630,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8920/AWP/2022', 'paid', 'IDR',
       '2022-12-14', '5CAN PLATONE 8000 TRAFFIC GREEN', 1175000.00, 0, 1, 1,
       11.000, NULL, NULL, 1175000.00, 129250.00,
       0.00, 0.00, 129250.00, 1304250.00, 1304250.00, '2022-12-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":114,"no_seri_fpn":"010.006-22.59848920","stated":{"dpp":1175000.0,"ppn":129250.0,"total":1304250.0},"unattributed_rows":[{"note":"register stated Rp 506,784,930 here; trimmed to the balance outstanding","amount":506784930.0,"date":"2022-12-30"}]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":114,"no_seri_fpn":"010.006-22.59848920","stated":{"dpp":1175000.0,"ppn":129250.0,"total":1304250.0},"unattributed_rows":[{"note":"register stated Rp 506,784,930 here; trimmed to the balance outstanding","amount":506784930.0,"date":"2022-12-30"}]}}'::jsonb, v_actor_id, ('2022-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '5CAN PLATONE 8000 TRAFFIC GREEN', 1, 1175000.00
+      '5CAN PLATONE 8000 TRAFFIC GREEN', 1, 1175000.00, ('2022-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8920-AWP-2022-1', 1304250.00, 'IDR',
-      'bank_transfer', '2022-12-30', 'Imported from historical register (row 114)', v_actor_id
+      'bank_transfer', '2022-12-30', 'Imported from historical register (row 114)', v_actor_id, ('2022-12-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3666,29 +3666,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '8921/AWP/2022', 'paid', 'IDR',
       '2023-12-28', 'PROGRESS 1 TWB LABOR', 537184986.72, 0, 1, 1,
       11.000, 2.133, 5.332, 537184986.72, 59090348.54,
       11458155.77, 28642703.49, 59090348.54, 556174476.00, 556174476.00, '2023-06-01'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":115,"no_seri_fpn":"010.006-22.59848921","no_po_customer":"9000621887","stated":{"harga_jual":572808762.0,"dpp":537181162.0,"ppn":59089928.0,"pph":11456175.0,"retensi":28640438.0,"total":556174476.0},"unattributed_rows":[{"note":"unallocated credit stated in register","amount":386595000.0,"date":"2023-02-13"}],"import_notes":["base adjusted 537181162.00 -> 537184986.72 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment date precedes invoice date in source; both left as recorded, needs a human eye","payment date precedes invoice date in source; both left as recorded, needs a human eye"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":115,"no_seri_fpn":"010.006-22.59848921","no_po_customer":"9000621887","stated":{"harga_jual":572808762.0,"dpp":537181162.0,"ppn":59089928.0,"pph":11456175.0,"retensi":28640438.0,"total":556174476.0},"unattributed_rows":[{"note":"unallocated credit stated in register","amount":386595000.0,"date":"2023-02-13"}],"import_notes":["base adjusted 537181162.00 -> 537184986.72 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment date precedes invoice date in source; both left as recorded, needs a human eye","payment date precedes invoice date in source; both left as recorded, needs a human eye"]}}'::jsonb, v_actor_id, ('2023-12-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 1 TWB LABOR', 1, 537184986.72
+      'PROGRESS 1 TWB LABOR', 1, 537184986.72, ('2023-12-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-8921-AWP-2022-1', 556174476.00, 'IDR',
-      'bank_transfer', '2023-06-01', 'Imported from historical register (row 115)', v_actor_id
+      'bank_transfer', '2023-06-01', 'Imported from historical register (row 115)', v_actor_id, ('2023-06-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3702,29 +3702,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0193/AWP/2023', 'paid', 'IDR',
       '2023-01-04', 'PROGRESS 2 TWB LABOR', 160258858.10, 0, 1, 1,
       11.000, 2.445, 6.112, 160258858.10, 17628474.39,
       3918329.08, 9795021.41, 17628474.39, 164173982.00, 164173982.00, '2023-01-20'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":117,"no_seri_fpn":"010.001-23.88660193","no_po_customer":"9000621887","stated":{"harga_jual":195885210.0,"dpp":160257610.0,"ppn":17628337.0,"pph":3917704.0,"retensi":9794261.0,"total":164173982.0},"import_notes":["base adjusted 160257610.00 -> 160258858.10 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":117,"no_seri_fpn":"010.001-23.88660193","no_po_customer":"9000621887","stated":{"harga_jual":195885210.0,"dpp":160257610.0,"ppn":17628337.0,"pph":3917704.0,"retensi":9794261.0,"total":164173982.0},"import_notes":["base adjusted 160257610.00 -> 160258858.10 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-01-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 2 TWB LABOR', 1, 160258858.10
+      'PROGRESS 2 TWB LABOR', 1, 160258858.10, ('2023-01-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0193-AWP-2023-1', 164173982.00, 'IDR',
-      'bank_transfer', '2023-01-20', 'Imported from historical register (row 117)', v_actor_id
+      'bank_transfer', '2023-01-20', 'Imported from historical register (row 117)', v_actor_id, ('2023-01-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3738,29 +3738,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0194/AWP/2023', 'paid', 'IDR',
       '2023-01-11', 'PROGRESS 3 TWB LABOR', 153532112.02, 0, 1, 1,
       11.000, 2.464, 6.160, 153532112.02, 16888532.32,
       3783031.24, 9457578.10, 16888532.32, 157180035.00, 157180035.00, '2023-01-20'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":118,"no_seri_fpn":"010.001-23.88660194","no_po_customer":"9000621887","stated":{"harga_jual":189160261.0,"dpp":153532661.0,"ppn":16888593.0,"pph":3783205.0,"retensi":9458013.0,"total":157180035.0},"import_notes":["base adjusted 153532661.00 -> 153532112.02 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":118,"no_seri_fpn":"010.001-23.88660194","no_po_customer":"9000621887","stated":{"harga_jual":189160261.0,"dpp":153532661.0,"ppn":16888593.0,"pph":3783205.0,"retensi":9458013.0,"total":157180035.0},"import_notes":["base adjusted 153532661.00 -> 153532112.02 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-01-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 3 TWB LABOR', 1, 153532112.02
+      'PROGRESS 3 TWB LABOR', 1, 153532112.02, ('2023-01-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0194-AWP-2023-1', 157180035.00, 'IDR',
-      'bank_transfer', '2023-01-20', 'Imported from historical register (row 118)', v_actor_id
+      'bank_transfer', '2023-01-20', 'Imported from historical register (row 118)', v_actor_id, ('2023-01-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3774,29 +3774,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0195/AWP/2023', 'paid', 'IDR',
       '2023-01-11', 'PROGRESS 21 TAKE OVER TOWER A', 6039350.46, 0, 1, 1,
       11.000, 2.000, NULL, 6039350.46, 664328.55,
       120787.01, 0.00, 664328.55, 6582892.00, 6582892.00, '2023-09-02'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":119,"no_seri_fpn":"010.001-23.88660195","stated":{"dpp":6039350.0,"ppn":664329.0,"pph":120787.0,"total":6582892.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":119,"no_seri_fpn":"010.001-23.88660195","stated":{"dpp":6039350.0,"ppn":664329.0,"pph":120787.0,"total":6582892.0}}}'::jsonb, v_actor_id, ('2023-01-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 21 TAKE OVER TOWER A', 1, 6039350.46
+      'PROGRESS 21 TAKE OVER TOWER A', 1, 6039350.46, ('2023-01-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0195-AWP-2023-1', 6582892.00, 'IDR',
-      'bank_transfer', '2023-09-02', 'Imported from historical register (row 119)', v_actor_id
+      'bank_transfer', '2023-09-02', 'Imported from historical register (row 119)', v_actor_id, ('2023-09-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3810,29 +3810,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0196/AWP/2023', 'paid', 'IDR',
       '2023-01-13', '644HOLLOW,393HOLLOW', 25523100.00, 0, 1, 1,
       11.000, NULL, NULL, 25523100.00, 2807541.00,
       0.00, 0.00, 2807541.00, 28330641.00, 28330641.00, '2023-03-02'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":120,"no_seri_fpn":"010.001-23.88660196","stated":{"dpp":25523100.0,"ppn":2807541.0,"total":28330641.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":120,"no_seri_fpn":"010.001-23.88660196","stated":{"dpp":25523100.0,"ppn":2807541.0,"total":28330641.0}}}'::jsonb, v_actor_id, ('2023-01-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '644HOLLOW,393HOLLOW', 1, 25523100.00
+      '644HOLLOW,393HOLLOW', 1, 25523100.00, ('2023-01-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0196-AWP-2023-1', 28330641.00, 'IDR',
-      'bank_transfer', '2023-03-02', 'Imported from historical register (row 120)', v_actor_id
+      'bank_transfer', '2023-03-02', 'Imported from historical register (row 120)', v_actor_id, ('2023-03-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3846,29 +3846,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0197/AWP/2023', 'paid', 'IDR',
       '2023-01-16', '50GLN PL8000 123 TRAFFIC GREEN', 10500000.00, 0, 1, 1,
       11.000, NULL, NULL, 10500000.00, 1155000.00,
       0.00, 0.00, 1155000.00, 11655000.00, 11655000.00, '2023-01-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":121,"no_seri_fpn":"010.001-23.88660197","stated":{"dpp":10500000.0,"ppn":1155000.0,"total":11655000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":121,"no_seri_fpn":"010.001-23.88660197","stated":{"dpp":10500000.0,"ppn":1155000.0,"total":11655000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-01-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '50GLN PL8000 123 TRAFFIC GREEN', 1, 10500000.00
+      '50GLN PL8000 123 TRAFFIC GREEN', 1, 10500000.00, ('2023-01-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0197-AWP-2023-1', 11655000.00, 'IDR',
-      'bank_transfer', '2023-01-27', 'Imported from historical register (row 121)', v_actor_id
+      'bank_transfer', '2023-01-27', 'Imported from historical register (row 121)', v_actor_id, ('2023-01-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3882,29 +3882,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0198/AWP/2023', 'paid', 'IDR',
       '2023-01-16', '48GLN PL8000 9102 S.WHITE', 10080000.00, 0, 1, 1,
       11.000, NULL, NULL, 10080000.00, 1108800.00,
       0.00, 0.00, 1108800.00, 11188800.00, 11188800.00, '2023-01-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":122,"no_seri_fpn":"010.001-23.88660198","stated":{"dpp":10080000.0,"ppn":1108800.0,"total":11188800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":122,"no_seri_fpn":"010.001-23.88660198","stated":{"dpp":10080000.0,"ppn":1108800.0,"total":11188800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-01-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '48GLN PL8000 9102 S.WHITE', 1, 10080000.00
+      '48GLN PL8000 9102 S.WHITE', 1, 10080000.00, ('2023-01-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0198-AWP-2023-1', 11188800.00, 'IDR',
-      'bank_transfer', '2023-01-27', 'Imported from historical register (row 122)', v_actor_id
+      'bank_transfer', '2023-01-27', 'Imported from historical register (row 122)', v_actor_id, ('2023-01-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3918,29 +3918,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0199/AWP/2023', 'paid', 'IDR',
       '2023-01-17', '30GLN PL8000 9103 S.BLACK', 6300000.00, 0, 1, 1,
       11.000, NULL, NULL, 6300000.00, 693000.00,
       0.00, 0.00, 693000.00, 6993000.00, 6993000.00, '2023-01-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":123,"no_seri_fpn":"010.001-23.88660199","stated":{"dpp":6300000.0,"ppn":693000.0,"total":6993000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":123,"no_seri_fpn":"010.001-23.88660199","stated":{"dpp":6300000.0,"ppn":693000.0,"total":6993000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-01-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '30GLN PL8000 9103 S.BLACK', 1, 6300000.00
+      '30GLN PL8000 9103 S.BLACK', 1, 6300000.00, ('2023-01-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0199-AWP-2023-1', 6993000.00, 'IDR',
-      'bank_transfer', '2023-01-27', 'Imported from historical register (row 123)', v_actor_id
+      'bank_transfer', '2023-01-27', 'Imported from historical register (row 123)', v_actor_id, ('2023-01-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3954,29 +3954,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0200/AWP/2023', 'paid', 'IDR',
       '2023-01-17', '150GLN PL8000 :RED,BLUE,WHITE', 31500000.00, 0, 1, 1,
       11.000, NULL, NULL, 31500000.00, 3465000.00,
       0.00, 0.00, 3465000.00, 34965000.00, 34965000.00, '2023-01-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":124,"no_seri_fpn":"010.001-23.88660200","stated":{"dpp":31500000.0,"ppn":3465000.0,"total":34965000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":124,"no_seri_fpn":"010.001-23.88660200","stated":{"dpp":31500000.0,"ppn":3465000.0,"total":34965000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-01-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '150GLN PL8000 :RED,BLUE,WHITE', 1, 31500000.00
+      '150GLN PL8000 :RED,BLUE,WHITE', 1, 31500000.00, ('2023-01-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0200-AWP-2023-1', 34965000.00, 'IDR',
-      'bank_transfer', '2023-01-27', 'Imported from historical register (row 124)', v_actor_id
+      'bank_transfer', '2023-01-27', 'Imported from historical register (row 124)', v_actor_id, ('2023-01-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -3990,29 +3990,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0201/AWP/2023', 'paid', 'IDR',
       '2023-01-17', '60GLN PL8000 1018 SUNSHINE', 12600000.00, 0, 1, 1,
       11.000, NULL, NULL, 12600000.00, 1386000.00,
       0.00, 0.00, 1386000.00, 13986000.00, 13986000.00, '2023-01-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":125,"no_seri_fpn":"010.001-23.88660201","stated":{"dpp":12600000.0,"ppn":1386000.0,"total":13986000.0},"unattributed_rows":[{"note":"register stated Rp 78,787,800 here; trimmed to the balance outstanding","amount":78787800.0,"date":"2023-01-27"}]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":125,"no_seri_fpn":"010.001-23.88660201","stated":{"dpp":12600000.0,"ppn":1386000.0,"total":13986000.0},"unattributed_rows":[{"note":"register stated Rp 78,787,800 here; trimmed to the balance outstanding","amount":78787800.0,"date":"2023-01-27"}]}}'::jsonb, v_actor_id, ('2023-01-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '60GLN PL8000 1018 SUNSHINE', 1, 12600000.00
+      '60GLN PL8000 1018 SUNSHINE', 1, 12600000.00, ('2023-01-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0201-AWP-2023-1', 13986000.00, 'IDR',
-      'bank_transfer', '2023-01-27', 'Imported from historical register (row 125)', v_actor_id
+      'bank_transfer', '2023-01-27', 'Imported from historical register (row 125)', v_actor_id, ('2023-01-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4026,29 +4026,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0202/AWP/2023', 'paid', 'IDR',
       '2023-01-18', 'PROGRESS 4 TWB LABOR', 316660220.71, 0, 1, 1,
       11.000, 2.225, 5.563, 316660220.71, 34832624.28,
       7045689.91, 17615808.08, 34832624.28, 326831347.00, 326831347.00, '2023-01-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":126,"no_seri_fpn":"010.001-23.88660202","no_po_customer":"9000621887","stated":{"harga_jual":352286522.0,"dpp":316658922.0,"ppn":34832481.0,"pph":7045730.0,"retensi":17614326.0,"total":326831347.0},"import_notes":["base adjusted 316658922.00 -> 316660220.71 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":126,"no_seri_fpn":"010.001-23.88660202","no_po_customer":"9000621887","stated":{"harga_jual":352286522.0,"dpp":316658922.0,"ppn":34832481.0,"pph":7045730.0,"retensi":17614326.0,"total":326831347.0},"import_notes":["base adjusted 316658922.00 -> 316660220.71 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-01-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 4 TWB LABOR', 1, 316660220.71
+      'PROGRESS 4 TWB LABOR', 1, 316660220.71, ('2023-01-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0202-AWP-2023-1', 326831347.00, 'IDR',
-      'bank_transfer', '2023-01-27', 'Imported from historical register (row 126)', v_actor_id
+      'bank_transfer', '2023-01-27', 'Imported from historical register (row 126)', v_actor_id, ('2023-01-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4062,29 +4062,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0203/AWP/2023', 'paid', 'IDR',
       '2023-01-31', '71p5200,20FL,21p5400,20pWB,1OpWBBRUNNET', 128090000.00, 0, 1, 1,
       11.000, NULL, NULL, 128090000.00, 14089900.00,
       0.00, 0.00, 14089900.00, 142179900.00, 142179900.00, '2023-09-02'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":127,"no_seri_fpn":"010.001-23.88660203","stated":{"dpp":128090000.0,"ppn":14089900.0,"total":142179900.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":127,"no_seri_fpn":"010.001-23.88660203","stated":{"dpp":128090000.0,"ppn":14089900.0,"total":142179900.0}}}'::jsonb, v_actor_id, ('2023-01-31'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '71p5200,20FL,21p5400,20pWB,1OpWBBRUNNET', 1, 128090000.00
+      '71p5200,20FL,21p5400,20pWB,1OpWBBRUNNET', 1, 128090000.00, ('2023-01-31'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0203-AWP-2023-1', 142179900.00, 'IDR',
-      'bank_transfer', '2023-09-02', 'Imported from historical register (row 127)', v_actor_id
+      'bank_transfer', '2023-09-02', 'Imported from historical register (row 127)', v_actor_id, ('2023-09-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4098,29 +4098,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0204/AWP/2023', 'paid', 'IDR',
       '2023-02-01', 'PROGRESS 5 TWB LABOR', 646382603.70, 0, 1, 1,
       11.000, 2.110, 5.276, 646382603.70, 71102086.41,
       13638672.94, 34103146.17, 71102086.41, 669742871.00, 669742871.00, '2023-09-02'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":128,"no_seri_fpn":"010.001-23.88660204","no_po_customer":"9000621887","stated":{"harga_jual":682009141.0,"dpp":646381541.0,"ppn":71101970.0,"pph":13640183.0,"retensi":34100457.0,"total":669742871.0},"import_notes":["base adjusted 646381541.00 -> 646382603.70 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":128,"no_seri_fpn":"010.001-23.88660204","no_po_customer":"9000621887","stated":{"harga_jual":682009141.0,"dpp":646381541.0,"ppn":71101970.0,"pph":13640183.0,"retensi":34100457.0,"total":669742871.0},"import_notes":["base adjusted 646381541.00 -> 646382603.70 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-02-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 5 TWB LABOR', 1, 646382603.70
+      'PROGRESS 5 TWB LABOR', 1, 646382603.70, ('2023-02-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0204-AWP-2023-1', 669742871.00, 'IDR',
-      'bank_transfer', '2023-09-02', 'Imported from historical register (row 128)', v_actor_id
+      'bank_transfer', '2023-09-02', 'Imported from historical register (row 128)', v_actor_id, ('2023-09-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4134,29 +4134,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0205/AWP/2023', 'paid', 'IDR',
       '2023-02-08', 'PROGRESS 6 TWB LABOR', 336385826.77, 0, 1, 1,
       11.000, 2.212, 5.530, 336385826.77, 37002440.94,
       7440854.49, 18602136.22, 37002440.94, 347345277.00, 347345277.00, '2023-02-17'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":129,"no_seri_fpn":"010.001-23.88660205","no_po_customer":"9000621887","stated":{"harga_jual":372011455.0,"dpp":336383855.0,"ppn":37002224.0,"pph":7440229.0,"retensi":18600573.0,"total":347345277.0},"unattributed_rows":[{"note":"unallocated credit stated in register","amount":39546636.0,"date":"2023-02-17"}],"import_notes":["base adjusted 336383855.00 -> 336385826.76 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":129,"no_seri_fpn":"010.001-23.88660205","no_po_customer":"9000621887","stated":{"harga_jual":372011455.0,"dpp":336383855.0,"ppn":37002224.0,"pph":7440229.0,"retensi":18600573.0,"total":347345277.0},"unattributed_rows":[{"note":"unallocated credit stated in register","amount":39546636.0,"date":"2023-02-17"}],"import_notes":["base adjusted 336383855.00 -> 336385826.76 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-02-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 6 TWB LABOR', 1, 336385826.77
+      'PROGRESS 6 TWB LABOR', 1, 336385826.77, ('2023-02-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0205-AWP-2023-1', 347345277.00, 'IDR',
-      'bank_transfer', '2023-02-17', 'Imported from historical register (row 129)', v_actor_id
+      'bank_transfer', '2023-02-17', 'Imported from historical register (row 129)', v_actor_id, ('2023-02-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4170,29 +4170,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0206/AWP/2023', 'paid', 'IDR',
       '2023-02-15', 'PROGRESS 7 TWB LABOR', 266131184.81, 0, 1, 1,
       11.000, 2.268, 5.669, 266131184.81, 29274430.33,
       6035855.27, 15086976.87, 29274430.33, 274282783.00, 274282783.00, '2023-06-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":131,"no_seri_fpn":"010.001-23.88660206","no_po_customer":"9000621887","stated":{"harga_jual":301759057.0,"dpp":266131457.0,"ppn":29274460.0,"pph":6035181.0,"retensi":15087953.0,"total":274282783.0},"import_notes":["base adjusted 266131457.00 -> 266131184.81 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":131,"no_seri_fpn":"010.001-23.88660206","no_po_customer":"9000621887","stated":{"harga_jual":301759057.0,"dpp":266131457.0,"ppn":29274460.0,"pph":6035181.0,"retensi":15087953.0,"total":274282783.0},"import_notes":["base adjusted 266131457.00 -> 266131184.81 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-02-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 7 TWB LABOR', 1, 266131184.81
+      'PROGRESS 7 TWB LABOR', 1, 266131184.81, ('2023-02-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0206-AWP-2023-1', 274282783.00, 'IDR',
-      'bank_transfer', '2023-06-03', 'Imported from historical register (row 131)', v_actor_id
+      'bank_transfer', '2023-06-03', 'Imported from historical register (row 131)', v_actor_id, ('2023-06-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4206,29 +4206,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0207/AWP/2023', 'paid', 'IDR',
       '2023-02-15', '150GLN PL8000 123 TRAFFIC GREEN', 31200000.00, 0, 1, 1,
       11.000, NULL, NULL, 31200000.00, 3432000.00,
       0.00, 0.00, 3432000.00, 34632000.00, 34632000.00, '2023-06-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":132,"no_seri_fpn":"010.001-23.88660207","stated":{"dpp":31200000.0,"ppn":3432000.0,"total":34632000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":132,"no_seri_fpn":"010.001-23.88660207","stated":{"dpp":31200000.0,"ppn":3432000.0,"total":34632000.0}}}'::jsonb, v_actor_id, ('2023-02-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '150GLN PL8000 123 TRAFFIC GREEN', 1, 31200000.00
+      '150GLN PL8000 123 TRAFFIC GREEN', 1, 31200000.00, ('2023-02-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0207-AWP-2023-1', 34632000.00, 'IDR',
-      'bank_transfer', '2023-06-03', 'Imported from historical register (row 132)', v_actor_id
+      'bank_transfer', '2023-06-03', 'Imported from historical register (row 132)', v_actor_id, ('2023-06-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4242,29 +4242,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0208/AWP/2023', 'paid', 'IDR',
       '2023-02-15', '450GLN PL8000 BLUE,SUNSHINE,WHITE', 93600000.00, 0, 1, 1,
       11.000, NULL, NULL, 93600000.00, 10296000.00,
       0.00, 0.00, 10296000.00, 103896000.00, 103896000.00, '2023-06-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":133,"no_seri_fpn":"010.001-23.88660208","stated":{"dpp":93600000.0,"ppn":10296000.0,"total":103896000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":133,"no_seri_fpn":"010.001-23.88660208","stated":{"dpp":93600000.0,"ppn":10296000.0,"total":103896000.0}}}'::jsonb, v_actor_id, ('2023-02-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '450GLN PL8000 BLUE,SUNSHINE,WHITE', 1, 93600000.00
+      '450GLN PL8000 BLUE,SUNSHINE,WHITE', 1, 93600000.00, ('2023-02-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0208-AWP-2023-1', 103896000.00, 'IDR',
-      'bank_transfer', '2023-06-03', 'Imported from historical register (row 133)', v_actor_id
+      'bank_transfer', '2023-06-03', 'Imported from historical register (row 133)', v_actor_id, ('2023-06-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4278,29 +4278,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0209/AWP/2023', 'paid', 'IDR',
       '2023-02-15', '150GLN PL8000 600 VERMILLION', 31200000.00, 0, 1, 1,
       11.000, NULL, NULL, 31200000.00, 3432000.00,
       0.00, 0.00, 3432000.00, 34632000.00, 34632000.00, '2023-06-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":134,"no_seri_fpn":"010.001-23.88660209","stated":{"dpp":31200000.0,"ppn":3432000.0,"total":34632000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":134,"no_seri_fpn":"010.001-23.88660209","stated":{"dpp":31200000.0,"ppn":3432000.0,"total":34632000.0}}}'::jsonb, v_actor_id, ('2023-02-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '150GLN PL8000 600 VERMILLION', 1, 31200000.00
+      '150GLN PL8000 600 VERMILLION', 1, 31200000.00, ('2023-02-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0209-AWP-2023-1', 34632000.00, 'IDR',
-      'bank_transfer', '2023-06-03', 'Imported from historical register (row 134)', v_actor_id
+      'bank_transfer', '2023-06-03', 'Imported from historical register (row 134)', v_actor_id, ('2023-06-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4314,29 +4314,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0210/AWP/2023', 'paid', 'IDR',
       '2023-02-20', '4,8GLN PL8000 9103 S.BLACK', 998400.00, 0, 1, 1,
       11.000, NULL, NULL, 998400.00, 109824.00,
       0.00, 0.00, 109824.00, 1108224.00, 1108224.00, '2023-06-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":135,"no_seri_fpn":"010.001-23.88660210","stated":{"dpp":998400.0,"ppn":109824.0,"total":1108224.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":135,"no_seri_fpn":"010.001-23.88660210","stated":{"dpp":998400.0,"ppn":109824.0,"total":1108224.0}}}'::jsonb, v_actor_id, ('2023-02-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '4,8GLN PL8000 9103 S.BLACK', 1, 998400.00
+      '4,8GLN PL8000 9103 S.BLACK', 1, 998400.00, ('2023-02-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0210-AWP-2023-1', 1108224.00, 'IDR',
-      'bank_transfer', '2023-06-03', 'Imported from historical register (row 135)', v_actor_id
+      'bank_transfer', '2023-06-03', 'Imported from historical register (row 135)', v_actor_id, ('2023-06-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4350,29 +4350,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0211/AWP/2023', 'paid', 'IDR',
       '2023-02-20', '3GLN PL8000 600 VERMILLION', 624000.00, 0, 1, 1,
       11.000, NULL, NULL, 624000.00, 68640.00,
       0.00, 0.00, 68640.00, 692640.00, 692640.00, '2023-06-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":136,"no_seri_fpn":"010.001-23.88660211","stated":{"dpp":624000.0,"ppn":68640.0,"total":692640.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":136,"no_seri_fpn":"010.001-23.88660211","stated":{"dpp":624000.0,"ppn":68640.0,"total":692640.0}}}'::jsonb, v_actor_id, ('2023-02-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '3GLN PL8000 600 VERMILLION', 1, 624000.00
+      '3GLN PL8000 600 VERMILLION', 1, 624000.00, ('2023-02-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0211-AWP-2023-1', 692640.00, 'IDR',
-      'bank_transfer', '2023-06-03', 'Imported from historical register (row 136)', v_actor_id
+      'bank_transfer', '2023-06-03', 'Imported from historical register (row 136)', v_actor_id, ('2023-06-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4386,29 +4386,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0212/AWP/2023', 'paid', 'IDR',
       '2023-02-22', 'PROGRESS 8 TWB LABOR', 303128726.36, 0, 1, 1,
       11.000, 2.235, 5.588, 303128726.36, 33344159.90,
       6774927.03, 16938833.23, 33344159.90, 312759126.00, 312759126.00, '2023-06-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":137,"no_seri_fpn":"010.001-23.88660212","no_po_customer":"9000621887","stated":{"harga_jual":338755540.0,"dpp":303127940.0,"ppn":33344073.0,"pph":6775111.0,"retensi":16937777.0,"total":312759126.0},"import_notes":["base adjusted 303127940.00 -> 303128726.36 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":137,"no_seri_fpn":"010.001-23.88660212","no_po_customer":"9000621887","stated":{"harga_jual":338755540.0,"dpp":303127940.0,"ppn":33344073.0,"pph":6775111.0,"retensi":16937777.0,"total":312759126.0},"import_notes":["base adjusted 303127940.00 -> 303128726.36 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-02-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 8 TWB LABOR', 1, 303128726.36
+      'PROGRESS 8 TWB LABOR', 1, 303128726.36, ('2023-02-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0212-AWP-2023-1', 312759126.00, 'IDR',
-      'bank_transfer', '2023-06-03', 'Imported from historical register (row 137)', v_actor_id
+      'bank_transfer', '2023-06-03', 'Imported from historical register (row 137)', v_actor_id, ('2023-06-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4422,29 +4422,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0213/AWP/2023', 'paid', 'IDR',
       '2023-02-24', 'REPAINTING ROOFTOP FLOOR&PAGAR PVC', 69266000.00, 0, 1, 1,
       11.000, 2.000, NULL, 69266000.00, 7619260.00,
       1385320.00, 0.00, 7619260.00, 75499940.00, 75499940.00, '2023-06-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":138,"no_seri_fpn":"010.001-23.88660213","stated":{"dpp":69266000.0,"ppn":7619260.0,"pph":1385320.0,"total":75499940.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":138,"no_seri_fpn":"010.001-23.88660213","stated":{"dpp":69266000.0,"ppn":7619260.0,"pph":1385320.0,"total":75499940.0}}}'::jsonb, v_actor_id, ('2023-02-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'REPAINTING ROOFTOP FLOOR&PAGAR PVC', 1, 69266000.00
+      'REPAINTING ROOFTOP FLOOR&PAGAR PVC', 1, 69266000.00, ('2023-02-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0213-AWP-2023-1', 75499940.00, 'IDR',
-      'bank_transfer', '2023-06-03', 'Imported from historical register (row 138)', v_actor_id
+      'bank_transfer', '2023-06-03', 'Imported from historical register (row 138)', v_actor_id, ('2023-06-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4458,29 +4458,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9000597661', 'paid', 'IDR',
       '2023-02-27', 'RETENSI PERBAIKAN MESS EUCALYPTUS', 14174979.00, 0, 1, 1,
       0.000, NULL, NULL, 14174979.00, 0.00,
       0.00, 0.00, 0.00, 14174979.00, 14174979.00, '2023-09-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":139,"stated":{"total":14174979.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":139,"stated":{"total":14174979.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL"]}}'::jsonb, v_actor_id, ('2023-02-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI PERBAIKAN MESS EUCALYPTUS', 1, 14174979.00
+      'RETENSI PERBAIKAN MESS EUCALYPTUS', 1, 14174979.00, ('2023-02-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9000597661-1', 14174979.00, 'IDR',
-      'bank_transfer', '2023-09-03', 'Imported from historical register (row 139)', v_actor_id
+      'bank_transfer', '2023-09-03', 'Imported from historical register (row 139)', v_actor_id, ('2023-09-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4494,29 +4494,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9000608624', 'paid', 'IDR',
       '2023-02-27', 'RETENSI ADDITIONAL WORKS MESS EUCALYPTUS', 5376961.00, 0, 1, 1,
       0.000, NULL, NULL, 5376961.00, 0.00,
       0.00, 0.00, 0.00, 5376961.00, 5376961.00, '2023-10-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":140,"stated":{"total":5376961.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":140,"stated":{"total":5376961.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-02-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI ADDITIONAL WORKS MESS EUCALYPTUS', 1, 5376961.00
+      'RETENSI ADDITIONAL WORKS MESS EUCALYPTUS', 1, 5376961.00, ('2023-02-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9000608624-1', 5376961.00, 'IDR',
-      'bank_transfer', '2023-10-03', 'Imported from historical register (row 140)', v_actor_id
+      'bank_transfer', '2023-10-03', 'Imported from historical register (row 140)', v_actor_id, ('2023-10-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4530,29 +4530,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9000608562', 'partial', 'IDR',
       '2023-02-27', 'RETENSI GANTI KULIT', 8750250.00, 0, 1, 1,
       0.000, NULL, NULL, 8750250.00, 0.00,
       0.00, 0.00, 0.00, 8750250.00, 7890756.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":141,"stated":{"total":8750250.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":141,"stated":{"total":8750250.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL"]}}'::jsonb, v_actor_id, ('2023-02-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI GANTI KULIT', 1, 8750250.00
+      'RETENSI GANTI KULIT', 1, 8750250.00, ('2023-02-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9000608562-1', 7890756.00, 'IDR',
-      'bank_transfer', '2023-10-03', 'Imported from historical register (row 141)', v_actor_id
+      'bank_transfer', '2023-10-03', 'Imported from historical register (row 141)', v_actor_id, ('2023-10-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4566,29 +4566,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9000608058', 'paid', 'IDR',
       '2023-02-27', 'RETENSI REWORK FURNITURE TWA', 2748000.00, 0, 1, 1,
       0.000, NULL, NULL, 2748000.00, 0.00,
       0.00, 0.00, 0.00, 2748000.00, 2748000.00, '2023-09-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":142,"stated":{"total":2748000.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":142,"stated":{"total":2748000.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL"]}}'::jsonb, v_actor_id, ('2023-02-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI REWORK FURNITURE TWA', 1, 2748000.00
+      'RETENSI REWORK FURNITURE TWA', 1, 2748000.00, ('2023-02-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9000608058-1', 2748000.00, 'IDR',
-      'bank_transfer', '2023-09-03', 'Imported from historical register (row 142)', v_actor_id
+      'bank_transfer', '2023-09-03', 'Imported from historical register (row 142)', v_actor_id, ('2023-09-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4602,29 +4602,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0214/AWP/2023', 'paid', 'IDR',
       '2023-03-01', 'PROGRESS 9 TWB LABOR', 276195266.59, 0, 1, 1,
       11.000, 2.258, 5.645, 276195266.59, 30381479.32,
       6236489.12, 15591222.80, 30381479.32, 284749034.00, 284749034.00, '2023-09-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":143,"no_seri_fpn":"010.001-23.88660214","no_po_customer":"9000621887","stated":{"harga_jual":311822759.0,"dpp":276195159.0,"ppn":30381468.0,"pph":6236455.0,"retensi":15591138.0,"total":284749034.0},"import_notes":["base adjusted 276195159.00 -> 276195266.59 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","stored rates reproduce TOTAL to within Rp 0.01"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":143,"no_seri_fpn":"010.001-23.88660214","no_po_customer":"9000621887","stated":{"harga_jual":311822759.0,"dpp":276195159.0,"ppn":30381468.0,"pph":6236455.0,"retensi":15591138.0,"total":284749034.0},"import_notes":["base adjusted 276195159.00 -> 276195266.59 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","stored rates reproduce TOTAL to within Rp 0.01"]}}'::jsonb, v_actor_id, ('2023-03-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 9 TWB LABOR', 1, 276195266.59
+      'PROGRESS 9 TWB LABOR', 1, 276195266.59, ('2023-03-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0214-AWP-2023-1', 284749034.00, 'IDR',
-      'bank_transfer', '2023-09-03', 'Imported from historical register (row 143)', v_actor_id
+      'bank_transfer', '2023-09-03', 'Imported from historical register (row 143)', v_actor_id, ('2023-09-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4635,10 +4635,10 @@ BEGIN
       WHERE workspace_id = v_workspace_id AND invoice_number = '0215/AWP/2023' AND deleted_at IS NULL) THEN
     INSERT INTO public.invoices (
       workspace_id, client_id, project_id, invoice_number, status, currency,
-      issue_date, title, custom_fields, created_by
+      issue_date, title, custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0215/AWP/2023', 'cancelled', 'IDR',
-      '2023-03-02', 'PROGRESS 3 OUTSTANDING NEW CM 2 S BLOK 3&4', '{"import":"old_invoice_register","source":{"sheet_row":144,"no_seri_fpn":"010.001-23.88660215 BATAL"}}'::jsonb, v_actor_id
+      '2023-03-02', 'PROGRESS 3 OUTSTANDING NEW CM 2 S BLOK 3&4', '{"import":"old_invoice_register","source":{"sheet_row":144,"no_seri_fpn":"010.001-23.88660215 BATAL"}}'::jsonb, v_actor_id, ('2023-03-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
   END IF;
 
@@ -4652,29 +4652,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0216/AWP/2023', 'paid', 'IDR',
       '2023-03-02', 'PROGRESS 3 OUTSTANDING NEW CM 2 S BLOK 3&4', 413665961.54, 0, 1, 1,
       11.000, 2.000, 5.000, 413665961.54, 45503255.77,
       8273319.23, 20683298.08, 45503255.77, 430212600.00, 430212600.00, '2023-03-14'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":145,"no_seri_fpn":"010.001-23.88660216","stated":{"dpp":413665962.0,"ppn":45503256.0,"pph":8273319.0,"retensi":20683298.0,"total":430212600.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":145,"no_seri_fpn":"010.001-23.88660216","stated":{"dpp":413665962.0,"ppn":45503256.0,"pph":8273319.0,"retensi":20683298.0,"total":430212600.0}}}'::jsonb, v_actor_id, ('2023-03-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 3 OUTSTANDING NEW CM 2 S BLOK 3&4', 1, 413665961.54
+      'PROGRESS 3 OUTSTANDING NEW CM 2 S BLOK 3&4', 1, 413665961.54, ('2023-03-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0216-AWP-2023-1', 430212600.00, 'IDR',
-      'bank_transfer', '2023-03-14', 'Imported from historical register (row 145)', v_actor_id
+      'bank_transfer', '2023-03-14', 'Imported from historical register (row 145)', v_actor_id, ('2023-03-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4688,29 +4688,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0217/AWP/2023', 'paid', 'IDR',
       '2023-03-09', 'PROGRESS 10 TWB LABOR', 502638009.07, 0, 1, 1,
       11.000, 2.284, 5.709, 502638009.07, 55290181.00,
       11480252.13, 28695603.94, 55290181.00, 517752334.00, 517752334.00, '2023-03-17'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":146,"no_seri_fpn":"010.001-23.88660217","no_po_customer":"9000621887","stated":{"harga_jual":573890005.0,"dpp":502634805.0,"ppn":55289829.0,"pph":11477800.0,"retensi":28694500.0,"total":517752334.0},"import_notes":["base adjusted 502634805.00 -> 502638009.07 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":146,"no_seri_fpn":"010.001-23.88660217","no_po_customer":"9000621887","stated":{"harga_jual":573890005.0,"dpp":502634805.0,"ppn":55289829.0,"pph":11477800.0,"retensi":28694500.0,"total":517752334.0},"import_notes":["base adjusted 502634805.00 -> 502638009.07 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-03-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 10 TWB LABOR', 1, 502638009.07
+      'PROGRESS 10 TWB LABOR', 1, 502638009.07, ('2023-03-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0217-AWP-2023-1', 517752334.00, 'IDR',
-      'bank_transfer', '2023-03-17', 'Imported from historical register (row 146)', v_actor_id
+      'bank_transfer', '2023-03-17', 'Imported from historical register (row 146)', v_actor_id, ('2023-03-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4724,29 +4724,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0218/AWP/2023', 'paid', 'IDR',
       '2023-03-16', 'PROGRESS 11 TWB LABOR', 341473050.51, 0, 1, 1,
       11.000, 2.417, 6.043, 341473050.51, 37562035.56,
       8253403.63, 20635216.44, 37562035.56, 350146466.00, 350146466.00, '2023-03-24'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":147,"no_seri_fpn":"010.001-23.88660218","no_po_customer":"9000621887","stated":{"harga_jual":412730517.0,"dpp":341475317.0,"ppn":37562285.0,"pph":8254610.0,"retensi":20636526.0,"total":350146466.0},"unattributed_rows":[{"note":"unallocated credit stated in register","amount":79093272.0,"date":"2023-03-24"}],"import_notes":["base adjusted 341475317.00 -> 341473050.52 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":147,"no_seri_fpn":"010.001-23.88660218","no_po_customer":"9000621887","stated":{"harga_jual":412730517.0,"dpp":341475317.0,"ppn":37562285.0,"pph":8254610.0,"retensi":20636526.0,"total":350146466.0},"unattributed_rows":[{"note":"unallocated credit stated in register","amount":79093272.0,"date":"2023-03-24"}],"import_notes":["base adjusted 341475317.00 -> 341473050.52 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-03-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 11 TWB LABOR', 1, 341473050.51
+      'PROGRESS 11 TWB LABOR', 1, 341473050.51, ('2023-03-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0218-AWP-2023-1', 350146466.00, 'IDR',
-      'bank_transfer', '2023-03-24', 'Imported from historical register (row 147)', v_actor_id
+      'bank_transfer', '2023-03-24', 'Imported from historical register (row 147)', v_actor_id, ('2023-03-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4760,29 +4760,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0219/AWP/2023', 'partial', 'IDR',
       '2023-03-23', 'PROGRESS 12 TWB LABOR', 273061522.13, 0, 1, 1,
       11.000, 2.522, 6.305, 273061522.13, 30036767.43,
       6886611.59, 17216528.97, 30036767.43, 278995149.00, 199901877.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":149,"no_seri_fpn":"010.001-23.88660219","no_po_customer":"9000621887","stated":{"harga_jual":344315790.0,"dpp":273060590.0,"ppn":30036665.0,"pph":6886316.0,"retensi":17215790.0,"total":278995149.0},"import_notes":["base adjusted 273060590.00 -> 273061522.12 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":149,"no_seri_fpn":"010.001-23.88660219","no_po_customer":"9000621887","stated":{"harga_jual":344315790.0,"dpp":273060590.0,"ppn":30036665.0,"pph":6886316.0,"retensi":17215790.0,"total":278995149.0},"import_notes":["base adjusted 273060590.00 -> 273061522.12 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-03-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 12 TWB LABOR', 1, 273061522.13
+      'PROGRESS 12 TWB LABOR', 1, 273061522.13, ('2023-03-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0219-AWP-2023-1', 199901877.00, 'IDR',
-      'bank_transfer', '2023-04-03', 'Imported from historical register (row 149)', v_actor_id
+      'bank_transfer', '2023-04-03', 'Imported from historical register (row 149)', v_actor_id, ('2023-04-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4796,29 +4796,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0220/AWP/2023', 'partial', 'IDR',
       '2023-03-30', 'PROGRESS 13 TWB LABOR', 92363842.80, 0, 1, 1,
       11.000, 3.543, 8.857, 92363842.80, 10160022.71,
       3272450.95, 8180665.56, 10160022.71, 91070749.00, 48232624.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":150,"no_seri_fpn":"010.001-23.88660220","no_po_customer":"9000621887","stated":{"harga_jual":163619251.0,"dpp":92364051.0,"ppn":10160046.0,"pph":3272385.0,"retensi":8180963.0,"total":91070749.0},"import_notes":["base adjusted 92364051.00 -> 92363842.80 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":150,"no_seri_fpn":"010.001-23.88660220","no_po_customer":"9000621887","stated":{"harga_jual":163619251.0,"dpp":92364051.0,"ppn":10160046.0,"pph":3272385.0,"retensi":8180963.0,"total":91070749.0},"import_notes":["base adjusted 92364051.00 -> 92363842.80 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-03-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 13 TWB LABOR', 1, 92363842.80
+      'PROGRESS 13 TWB LABOR', 1, 92363842.80, ('2023-03-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0220-AWP-2023-1', 48232624.00, 'IDR',
-      'bank_transfer', '2023-11-04', 'Imported from historical register (row 150)', v_actor_id
+      'bank_transfer', '2023-11-04', 'Imported from historical register (row 150)', v_actor_id, ('2023-11-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4832,29 +4832,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0221/AWP/2023', 'paid', 'IDR',
       '2023-03-30', '240CAN PL.8000', 49920000.00, 0, 1, 1,
       11.000, NULL, NULL, 49920000.00, 5491200.00,
       0.00, 0.00, 5491200.00, 55411200.00, 55411200.00, '2023-04-14'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":151,"no_seri_fpn":"010.001-23.88660221","stated":{"dpp":49920000.0,"ppn":5491200.0,"total":55411200.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":151,"no_seri_fpn":"010.001-23.88660221","stated":{"dpp":49920000.0,"ppn":5491200.0,"total":55411200.0}}}'::jsonb, v_actor_id, ('2023-03-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '240CAN PL.8000', 1, 49920000.00
+      '240CAN PL.8000', 1, 49920000.00, ('2023-03-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0221-AWP-2023-1', 55411200.00, 'IDR',
-      'bank_transfer', '2023-04-14', 'Imported from historical register (row 151)', v_actor_id
+      'bank_transfer', '2023-04-14', 'Imported from historical register (row 151)', v_actor_id, ('2023-04-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4868,29 +4868,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0222/AWP/2023', 'paid', 'IDR',
       '2023-03-30', '746CAN PL.8000', 155168000.00, 0, 1, 1,
       11.000, NULL, NULL, 155168000.00, 17068480.00,
       0.00, 0.00, 17068480.00, 172236480.00, 172236480.00, '2023-04-14'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":152,"no_seri_fpn":"010.001-23.88660222","stated":{"dpp":155168000.0,"ppn":17068480.0,"total":172236480.0},"unattributed_rows":[{"note":"unallocated credit stated in register","amount":712552.0,"date":"2023-09-02"}]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":152,"no_seri_fpn":"010.001-23.88660222","stated":{"dpp":155168000.0,"ppn":17068480.0,"total":172236480.0},"unattributed_rows":[{"note":"unallocated credit stated in register","amount":712552.0,"date":"2023-09-02"}]}}'::jsonb, v_actor_id, ('2023-03-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '746CAN PL.8000', 1, 155168000.00
+      '746CAN PL.8000', 1, 155168000.00, ('2023-03-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0222-AWP-2023-1', 172236480.00, 'IDR',
-      'bank_transfer', '2023-04-14', 'Imported from historical register (row 152)', v_actor_id
+      'bank_transfer', '2023-04-14', 'Imported from historical register (row 152)', v_actor_id, ('2023-04-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4904,29 +4904,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0223/AWP/2023', 'partial', 'IDR',
       '2023-04-06', 'PROGRESS 14 TWB LABOR', 188727153.53, 0, 1, 1,
       11.000, 2.755, 6.888, 188727153.53, 20759986.89,
       5199433.08, 12999526.34, 20759986.89, 191288181.00, 190575629.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":154,"no_seri_fpn":"010.001-23.88660223","no_po_customer":"9000621887","stated":{"harga_jual":259982166.0,"dpp":188726966.0,"ppn":20759966.0,"pph":5199643.0,"retensi":12999108.0,"total":191288181.0},"import_notes":["base adjusted 188726966.00 -> 188727153.53 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":154,"no_seri_fpn":"010.001-23.88660223","no_po_customer":"9000621887","stated":{"harga_jual":259982166.0,"dpp":188726966.0,"ppn":20759966.0,"pph":5199643.0,"retensi":12999108.0,"total":191288181.0},"import_notes":["base adjusted 188726966.00 -> 188727153.53 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-04-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 14 TWB LABOR', 1, 188727153.53
+      'PROGRESS 14 TWB LABOR', 1, 188727153.53, ('2023-04-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0223-AWP-2023-1', 190575629.00, 'IDR',
-      'bank_transfer', '2023-04-14', 'Imported from historical register (row 154)', v_actor_id
+      'bank_transfer', '2023-04-14', 'Imported from historical register (row 154)', v_actor_id, ('2023-04-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4940,29 +4940,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0224/AWP/2023', 'paid', 'IDR',
       '2023-04-13', 'PROGRESS 15 TWB LABOR', 62875856.43, 0, 1, 1,
       11.000, 4.267, 10.666, 62875856.43, 6916344.21,
       2682912.79, 6706338.85, 6916344.21, 60402949.00, 60402949.00, '2023-04-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":155,"no_seri_fpn":"010.001-23.88660224","no_po_customer":"9000621887","stated":{"harga_jual":134130981.0,"dpp":62875781.0,"ppn":6916336.0,"pph":2682620.0,"retensi":6706549.0,"total":60402949.0},"import_notes":["base adjusted 62875781.00 -> 62875856.43 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":155,"no_seri_fpn":"010.001-23.88660224","no_po_customer":"9000621887","stated":{"harga_jual":134130981.0,"dpp":62875781.0,"ppn":6916336.0,"pph":2682620.0,"retensi":6706549.0,"total":60402949.0},"import_notes":["base adjusted 62875781.00 -> 62875856.43 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-04-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 15 TWB LABOR', 1, 62875856.43
+      'PROGRESS 15 TWB LABOR', 1, 62875856.43, ('2023-04-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0224-AWP-2023-1', 60402949.00, 'IDR',
-      'bank_transfer', '2023-04-27', 'Imported from historical register (row 155)', v_actor_id
+      'bank_transfer', '2023-04-27', 'Imported from historical register (row 155)', v_actor_id, ('2023-04-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -4976,29 +4976,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0225/AWP/2023', 'paid', 'IDR',
       '2023-04-13', 'PINTU &PEMIPAAN TWA', 2600000.00, 0, 1, 1,
       11.000, 2.000, NULL, 2600000.00, 286000.00,
       52000.00, 0.00, 286000.00, 2834000.00, 2834000.00, '2023-04-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":156,"no_seri_fpn":"010.001-23.88660225","stated":{"dpp":2600000.0,"ppn":286000.0,"pph":52000.0,"total":2834000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":156,"no_seri_fpn":"010.001-23.88660225","stated":{"dpp":2600000.0,"ppn":286000.0,"pph":52000.0,"total":2834000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-04-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PINTU &PEMIPAAN TWA', 1, 2600000.00
+      'PINTU &PEMIPAAN TWA', 1, 2600000.00, ('2023-04-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0225-AWP-2023-1', 2834000.00, 'IDR',
-      'bank_transfer', '2023-04-27', 'Imported from historical register (row 156)', v_actor_id
+      'bank_transfer', '2023-04-27', 'Imported from historical register (row 156)', v_actor_id, ('2023-04-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5012,29 +5012,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0226/AWP/2023', 'paid', 'IDR',
       '2023-04-13', '29P 5200', 16385000.00, 0, 1, 1,
       11.000, NULL, NULL, 16385000.00, 1802350.00,
       0.00, 0.00, 1802350.00, 18187350.00, 18187350.00, '2023-04-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":157,"no_seri_fpn":"010.001-23.88660226","stated":{"dpp":16385000.0,"ppn":1802350.0,"total":18187350.0},"import_notes":["source figure Rp 81,424,298 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":157,"no_seri_fpn":"010.001-23.88660226","stated":{"dpp":16385000.0,"ppn":1802350.0,"total":18187350.0},"import_notes":["source figure Rp 81,424,298 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id, ('2023-04-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '29P 5200', 1, 16385000.00
+      '29P 5200', 1, 16385000.00, ('2023-04-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0226-AWP-2023-1', 18187350.00, 'IDR',
-      'bank_transfer', '2023-04-27', 'Imported from historical register (row 157)', v_actor_id
+      'bank_transfer', '2023-04-27', 'Imported from historical register (row 157)', v_actor_id, ('2023-04-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5048,29 +5048,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9000601606', 'paid', 'IDR',
       '2023-04-13', 'RETENSI TAKE OVER CM PART1 BLOCK 4 BUILD', 19484957.00, 0, 1, 1,
       0.000, NULL, NULL, 19484957.00, 0.00,
       0.00, 0.00, 0.00, 19484957.00, 19484957.00, '2023-04-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":158,"stated":{"dpp":19484957.0,"total":19484957.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":158,"stated":{"dpp":19484957.0,"total":19484957.0}}}'::jsonb, v_actor_id, ('2023-04-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI TAKE OVER CM PART1 BLOCK 4 BUILD', 1, 19484957.00
+      'RETENSI TAKE OVER CM PART1 BLOCK 4 BUILD', 1, 19484957.00, ('2023-04-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9000601606-1', 19484957.00, 'IDR',
-      'bank_transfer', '2023-04-27', 'Imported from historical register (row 158)', v_actor_id
+      'bank_transfer', '2023-04-27', 'Imported from historical register (row 158)', v_actor_id, ('2023-04-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5084,29 +5084,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0227/AWP/2023', 'paid', 'IDR',
       '2023-04-19', 'PROGRESS 16 TWB LABOR', 109114442.47, 0, 1, 1,
       11.000, 3.306, 8.265, 109114442.47, 12002588.67,
       3607323.47, 9018308.67, 12002588.67, 108491399.00, 108491399.00, '2023-04-28'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":159,"no_seri_fpn":"010.001-23.88660227","no_po_customer":"9000621887","stated":{"harga_jual":180369877.0,"dpp":109114677.0,"ppn":12002614.0,"pph":3607398.0,"retensi":9018494.0,"total":108491399.0},"import_notes":["base adjusted 109114677.00 -> 109114442.47 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":159,"no_seri_fpn":"010.001-23.88660227","no_po_customer":"9000621887","stated":{"harga_jual":180369877.0,"dpp":109114677.0,"ppn":12002614.0,"pph":3607398.0,"retensi":9018494.0,"total":108491399.0},"import_notes":["base adjusted 109114677.00 -> 109114442.47 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-04-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 16 TWB LABOR', 1, 109114442.47
+      'PROGRESS 16 TWB LABOR', 1, 109114442.47, ('2023-04-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0227-AWP-2023-1', 108491399.00, 'IDR',
-      'bank_transfer', '2023-04-28', 'Imported from historical register (row 159)', v_actor_id
+      'bank_transfer', '2023-04-28', 'Imported from historical register (row 159)', v_actor_id, ('2023-04-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5120,29 +5120,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0228/AWP/2023', 'paid', 'IDR',
       '2023-04-19', '22P VINILEX BRILLIANT WHITE', 14300000.00, 0, 1, 1,
       11.000, NULL, NULL, 14300000.00, 1573000.00,
       0.00, 0.00, 1573000.00, 15873000.00, 15873000.00, '2023-04-28'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":160,"no_seri_fpn":"010.001-23.88660228","stated":{"dpp":14300000.0,"ppn":1573000.0,"total":15873000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":160,"no_seri_fpn":"010.001-23.88660228","stated":{"dpp":14300000.0,"ppn":1573000.0,"total":15873000.0}}}'::jsonb, v_actor_id, ('2023-04-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '22P VINILEX BRILLIANT WHITE', 1, 14300000.00
+      '22P VINILEX BRILLIANT WHITE', 1, 14300000.00, ('2023-04-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0228-AWP-2023-1', 15873000.00, 'IDR',
-      'bank_transfer', '2023-04-28', 'Imported from historical register (row 160)', v_actor_id
+      'bank_transfer', '2023-04-28', 'Imported from historical register (row 160)', v_actor_id, ('2023-04-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5156,29 +5156,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0229/AWP/2023', 'paid', 'IDR',
       '2023-04-21', '305EA CABLE,SP,ELEC,BELDEN,1030A', 6208260.36, 0, 1, 1,
       11.000, NULL, NULL, 6208260.36, 682908.64,
       0.00, 0.00, 682908.64, 6891169.00, 6891169.00, '2023-05-19'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":161,"no_seri_fpn":"010.001-23.88660229","stated":{"dpp":6208260.0,"ppn":682909.0,"total":6891169.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":161,"no_seri_fpn":"010.001-23.88660229","stated":{"dpp":6208260.0,"ppn":682909.0,"total":6891169.0}}}'::jsonb, v_actor_id, ('2023-04-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '305EA CABLE,SP,ELEC,BELDEN,1030A', 1, 6208260.36
+      '305EA CABLE,SP,ELEC,BELDEN,1030A', 1, 6208260.36, ('2023-04-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0229-AWP-2023-1', 6891169.00, 'IDR',
-      'bank_transfer', '2023-05-19', 'Imported from historical register (row 161)', v_actor_id
+      'bank_transfer', '2023-05-19', 'Imported from historical register (row 161)', v_actor_id, ('2023-05-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5192,29 +5192,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0230/AWP/2023', 'paid', 'IDR',
       '2023-05-09', 'PROGRESS 22 TWA', 8229124.78, 0, 1, 1,
       11.000, 2.000, NULL, 8229124.78, 905203.73,
       164582.50, 0.00, 905203.73, 8969746.00, 8969746.00, '2023-05-26'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":162,"no_seri_fpn":"010.001-23.88660230","stated":{"dpp":8229125.0,"ppn":905204.0,"pph":164583.0,"total":8969746.0},"import_notes":["stored rates reproduce TOTAL to within Rp 0.01","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":162,"no_seri_fpn":"010.001-23.88660230","stated":{"dpp":8229125.0,"ppn":905204.0,"pph":164583.0,"total":8969746.0},"import_notes":["stored rates reproduce TOTAL to within Rp 0.01","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-05-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 22 TWA', 1, 8229124.78
+      'PROGRESS 22 TWA', 1, 8229124.78, ('2023-05-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0230-AWP-2023-1', 8969746.00, 'IDR',
-      'bank_transfer', '2023-05-26', 'Imported from historical register (row 162)', v_actor_id
+      'bank_transfer', '2023-05-26', 'Imported from historical register (row 162)', v_actor_id, ('2023-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5228,29 +5228,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0231/AWP/2023', 'paid', 'IDR',
       '2023-05-10', '7P WBOND SWANLIKE, 3P WBOND BRUNETE', 18905000.00, 0, 1, 1,
       11.000, NULL, NULL, 18905000.00, 2079550.00,
       0.00, 0.00, 2079550.00, 20984550.00, 20984550.00, '2023-05-19'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":163,"no_seri_fpn":"010.001-23.88660231","stated":{"dpp":18905000.0,"ppn":2079550.0,"total":20984550.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":163,"no_seri_fpn":"010.001-23.88660231","stated":{"dpp":18905000.0,"ppn":2079550.0,"total":20984550.0}}}'::jsonb, v_actor_id, ('2023-05-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '7P WBOND SWANLIKE, 3P WBOND BRUNETE', 1, 18905000.00
+      '7P WBOND SWANLIKE, 3P WBOND BRUNETE', 1, 18905000.00, ('2023-05-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0231-AWP-2023-1', 20984550.00, 'IDR',
-      'bank_transfer', '2023-05-19', 'Imported from historical register (row 163)', v_actor_id
+      'bank_transfer', '2023-05-19', 'Imported from historical register (row 163)', v_actor_id, ('2023-05-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5264,29 +5264,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9000611507', 'paid', 'IDR',
       '2023-05-11', 'RETENSI TAKE OVER PLESTER ACI NEW CM2', 11248230.00, 0, 1, 1,
       0.000, NULL, NULL, 11248230.00, 0.00,
       0.00, 0.00, 0.00, 11248230.00, 11248230.00, '2023-05-23'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":164,"stated":{"dpp":11248230.0,"total":11248230.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":164,"stated":{"dpp":11248230.0,"total":11248230.0}}}'::jsonb, v_actor_id, ('2023-05-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI TAKE OVER PLESTER ACI NEW CM2', 1, 11248230.00
+      'RETENSI TAKE OVER PLESTER ACI NEW CM2', 1, 11248230.00, ('2023-05-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9000611507-1', 11248230.00, 'IDR',
-      'bank_transfer', '2023-05-23', 'Imported from historical register (row 164)', v_actor_id
+      'bank_transfer', '2023-05-23', 'Imported from historical register (row 164)', v_actor_id, ('2023-05-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5300,29 +5300,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0232/AWP/2023', 'paid', 'IDR',
       '2023-05-12', 'ADD MATERIAL, LABOUR PLASTER ACI BLK III&IV', 474585739.42, 0, 1, 1,
       11.000, 0.857, 5.000, 474585739.42, 52204431.34,
       4067199.79, 23729286.97, 52204431.34, 498993684.00, 498993684.00, '2023-09-06'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":165,"no_seri_fpn":"010.001-23.88660232","no_po_customer":"9000654757","stated":{"dpp":474584841.0,"ppn":52204333.0,"pph":4066248.0,"retensi":23729242.0,"total":498993684.0},"import_notes":["base adjusted 474584841.00 -> 474585739.42 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":165,"no_seri_fpn":"010.001-23.88660232","no_po_customer":"9000654757","stated":{"dpp":474584841.0,"ppn":52204333.0,"pph":4066248.0,"retensi":23729242.0,"total":498993684.0},"import_notes":["base adjusted 474584841.00 -> 474585739.42 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-05-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'ADD MATERIAL, LABOUR PLASTER ACI BLK III&IV', 1, 474585739.42
+      'ADD MATERIAL, LABOUR PLASTER ACI BLK III&IV', 1, 474585739.42, ('2023-05-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0232-AWP-2023-1', 498993684.00, 'IDR',
-      'bank_transfer', '2023-09-06', 'Imported from historical register (row 165)', v_actor_id
+      'bank_transfer', '2023-09-06', 'Imported from historical register (row 165)', v_actor_id, ('2023-09-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5336,29 +5336,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0233/AWP/2023', 'paid', 'IDR',
       '2023-05-16', '96CAN PL.8000', 19968000.00, 0, 1, 1,
       11.000, NULL, NULL, 19968000.00, 2196480.00,
       0.00, 0.00, 2196480.00, 22164480.00, 22164480.00, '2023-05-26'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":166,"no_seri_fpn":"010.001-23.88660233","no_po_customer":"900065965","stated":{"dpp":19968000.0,"ppn":2196480.0,"total":22164480.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":166,"no_seri_fpn":"010.001-23.88660233","no_po_customer":"900065965","stated":{"dpp":19968000.0,"ppn":2196480.0,"total":22164480.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '96CAN PL.8000', 1, 19968000.00
+      '96CAN PL.8000', 1, 19968000.00, ('2023-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0233-AWP-2023-1', 22164480.00, 'IDR',
-      'bank_transfer', '2023-05-26', 'Imported from historical register (row 166)', v_actor_id
+      'bank_transfer', '2023-05-26', 'Imported from historical register (row 166)', v_actor_id, ('2023-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5372,29 +5372,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0234/AWP/2023', 'paid', 'IDR',
       '2023-05-16', '100CAN PL.8000 S.WHITE', 20800000.00, 0, 1, 1,
       11.000, NULL, NULL, 20800000.00, 2288000.00,
       0.00, 0.00, 2288000.00, 23088000.00, 23088000.00, '2023-05-26'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":167,"no_seri_fpn":"010.001-23.88660234","no_po_customer":"9000646760","stated":{"dpp":20800000.0,"ppn":2288000.0,"total":23088000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":167,"no_seri_fpn":"010.001-23.88660234","no_po_customer":"9000646760","stated":{"dpp":20800000.0,"ppn":2288000.0,"total":23088000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '100CAN PL.8000 S.WHITE', 1, 20800000.00
+      '100CAN PL.8000 S.WHITE', 1, 20800000.00, ('2023-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0234-AWP-2023-1', 23088000.00, 'IDR',
-      'bank_transfer', '2023-05-26', 'Imported from historical register (row 167)', v_actor_id
+      'bank_transfer', '2023-05-26', 'Imported from historical register (row 167)', v_actor_id, ('2023-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5408,29 +5408,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0235/AWP/2023', 'paid', 'IDR',
       '2023-05-16', '100CAN PL.8000 S.WHITE', 20800000.00, 0, 1, 1,
       11.000, NULL, NULL, 20800000.00, 2288000.00,
       0.00, 0.00, 2288000.00, 23088000.00, 23088000.00, '2023-05-26'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":168,"no_seri_fpn":"010.001-23.88660235","no_po_customer":"9000648507","stated":{"dpp":20800000.0,"ppn":2288000.0,"total":23088000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":168,"no_seri_fpn":"010.001-23.88660235","no_po_customer":"9000648507","stated":{"dpp":20800000.0,"ppn":2288000.0,"total":23088000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '100CAN PL.8000 S.WHITE', 1, 20800000.00
+      '100CAN PL.8000 S.WHITE', 1, 20800000.00, ('2023-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0235-AWP-2023-1', 23088000.00, 'IDR',
-      'bank_transfer', '2023-05-26', 'Imported from historical register (row 168)', v_actor_id
+      'bank_transfer', '2023-05-26', 'Imported from historical register (row 168)', v_actor_id, ('2023-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5444,29 +5444,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0236/AWP/2023', 'paid', 'IDR',
       '2023-05-16', '10CAN PL.8000 S.BLACK', 2080000.00, 0, 1, 1,
       11.000, NULL, NULL, 2080000.00, 228800.00,
       0.00, 0.00, 228800.00, 2308800.00, 2308800.00, '2023-05-26'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":169,"no_seri_fpn":"010.001-23.88660236","no_po_customer":"9000649251","stated":{"dpp":2080000.0,"ppn":228800.0,"total":2308800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":169,"no_seri_fpn":"010.001-23.88660236","no_po_customer":"9000649251","stated":{"dpp":2080000.0,"ppn":228800.0,"total":2308800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10CAN PL.8000 S.BLACK', 1, 2080000.00
+      '10CAN PL.8000 S.BLACK', 1, 2080000.00, ('2023-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0236-AWP-2023-1', 2308800.00, 'IDR',
-      'bank_transfer', '2023-05-26', 'Imported from historical register (row 169)', v_actor_id
+      'bank_transfer', '2023-05-26', 'Imported from historical register (row 169)', v_actor_id, ('2023-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5480,29 +5480,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0237/AWP/2023', 'paid', 'IDR',
       '2023-05-16', '20CAN PL.8000 SUNSHINE', 4160000.00, 0, 1, 1,
       11.000, NULL, NULL, 4160000.00, 457600.00,
       0.00, 0.00, 457600.00, 4617600.00, 4617600.00, '2023-05-26'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":170,"no_seri_fpn":"010.001-23.88660237","no_po_customer":"9000649787","stated":{"dpp":4160000.0,"ppn":457600.0,"total":4617600.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":170,"no_seri_fpn":"010.001-23.88660237","no_po_customer":"9000649787","stated":{"dpp":4160000.0,"ppn":457600.0,"total":4617600.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '20CAN PL.8000 SUNSHINE', 1, 4160000.00
+      '20CAN PL.8000 SUNSHINE', 1, 4160000.00, ('2023-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0237-AWP-2023-1', 4617600.00, 'IDR',
-      'bank_transfer', '2023-05-26', 'Imported from historical register (row 170)', v_actor_id
+      'bank_transfer', '2023-05-26', 'Imported from historical register (row 170)', v_actor_id, ('2023-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5516,29 +5516,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0238/AWP/2023', 'paid', 'IDR',
       '2023-05-16', '10CAN PL.8000 S.WHITE', 2080000.00, 0, 1, 1,
       11.000, NULL, NULL, 2080000.00, 228800.00,
       0.00, 0.00, 228800.00, 2308800.00, 2308800.00, '2023-05-26'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":171,"no_seri_fpn":"010.001-23.88660238","no_po_customer":"9000653443","stated":{"dpp":2080000.0,"ppn":228800.0,"total":2308800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":171,"no_seri_fpn":"010.001-23.88660238","no_po_customer":"9000653443","stated":{"dpp":2080000.0,"ppn":228800.0,"total":2308800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10CAN PL.8000 S.WHITE', 1, 2080000.00
+      '10CAN PL.8000 S.WHITE', 1, 2080000.00, ('2023-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0238-AWP-2023-1', 2308800.00, 'IDR',
-      'bank_transfer', '2023-05-26', 'Imported from historical register (row 171)', v_actor_id
+      'bank_transfer', '2023-05-26', 'Imported from historical register (row 171)', v_actor_id, ('2023-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5552,29 +5552,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0239/AWP/2023', 'paid', 'IDR',
       '2023-05-16', '12CAN PL.8000 S.WHITE, 5CAN SUNSHINE', 3536000.00, 0, 1, 1,
       11.000, NULL, NULL, 3536000.00, 388960.00,
       0.00, 0.00, 388960.00, 3924960.00, 3924960.00, '2023-05-26'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":172,"no_seri_fpn":"010.001-23.88660239","no_po_customer":"9000651698","stated":{"dpp":3536000.0,"ppn":388960.0,"total":3924960.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":172,"no_seri_fpn":"010.001-23.88660239","no_po_customer":"9000651698","stated":{"dpp":3536000.0,"ppn":388960.0,"total":3924960.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '12CAN PL.8000 S.WHITE, 5CAN SUNSHINE', 1, 3536000.00
+      '12CAN PL.8000 S.WHITE, 5CAN SUNSHINE', 1, 3536000.00, ('2023-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0239-AWP-2023-1', 3924960.00, 'IDR',
-      'bank_transfer', '2023-05-26', 'Imported from historical register (row 172)', v_actor_id
+      'bank_transfer', '2023-05-26', 'Imported from historical register (row 172)', v_actor_id, ('2023-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5588,29 +5588,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0240/AWP/2023', 'paid', 'IDR',
       '2023-05-16', '186CAN PL.8000', 38688000.00, 0, 1, 1,
       11.000, NULL, NULL, 38688000.00, 4255680.00,
       0.00, 0.00, 4255680.00, 42943680.00, 42943680.00, '2023-05-26'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":173,"no_seri_fpn":"010.001-23.88660240","no_po_customer":"9000655345","stated":{"dpp":38688000.0,"ppn":4255680.0,"total":42943680.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":173,"no_seri_fpn":"010.001-23.88660240","no_po_customer":"9000655345","stated":{"dpp":38688000.0,"ppn":4255680.0,"total":42943680.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '186CAN PL.8000', 1, 38688000.00
+      '186CAN PL.8000', 1, 38688000.00, ('2023-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0240-AWP-2023-1', 42943680.00, 'IDR',
-      'bank_transfer', '2023-05-26', 'Imported from historical register (row 173)', v_actor_id
+      'bank_transfer', '2023-05-26', 'Imported from historical register (row 173)', v_actor_id, ('2023-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5624,29 +5624,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0241/AWP/2023', 'paid', 'IDR',
       '2023-05-17', 'PROGRESS 17 TWB LABOR', 162035754.70, 0, 1, 1,
       11.000, 2.880, 7.199, 162035754.70, 17823933.02,
       4666629.74, 11664953.98, 17823933.02, 163528104.00, 163528104.00, '2023-05-26'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":174,"no_seri_fpn":"010.001-23.88660241","no_po_customer":"9000621887","stated":{"harga_jual":233289785.0,"dpp":162034585.0,"ppn":17823804.0,"pph":4665796.0,"retensi":11664489.0,"total":163528104.0},"unattributed_rows":[{"note":"register stated Rp 296,942,170 here; trimmed to the balance outstanding","amount":296942170.0,"date":"2023-05-26"}],"import_notes":["base adjusted 162034585.00 -> 162035754.70 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":174,"no_seri_fpn":"010.001-23.88660241","no_po_customer":"9000621887","stated":{"harga_jual":233289785.0,"dpp":162034585.0,"ppn":17823804.0,"pph":4665796.0,"retensi":11664489.0,"total":163528104.0},"unattributed_rows":[{"note":"register stated Rp 296,942,170 here; trimmed to the balance outstanding","amount":296942170.0,"date":"2023-05-26"}],"import_notes":["base adjusted 162034585.00 -> 162035754.70 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-05-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 17 TWB LABOR', 1, 162035754.70
+      'PROGRESS 17 TWB LABOR', 1, 162035754.70, ('2023-05-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0241-AWP-2023-1', 163528104.00, 'IDR',
-      'bank_transfer', '2023-05-26', 'Imported from historical register (row 174)', v_actor_id
+      'bank_transfer', '2023-05-26', 'Imported from historical register (row 174)', v_actor_id, ('2023-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5660,29 +5660,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0242/AWP/2023', 'paid', 'IDR',
       '2023-05-17', '2CAN SUNSHINE, 2CAN TRAFFIC GREEN', 832000.00, 0, 1, 1,
       11.000, NULL, NULL, 832000.00, 91520.00,
       0.00, 0.00, 91520.00, 923520.00, 923520.00, '2023-07-06'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":175,"no_seri_fpn":"010.001-23.88660242","no_po_customer":"3170025240","stated":{"dpp":832000.0,"ppn":91520.0,"total":923520.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":175,"no_seri_fpn":"010.001-23.88660242","no_po_customer":"3170025240","stated":{"dpp":832000.0,"ppn":91520.0,"total":923520.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-05-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '2CAN SUNSHINE, 2CAN TRAFFIC GREEN', 1, 832000.00
+      '2CAN SUNSHINE, 2CAN TRAFFIC GREEN', 1, 832000.00, ('2023-05-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0242-AWP-2023-1', 923520.00, 'IDR',
-      'bank_transfer', '2023-07-06', 'Imported from historical register (row 175)', v_actor_id
+      'bank_transfer', '2023-07-06', 'Imported from historical register (row 175)', v_actor_id, ('2023-07-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5696,29 +5696,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0243/AWP/2023', 'paid', 'IDR',
       '2023-05-17', '1PCS PFP241 2K SB 16KP + 1PC HARDENER', 1985000.00, 0, 1, 1,
       11.000, NULL, NULL, 1985000.00, 218350.00,
       0.00, 0.00, 218350.00, 2203350.00, 2203350.00, '2023-07-04'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":176,"no_seri_fpn":"010.001-23.88660243","no_po_customer":"1303042296","stated":{"dpp":1985000.0,"ppn":218350.0,"total":2203350.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":176,"no_seri_fpn":"010.001-23.88660243","no_po_customer":"1303042296","stated":{"dpp":1985000.0,"ppn":218350.0,"total":2203350.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-05-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '1PCS PFP241 2K SB 16KP + 1PC HARDENER', 1, 1985000.00
+      '1PCS PFP241 2K SB 16KP + 1PC HARDENER', 1, 1985000.00, ('2023-05-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0243-AWP-2023-1', 2203350.00, 'IDR',
-      'bank_transfer', '2023-07-04', 'Imported from historical register (row 176)', v_actor_id
+      'bank_transfer', '2023-07-04', 'Imported from historical register (row 176)', v_actor_id, ('2023-07-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5732,29 +5732,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0244/AWP/2023', 'paid', 'IDR',
       '2023-05-22', '7CAN PL.8000 WHITE, 5CAN BLUE', 2496000.00, 0, 1, 1,
       11.000, NULL, NULL, 2496000.00, 274560.00,
       0.00, 0.00, 274560.00, 2770560.00, 2770560.00, '2023-09-06'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":177,"no_seri_fpn":"010.001-23.88660244","no_po_customer":"9000647580","stated":{"dpp":2496000.0,"ppn":274560.0,"total":2770560.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":177,"no_seri_fpn":"010.001-23.88660244","no_po_customer":"9000647580","stated":{"dpp":2496000.0,"ppn":274560.0,"total":2770560.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-05-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '7CAN PL.8000 WHITE, 5CAN BLUE', 1, 2496000.00
+      '7CAN PL.8000 WHITE, 5CAN BLUE', 1, 2496000.00, ('2023-05-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0244-AWP-2023-1', 2770560.00, 'IDR',
-      'bank_transfer', '2023-09-06', 'Imported from historical register (row 177)', v_actor_id
+      'bank_transfer', '2023-09-06', 'Imported from historical register (row 177)', v_actor_id, ('2023-09-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5768,29 +5768,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0245/AWP/2023', 'paid', 'IDR',
       '2023-05-26', '25CAN PL.8000 WHITE', 5200000.00, 0, 1, 1,
       11.000, NULL, NULL, 5200000.00, 572000.00,
       0.00, 0.00, 572000.00, 5772000.00, 5772000.00, '2023-09-06'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":178,"no_seri_fpn":"010.001-23.88660245","no_po_customer":"9000650036","stated":{"dpp":5200000.0,"ppn":572000.0,"total":5772000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":178,"no_seri_fpn":"010.001-23.88660245","no_po_customer":"9000650036","stated":{"dpp":5200000.0,"ppn":572000.0,"total":5772000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '25CAN PL.8000 WHITE', 1, 5200000.00
+      '25CAN PL.8000 WHITE', 1, 5200000.00, ('2023-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0245-AWP-2023-1', 5772000.00, 'IDR',
-      'bank_transfer', '2023-09-06', 'Imported from historical register (row 178)', v_actor_id
+      'bank_transfer', '2023-09-06', 'Imported from historical register (row 178)', v_actor_id, ('2023-09-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5804,29 +5804,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0246/AWP/2023', 'paid', 'IDR',
       '2023-05-29', '1EA WATER CLOSET,TOTO,CW421J', 1332000.00, 0, 1, 1,
       11.000, NULL, NULL, 1332000.00, 146520.00,
       0.00, 0.00, 146520.00, 1478520.00, 1478520.00, '2023-09-06'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":179,"no_seri_fpn":"010.001-23.88660246","no_po_customer":"9000657585","stated":{"dpp":1332000.0,"ppn":146520.0,"total":1478520.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":179,"no_seri_fpn":"010.001-23.88660246","no_po_customer":"9000657585","stated":{"dpp":1332000.0,"ppn":146520.0,"total":1478520.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-05-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '1EA WATER CLOSET,TOTO,CW421J', 1, 1332000.00
+      '1EA WATER CLOSET,TOTO,CW421J', 1, 1332000.00, ('2023-05-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0246-AWP-2023-1', 1478520.00, 'IDR',
-      'bank_transfer', '2023-09-06', 'Imported from historical register (row 179)', v_actor_id
+      'bank_transfer', '2023-09-06', 'Imported from historical register (row 179)', v_actor_id, ('2023-09-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5840,29 +5840,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0247/AWP/2023', 'paid', 'IDR',
       '2023-06-02', 'ADDITIONAL FULL TAKEOVER III&IV, INFRA NEW CM2-STOREY', 437235365.39, 0, 1, 1,
       11.000, 2.000, 5.000, 437235365.39, 48095890.19,
       8744707.31, 21861768.27, 48095890.19, 454724780.00, 454724780.00, '2023-06-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":180,"no_seri_fpn":"010.001-23.88660247","no_po_customer":"9000657462","stated":{"dpp":437235365.0,"ppn":48095890.0,"pph":8744707.0,"retensi":21861768.0,"total":454724780.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":180,"no_seri_fpn":"010.001-23.88660247","no_po_customer":"9000657462","stated":{"dpp":437235365.0,"ppn":48095890.0,"pph":8744707.0,"retensi":21861768.0,"total":454724780.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-06-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'ADDITIONAL FULL TAKEOVER III&IV, INFRA NEW CM2-STOREY', 1, 437235365.39
+      'ADDITIONAL FULL TAKEOVER III&IV, INFRA NEW CM2-STOREY', 1, 437235365.39, ('2023-06-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0247-AWP-2023-1', 454724780.00, 'IDR',
-      'bank_transfer', '2023-06-21', 'Imported from historical register (row 180)', v_actor_id
+      'bank_transfer', '2023-06-21', 'Imported from historical register (row 180)', v_actor_id, ('2023-06-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5876,29 +5876,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0248/AWP/2023', 'paid', 'IDR',
       '2023-06-02', 'PROGRESS 18 TWB LABOR', 170974662.50, 0, 1, 1,
       11.000, 2.000, 5.000, 170974662.50, 18807212.88,
       3419493.25, 8548733.13, 18807212.88, 177813649.00, 177813649.00, '2023-06-16'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":181,"no_seri_fpn":"010.001-23.88660248","no_po_customer":"9000621887","stated":{"harga_jual":170974662.0,"dpp":170974662.0,"ppn":18807213.0,"pph":3419493.0,"retensi":8548733.0,"total":177813649.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":181,"no_seri_fpn":"010.001-23.88660248","no_po_customer":"9000621887","stated":{"harga_jual":170974662.0,"dpp":170974662.0,"ppn":18807213.0,"pph":3419493.0,"retensi":8548733.0,"total":177813649.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-06-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 18 TWB LABOR', 1, 170974662.50
+      'PROGRESS 18 TWB LABOR', 1, 170974662.50, ('2023-06-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0248-AWP-2023-1', 177813649.00, 'IDR',
-      'bank_transfer', '2023-06-16', 'Imported from historical register (row 181)', v_actor_id
+      'bank_transfer', '2023-06-16', 'Imported from historical register (row 181)', v_actor_id, ('2023-06-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5912,29 +5912,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9000608488', 'paid', 'IDR',
       '2023-06-02', 'RETENSI UPGRADE WORK MESS EUCA PHASE 6 BLOK 1', 1412818.00, 0, 1, 1,
       0.000, NULL, NULL, 1412818.00, 0.00,
       0.00, 0.00, 0.00, 1412818.00, 1412818.00, '2023-06-23'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":182,"stated":{"dpp":1412818.0,"total":1412818.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":182,"stated":{"dpp":1412818.0,"total":1412818.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-06-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI UPGRADE WORK MESS EUCA PHASE 6 BLOK 1', 1, 1412818.00
+      'RETENSI UPGRADE WORK MESS EUCA PHASE 6 BLOK 1', 1, 1412818.00, ('2023-06-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9000608488-1', 1412818.00, 'IDR',
-      'bank_transfer', '2023-06-23', 'Imported from historical register (row 182)', v_actor_id
+      'bank_transfer', '2023-06-23', 'Imported from historical register (row 182)', v_actor_id, ('2023-06-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5948,29 +5948,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9000608485', 'paid', 'IDR',
       '2023-06-02', 'RETENSI FENCE APARTMENT 5 FL TOWER B', 1983750.00, 0, 1, 1,
       0.000, NULL, NULL, 1983750.00, 0.00,
       0.00, 0.00, 0.00, 1983750.00, 1983750.00, '2023-06-23'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":183,"stated":{"dpp":1983750.0,"total":1983750.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":183,"stated":{"dpp":1983750.0,"total":1983750.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-06-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI FENCE APARTMENT 5 FL TOWER B', 1, 1983750.00
+      'RETENSI FENCE APARTMENT 5 FL TOWER B', 1, 1983750.00, ('2023-06-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9000608485-1', 1983750.00, 'IDR',
-      'bank_transfer', '2023-06-23', 'Imported from historical register (row 183)', v_actor_id
+      'bank_transfer', '2023-06-23', 'Imported from historical register (row 183)', v_actor_id, ('2023-06-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -5984,29 +5984,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9000654757', 'paid', 'IDR',
       '2023-06-02', 'RETENSI ADD MATERIAL, LABOUR PLASTER ACI BLK III&IV', 23729242.00, 0, 1, 1,
       0.000, NULL, NULL, 23729242.00, 0.00,
       0.00, 0.00, 0.00, 23729242.00, 23729242.00, '2023-06-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":184,"stated":{"dpp":23729242.0,"total":23729242.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":184,"stated":{"dpp":23729242.0,"total":23729242.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-06-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI ADD MATERIAL, LABOUR PLASTER ACI BLK III&IV', 1, 23729242.00
+      'RETENSI ADD MATERIAL, LABOUR PLASTER ACI BLK III&IV', 1, 23729242.00, ('2023-06-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9000654757-1', 23729242.00, 'IDR',
-      'bank_transfer', '2023-06-27', 'Imported from historical register (row 184)', v_actor_id
+      'bank_transfer', '2023-06-27', 'Imported from historical register (row 184)', v_actor_id, ('2023-06-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6020,29 +6020,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9000615021', 'paid', 'IDR',
       '2023-06-12', 'RETENSI OUTSTANDING INFRASTRUCTURE NEW CM 2S', 15249934.00, 0, 1, 1,
       0.000, NULL, NULL, 15249934.00, 0.00,
       0.00, 0.00, 0.00, 15249934.00, 15249934.00, '2023-06-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":185,"stated":{"dpp":15249934.0,"total":15249934.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":185,"stated":{"dpp":15249934.0,"total":15249934.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-06-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI OUTSTANDING INFRASTRUCTURE NEW CM 2S', 1, 15249934.00
+      'RETENSI OUTSTANDING INFRASTRUCTURE NEW CM 2S', 1, 15249934.00, ('2023-06-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9000615021-1', 15249934.00, 'IDR',
-      'bank_transfer', '2023-06-27', 'Imported from historical register (row 185)', v_actor_id
+      'bank_transfer', '2023-06-27', 'Imported from historical register (row 185)', v_actor_id, ('2023-06-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6056,29 +6056,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0249/AWP/2023', 'paid', 'IDR',
       '2023-06-08', '5CAN PL.8000 VERMILLION, 8CAN SUNSHINE', 2704000.00, 0, 1, 1,
       11.000, NULL, NULL, 2704000.00, 297440.00,
       0.00, 0.00, 297440.00, 3001440.00, 3001440.00, '2023-06-23'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":186,"no_seri_fpn":"010.001-23.88660249","no_po_customer":"9000648913","stated":{"dpp":2704000.0,"ppn":297440.0,"total":3001440.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":186,"no_seri_fpn":"010.001-23.88660249","no_po_customer":"9000648913","stated":{"dpp":2704000.0,"ppn":297440.0,"total":3001440.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-06-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '5CAN PL.8000 VERMILLION, 8CAN SUNSHINE', 1, 2704000.00
+      '5CAN PL.8000 VERMILLION, 8CAN SUNSHINE', 1, 2704000.00, ('2023-06-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0249-AWP-2023-1', 3001440.00, 'IDR',
-      'bank_transfer', '2023-06-23', 'Imported from historical register (row 186)', v_actor_id
+      'bank_transfer', '2023-06-23', 'Imported from historical register (row 186)', v_actor_id, ('2023-06-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6092,29 +6092,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0250/AWP/2023', 'paid', 'IDR',
       '2023-06-13', '2EA TEE TORO PPR 4'' (T110)', 1012800.00, 0, 1, 1,
       11.000, NULL, NULL, 1012800.00, 111408.00,
       0.00, 0.00, 111408.00, 1124208.00, 1124208.00, '2023-07-07'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":187,"no_seri_fpn":"010.001-23.88660250","no_po_customer":"9000660817","stated":{"dpp":1012800.0,"ppn":111408.0,"total":1124208.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":187,"no_seri_fpn":"010.001-23.88660250","no_po_customer":"9000660817","stated":{"dpp":1012800.0,"ppn":111408.0,"total":1124208.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-06-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '2EA TEE TORO PPR 4'' (T110)', 1, 1012800.00
+      '2EA TEE TORO PPR 4'' (T110)', 1, 1012800.00, ('2023-06-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0250-AWP-2023-1', 1124208.00, 'IDR',
-      'bank_transfer', '2023-07-07', 'Imported from historical register (row 187)', v_actor_id
+      'bank_transfer', '2023-07-07', 'Imported from historical register (row 187)', v_actor_id, ('2023-07-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6128,29 +6128,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0251/AWP/2023', 'paid', 'IDR',
       '2023-06-20', '4PWBOND SWANLIKE,5GL BODELAC 3020,15GL 7046', 12645000.00, 0, 1, 1,
       11.000, NULL, NULL, 12645000.00, 1390950.00,
       0.00, 0.00, 1390950.00, 14035950.00, 14035950.00, '2023-06-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":188,"no_seri_fpn":"010.001-23.88660251","no_po_customer":"9000661477","stated":{"dpp":12645000.0,"ppn":1390950.0,"total":14035950.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":188,"no_seri_fpn":"010.001-23.88660251","no_po_customer":"9000661477","stated":{"dpp":12645000.0,"ppn":1390950.0,"total":14035950.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-06-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '4PWBOND SWANLIKE,5GL BODELAC 3020,15GL 7046', 1, 12645000.00
+      '4PWBOND SWANLIKE,5GL BODELAC 3020,15GL 7046', 1, 12645000.00, ('2023-06-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0251-AWP-2023-1', 14035950.00, 'IDR',
-      'bank_transfer', '2023-06-30', 'Imported from historical register (row 188)', v_actor_id
+      'bank_transfer', '2023-06-30', 'Imported from historical register (row 188)', v_actor_id, ('2023-06-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6164,29 +6164,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0252/AWP/2023', 'paid', 'IDR',
       '2023-06-20', 'OUTDOOR SIGNAGE TWA, INDOOR & OUTDOOR TWB', 91969000.00, 0, 1, 1,
       11.000, 2.000, NULL, 91969000.00, 10116590.00,
       1839380.00, 0.00, 10116590.00, 100246210.00, 100246210.00, '2023-07-07'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":189,"no_seri_fpn":"010.001-23.88660252","no_po_customer":"9000659107","stated":{"dpp":91969000.0,"ppn":10116590.0,"pph":1839380.0,"total":100246210.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":189,"no_seri_fpn":"010.001-23.88660252","no_po_customer":"9000659107","stated":{"dpp":91969000.0,"ppn":10116590.0,"pph":1839380.0,"total":100246210.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-06-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'OUTDOOR SIGNAGE TWA, INDOOR & OUTDOOR TWB', 1, 91969000.00
+      'OUTDOOR SIGNAGE TWA, INDOOR & OUTDOOR TWB', 1, 91969000.00, ('2023-06-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0252-AWP-2023-1', 100246210.00, 'IDR',
-      'bank_transfer', '2023-07-07', 'Imported from historical register (row 189)', v_actor_id
+      'bank_transfer', '2023-07-07', 'Imported from historical register (row 189)', v_actor_id, ('2023-07-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6200,29 +6200,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0253/AWP/2023', 'paid', 'IDR',
       '2023-06-20', 'EXTERIOR FACADE WORK NEW CM2-STOREY BLOCK III&IV', 17484000.00, 0, 1, 1,
       11.000, 2.000, NULL, 17484000.00, 1923240.00,
       349680.00, 0.00, 1923240.00, 19057560.00, 19057560.00, '2023-07-05'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":190,"no_seri_fpn":"010.001-23.88660253","no_po_customer":"9000660562","stated":{"dpp":17484000.0,"ppn":1923240.0,"pph":349680.0,"total":19057560.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":190,"no_seri_fpn":"010.001-23.88660253","no_po_customer":"9000660562","stated":{"dpp":17484000.0,"ppn":1923240.0,"pph":349680.0,"total":19057560.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-06-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'EXTERIOR FACADE WORK NEW CM2-STOREY BLOCK III&IV', 1, 17484000.00
+      'EXTERIOR FACADE WORK NEW CM2-STOREY BLOCK III&IV', 1, 17484000.00, ('2023-06-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0253-AWP-2023-1', 19057560.00, 'IDR',
-      'bank_transfer', '2023-07-05', 'Imported from historical register (row 190)', v_actor_id
+      'bank_transfer', '2023-07-05', 'Imported from historical register (row 190)', v_actor_id, ('2023-07-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6236,29 +6236,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0254/AWP/2023', 'paid', 'IDR',
       '2023-06-22', 'PROGRESS 19 TWB LABOR', 234895150.96, 0, 1, 1,
       11.000, 2.000, 5.000, 234895150.96, 25838466.61,
       4697903.02, 11744757.55, 25838466.61, 244290957.00, 244290957.00, '2023-06-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":191,"no_seri_fpn":"010.001-23.88660254","no_po_customer":"9000621887","stated":{"harga_jual":234895151.0,"dpp":234895151.0,"ppn":25838467.0,"pph":4697903.0,"retensi":11744758.0,"total":244290957.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":191,"no_seri_fpn":"010.001-23.88660254","no_po_customer":"9000621887","stated":{"harga_jual":234895151.0,"dpp":234895151.0,"ppn":25838467.0,"pph":4697903.0,"retensi":11744758.0,"total":244290957.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-06-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 19 TWB LABOR', 1, 234895150.96
+      'PROGRESS 19 TWB LABOR', 1, 234895150.96, ('2023-06-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0254-AWP-2023-1', 244290957.00, 'IDR',
-      'bank_transfer', '2023-06-30', 'Imported from historical register (row 191)', v_actor_id
+      'bank_transfer', '2023-06-30', 'Imported from historical register (row 191)', v_actor_id, ('2023-06-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6272,29 +6272,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0255/AWP/2023', 'paid', 'IDR',
       '2023-06-22', '80 DOOR MOHAIR, 40DOOR SEAL TRIP', 9000000.00, 0, 1, 1,
       11.000, NULL, NULL, 9000000.00, 990000.00,
       0.00, 0.00, 990000.00, 9990000.00, 9990000.00, '2023-07-07'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":192,"no_seri_fpn":"010.001-23.88660255","no_po_customer":"9000656955","stated":{"dpp":9000000.0,"ppn":990000.0,"total":9990000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":192,"no_seri_fpn":"010.001-23.88660255","no_po_customer":"9000656955","stated":{"dpp":9000000.0,"ppn":990000.0,"total":9990000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-06-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '80 DOOR MOHAIR, 40DOOR SEAL TRIP', 1, 9000000.00
+      '80 DOOR MOHAIR, 40DOOR SEAL TRIP', 1, 9000000.00, ('2023-06-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0255-AWP-2023-1', 9990000.00, 'IDR',
-      'bank_transfer', '2023-07-07', 'Imported from historical register (row 192)', v_actor_id
+      'bank_transfer', '2023-07-07', 'Imported from historical register (row 192)', v_actor_id, ('2023-07-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6308,29 +6308,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9000614985', 'paid', 'IDR',
       '2023-07-11', 'RETENSI ROOF WORK APARTMENT 5 FL TWRB', 13619283.00, 0, 1, 1,
       0.000, NULL, NULL, 13619283.00, 0.00,
       0.00, 0.00, 0.00, 13619283.00, 13619283.00, '2023-07-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":193,"stated":{"dpp":13619283.0,"total":13619283.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":193,"stated":{"dpp":13619283.0,"total":13619283.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-07-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI ROOF WORK APARTMENT 5 FL TWRB', 1, 13619283.00
+      'RETENSI ROOF WORK APARTMENT 5 FL TWRB', 1, 13619283.00, ('2023-07-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9000614985-1', 13619283.00, 'IDR',
-      'bank_transfer', '2023-07-21', 'Imported from historical register (row 193)', v_actor_id
+      'bank_transfer', '2023-07-21', 'Imported from historical register (row 193)', v_actor_id, ('2023-07-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6344,29 +6344,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0256/AWP/2023', 'paid', 'IDR',
       '2023-07-12', '8GLN PL.8000', 1664000.00, 0, 1, 1,
       11.000, NULL, NULL, 1664000.00, 183040.00,
       0.00, 0.00, 183040.00, 1847040.00, 1847040.00, '2023-08-04'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":194,"no_seri_fpn":"010.001-23.88660256","stated":{"dpp":1664000.0,"ppn":183040.0,"total":1847040.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":194,"no_seri_fpn":"010.001-23.88660256","stated":{"dpp":1664000.0,"ppn":183040.0,"total":1847040.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-07-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '8GLN PL.8000', 1, 1664000.00
+      '8GLN PL.8000', 1, 1664000.00, ('2023-07-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0256-AWP-2023-1', 1847040.00, 'IDR',
-      'bank_transfer', '2023-08-04', 'Imported from historical register (row 194)', v_actor_id
+      'bank_transfer', '2023-08-04', 'Imported from historical register (row 194)', v_actor_id, ('2023-08-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6380,29 +6380,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0257/AWP/2023', 'paid', 'IDR',
       '2023-07-12', '4GLN PL.8000 SBLACK', 832000.00, 0, 1, 1,
       11.000, NULL, NULL, 832000.00, 91520.00,
       0.00, 0.00, 91520.00, 923520.00, 923520.00, '2023-07-28'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":195,"no_seri_fpn":"010.001-23.88660257","stated":{"dpp":832000.0,"ppn":91520.0,"total":923520.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":195,"no_seri_fpn":"010.001-23.88660257","stated":{"dpp":832000.0,"ppn":91520.0,"total":923520.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-07-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '4GLN PL.8000 SBLACK', 1, 832000.00
+      '4GLN PL.8000 SBLACK', 1, 832000.00, ('2023-07-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0257-AWP-2023-1', 923520.00, 'IDR',
-      'bank_transfer', '2023-07-28', 'Imported from historical register (row 195)', v_actor_id
+      'bank_transfer', '2023-07-28', 'Imported from historical register (row 195)', v_actor_id, ('2023-07-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6416,29 +6416,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0258/AWP/2023', 'paid', 'IDR',
       '2023-07-12', '854GLN PL8000', 177632000.00, 0, 1, 1,
       11.000, NULL, NULL, 177632000.00, 19539520.00,
       0.00, 0.00, 19539520.00, 197171520.00, 197171520.00, '2023-07-28'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":196,"no_seri_fpn":"010.001-23.88660258","stated":{"dpp":177632000.0,"ppn":19539520.0,"total":197171520.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":196,"no_seri_fpn":"010.001-23.88660258","stated":{"dpp":177632000.0,"ppn":19539520.0,"total":197171520.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-07-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '854GLN PL8000', 1, 177632000.00
+      '854GLN PL8000', 1, 177632000.00, ('2023-07-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0258-AWP-2023-1', 197171520.00, 'IDR',
-      'bank_transfer', '2023-07-28', 'Imported from historical register (row 196)', v_actor_id
+      'bank_transfer', '2023-07-28', 'Imported from historical register (row 196)', v_actor_id, ('2023-07-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6452,29 +6452,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0259/AWP/2023', 'paid', 'IDR',
       '2023-07-12', '3GLN PL.8000 SBLACK', 624000.00, 0, 1, 1,
       11.000, NULL, NULL, 624000.00, 68640.00,
       0.00, 0.00, 68640.00, 692640.00, 692640.00, '2023-07-28'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":197,"no_seri_fpn":"010.001-23.88660259","stated":{"dpp":624000.0,"ppn":68640.0,"total":692640.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":197,"no_seri_fpn":"010.001-23.88660259","stated":{"dpp":624000.0,"ppn":68640.0,"total":692640.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-07-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '3GLN PL.8000 SBLACK', 1, 624000.00
+      '3GLN PL.8000 SBLACK', 1, 624000.00, ('2023-07-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0259-AWP-2023-1', 692640.00, 'IDR',
-      'bank_transfer', '2023-07-28', 'Imported from historical register (row 197)', v_actor_id
+      'bank_transfer', '2023-07-28', 'Imported from historical register (row 197)', v_actor_id, ('2023-07-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6488,29 +6488,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0260/AWP/2023', 'paid', 'IDR',
       '2023-07-12', '12GLN PL.8000', 2496000.00, 0, 1, 1,
       11.000, NULL, NULL, 2496000.00, 274560.00,
       0.00, 0.00, 274560.00, 2770560.00, 2770560.00, '2023-07-28'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":198,"no_seri_fpn":"010.001-23.88660260","stated":{"dpp":2496000.0,"ppn":274560.0,"total":2770560.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":198,"no_seri_fpn":"010.001-23.88660260","stated":{"dpp":2496000.0,"ppn":274560.0,"total":2770560.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-07-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '12GLN PL.8000', 1, 2496000.00
+      '12GLN PL.8000', 1, 2496000.00, ('2023-07-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0260-AWP-2023-1', 2770560.00, 'IDR',
-      'bank_transfer', '2023-07-28', 'Imported from historical register (row 198)', v_actor_id
+      'bank_transfer', '2023-07-28', 'Imported from historical register (row 198)', v_actor_id, ('2023-07-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6524,29 +6524,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0261/AWP/2023', 'paid', 'IDR',
       '2023-07-12', '135GLN PL.8000', 28080000.00, 0, 1, 1,
       11.000, NULL, NULL, 28080000.00, 3088800.00,
       0.00, 0.00, 3088800.00, 31168800.00, 31168800.00, '2023-07-28'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":199,"no_seri_fpn":"010.001-23.88660261","stated":{"dpp":28080000.0,"ppn":3088800.0,"total":31168800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":199,"no_seri_fpn":"010.001-23.88660261","stated":{"dpp":28080000.0,"ppn":3088800.0,"total":31168800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-07-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '135GLN PL.8000', 1, 28080000.00
+      '135GLN PL.8000', 1, 28080000.00, ('2023-07-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0261-AWP-2023-1', 31168800.00, 'IDR',
-      'bank_transfer', '2023-07-28', 'Imported from historical register (row 199)', v_actor_id
+      'bank_transfer', '2023-07-28', 'Imported from historical register (row 199)', v_actor_id, ('2023-07-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6560,29 +6560,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0262/AWP/2023', 'paid', 'IDR',
       '2023-07-13', '15LOT DOOR SEAL TRIP RUBBER', 1125000.00, 0, 1, 1,
       11.000, NULL, NULL, 1125000.00, 123750.00,
       0.00, 0.00, 123750.00, 1248750.00, 1248750.00, '2023-11-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":200,"no_seri_fpn":"010.001-23.88660262","no_po_customer":"9000664456","stated":{"dpp":1125000.0,"ppn":123750.0,"total":1248750.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":200,"no_seri_fpn":"010.001-23.88660262","no_po_customer":"9000664456","stated":{"dpp":1125000.0,"ppn":123750.0,"total":1248750.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-07-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '15LOT DOOR SEAL TRIP RUBBER', 1, 1125000.00
+      '15LOT DOOR SEAL TRIP RUBBER', 1, 1125000.00, ('2023-07-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0262-AWP-2023-1', 1248750.00, 'IDR',
-      'bank_transfer', '2023-11-08', 'Imported from historical register (row 200)', v_actor_id
+      'bank_transfer', '2023-11-08', 'Imported from historical register (row 200)', v_actor_id, ('2023-11-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6596,29 +6596,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0263/AWP/2023', 'paid', 'IDR',
       '2023-07-14', 'ADVANCE PAYMENT (10%)PAINTING WORKS OF BM-1 PROJECT', 145629099.10, 0, 1, 1,
       11.000, NULL, NULL, 145629099.10, 16019200.90,
       0.00, 0.00, 16019200.90, 161648300.00, 161648300.00, '2023-10-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":201,"no_seri_fpn":"010.001-23.88660263","no_po_customer":"9100010450","stated":{"dpp":145629099.0,"ppn":16019201.0,"total":161648300.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":201,"no_seri_fpn":"010.001-23.88660263","no_po_customer":"9100010450","stated":{"dpp":145629099.0,"ppn":16019201.0,"total":161648300.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-07-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'ADVANCE PAYMENT (10%)PAINTING WORKS OF BM-1 PROJECT', 1, 145629099.10
+      'ADVANCE PAYMENT (10%)PAINTING WORKS OF BM-1 PROJECT', 1, 145629099.10, ('2023-07-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0263-AWP-2023-1', 161648300.00, 'IDR',
-      'bank_transfer', '2023-10-08', 'Imported from historical register (row 201)', v_actor_id
+      'bank_transfer', '2023-10-08', 'Imported from historical register (row 201)', v_actor_id, ('2023-10-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6632,29 +6632,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0264/AWP/2023', 'paid', 'IDR',
       '2023-07-17', '80LOT SCREEN COVER AC', 6240000.00, 0, 1, 1,
       11.000, NULL, NULL, 6240000.00, 686400.00,
       0.00, 0.00, 686400.00, 6926400.00, 6926400.00, '2023-07-28'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":202,"no_seri_fpn":"010.001-23.88660264","no_po_customer":"9000667170","stated":{"dpp":6240000.0,"ppn":686400.0,"total":6926400.0},"unattributed_rows":[{"note":"register stated Rp 239,653,440 here; trimmed to the balance outstanding","amount":239653440.0,"date":"2023-07-28"}]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":202,"no_seri_fpn":"010.001-23.88660264","no_po_customer":"9000667170","stated":{"dpp":6240000.0,"ppn":686400.0,"total":6926400.0},"unattributed_rows":[{"note":"register stated Rp 239,653,440 here; trimmed to the balance outstanding","amount":239653440.0,"date":"2023-07-28"}]}}'::jsonb, v_actor_id, ('2023-07-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '80LOT SCREEN COVER AC', 1, 6240000.00
+      '80LOT SCREEN COVER AC', 1, 6240000.00, ('2023-07-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0264-AWP-2023-1', 6926400.00, 'IDR',
-      'bank_transfer', '2023-07-28', 'Imported from historical register (row 202)', v_actor_id
+      'bank_transfer', '2023-07-28', 'Imported from historical register (row 202)', v_actor_id, ('2023-07-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6668,29 +6668,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0265/AWP/2023', 'paid', 'IDR',
       '2023-07-18', 'FIRE ALARM FOR APARTMENT 5FL TWB', 66342566.05, 0, 1, 1,
       11.000, 2.000, NULL, 66342566.05, 7297682.27,
       1326851.32, 0.00, 7297682.27, 72313397.00, 72313397.00, '2023-08-07'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":203,"no_seri_fpn":"010.001-23.88660265","no_po_customer":"9000632642","stated":{"dpp":66342565.0,"ppn":7297682.0,"pph":1326850.0,"total":72313397.0},"import_notes":["base adjusted 66342565.00 -> 66342566.06 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":203,"no_seri_fpn":"010.001-23.88660265","no_po_customer":"9000632642","stated":{"dpp":66342565.0,"ppn":7297682.0,"pph":1326850.0,"total":72313397.0},"import_notes":["base adjusted 66342565.00 -> 66342566.06 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-07-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'FIRE ALARM FOR APARTMENT 5FL TWB', 1, 66342566.05
+      'FIRE ALARM FOR APARTMENT 5FL TWB', 1, 66342566.05, ('2023-07-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0265-AWP-2023-1', 72313397.00, 'IDR',
-      'bank_transfer', '2023-08-07', 'Imported from historical register (row 203)', v_actor_id
+      'bank_transfer', '2023-08-07', 'Imported from historical register (row 203)', v_actor_id, ('2023-08-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6704,29 +6704,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0266/AWP/2023', 'paid', 'IDR',
       '2023-07-17', '3P PFP241, 2MX94 L.ALABTER, 6P MX94 LEAF GREEN', 24813198.20, 0, 1, 1,
       11.000, NULL, NULL, 24813198.20, 2729451.80,
       0.00, 0.00, 2729451.80, 27542650.00, 27542650.00, '2023-11-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":204,"no_seri_fpn":"010.001-23.88660266","no_po_customer":"1201152309","biaya_adm":"Rp 2,000","stated":{"dpp":24815000.0,"ppn":2729650.0,"total":27542650.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":204,"no_seri_fpn":"010.001-23.88660266","no_po_customer":"1201152309","biaya_adm":"Rp 2,000","stated":{"dpp":24815000.0,"ppn":2729650.0,"total":27542650.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-07-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '3P PFP241, 2MX94 L.ALABTER, 6P MX94 LEAF GREEN', 1, 24813198.20
+      '3P PFP241, 2MX94 L.ALABTER, 6P MX94 LEAF GREEN', 1, 24813198.20, ('2023-07-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0266-AWP-2023-1', 27542650.00, 'IDR',
-      'bank_transfer', '2023-11-08', 'Imported from historical register (row 204)', v_actor_id
+      'bank_transfer', '2023-11-08', 'Imported from historical register (row 204)', v_actor_id, ('2023-11-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6740,29 +6740,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '0267/AWP/2023', 'paid', 'IDR',
       '2023-07-17', '3P PFP241, 3P MX94 LEAF GREEN', 12913198.20, 0, 1, 1,
       11.000, NULL, NULL, 12913198.20, 1420451.80,
       0.00, 0.00, 1420451.80, 14333650.00, 14333650.00, '2023-11-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":205,"no_seri_fpn":"010.001-23.88660267","no_po_customer":"1204031096","biaya_adm":"Rp 2,000","stated":{"dpp":12915000.0,"ppn":1420650.0,"total":14333650.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":205,"no_seri_fpn":"010.001-23.88660267","no_po_customer":"1204031096","biaya_adm":"Rp 2,000","stated":{"dpp":12915000.0,"ppn":1420650.0,"total":14333650.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-07-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '3P PFP241, 3P MX94 LEAF GREEN', 1, 12913198.20
+      '3P PFP241, 3P MX94 LEAF GREEN', 1, 12913198.20, ('2023-07-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-0267-AWP-2023-1', 14333650.00, 'IDR',
-      'bank_transfer', '2023-11-08', 'Imported from historical register (row 205)', v_actor_id
+      'bank_transfer', '2023-11-08', 'Imported from historical register (row 205)', v_actor_id, ('2023-11-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6776,29 +6776,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7242/AWP/2023', 'paid', 'IDR',
       '2023-07-24', 'WATERPROFING ROOF DECK TWA', 20345000.00, 0, 1, 1,
       11.000, 2.000, 5.000, 20345000.00, 2237950.00,
       406900.00, 1017250.00, 2237950.00, 21158800.00, 21158800.00, '2023-11-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":206,"no_seri_fpn":"010.007-23.38307242","no_po_customer":"9000532332","stated":{"dpp":20345000.0,"ppn":2237950.0,"pph":406900.0,"retensi":1017250.0,"total":21158800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":206,"no_seri_fpn":"010.007-23.38307242","no_po_customer":"9000532332","stated":{"dpp":20345000.0,"ppn":2237950.0,"pph":406900.0,"retensi":1017250.0,"total":21158800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-07-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'WATERPROFING ROOF DECK TWA', 1, 20345000.00
+      'WATERPROFING ROOF DECK TWA', 1, 20345000.00, ('2023-07-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7242-AWP-2023-1', 21158800.00, 'IDR',
-      'bank_transfer', '2023-11-08', 'Imported from historical register (row 206)', v_actor_id
+      'bank_transfer', '2023-11-08', 'Imported from historical register (row 206)', v_actor_id, ('2023-11-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6812,29 +6812,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7243/AWP/2023', 'paid', 'IDR',
       '2023-07-24', 'PROGRESS 20 TWB LABOR', 219587579.81, 0, 1, 1,
       11.000, 2.000, 5.000, 219587579.81, 24154633.78,
       4391751.60, 10979378.99, 24154633.78, 228371083.00, 228371083.00, '2023-11-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":207,"no_seri_fpn":"010.007-23.38307243","no_po_customer":"9000621887","stated":{"harga_jual":219587580.0,"dpp":219587580.0,"ppn":24154634.0,"pph":4391752.0,"retensi":10979379.0,"total":228371083.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":207,"no_seri_fpn":"010.007-23.38307243","no_po_customer":"9000621887","stated":{"harga_jual":219587580.0,"dpp":219587580.0,"ppn":24154634.0,"pph":4391752.0,"retensi":10979379.0,"total":228371083.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-07-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 20 TWB LABOR', 1, 219587579.81
+      'PROGRESS 20 TWB LABOR', 1, 219587579.81, ('2023-07-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7243-AWP-2023-1', 228371083.00, 'IDR',
-      'bank_transfer', '2023-11-08', 'Imported from historical register (row 207)', v_actor_id
+      'bank_transfer', '2023-11-08', 'Imported from historical register (row 207)', v_actor_id, ('2023-11-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6848,29 +6848,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7244/AWP/2023', 'paid', 'IDR',
       '2023-07-26', 'INDOOR SIGNAGE TWA', 45000000.00, 0, 1, 1,
       11.000, 2.000, NULL, 45000000.00, 4950000.00,
       900000.00, 0.00, 4950000.00, 49050000.00, 49050000.00, '2023-08-25'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":208,"no_seri_fpn":"010.007-23.38307244","no_po_customer":"9000667211","stated":{"dpp":45000000.0,"ppn":4950000.0,"pph":900000.0,"total":49050000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":208,"no_seri_fpn":"010.007-23.38307244","no_po_customer":"9000667211","stated":{"dpp":45000000.0,"ppn":4950000.0,"pph":900000.0,"total":49050000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-07-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'INDOOR SIGNAGE TWA', 1, 45000000.00
+      'INDOOR SIGNAGE TWA', 1, 45000000.00, ('2023-07-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7244-AWP-2023-1', 49050000.00, 'IDR',
-      'bank_transfer', '2023-08-25', 'Imported from historical register (row 208)', v_actor_id
+      'bank_transfer', '2023-08-25', 'Imported from historical register (row 208)', v_actor_id, ('2023-08-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6884,29 +6884,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7245/AWP/2023', 'paid', 'IDR',
       '2023-07-28', '4PAIL CATYLAC PUTIH', 2800000.00, 0, 1, 1,
       11.000, NULL, NULL, 2800000.00, 308000.00,
       0.00, 0.00, 308000.00, 3108000.00, 3108000.00, '2023-11-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":209,"no_seri_fpn":"010.007-23.38307245","no_po_customer":"9000666847","stated":{"dpp":2800000.0,"ppn":308000.0,"total":3108000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":209,"no_seri_fpn":"010.007-23.38307245","no_po_customer":"9000666847","stated":{"dpp":2800000.0,"ppn":308000.0,"total":3108000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-07-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '4PAIL CATYLAC PUTIH', 1, 2800000.00
+      '4PAIL CATYLAC PUTIH', 1, 2800000.00, ('2023-07-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7245-AWP-2023-1', 3108000.00, 'IDR',
-      'bank_transfer', '2023-11-08', 'Imported from historical register (row 209)', v_actor_id
+      'bank_transfer', '2023-11-08', 'Imported from historical register (row 209)', v_actor_id, ('2023-11-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6920,29 +6920,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9000657462', 'paid', 'IDR',
       '2023-08-01', 'RETENSI ADD FULL TAKE OVER, INFRA NEW CM2 STOREY', 21861768.00, 0, 1, 1,
       0.000, NULL, NULL, 21861768.00, 0.00,
       0.00, 0.00, 0.00, 21861768.00, 21861768.00, '2023-08-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":210,"stated":{"dpp":21861768.0,"total":21861768.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":210,"stated":{"dpp":21861768.0,"total":21861768.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-08-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI ADD FULL TAKE OVER, INFRA NEW CM2 STOREY', 1, 21861768.00
+      'RETENSI ADD FULL TAKE OVER, INFRA NEW CM2 STOREY', 1, 21861768.00, ('2023-08-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9000657462-1', 21861768.00, 'IDR',
-      'bank_transfer', '2023-08-21', 'Imported from historical register (row 210)', v_actor_id
+      'bank_transfer', '2023-08-21', 'Imported from historical register (row 210)', v_actor_id, ('2023-08-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6956,29 +6956,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9000615537', 'paid', 'IDR',
       '2023-08-01', 'RETENSI OUTSTANDING NEW CM 2S BLOK III&IV', 103416490.00, 0, 1, 1,
       0.000, NULL, NULL, 103416490.00, 0.00,
       0.00, 0.00, 0.00, 103416490.00, 103416490.00, '2023-08-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":211,"stated":{"dpp":103416490.0,"total":103416490.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":211,"stated":{"dpp":103416490.0,"total":103416490.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-08-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI OUTSTANDING NEW CM 2S BLOK III&IV', 1, 103416490.00
+      'RETENSI OUTSTANDING NEW CM 2S BLOK III&IV', 1, 103416490.00, ('2023-08-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9000615537-1', 103416490.00, 'IDR',
-      'bank_transfer', '2023-08-21', 'Imported from historical register (row 211)', v_actor_id
+      'bank_transfer', '2023-08-21', 'Imported from historical register (row 211)', v_actor_id, ('2023-08-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -6992,29 +6992,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7246/AWP/2023', 'paid', 'IDR',
       '2023-08-04', 'PROGRESS 21 TWB LABOR', 49126125.00, 0, 1, 1,
       11.000, 2.000, 5.000, 49126125.00, 5403873.75,
       982522.50, 2456306.25, 5403873.75, 51091170.00, 51091170.00, '2023-08-25'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":212,"no_seri_fpn":"010.007-23.38307246","no_po_customer":"9000621887","stated":{"harga_jual":49126124.0,"dpp":49126124.0,"ppn":5403874.0,"pph":982522.0,"retensi":2456306.0,"total":51091170.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":212,"no_seri_fpn":"010.007-23.38307246","no_po_customer":"9000621887","stated":{"harga_jual":49126124.0,"dpp":49126124.0,"ppn":5403874.0,"pph":982522.0,"retensi":2456306.0,"total":51091170.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-08-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 21 TWB LABOR', 1, 49126125.00
+      'PROGRESS 21 TWB LABOR', 1, 49126125.00, ('2023-08-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7246-AWP-2023-1', 51091170.00, 'IDR',
-      'bank_transfer', '2023-08-25', 'Imported from historical register (row 212)', v_actor_id
+      'bank_transfer', '2023-08-25', 'Imported from historical register (row 212)', v_actor_id, ('2023-08-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7028,29 +7028,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7247/AWP/2023', 'paid', 'IDR',
       '2023-08-02', 'PROGRESS 23 TWA', 419250.46, 0, 1, 1,
       11.000, 2.000, NULL, 419250.46, 46117.55,
       8385.01, 0.00, 46117.55, 456983.00, 456983.00, '2023-11-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":213,"no_seri_fpn":"010.007-23.38307247","stated":{"dpp":419250.0,"ppn":46118.0,"pph":8385.0,"total":456983.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":213,"no_seri_fpn":"010.007-23.38307247","stated":{"dpp":419250.0,"ppn":46118.0,"pph":8385.0,"total":456983.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-08-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 23 TWA', 1, 419250.46
+      'PROGRESS 23 TWA', 1, 419250.46, ('2023-08-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7247-AWP-2023-1', 456983.00, 'IDR',
-      'bank_transfer', '2023-11-08', 'Imported from historical register (row 213)', v_actor_id
+      'bank_transfer', '2023-11-08', 'Imported from historical register (row 213)', v_actor_id, ('2023-11-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7064,29 +7064,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7248/AWP/2023', 'paid', 'IDR',
       '2023-08-08', 'PROGRESS I PAINTING WORKS OF BM-1 PROJECT', 173253643.60, 0, 1, 1,
       11.000, 2.222, 5.556, 173253643.60, 19057900.80,
       3849695.96, 9625972.44, 19057900.80, 178835876.00, 178835876.00, '2023-08-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":214,"no_seri_fpn":"010.007-23.38307248","no_po_customer":"9100010450","stated":{"harga_jual":192503634.0,"dpp":173253271.0,"ppn":19057860.0,"pph":3850073.0,"retensi":9625182.0,"total":178835876.0},"unattributed_rows":[{"note":"register stated Rp 201,936,312 here; trimmed to the balance outstanding","amount":201936312.0,"date":"2023-08-08"}],"import_notes":["base adjusted 173253271.00 -> 173253643.60 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":214,"no_seri_fpn":"010.007-23.38307248","no_po_customer":"9100010450","stated":{"harga_jual":192503634.0,"dpp":173253271.0,"ppn":19057860.0,"pph":3850073.0,"retensi":9625182.0,"total":178835876.0},"unattributed_rows":[{"note":"register stated Rp 201,936,312 here; trimmed to the balance outstanding","amount":201936312.0,"date":"2023-08-08"}],"import_notes":["base adjusted 173253271.00 -> 173253643.60 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-08-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS I PAINTING WORKS OF BM-1 PROJECT', 1, 173253643.60
+      'PROGRESS I PAINTING WORKS OF BM-1 PROJECT', 1, 173253643.60, ('2023-08-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7248-AWP-2023-1', 178835876.00, 'IDR',
-      'bank_transfer', '2023-08-08', 'Imported from historical register (row 214)', v_actor_id
+      'bank_transfer', '2023-08-08', 'Imported from historical register (row 214)', v_actor_id, ('2023-08-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7100,29 +7100,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7249/AWP/2023', 'paid', 'IDR',
       '2023-08-18', 'PROGRESS II PAINTING WORKS OF BM-1 PROJECT', 158038385.23, 0, 1, 1,
       11.000, 2.222, 5.556, 158038385.23, 17384222.38,
       3511612.92, 8780612.68, 17384222.38, 163130382.00, 163130382.00, '2023-08-31'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":215,"no_seri_fpn":"010.007-23.38307249","no_po_customer":"9100010450","stated":{"harga_jual":175597828.0,"dpp":158038045.0,"ppn":17384185.0,"pph":3511957.0,"retensi":8779891.0,"total":163130382.0},"import_notes":["base adjusted 158038045.00 -> 158038385.23 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","stored rates reproduce TOTAL to within Rp 0.01","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":215,"no_seri_fpn":"010.007-23.38307249","no_po_customer":"9100010450","stated":{"harga_jual":175597828.0,"dpp":158038045.0,"ppn":17384185.0,"pph":3511957.0,"retensi":8779891.0,"total":163130382.0},"import_notes":["base adjusted 158038045.00 -> 158038385.23 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","stored rates reproduce TOTAL to within Rp 0.01","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-08-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS II PAINTING WORKS OF BM-1 PROJECT', 1, 158038385.23
+      'PROGRESS II PAINTING WORKS OF BM-1 PROJECT', 1, 158038385.23, ('2023-08-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7249-AWP-2023-1', 163130382.00, 'IDR',
-      'bank_transfer', '2023-08-31', 'Imported from historical register (row 215)', v_actor_id
+      'bank_transfer', '2023-08-31', 'Imported from historical register (row 215)', v_actor_id, ('2023-08-31'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7136,29 +7136,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7250/AWP/2023', 'paid', 'IDR',
       '2023-08-18', 'PASANG LAMPU LED MULTIPLEK, PSG LIST KAYU MERBAU', 45299100.00, 0, 1, 1,
       11.000, 2.000, NULL, 45299100.00, 4982901.00,
       905982.00, 0.00, 4982901.00, 49376019.00, 49376019.00, '2023-09-20'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":216,"no_seri_fpn":"010.007-23.38307250","no_po_customer":"12983","stated":{"dpp":45299100.0,"ppn":4982901.0,"pph":905982.0,"total":49376019.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":216,"no_seri_fpn":"010.007-23.38307250","no_po_customer":"12983","stated":{"dpp":45299100.0,"ppn":4982901.0,"pph":905982.0,"total":49376019.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-08-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PASANG LAMPU LED MULTIPLEK, PSG LIST KAYU MERBAU', 1, 45299100.00
+      'PASANG LAMPU LED MULTIPLEK, PSG LIST KAYU MERBAU', 1, 45299100.00, ('2023-08-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7250-AWP-2023-1', 49376019.00, 'IDR',
-      'bank_transfer', '2023-09-20', 'Imported from historical register (row 216)', v_actor_id
+      'bank_transfer', '2023-09-20', 'Imported from historical register (row 216)', v_actor_id, ('2023-09-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7172,29 +7172,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7251/AWP/2023', 'paid', 'IDR',
       '2023-08-23', '1PCS MX-94-2K SB LEAF GREEN 8416-20KSP', 2380000.00, 0, 1, 1,
       11.000, NULL, NULL, 2380000.00, 261800.00,
       0.00, 0.00, 261800.00, 2641800.00, 2641800.00, '2023-10-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":217,"no_seri_fpn":"010.007-23.38307251","no_po_customer":"120253329","stated":{"dpp":2380000.0,"ppn":261800.0,"total":2641800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":217,"no_seri_fpn":"010.007-23.38307251","no_po_customer":"120253329","stated":{"dpp":2380000.0,"ppn":261800.0,"total":2641800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-08-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '1PCS MX-94-2K SB LEAF GREEN 8416-20KSP', 1, 2380000.00
+      '1PCS MX-94-2K SB LEAF GREEN 8416-20KSP', 1, 2380000.00, ('2023-08-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7251-AWP-2023-1', 2641800.00, 'IDR',
-      'bank_transfer', '2023-10-03', 'Imported from historical register (row 217)', v_actor_id
+      'bank_transfer', '2023-10-03', 'Imported from historical register (row 217)', v_actor_id, ('2023-10-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7208,29 +7208,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7252/AWP/2023', 'paid', 'IDR',
       '2023-09-09', 'PROGRESS 22 TWB LABOR', 24729839.42, 0, 1, 1,
       11.000, 2.000, 5.000, 24729839.42, 2720282.34,
       494596.79, 1236491.97, 2720282.34, 25719033.00, 25719033.00, '2023-09-22'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":218,"no_seri_fpn":"010.007-23.38307252","no_po_customer":"9000621887","stated":{"harga_jual":24729840.0,"dpp":24729840.0,"ppn":2720282.0,"pph":494597.0,"retensi":1236492.0,"total":25719033.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":218,"no_seri_fpn":"010.007-23.38307252","no_po_customer":"9000621887","stated":{"harga_jual":24729840.0,"dpp":24729840.0,"ppn":2720282.0,"pph":494597.0,"retensi":1236492.0,"total":25719033.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-09-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 22 TWB LABOR', 1, 24729839.42
+      'PROGRESS 22 TWB LABOR', 1, 24729839.42, ('2023-09-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7252-AWP-2023-1', 25719033.00, 'IDR',
-      'bank_transfer', '2023-09-22', 'Imported from historical register (row 218)', v_actor_id
+      'bank_transfer', '2023-09-22', 'Imported from historical register (row 218)', v_actor_id, ('2023-09-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7244,29 +7244,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7253/AWP/2023', 'partial', 'IDR',
       '2023-09-22', 'PROGRESS III PAINTING WORKS OF BM-1 PROJECT', 175072717.05, 0, 1, 1,
       11.000, 2.222, 5.556, 175072717.05, 19257998.88,
       3890115.77, 9727040.16, 19257998.88, 180713560.00, 157613124.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":219,"no_seri_fpn":"010.007-23.38307253","no_po_customer":"9100010450","stated":{"harga_jual":194524822.0,"dpp":175072340.0,"ppn":19257957.0,"pph":3890496.0,"retensi":9726241.0,"total":180713560.0},"import_notes":["base adjusted 175072340.00 -> 175072717.06 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":219,"no_seri_fpn":"010.007-23.38307253","no_po_customer":"9100010450","stated":{"harga_jual":194524822.0,"dpp":175072340.0,"ppn":19257957.0,"pph":3890496.0,"retensi":9726241.0,"total":180713560.0},"import_notes":["base adjusted 175072340.00 -> 175072717.06 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-09-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS III PAINTING WORKS OF BM-1 PROJECT', 1, 175072717.05
+      'PROGRESS III PAINTING WORKS OF BM-1 PROJECT', 1, 175072717.05, ('2023-09-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7253-AWP-2023-1', 157613124.00, 'IDR',
-      'bank_transfer', '2023-10-06', 'Imported from historical register (row 219)', v_actor_id
+      'bank_transfer', '2023-10-06', 'Imported from historical register (row 219)', v_actor_id, ('2023-10-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7280,29 +7280,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7254/AWP/2023', 'paid', 'IDR',
       '2023-10-04', 'PROGRESS IV PAINTING WORKS OF BM-1 PROJECT', 100068901.97, 0, 1, 1,
       11.000, 2.222, 5.556, 100068901.97, 11007579.22,
       2223531.00, 5559828.19, 11007579.22, 103293122.00, 103293122.00, '2023-10-19'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":220,"no_seri_fpn":"010.007-23.38307254","no_po_customer":"9100010450","stated":{"harga_jual":111187430.0,"dpp":100068687.0,"ppn":11007556.0,"pph":2223749.0,"retensi":5559372.0,"total":103293122.0},"import_notes":["base adjusted 100068687.00 -> 100068901.98 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":220,"no_seri_fpn":"010.007-23.38307254","no_po_customer":"9100010450","stated":{"harga_jual":111187430.0,"dpp":100068687.0,"ppn":11007556.0,"pph":2223749.0,"retensi":5559372.0,"total":103293122.0},"import_notes":["base adjusted 100068687.00 -> 100068901.98 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-10-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS IV PAINTING WORKS OF BM-1 PROJECT', 1, 100068901.97
+      'PROGRESS IV PAINTING WORKS OF BM-1 PROJECT', 1, 100068901.97, ('2023-10-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7254-AWP-2023-1', 103293122.00, 'IDR',
-      'bank_transfer', '2023-10-19', 'Imported from historical register (row 220)', v_actor_id
+      'bank_transfer', '2023-10-19', 'Imported from historical register (row 220)', v_actor_id, ('2023-10-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7316,29 +7316,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7255/AWP/2023', 'partial', 'IDR',
       '2023-10-05', 'PROGRESS 23 TWB LABOR', 1000000000.00, 0, 1, 1,
       11.000, 2.000, 5.000, 1000000000.00, 110000000.00,
       20000000.00, 50000000.00, 110000000.00, 1040000000.00, 1036080965.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":221,"no_seri_fpn":"010.007-23.38307255","no_po_customer":"9000621887","stated":{"harga_jual":1000000000.0,"dpp":1000000000.0,"ppn":110000000.0,"pph":20000000.0,"retensi":50000000.0,"total":1040000000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":221,"no_seri_fpn":"010.007-23.38307255","no_po_customer":"9000621887","stated":{"harga_jual":1000000000.0,"dpp":1000000000.0,"ppn":110000000.0,"pph":20000000.0,"retensi":50000000.0,"total":1040000000.0}}}'::jsonb, v_actor_id, ('2023-10-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 23 TWB LABOR', 1, 1000000000.00
+      'PROGRESS 23 TWB LABOR', 1, 1000000000.00, ('2023-10-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7255-AWP-2023-1', 1036080965.00, 'IDR',
-      'bank_transfer', '2023-10-21', 'Imported from historical register (row 221)', v_actor_id
+      'bank_transfer', '2023-10-21', 'Imported from historical register (row 221)', v_actor_id, ('2023-10-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7352,29 +7352,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7256/AWP/2023', 'paid', 'IDR',
       '2023-10-09', 'DP 20% PAINTING TG10', 135665339.64, 0, 1, 1,
       11.000, NULL, NULL, 135665339.64, 14923187.36,
       0.00, 0.00, 14923187.36, 150588527.00, 150588527.00, '2023-10-20'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":222,"no_seri_fpn":"010.007-23.38307256","no_po_customer":"9100011479","stated":{"dpp":135665340.0,"ppn":14923187.0,"total":150588527.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":222,"no_seri_fpn":"010.007-23.38307256","no_po_customer":"9100011479","stated":{"dpp":135665340.0,"ppn":14923187.0,"total":150588527.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-10-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'DP 20% PAINTING TG10', 1, 135665339.64
+      'DP 20% PAINTING TG10', 1, 135665339.64, ('2023-10-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7256-AWP-2023-1', 150588527.00, 'IDR',
-      'bank_transfer', '2023-10-20', 'Imported from historical register (row 222)', v_actor_id
+      'bank_transfer', '2023-10-20', 'Imported from historical register (row 222)', v_actor_id, ('2023-10-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7388,29 +7388,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7257/AWP/2023', 'paid', 'IDR',
       '2023-10-13', 'PROGRESS 24 TWB LABOR', 349717891.35, 0, 1, 1,
       11.000, 2.000, 5.000, 349717891.35, 38468968.05,
       6994357.83, 17485894.57, 38468968.05, 363706607.00, 363706607.00, '2023-11-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":223,"no_seri_fpn":"010.007-23.38307257","no_po_customer":"9000621887","stated":{"harga_jual":349717892.0,"dpp":349717892.0,"ppn":38468968.0,"pph":6994358.0,"retensi":17485895.0,"total":363706607.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":223,"no_seri_fpn":"010.007-23.38307257","no_po_customer":"9000621887","stated":{"harga_jual":349717892.0,"dpp":349717892.0,"ppn":38468968.0,"pph":6994358.0,"retensi":17485895.0,"total":363706607.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-10-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 24 TWB LABOR', 1, 349717891.35
+      'PROGRESS 24 TWB LABOR', 1, 349717891.35, ('2023-10-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7257-AWP-2023-1', 363706607.00, 'IDR',
-      'bank_transfer', '2023-11-03', 'Imported from historical register (row 223)', v_actor_id
+      'bank_transfer', '2023-11-03', 'Imported from historical register (row 223)', v_actor_id, ('2023-11-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7424,29 +7424,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7258/AWP/2023', 'partial', 'IDR',
       '2023-11-15', 'PROGRESS V PAINTING WORKS OF BM-1 PROJECT', 93080360.78, 0, 1, 1,
       11.000, 2.222, 5.556, 93080360.78, 10238839.69,
       2068245.62, 5171544.84, 10238839.69, 96079410.00, 94979410.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":224,"no_seri_fpn":"010.007-23.38307258","no_po_customer":"9100010450","plus_minus":"violation 1,100","stated":{"harga_jual":103422400.0,"dpp":93080160.0,"ppn":10238818.0,"pph":2068448.0,"retensi":5171120.0,"total":96079410.0},"import_notes":["base adjusted 93080160.00 -> 93080360.78 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","stored rates reproduce TOTAL to within Rp 0.01"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":224,"no_seri_fpn":"010.007-23.38307258","no_po_customer":"9100010450","plus_minus":"violation 1,100","stated":{"harga_jual":103422400.0,"dpp":93080160.0,"ppn":10238818.0,"pph":2068448.0,"retensi":5171120.0,"total":96079410.0},"import_notes":["base adjusted 93080160.00 -> 93080360.78 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","stored rates reproduce TOTAL to within Rp 0.01"]}}'::jsonb, v_actor_id, ('2023-11-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS V PAINTING WORKS OF BM-1 PROJECT', 1, 93080360.78
+      'PROGRESS V PAINTING WORKS OF BM-1 PROJECT', 1, 93080360.78, ('2023-11-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7258-AWP-2023-1', 94979410.00, 'IDR',
-      'bank_transfer', '2023-11-24', 'Imported from historical register (row 224)', v_actor_id
+      'bank_transfer', '2023-11-24', 'Imported from historical register (row 224)', v_actor_id, ('2023-11-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7460,29 +7460,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7259/AWP/2023', 'partial', 'IDR',
       '2023-12-14', 'PROGRESS VI PAINTING WORKS OF BM-1 PROJECT', 146617083.57, 0, 1, 1,
       11.000, 2.222, 5.556, 146617083.57, 16127879.19,
       3257831.60, 8146045.16, 16127879.19, 151341086.00, 151241086.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":225,"no_seri_fpn":"010.007-23.38307259","no_po_customer":"9100010450","plus_minus":"violation 100","stated":{"harga_jual":162907520.0,"dpp":146616768.0,"ppn":16127844.0,"pph":3258150.0,"retensi":8145376.0,"total":151341086.0},"import_notes":["base adjusted 146616768.00 -> 146617083.57 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":225,"no_seri_fpn":"010.007-23.38307259","no_po_customer":"9100010450","plus_minus":"violation 100","stated":{"harga_jual":162907520.0,"dpp":146616768.0,"ppn":16127844.0,"pph":3258150.0,"retensi":8145376.0,"total":151341086.0},"import_notes":["base adjusted 146616768.00 -> 146617083.57 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2023-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS VI PAINTING WORKS OF BM-1 PROJECT', 1, 146617083.57
+      'PROGRESS VI PAINTING WORKS OF BM-1 PROJECT', 1, 146617083.57, ('2023-12-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7259-AWP-2023-1', 151241086.00, 'IDR',
-      'bank_transfer', '2024-02-01', 'Imported from historical register (row 225)', v_actor_id
+      'bank_transfer', '2024-02-01', 'Imported from historical register (row 225)', v_actor_id, ('2024-02-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7496,29 +7496,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '7260/AWP/2023', 'paid', 'IDR',
       '2023-12-26', 'ARCHITECTURAL WORKS FOR CCK CONTROL ROOM', 172740500.00, 0, 1, 1,
       11.000, 2.000, 5.000, 172740500.00, 19001455.00,
       3454810.00, 8637025.00, 19001455.00, 179650120.00, 179650120.00, '2024-01-18'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":226,"no_seri_fpn":"010.007-23.38307260","no_po_customer":"9100011902","stated":{"dpp":172740500.0,"ppn":19001455.0,"pph":3454810.0,"retensi":8637025.0,"total":179650120.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":226,"no_seri_fpn":"010.007-23.38307260","no_po_customer":"9100011902","stated":{"dpp":172740500.0,"ppn":19001455.0,"pph":3454810.0,"retensi":8637025.0,"total":179650120.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2023-12-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'ARCHITECTURAL WORKS FOR CCK CONTROL ROOM', 1, 172740500.00
+      'ARCHITECTURAL WORKS FOR CCK CONTROL ROOM', 1, 172740500.00, ('2023-12-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-7260-AWP-2023-1', 179650120.00, 'IDR',
-      'bank_transfer', '2024-01-18', 'Imported from historical register (row 226)', v_actor_id
+      'bank_transfer', '2024-01-18', 'Imported from historical register (row 226)', v_actor_id, ('2024-01-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7532,29 +7532,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9441/AWP/2024', 'paid', 'IDR',
       '2024-01-05', 'PROGRESS VII PAINTING WORKS OF BM-1 PROJECT', 284772961.19, 0, 1, 1,
       11.000, 2.222, 5.556, 284772961.19, 31325025.73,
       6327655.20, 15821985.72, 31325025.73, 293948346.00, 293948346.00, '2024-01-18'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":227,"no_seri_fpn":"010.002-24.91999441","no_po_customer":"9100010450","stated":{"harga_jual":316413720.0,"dpp":284772348.0,"ppn":31324958.0,"pph":6328274.0,"retensi":15820686.0,"total":293948346.0},"import_notes":["base adjusted 284772348.00 -> 284772961.19 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":227,"no_seri_fpn":"010.002-24.91999441","no_po_customer":"9100010450","stated":{"harga_jual":316413720.0,"dpp":284772348.0,"ppn":31324958.0,"pph":6328274.0,"retensi":15820686.0,"total":293948346.0},"import_notes":["base adjusted 284772348.00 -> 284772961.19 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-01-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS VII PAINTING WORKS OF BM-1 PROJECT', 1, 284772961.19
+      'PROGRESS VII PAINTING WORKS OF BM-1 PROJECT', 1, 284772961.19, ('2024-01-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9441-AWP-2024-1', 293948346.00, 'IDR',
-      'bank_transfer', '2024-01-18', 'Imported from historical register (row 227)', v_actor_id
+      'bank_transfer', '2024-01-18', 'Imported from historical register (row 227)', v_actor_id, ('2024-01-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7568,29 +7568,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9000532332', 'paid', 'IDR',
       '2024-02-06', 'RETENSI WATERPROFING ROOF DECK TWA', 1017250.00, 0, 1, 1,
       0.000, NULL, NULL, 1017250.00, 0.00,
       0.00, 0.00, 0.00, 1017250.00, 1017250.00, '2024-02-29'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":228,"stated":{"dpp":1017250.0,"total":1017250.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":228,"stated":{"dpp":1017250.0,"total":1017250.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-02-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI WATERPROFING ROOF DECK TWA', 1, 1017250.00
+      'RETENSI WATERPROFING ROOF DECK TWA', 1, 1017250.00, ('2024-02-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9000532332-1', 1017250.00, 'IDR',
-      'bank_transfer', '2024-02-29', 'Imported from historical register (row 228)', v_actor_id
+      'bank_transfer', '2024-02-29', 'Imported from historical register (row 228)', v_actor_id, ('2024-02-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7604,29 +7604,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9442/AWP/2024', 'paid', 'IDR',
       '2024-02-16', 'PROGRESS VIII PAINTING WORKS OF BM-1 PROJECT', 109686880.70, 0, 1, 1,
       11.000, 2.222, 5.556, 109686880.70, 12065556.88,
       2437242.49, 6094203.09, 12065556.88, 113220992.00, 113220992.00, '2024-03-02'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":229,"no_seri_fpn":"010.002-24.91999442","no_po_customer":"9100010450","stated":{"harga_jual":121874050.0,"dpp":109686645.0,"ppn":12065531.0,"pph":2437481.0,"retensi":6093703.0,"total":113220992.0},"import_notes":["base adjusted 109686645.00 -> 109686880.70 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":229,"no_seri_fpn":"010.002-24.91999442","no_po_customer":"9100010450","stated":{"harga_jual":121874050.0,"dpp":109686645.0,"ppn":12065531.0,"pph":2437481.0,"retensi":6093703.0,"total":113220992.0},"import_notes":["base adjusted 109686645.00 -> 109686880.70 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-02-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS VIII PAINTING WORKS OF BM-1 PROJECT', 1, 109686880.70
+      'PROGRESS VIII PAINTING WORKS OF BM-1 PROJECT', 1, 109686880.70, ('2024-02-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9442-AWP-2024-1', 113220992.00, 'IDR',
-      'bank_transfer', '2024-03-02', 'Imported from historical register (row 229)', v_actor_id
+      'bank_transfer', '2024-03-02', 'Imported from historical register (row 229)', v_actor_id, ('2024-03-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7640,29 +7640,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9443/AWP/2024', 'paid', 'IDR',
       '2024-04-12', 'REPAIR CRACK WALL OF BM1 PROJECT', 77500000.00, 0, 1, 1,
       11.000, 2.000, 5.000, 77500000.00, 8525000.00,
       1550000.00, 3875000.00, 8525000.00, 80600000.00, 80600000.00, '2024-04-25'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":230,"no_seri_fpn":"010.002-24.91999443","no_po_customer":"9100012003","stated":{"dpp":77500000.0,"ppn":8525000.0,"pph":1550000.0,"retensi":3875000.0,"total":80600000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":230,"no_seri_fpn":"010.002-24.91999443","no_po_customer":"9100012003","stated":{"dpp":77500000.0,"ppn":8525000.0,"pph":1550000.0,"retensi":3875000.0,"total":80600000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-04-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'REPAIR CRACK WALL OF BM1 PROJECT', 1, 77500000.00
+      'REPAIR CRACK WALL OF BM1 PROJECT', 1, 77500000.00, ('2024-04-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9443-AWP-2024-1', 80600000.00, 'IDR',
-      'bank_transfer', '2024-04-25', 'Imported from historical register (row 230)', v_actor_id
+      'bank_transfer', '2024-04-25', 'Imported from historical register (row 230)', v_actor_id, ('2024-04-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7676,29 +7676,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9444/AWP/2024', 'partial', 'IDR',
       '2024-04-16', '19SHT PVC BOARD 5MM', 4845000.00, 0, 1, 1,
       11.000, NULL, NULL, 4845000.00, 532950.00,
       0.00, 0.00, 532950.00, 5377950.00, 5375950.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":231,"no_seri_fpn":"010.002-24.91999444","no_po_customer":"1204032464","biaya_adm":"Rp 2,000","stated":{"dpp":4845000.0,"ppn":532950.0,"total":5377950.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":231,"no_seri_fpn":"010.002-24.91999444","no_po_customer":"1204032464","biaya_adm":"Rp 2,000","stated":{"dpp":4845000.0,"ppn":532950.0,"total":5377950.0}}}'::jsonb, v_actor_id, ('2024-04-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '19SHT PVC BOARD 5MM', 1, 4845000.00
+      '19SHT PVC BOARD 5MM', 1, 4845000.00, ('2024-04-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9444-AWP-2024-1', 5375950.00, 'IDR',
-      'bank_transfer', '2024-05-14', 'Imported from historical register (row 231)', v_actor_id
+      'bank_transfer', '2024-05-14', 'Imported from historical register (row 231)', v_actor_id, ('2024-05-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7712,29 +7712,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9445/AWP/2024', 'paid', 'IDR',
       '2024-04-18', 'PROGRESS 1 SERVICE CONTRACT OF PAINTING WORKS AT TG10 AREA', 359528638.44, 0, 1, 1,
       11.000, 2.000, 6.250, 359528638.44, 39548150.23,
       7190572.77, 22470539.90, 39548150.23, 369415676.00, 369415676.00, '2024-05-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":232,"no_seri_fpn":"010.002-24.91999445","no_po_customer":"9100011479","stated":{"harga_jual":449410798.0,"dpp":359528639.0,"ppn":39548150.0,"pph":7190573.0,"retensi":22470540.0,"total":369415676.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":232,"no_seri_fpn":"010.002-24.91999445","no_po_customer":"9100011479","stated":{"harga_jual":449410798.0,"dpp":359528639.0,"ppn":39548150.0,"pph":7190573.0,"retensi":22470540.0,"total":369415676.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-04-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 1 SERVICE CONTRACT OF PAINTING WORKS AT TG10 AREA', 1, 359528638.44
+      'PROGRESS 1 SERVICE CONTRACT OF PAINTING WORKS AT TG10 AREA', 1, 359528638.44, ('2024-04-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9445-AWP-2024-1', 369415676.00, 'IDR',
-      'bank_transfer', '2024-05-03', 'Imported from historical register (row 232)', v_actor_id
+      'bank_transfer', '2024-05-03', 'Imported from historical register (row 232)', v_actor_id, ('2024-05-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7748,29 +7748,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9100011902', 'paid', 'IDR',
       '2024-04-27', 'RETENSI ARCHITECTURAL WORKS FOR CCK CONTROL ROOM', 8637025.00, 0, 1, 1,
       0.000, NULL, NULL, 8637025.00, 0.00,
       0.00, 0.00, 0.00, 8637025.00, 8637025.00, '2024-05-16'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":233,"stated":{"dpp":8637025.0,"total":8637025.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":233,"stated":{"dpp":8637025.0,"total":8637025.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-04-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI ARCHITECTURAL WORKS FOR CCK CONTROL ROOM', 1, 8637025.00
+      'RETENSI ARCHITECTURAL WORKS FOR CCK CONTROL ROOM', 1, 8637025.00, ('2024-04-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9100011902-1', 8637025.00, 'IDR',
-      'bank_transfer', '2024-05-16', 'Imported from historical register (row 233)', v_actor_id
+      'bank_transfer', '2024-05-16', 'Imported from historical register (row 233)', v_actor_id, ('2024-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7784,29 +7784,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9446/AWP/2024', 'paid', 'IDR',
       '2024-05-28', '62P VINILEX-2002 BRILLIANT WHITE', 42625000.00, 0, 1, 1,
       11.000, NULL, NULL, 42625000.00, 4688750.00,
       0.00, 0.00, 4688750.00, 47313750.00, 47313750.00, '2024-08-14'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":234,"no_seri_fpn":"010.002-24.91999446","no_po_customer":"KPN/HO/24/05/0115","stated":{"dpp":42625000.0,"ppn":4688750.0,"total":47313750.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":234,"no_seri_fpn":"010.002-24.91999446","no_po_customer":"KPN/HO/24/05/0115","stated":{"dpp":42625000.0,"ppn":4688750.0,"total":47313750.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-05-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '62P VINILEX-2002 BRILLIANT WHITE', 1, 42625000.00
+      '62P VINILEX-2002 BRILLIANT WHITE', 1, 42625000.00, ('2024-05-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9446-AWP-2024-1', 47313750.00, 'IDR',
-      'bank_transfer', '2024-08-14', 'Imported from historical register (row 234)', v_actor_id
+      'bank_transfer', '2024-08-14', 'Imported from historical register (row 234)', v_actor_id, ('2024-08-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7820,29 +7820,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9447/AWP/2024', 'paid', 'IDR',
       '2024-06-14', 'PROGRESS IX PAINTING WORKS OF BM-1 PROJECT', 323397013.45, 0, 1, 1,
       11.000, 2.048, 5.120, 323397013.45, 35573671.48,
       6623170.84, 16557927.09, 35573671.48, 335789587.00, 335789587.00, '2024-06-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":235,"no_seri_fpn":"010.002-24.91999447","no_po_customer":"9100010450","stated":{"harga_jual":331184617.0,"dpp":323398658.0,"ppn":35573852.0,"pph":6623692.0,"retensi":16559231.0,"total":335789587.0},"import_notes":["base adjusted 323398658.00 -> 323397013.44 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":235,"no_seri_fpn":"010.002-24.91999447","no_po_customer":"9100010450","stated":{"harga_jual":331184617.0,"dpp":323398658.0,"ppn":35573852.0,"pph":6623692.0,"retensi":16559231.0,"total":335789587.0},"import_notes":["base adjusted 323398658.00 -> 323397013.44 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-06-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS IX PAINTING WORKS OF BM-1 PROJECT', 1, 323397013.45
+      'PROGRESS IX PAINTING WORKS OF BM-1 PROJECT', 1, 323397013.45, ('2024-06-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9447-AWP-2024-1', 335789587.00, 'IDR',
-      'bank_transfer', '2024-06-21', 'Imported from historical register (row 235)', v_actor_id
+      'bank_transfer', '2024-06-21', 'Imported from historical register (row 235)', v_actor_id, ('2024-06-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7856,29 +7856,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9448/AWP/2024', 'partial', 'IDR',
       '2024-06-24', '30SHT PVC BOARD 5MM', 7650000.00, 0, 1, 1,
       11.000, NULL, NULL, 7650000.00, 841500.00,
       0.00, 0.00, 841500.00, 8491500.00, 8489500.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":236,"no_seri_fpn":"010.002-24.91999448","no_po_customer":"1204032865","biaya_adm":"Rp 2,000","stated":{"dpp":7650000.0,"ppn":841500.0,"total":8491500.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":236,"no_seri_fpn":"010.002-24.91999448","no_po_customer":"1204032865","biaya_adm":"Rp 2,000","stated":{"dpp":7650000.0,"ppn":841500.0,"total":8491500.0}}}'::jsonb, v_actor_id, ('2024-06-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '30SHT PVC BOARD 5MM', 1, 7650000.00
+      '30SHT PVC BOARD 5MM', 1, 7650000.00, ('2024-06-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9448-AWP-2024-1', 8489500.00, 'IDR',
-      'bank_transfer', '2024-09-08', 'Imported from historical register (row 236)', v_actor_id
+      'bank_transfer', '2024-09-08', 'Imported from historical register (row 236)', v_actor_id, ('2024-09-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7892,29 +7892,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9449/AWP/2024', 'partial', 'IDR',
       '2024-07-01', '20PAIL VINILEX-2002 BRILLIANT WHITE (PROJECT)', 13750000.00, 0, 1, 1,
       11.000, NULL, NULL, 13750000.00, 1512500.00,
       0.00, 0.00, 1512500.00, 15262500.00, 15261900.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":237,"no_seri_fpn":"010.002-24.91999449","no_po_customer":"KPN/HO/04/07/0003","biaya_adm":"Rp 600","stated":{"dpp":13750000.0,"ppn":1512500.0,"total":15262500.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":237,"no_seri_fpn":"010.002-24.91999449","no_po_customer":"KPN/HO/04/07/0003","biaya_adm":"Rp 600","stated":{"dpp":13750000.0,"ppn":1512500.0,"total":15262500.0}}}'::jsonb, v_actor_id, ('2024-07-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '20PAIL VINILEX-2002 BRILLIANT WHITE (PROJECT)', 1, 13750000.00
+      '20PAIL VINILEX-2002 BRILLIANT WHITE (PROJECT)', 1, 13750000.00, ('2024-07-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9449-AWP-2024-1', 15261900.00, 'IDR',
-      'bank_transfer', '2024-08-20', 'Imported from historical register (row 237)', v_actor_id
+      'bank_transfer', '2024-08-20', 'Imported from historical register (row 237)', v_actor_id, ('2024-08-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7928,29 +7928,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9450/AWP/2024', 'partial', 'IDR',
       '2024-07-03', '35PAIL VINILEX-2002 BRILLIANT WHITE (PROJECT)', 24062500.00, 0, 1, 1,
       11.000, NULL, NULL, 24062500.00, 2646875.00,
       0.00, 0.00, 2646875.00, 26709375.00, 26708775.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":238,"no_seri_fpn":"010.002-24.91999450","no_po_customer":"ARP/HO/24/06/0107","biaya_adm":"Rp 600","stated":{"dpp":24062500.0,"ppn":2646875.0,"total":26709375.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":238,"no_seri_fpn":"010.002-24.91999450","no_po_customer":"ARP/HO/24/06/0107","biaya_adm":"Rp 600","stated":{"dpp":24062500.0,"ppn":2646875.0,"total":26709375.0}}}'::jsonb, v_actor_id, ('2024-07-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '35PAIL VINILEX-2002 BRILLIANT WHITE (PROJECT)', 1, 24062500.00
+      '35PAIL VINILEX-2002 BRILLIANT WHITE (PROJECT)', 1, 24062500.00, ('2024-07-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9450-AWP-2024-1', 26708775.00, 'IDR',
-      'bank_transfer', '2024-08-23', 'Imported from historical register (row 238)', v_actor_id
+      'bank_transfer', '2024-08-23', 'Imported from historical register (row 238)', v_actor_id, ('2024-08-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -7964,29 +7964,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9451/AWP/2024', 'paid', 'IDR',
       '2024-07-16', '160CAN PL.8000 (50BLUE,50SUNSHINE,30WHITE,30VERMILION)', 34079893.33, 0, 1, 1,
       10.998, NULL, NULL, 34079893.33, 3748106.67,
       0.00, 0.00, 3748106.67, 37828000.00, 37828000.00, '2024-08-02'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":239,"no_seri_fpn":"010.002-24.91999451","no_po_customer":"9000742506","stated":{"dpp":34080000.0,"ppn":3748000.0,"total":37828000.0},"import_notes":["base adjusted 34080000.00 -> 34079893.33 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":239,"no_seri_fpn":"010.002-24.91999451","no_po_customer":"9000742506","stated":{"dpp":34080000.0,"ppn":3748000.0,"total":37828000.0},"import_notes":["base adjusted 34080000.00 -> 34079893.33 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-07-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '160CAN PL.8000 (50BLUE,50SUNSHINE,30WHITE,30VERMILION)', 1, 34079893.33
+      '160CAN PL.8000 (50BLUE,50SUNSHINE,30WHITE,30VERMILION)', 1, 34079893.33, ('2024-07-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9451-AWP-2024-1', 37828000.00, 'IDR',
-      'bank_transfer', '2024-08-02', 'Imported from historical register (row 239)', v_actor_id
+      'bank_transfer', '2024-08-02', 'Imported from historical register (row 239)', v_actor_id, ('2024-08-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8000,29 +8000,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9100012003', 'partial', 'IDR',
       '2024-08-12', 'RETENSI REPAIR CRACK WALL OF BM1 PROJECT', 3875000.00, 0, 1, 1,
       0.000, NULL, NULL, 3875000.00, 0.00,
       0.00, 0.00, 0.00, 3875000.00, 3775000.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":240,"plus_minus":"violation 100","stated":{"dpp":3875000.0,"total":3875000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":240,"plus_minus":"violation 100","stated":{"dpp":3875000.0,"total":3875000.0}}}'::jsonb, v_actor_id, ('2024-08-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI REPAIR CRACK WALL OF BM1 PROJECT', 1, 3875000.00
+      'RETENSI REPAIR CRACK WALL OF BM1 PROJECT', 1, 3875000.00, ('2024-08-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9100012003-1', 3775000.00, 'IDR',
-      'bank_transfer', '2024-08-30', 'Imported from historical register (row 240)', v_actor_id
+      'bank_transfer', '2024-08-30', 'Imported from historical register (row 240)', v_actor_id, ('2024-08-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8036,29 +8036,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9452/AWP/2024', 'paid', 'IDR',
       '2024-08-12', '1PAIL 20LT- BEE BRAND 1000-2135A EXPRESSO', 1316000.00, 0, 1, 1,
       11.000, NULL, NULL, 1316000.00, 144760.00,
       0.00, 0.00, 144760.00, 1460760.00, 1460760.00, '2024-09-13'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":241,"no_seri_fpn":"010.002-24.91999452","no_po_customer":"KAP/HO/24/08/003","stated":{"dpp":1316000.0,"ppn":144760.0,"total":1460760.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":241,"no_seri_fpn":"010.002-24.91999452","no_po_customer":"KAP/HO/24/08/003","stated":{"dpp":1316000.0,"ppn":144760.0,"total":1460760.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-08-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '1PAIL 20LT- BEE BRAND 1000-2135A EXPRESSO', 1, 1316000.00
+      '1PAIL 20LT- BEE BRAND 1000-2135A EXPRESSO', 1, 1316000.00, ('2024-08-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9452-AWP-2024-1', 1460760.00, 'IDR',
-      'bank_transfer', '2024-09-13', 'Imported from historical register (row 241)', v_actor_id
+      'bank_transfer', '2024-09-13', 'Imported from historical register (row 241)', v_actor_id, ('2024-09-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8072,29 +8072,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9453/AWP/2024', 'partial', 'IDR',
       '2024-08-23', 'PROGRESS 2 SERVICE CONTRACT OF PAINTING WORKS AT TG10 AREA', 259673786.79, 0, 1, 1,
       11.000, 2.353, 5.882, 259673786.79, 28564116.55,
       6110124.20, 15274012.14, 28564116.55, 266853767.00, 265056123.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":242,"no_seri_fpn":"010.002-24.91999453","no_po_customer":"9100011479","plus_minus":"1797643","stated":{"harga_jual":305454901.0,"dpp":259671721.0,"ppn":28563889.0,"pph":6109098.0,"retensi":15272745.0,"total":266853767.0},"import_notes":["base adjusted 259671721.00 -> 259673786.80 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":242,"no_seri_fpn":"010.002-24.91999453","no_po_customer":"9100011479","plus_minus":"1797643","stated":{"harga_jual":305454901.0,"dpp":259671721.0,"ppn":28563889.0,"pph":6109098.0,"retensi":15272745.0,"total":266853767.0},"import_notes":["base adjusted 259671721.00 -> 259673786.80 so the stored rates reproduce TOTAL (source computed PPH/retensi on a different base)"]}}'::jsonb, v_actor_id, ('2024-08-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 2 SERVICE CONTRACT OF PAINTING WORKS AT TG10 AREA', 1, 259673786.79
+      'PROGRESS 2 SERVICE CONTRACT OF PAINTING WORKS AT TG10 AREA', 1, 259673786.79, ('2024-08-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9453-AWP-2024-1', 265056123.00, 'IDR',
-      'bank_transfer', '2024-09-06', 'Imported from historical register (row 242)', v_actor_id
+      'bank_transfer', '2024-09-06', 'Imported from historical register (row 242)', v_actor_id, ('2024-09-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8108,29 +8108,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9454/AWP/2024', 'paid', 'IDR',
       '2024-10-08', '40PCS CARAFE 1L', 6400000.00, 0, 1, 1,
       11.000, NULL, NULL, 6400000.00, 704000.00,
       0.00, 0.00, 704000.00, 7104000.00, 7104000.00, '2024-10-23'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":243,"no_seri_fpn":"010.002-24.91999454","no_po_customer":"22792","stated":{"dpp":6400000.0,"ppn":704000.0,"total":7104000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":243,"no_seri_fpn":"010.002-24.91999454","no_po_customer":"22792","stated":{"dpp":6400000.0,"ppn":704000.0,"total":7104000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-10-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '40PCS CARAFE 1L', 1, 6400000.00
+      '40PCS CARAFE 1L', 1, 6400000.00, ('2024-10-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9454-AWP-2024-1', 7104000.00, 'IDR',
-      'bank_transfer', '2024-10-23', 'Imported from historical register (row 243)', v_actor_id
+      'bank_transfer', '2024-10-23', 'Imported from historical register (row 243)', v_actor_id, ('2024-10-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8144,29 +8144,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9455/AWP/2024', 'paid', 'IDR',
       '2024-10-21', 'PROGRESS 1 CIVIL WORKS LAP BOLA PANGKER&DRAINASE', 200221250.00, 0, 1, 1,
       11.000, 2.000, 5.000, 200221250.00, 22024337.50,
       4004425.00, 10011062.50, 22024337.50, 208230100.00, 208230100.00, '2024-11-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":244,"no_seri_fpn":"010.002-24.91999455","no_po_customer":"9000758813","stated":{"dpp":200221250.0,"ppn":22024338.0,"pph":4004425.0,"retensi":10011063.0,"total":208230100.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":244,"no_seri_fpn":"010.002-24.91999455","no_po_customer":"9000758813","stated":{"dpp":200221250.0,"ppn":22024338.0,"pph":4004425.0,"retensi":10011063.0,"total":208230100.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-10-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 1 CIVIL WORKS LAP BOLA PANGKER&DRAINASE', 1, 200221250.00
+      'PROGRESS 1 CIVIL WORKS LAP BOLA PANGKER&DRAINASE', 1, 200221250.00, ('2024-10-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9455-AWP-2024-1', 208230100.00, 'IDR',
-      'bank_transfer', '2024-11-08', 'Imported from historical register (row 244)', v_actor_id
+      'bank_transfer', '2024-11-08', 'Imported from historical register (row 244)', v_actor_id, ('2024-11-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8180,29 +8180,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9456/AWP/2024', 'paid', 'IDR',
       '2024-10-30', 'PROGRESS 2 CIVIL WORKS LAP BOLA PANGKER&DRAINASE', 123294809.61, 0, 1, 1,
       11.000, 2.000, 5.000, 123294809.61, 13562429.06,
       2465896.19, 6164740.48, 13562429.06, 128226602.00, 128226602.00, '2024-11-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":245,"no_seri_fpn":"010.002-24.91999456","no_po_customer":"9000758813","stated":{"dpp":123294810.0,"ppn":13562429.0,"pph":2465896.0,"retensi":6164741.0,"total":128226602.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":245,"no_seri_fpn":"010.002-24.91999456","no_po_customer":"9000758813","stated":{"dpp":123294810.0,"ppn":13562429.0,"pph":2465896.0,"retensi":6164741.0,"total":128226602.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-10-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 2 CIVIL WORKS LAP BOLA PANGKER&DRAINASE', 1, 123294809.61
+      'PROGRESS 2 CIVIL WORKS LAP BOLA PANGKER&DRAINASE', 1, 123294809.61, ('2024-10-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9456-AWP-2024-1', 128226602.00, 'IDR',
-      'bank_transfer', '2024-11-08', 'Imported from historical register (row 245)', v_actor_id
+      'bank_transfer', '2024-11-08', 'Imported from historical register (row 245)', v_actor_id, ('2024-11-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8216,29 +8216,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9457/AWP/2024', 'paid', 'IDR',
       '2024-11-14', 'PROGRESS 3 CIVIL WORKS LAP BOLA PANGKER&DRAINASE', 229013180.78, 0, 1, 1,
       11.000, 2.000, 5.000, 229013180.78, 25191449.89,
       4580263.62, 11450659.04, 25191449.89, 238173708.00, 238173708.00, '2024-11-22'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":246,"no_seri_fpn":"010.002-24.91999457","no_po_customer":"9000758813","stated":{"dpp":229013181.0,"ppn":25191450.0,"pph":4580264.0,"retensi":11450659.0,"total":238173708.0},"import_notes":["stored rates reproduce TOTAL to within Rp 0.01","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":246,"no_seri_fpn":"010.002-24.91999457","no_po_customer":"9000758813","stated":{"dpp":229013181.0,"ppn":25191450.0,"pph":4580264.0,"retensi":11450659.0,"total":238173708.0},"import_notes":["stored rates reproduce TOTAL to within Rp 0.01","payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-11-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 3 CIVIL WORKS LAP BOLA PANGKER&DRAINASE', 1, 229013180.78
+      'PROGRESS 3 CIVIL WORKS LAP BOLA PANGKER&DRAINASE', 1, 229013180.78, ('2024-11-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9457-AWP-2024-1', 238173708.00, 'IDR',
-      'bank_transfer', '2024-11-22', 'Imported from historical register (row 246)', v_actor_id
+      'bank_transfer', '2024-11-22', 'Imported from historical register (row 246)', v_actor_id, ('2024-11-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8252,29 +8252,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9458/AWP/2024', 'paid', 'IDR',
       '2024-11-22', '160CAN PL.8000-NP066 BLUE', 34080000.00, 0, 1, 1,
       11.000, NULL, NULL, 34080000.00, 3748800.00,
       0.00, 0.00, 3748800.00, 37828800.00, 37828800.00, '2024-12-06'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":247,"no_seri_fpn":"010.002-24.91999458","no_po_customer":"9000769390","stated":{"dpp":34080000.0,"ppn":3748800.0,"total":37828800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":247,"no_seri_fpn":"010.002-24.91999458","no_po_customer":"9000769390","stated":{"dpp":34080000.0,"ppn":3748800.0,"total":37828800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-11-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '160CAN PL.8000-NP066 BLUE', 1, 34080000.00
+      '160CAN PL.8000-NP066 BLUE', 1, 34080000.00, ('2024-11-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9458-AWP-2024-1', 37828800.00, 'IDR',
-      'bank_transfer', '2024-12-06', 'Imported from historical register (row 247)', v_actor_id
+      'bank_transfer', '2024-12-06', 'Imported from historical register (row 247)', v_actor_id, ('2024-12-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8288,29 +8288,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, 'R9100010450', 'paid', 'IDR',
       '2024-11-28', 'RETENSI PAINTING WORKS OF BM-1 PROJECT', 85480802.00, 0, 1, 1,
       0.000, NULL, NULL, 85480802.00, 0.00,
       0.00, 0.00, 0.00, 85480802.00, 85480802.00, '2024-12-12'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":248,"stated":{"dpp":85480802.0,"total":85480802.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":248,"stated":{"dpp":85480802.0,"total":85480802.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-11-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI PAINTING WORKS OF BM-1 PROJECT', 1, 85480802.00
+      'RETENSI PAINTING WORKS OF BM-1 PROJECT', 1, 85480802.00, ('2024-11-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-R9100010450-1', 85480802.00, 'IDR',
-      'bank_transfer', '2024-12-12', 'Imported from historical register (row 248)', v_actor_id
+      'bank_transfer', '2024-12-12', 'Imported from historical register (row 248)', v_actor_id, ('2024-12-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8324,29 +8324,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9459/AWP/2024', 'paid', 'IDR',
       '2024-12-13', '300CAN PL.8000-1018 SUNSHINE', 63900000.00, 0, 1, 1,
       11.000, NULL, NULL, 63900000.00, 7029000.00,
       0.00, 0.00, 7029000.00, 70929000.00, 70929000.00, '2024-12-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":249,"no_seri_fpn":"010.002-24.91999459","stated":{"dpp":63900000.0,"ppn":7029000.0,"total":70929000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":249,"no_seri_fpn":"010.002-24.91999459","stated":{"dpp":63900000.0,"ppn":7029000.0,"total":70929000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-12-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '300CAN PL.8000-1018 SUNSHINE', 1, 63900000.00
+      '300CAN PL.8000-1018 SUNSHINE', 1, 63900000.00, ('2024-12-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9459-AWP-2024-1', 70929000.00, 'IDR',
-      'bank_transfer', '2024-12-27', 'Imported from historical register (row 249)', v_actor_id
+      'bank_transfer', '2024-12-27', 'Imported from historical register (row 249)', v_actor_id, ('2024-12-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8360,29 +8360,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9460/AWP/2024', 'paid', 'IDR',
       '2024-12-16', 'PROGRESS 4 CIVIL WORKS LAP BOLA PANGKER&DRAINASE', 104706748.07, 0, 1, 1,
       11.000, 2.000, 5.000, 104706748.07, 11517742.29,
       2094134.96, 5235337.40, 11517742.29, 108895018.00, 108895018.00, '2024-12-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":250,"no_seri_fpn":"010.002-24.91999460","no_po_customer":"9000758813","stated":{"dpp":104706748.0,"ppn":11517742.0,"pph":2094135.0,"retensi":5235337.0,"total":108895018.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":250,"no_seri_fpn":"010.002-24.91999460","no_po_customer":"9000758813","stated":{"dpp":104706748.0,"ppn":11517742.0,"pph":2094135.0,"retensi":5235337.0,"total":108895018.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-12-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 4 CIVIL WORKS LAP BOLA PANGKER&DRAINASE', 1, 104706748.07
+      'PROGRESS 4 CIVIL WORKS LAP BOLA PANGKER&DRAINASE', 1, 104706748.07, ('2024-12-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9460-AWP-2024-1', 108895018.00, 'IDR',
-      'bank_transfer', '2024-12-27', 'Imported from historical register (row 250)', v_actor_id
+      'bank_transfer', '2024-12-27', 'Imported from historical register (row 250)', v_actor_id, ('2024-12-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8396,29 +8396,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9461/AWP/2024', 'paid', 'IDR',
       '2024-12-16', 'PEKERJAAN Conblock TB pangker', 34500000.00, 0, 1, 1,
       11.000, 2.000, 5.000, 34500000.00, 3795000.00,
       690000.00, 1725000.00, 3795000.00, 35880000.00, 35880000.00, '2024-12-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":251,"no_seri_fpn":"010.002-24.91999461","no_po_customer":"9000768663","stated":{"dpp":34500000.0,"ppn":3795000.0,"pph":690000.0,"retensi":1725000.0,"total":35880000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":251,"no_seri_fpn":"010.002-24.91999461","no_po_customer":"9000768663","stated":{"dpp":34500000.0,"ppn":3795000.0,"pph":690000.0,"retensi":1725000.0,"total":35880000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-12-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PEKERJAAN Conblock TB pangker', 1, 34500000.00
+      'PEKERJAAN Conblock TB pangker', 1, 34500000.00, ('2024-12-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9461-AWP-2024-1', 35880000.00, 'IDR',
-      'bank_transfer', '2024-12-27', 'Imported from historical register (row 251)', v_actor_id
+      'bank_transfer', '2024-12-27', 'Imported from historical register (row 251)', v_actor_id, ('2024-12-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8432,29 +8432,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9462/AWP/2024', 'paid', 'IDR',
       '2024-12-19', '250CAN PL.8000-BS9102 SUPER WHITE', 53000000.00, 0, 1, 1,
       11.000, NULL, NULL, 53000000.00, 5830000.00,
       0.00, 0.00, 5830000.00, 58830000.00, 58830000.00, '2025-01-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":252,"no_seri_fpn":"010.002-24.91999462","no_po_customer":"900077390","stated":{"dpp":53000000.0,"ppn":5830000.0,"total":58830000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":252,"no_seri_fpn":"010.002-24.91999462","no_po_customer":"900077390","stated":{"dpp":53000000.0,"ppn":5830000.0,"total":58830000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '250CAN PL.8000-BS9102 SUPER WHITE', 1, 53000000.00
+      '250CAN PL.8000-BS9102 SUPER WHITE', 1, 53000000.00, ('2024-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9462-AWP-2024-1', 58830000.00, 'IDR',
-      'bank_transfer', '2025-01-03', 'Imported from historical register (row 252)', v_actor_id
+      'bank_transfer', '2025-01-03', 'Imported from historical register (row 252)', v_actor_id, ('2025-01-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8468,29 +8468,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9463/AWP/2024', 'paid', 'IDR',
       '2024-12-19', '6CAN PL.8000-1018 SUNSHINE', 1278000.00, 0, 1, 1,
       11.000, NULL, NULL, 1278000.00, 140580.00,
       0.00, 0.00, 140580.00, 1418580.00, 1418580.00, '2025-01-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":253,"no_seri_fpn":"010.002-24.91999463","no_po_customer":"9000768705","stated":{"dpp":1278000.0,"ppn":140580.0,"total":1418580.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":253,"no_seri_fpn":"010.002-24.91999463","no_po_customer":"9000768705","stated":{"dpp":1278000.0,"ppn":140580.0,"total":1418580.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '6CAN PL.8000-1018 SUNSHINE', 1, 1278000.00
+      '6CAN PL.8000-1018 SUNSHINE', 1, 1278000.00, ('2024-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9463-AWP-2024-1', 1418580.00, 'IDR',
-      'bank_transfer', '2025-01-03', 'Imported from historical register (row 253)', v_actor_id
+      'bank_transfer', '2025-01-03', 'Imported from historical register (row 253)', v_actor_id, ('2025-01-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8504,29 +8504,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9464/AWP/2024', 'paid', 'IDR',
       '2024-12-19', '8CAN PL.8000-1018 SUNSHINE', 1704000.00, 0, 1, 1,
       11.000, NULL, NULL, 1704000.00, 187440.00,
       0.00, 0.00, 187440.00, 1891440.00, 1891440.00, '2025-01-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":254,"no_seri_fpn":"010.002-24.91999464","no_po_customer":"9000768704","stated":{"dpp":1704000.0,"ppn":187440.0,"total":1891440.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":254,"no_seri_fpn":"010.002-24.91999464","no_po_customer":"9000768704","stated":{"dpp":1704000.0,"ppn":187440.0,"total":1891440.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '8CAN PL.8000-1018 SUNSHINE', 1, 1704000.00
+      '8CAN PL.8000-1018 SUNSHINE', 1, 1704000.00, ('2024-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9464-AWP-2024-1', 1891440.00, 'IDR',
-      'bank_transfer', '2025-01-03', 'Imported from historical register (row 254)', v_actor_id
+      'bank_transfer', '2025-01-03', 'Imported from historical register (row 254)', v_actor_id, ('2025-01-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8540,29 +8540,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9465/AWP/2024', 'paid', 'IDR',
       '2024-12-21', '100CAN PL.8000-1018 SUNSHINE', 21300000.00, 0, 1, 1,
       11.000, NULL, NULL, 21300000.00, 2343000.00,
       0.00, 0.00, 2343000.00, 23643000.00, 23643000.00, '2025-01-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":255,"no_seri_fpn":"010.002-24.91999465","no_po_customer":"9000775200","stated":{"dpp":21300000.0,"ppn":2343000.0,"total":23643000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":255,"no_seri_fpn":"010.002-24.91999465","no_po_customer":"9000775200","stated":{"dpp":21300000.0,"ppn":2343000.0,"total":23643000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-12-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '100CAN PL.8000-1018 SUNSHINE', 1, 21300000.00
+      '100CAN PL.8000-1018 SUNSHINE', 1, 21300000.00, ('2024-12-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9465-AWP-2024-1', 23643000.00, 'IDR',
-      'bank_transfer', '2025-01-03', 'Imported from historical register (row 255)', v_actor_id
+      'bank_transfer', '2025-01-03', 'Imported from historical register (row 255)', v_actor_id, ('2025-01-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8576,29 +8576,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '9466/AWP/2024', 'paid', 'IDR',
       '2024-12-21', '50CAN PL.8000-BS9102 SUPER WHITE', 10650000.00, 0, 1, 1,
       11.000, NULL, NULL, 10650000.00, 1171500.00,
       0.00, 0.00, 1171500.00, 11821500.00, 11821500.00, '2025-01-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":256,"no_seri_fpn":"010.002-24.91999466","no_po_customer":"9000775952","stated":{"dpp":10650000.0,"ppn":1171500.0,"total":11821500.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":256,"no_seri_fpn":"010.002-24.91999466","no_po_customer":"9000775952","stated":{"dpp":10650000.0,"ppn":1171500.0,"total":11821500.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2024-12-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '50CAN PL.8000-BS9102 SUPER WHITE', 1, 10650000.00
+      '50CAN PL.8000-BS9102 SUPER WHITE', 1, 10650000.00, ('2024-12-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-9466-AWP-2024-1', 11821500.00, 'IDR',
-      'bank_transfer', '2025-01-03', 'Imported from historical register (row 256)', v_actor_id
+      'bank_transfer', '2025-01-03', 'Imported from historical register (row 256)', v_actor_id, ('2025-01-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8612,29 +8612,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/001', 'paid', 'IDR',
       '2025-01-10', '100CAN 3,785L- PL.8000-BS9102 S.WHITE', 21200000.00, 0, 11, 12,
       12.000, NULL, NULL, 19433333.33, 2332000.00,
       0.00, 0.00, 2332000.00, 23532000.00, 23532000.00, '2025-01-23'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":257,"no_seri_fpn":"0.400250000073278","no_po_customer":"9000781190","stated":{"harga_jual":21200000.0,"dpp":19433333.0,"ppn":2332000.0,"total":23532000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":257,"no_seri_fpn":"0.400250000073278","no_po_customer":"9000781190","stated":{"harga_jual":21200000.0,"dpp":19433333.0,"ppn":2332000.0,"total":23532000.0}}}'::jsonb, v_actor_id, ('2025-01-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '100CAN 3,785L- PL.8000-BS9102 S.WHITE', 1, 21200000.00
+      '100CAN 3,785L- PL.8000-BS9102 S.WHITE', 1, 21200000.00, ('2025-01-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-001-1', 23532000.00, 'IDR',
-      'bank_transfer', '2025-01-23', 'Imported from historical register (row 257)', v_actor_id
+      'bank_transfer', '2025-01-23', 'Imported from historical register (row 257)', v_actor_id, ('2025-01-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8648,29 +8648,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/002', 'paid', 'IDR',
       '2025-01-10', '10EA DRESSING TABLE+POUF,30SET WARDROBE 2DOORS WO MIRROR', 116000000.00, 0, 11, 12,
       12.000, NULL, NULL, 106333333.33, 12760000.00,
       0.00, 0.00, 12760000.00, 128760000.00, 128760000.00, '2025-02-06'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":258,"no_seri_fpn":"0.400250000073331","no_po_customer":"9000765414","stated":{"harga_jual":116000000.0,"dpp":106333333.0,"ppn":12760000.0,"total":128760000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":258,"no_seri_fpn":"0.400250000073331","no_po_customer":"9000765414","stated":{"harga_jual":116000000.0,"dpp":106333333.0,"ppn":12760000.0,"total":128760000.0}}}'::jsonb, v_actor_id, ('2025-01-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10EA DRESSING TABLE+POUF,30SET WARDROBE 2DOORS WO MIRROR', 1, 116000000.00
+      '10EA DRESSING TABLE+POUF,30SET WARDROBE 2DOORS WO MIRROR', 1, 116000000.00, ('2025-01-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-002-1', 128760000.00, 'IDR',
-      'bank_transfer', '2025-02-06', 'Imported from historical register (row 258)', v_actor_id
+      'bank_transfer', '2025-02-06', 'Imported from historical register (row 258)', v_actor_id, ('2025-02-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8684,29 +8684,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/003', 'paid', 'IDR',
       '2025-01-20', '4EA DRESSING TABLE+POUF,12SET WARDROBE 2DOORS WO MIRROR', 46400000.00, 0, 11, 12,
       12.000, NULL, 5.000, 42533333.33, 5104000.00,
       0.00, 2320000.00, 5104000.00, 49184000.00, 49184000.00, '2025-02-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":259,"no_seri_fpn":"0.400250001523588","no_po_customer":"9000765414","stated":{"harga_jual":46400000.0,"dpp":42533333.0,"ppn":5104000.0,"retensi":2320000.0,"total":49184000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":259,"no_seri_fpn":"0.400250001523588","no_po_customer":"9000765414","stated":{"harga_jual":46400000.0,"dpp":42533333.0,"ppn":5104000.0,"retensi":2320000.0,"total":49184000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-01-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '4EA DRESSING TABLE+POUF,12SET WARDROBE 2DOORS WO MIRROR', 1, 46400000.00
+      '4EA DRESSING TABLE+POUF,12SET WARDROBE 2DOORS WO MIRROR', 1, 46400000.00, ('2025-01-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-003-1', 49184000.00, 'IDR',
-      'bank_transfer', '2025-02-21', 'Imported from historical register (row 259)', v_actor_id
+      'bank_transfer', '2025-02-21', 'Imported from historical register (row 259)', v_actor_id, ('2025-02-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8720,29 +8720,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/004', 'paid', 'IDR',
       '2025-01-31', '6EA DRESSING TABLE+POUF,18SET WARDROBE 2DOORS WO MIRROR', 69600000.00, 0, 11, 12,
       12.000, NULL, 5.000, 63800000.00, 7656000.00,
       0.00, 3480000.00, 7656000.00, 73776000.00, 73776000.00, '2025-02-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":260,"no_seri_fpn":"0.400250001525266","no_po_customer":"9000765414","stated":{"harga_jual":69600000.0,"dpp":63800000.0,"ppn":7656000.0,"retensi":3480000.0,"total":73776000.0},"import_notes":["source figure Rp 122,960,000 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":260,"no_seri_fpn":"0.400250001525266","no_po_customer":"9000765414","stated":{"harga_jual":69600000.0,"dpp":63800000.0,"ppn":7656000.0,"retensi":3480000.0,"total":73776000.0},"import_notes":["source figure Rp 122,960,000 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id, ('2025-01-31'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '6EA DRESSING TABLE+POUF,18SET WARDROBE 2DOORS WO MIRROR', 1, 69600000.00
+      '6EA DRESSING TABLE+POUF,18SET WARDROBE 2DOORS WO MIRROR', 1, 69600000.00, ('2025-01-31'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-004-1', 73776000.00, 'IDR',
-      'bank_transfer', '2025-02-21', 'Imported from historical register (row 260)', v_actor_id
+      'bank_transfer', '2025-02-21', 'Imported from historical register (row 260)', v_actor_id, ('2025-02-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8756,29 +8756,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/R9100011479', 'paid', 'IDR',
       '2025-02-03', 'RETENSI SERVICE CONTRACT OF PAINTING WORKS TG10', 37743285.00, 0, 1, 1,
       0.000, NULL, NULL, 37743285.00, 0.00,
       0.00, 0.00, 0.00, 37743285.00, 37743285.00, '2025-02-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":261,"stated":{"harga_jual":37743285.0,"total":37743285.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":261,"stated":{"harga_jual":37743285.0,"total":37743285.0}}}'::jsonb, v_actor_id, ('2025-02-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI SERVICE CONTRACT OF PAINTING WORKS TG10', 1, 37743285.00
+      'RETENSI SERVICE CONTRACT OF PAINTING WORKS TG10', 1, 37743285.00, ('2025-02-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-R9100011479-1', 37743285.00, 'IDR',
-      'bank_transfer', '2025-02-27', 'Imported from historical register (row 261)', v_actor_id
+      'bank_transfer', '2025-02-27', 'Imported from historical register (row 261)', v_actor_id, ('2025-02-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8792,29 +8792,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/005', 'paid', 'IDR',
       '2025-02-21', '80CAN 3,785L- PL.8000-BS9102 S.WHITE', 16808571.43, 0, 1, 1,
       12.000, NULL, NULL, 16808571.43, 2017028.57,
       0.00, 0.00, 2017028.57, 18825600.00, 18825600.00, '2025-03-07'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":262,"no_seri_fpn":"0.400250004383689","no_po_customer":"9000786930","stated":{"harga_jual":21200000.0,"dpp":15546666.0,"ppn":1865600.0,"total":18825600.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":262,"no_seri_fpn":"0.400250004383689","no_po_customer":"9000786930","stated":{"harga_jual":21200000.0,"dpp":15546666.0,"ppn":1865600.0,"total":18825600.0},"import_notes":["components contradicted TOTAL; base back-solved from TOTAL"]}}'::jsonb, v_actor_id, ('2025-02-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '80CAN 3,785L- PL.8000-BS9102 S.WHITE', 1, 16808571.43
+      '80CAN 3,785L- PL.8000-BS9102 S.WHITE', 1, 16808571.43, ('2025-02-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-005-1', 18825600.00, 'IDR',
-      'bank_transfer', '2025-03-07', 'Imported from historical register (row 262)', v_actor_id
+      'bank_transfer', '2025-03-07', 'Imported from historical register (row 262)', v_actor_id, ('2025-03-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8828,29 +8828,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/006', 'paid', 'IDR',
       '2025-02-26', '6EA DRESSING TABLE+POUF,18SET WARDROBE 2DOORS WO MIRROR', 69600000.00, 0, 11, 12,
       12.000, NULL, NULL, 63800000.00, 7656000.00,
       0.00, 0.00, 7656000.00, 77256000.00, 77256000.00, '2025-03-06'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":263,"no_seri_fpn":"0.400250004931559","no_po_customer":"9000765424","stated":{"harga_jual":69600000.0,"dpp":63800000.0,"ppn":7656000.0,"total":77256000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":263,"no_seri_fpn":"0.400250004931559","no_po_customer":"9000765424","stated":{"harga_jual":69600000.0,"dpp":63800000.0,"ppn":7656000.0,"total":77256000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-02-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '6EA DRESSING TABLE+POUF,18SET WARDROBE 2DOORS WO MIRROR', 1, 69600000.00
+      '6EA DRESSING TABLE+POUF,18SET WARDROBE 2DOORS WO MIRROR', 1, 69600000.00, ('2025-02-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-006-1', 77256000.00, 'IDR',
-      'bank_transfer', '2025-03-06', 'Imported from historical register (row 263)', v_actor_id
+      'bank_transfer', '2025-03-06', 'Imported from historical register (row 263)', v_actor_id, ('2025-03-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8864,29 +8864,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/007', 'paid', 'IDR',
       '2025-02-26', 'PEK. PEDESTRIAN G,H,I TB PANGKER', 191642840.39, 0, 11, 12,
       12.000, 2.000, 5.000, 175672603.69, 21080712.44,
       3832856.81, 9582142.02, 21080712.44, 199308554.00, 199308554.00, '2025-03-07'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":264,"no_seri_fpn":"0.401250004837249","no_po_customer":"9000781718","stated":{"harga_jual":191642840.0,"dpp":175672603.0,"ppn":21080712.0,"pph":3832857.0,"retensi":9582142.0,"total":199308554.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":264,"no_seri_fpn":"0.401250004837249","no_po_customer":"9000781718","stated":{"harga_jual":191642840.0,"dpp":175672603.0,"ppn":21080712.0,"pph":3832857.0,"retensi":9582142.0,"total":199308554.0}}}'::jsonb, v_actor_id, ('2025-02-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PEK. PEDESTRIAN G,H,I TB PANGKER', 1, 191642840.39
+      'PEK. PEDESTRIAN G,H,I TB PANGKER', 1, 191642840.39, ('2025-02-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-007-1', 199308554.00, 'IDR',
-      'bank_transfer', '2025-03-07', 'Imported from historical register (row 264)', v_actor_id
+      'bank_transfer', '2025-03-07', 'Imported from historical register (row 264)', v_actor_id, ('2025-03-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8900,29 +8900,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/008', 'partial', 'IDR',
       '2025-02-26', '2EA DRESSING TABLE+POUF,6SET WARDROBE 2DOORS WO MIRROR', 23200000.00, 0, 11, 12,
       12.000, NULL, 5.000, 21266666.67, 2552000.00,
       0.00, 1160000.00, 2552000.00, 24592000.00, 22040000.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":265,"no_seri_fpn":"0.400250004837892","no_po_customer":"9000765414","stated":{"harga_jual":23200000.0,"dpp":21266667.0,"ppn":2552000.0,"retensi":1160000.0,"total":24592000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":265,"no_seri_fpn":"0.400250004837892","no_po_customer":"9000765414","stated":{"harga_jual":23200000.0,"dpp":21266667.0,"ppn":2552000.0,"retensi":1160000.0,"total":24592000.0}}}'::jsonb, v_actor_id, ('2025-02-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '2EA DRESSING TABLE+POUF,6SET WARDROBE 2DOORS WO MIRROR', 1, 23200000.00
+      '2EA DRESSING TABLE+POUF,6SET WARDROBE 2DOORS WO MIRROR', 1, 23200000.00, ('2025-02-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-008-1', 22040000.00, 'IDR',
-      'bank_transfer', '2025-03-13', 'Imported from historical register (row 265)', v_actor_id
+      'bank_transfer', '2025-03-13', 'Imported from historical register (row 265)', v_actor_id, ('2025-03-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8936,29 +8936,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/009', 'paid', 'IDR',
       '2025-02-27', '8EA DRESSING TABLE+POUF,24SET WARDROBE 2DOORS WO MIRROR', 92800000.00, 0, 11, 12,
       12.000, NULL, 5.000, 85066666.67, 10208000.00,
       0.00, 4640000.00, 10208000.00, 98368000.00, 98368000.00, '2025-03-07'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":266,"no_seri_fpn":"0.400250004954287","no_po_customer":"9000765414","plus_minus":"2552000","stated":{"harga_jual":92800000.0,"dpp":85066667.0,"ppn":10208000.0,"retensi":4640000.0,"total":98368000.0},"unattributed_rows":[{"note":"register stated Rp 100,920,000 here; trimmed to the balance outstanding","amount":100920000.0,"date":"2025-03-07"}]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":266,"no_seri_fpn":"0.400250004954287","no_po_customer":"9000765414","plus_minus":"2552000","stated":{"harga_jual":92800000.0,"dpp":85066667.0,"ppn":10208000.0,"retensi":4640000.0,"total":98368000.0},"unattributed_rows":[{"note":"register stated Rp 100,920,000 here; trimmed to the balance outstanding","amount":100920000.0,"date":"2025-03-07"}]}}'::jsonb, v_actor_id, ('2025-02-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '8EA DRESSING TABLE+POUF,24SET WARDROBE 2DOORS WO MIRROR', 1, 92800000.00
+      '8EA DRESSING TABLE+POUF,24SET WARDROBE 2DOORS WO MIRROR', 1, 92800000.00, ('2025-02-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-009-1', 98368000.00, 'IDR',
-      'bank_transfer', '2025-03-07', 'Imported from historical register (row 266)', v_actor_id
+      'bank_transfer', '2025-03-07', 'Imported from historical register (row 266)', v_actor_id, ('2025-03-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -8972,29 +8972,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/010', 'paid', 'IDR',
       '2025-02-27', '8EA DRESSING TABLE+POUF,24SET WARDROBE 2DOORS WO MIRROR', 92800000.00, 0, 11, 12,
       12.000, NULL, 5.000, 85066666.67, 10208000.00,
       0.00, 4640000.00, 10208000.00, 98368000.00, 98368000.00, '2025-03-06'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":267,"no_seri_fpn":"0.40025000495458","no_po_customer":"9000765424","stated":{"harga_jual":92800000.0,"dpp":85066667.0,"ppn":10208000.0,"retensi":4640000.0,"total":98368000.0},"unattributed_rows":[{"note":"register stated Rp 175,624,000 here; trimmed to the balance outstanding","amount":175624000.0,"date":"2025-03-06"}]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":267,"no_seri_fpn":"0.40025000495458","no_po_customer":"9000765424","stated":{"harga_jual":92800000.0,"dpp":85066667.0,"ppn":10208000.0,"retensi":4640000.0,"total":98368000.0},"unattributed_rows":[{"note":"register stated Rp 175,624,000 here; trimmed to the balance outstanding","amount":175624000.0,"date":"2025-03-06"}]}}'::jsonb, v_actor_id, ('2025-02-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '8EA DRESSING TABLE+POUF,24SET WARDROBE 2DOORS WO MIRROR', 1, 92800000.00
+      '8EA DRESSING TABLE+POUF,24SET WARDROBE 2DOORS WO MIRROR', 1, 92800000.00, ('2025-02-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-010-1', 98368000.00, 'IDR',
-      'bank_transfer', '2025-03-06', 'Imported from historical register (row 267)', v_actor_id
+      'bank_transfer', '2025-03-06', 'Imported from historical register (row 267)', v_actor_id, ('2025-03-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9008,29 +9008,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/011', 'paid', 'IDR',
       '2025-02-27', '4EA DRESSING TABLE+POUF,12SET WARDROBE 2DOORS WO MIRROR', 46400000.00, 0, 11, 12,
       12.000, NULL, 5.000, 42533333.33, 5104000.00,
       0.00, 2320000.00, 5104000.00, 49184000.00, 49184000.00, '2025-03-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":268,"no_seri_fpn":"0.40025000510655","no_po_customer":"9000765424","stated":{"harga_jual":46400000.0,"dpp":42533333.0,"ppn":5104000.0,"retensi":2320000.0,"total":49184000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":268,"no_seri_fpn":"0.40025000510655","no_po_customer":"9000765424","stated":{"harga_jual":46400000.0,"dpp":42533333.0,"ppn":5104000.0,"retensi":2320000.0,"total":49184000.0}}}'::jsonb, v_actor_id, ('2025-02-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '4EA DRESSING TABLE+POUF,12SET WARDROBE 2DOORS WO MIRROR', 1, 46400000.00
+      '4EA DRESSING TABLE+POUF,12SET WARDROBE 2DOORS WO MIRROR', 1, 46400000.00, ('2025-02-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-011-1', 49184000.00, 'IDR',
-      'bank_transfer', '2025-03-21', 'Imported from historical register (row 268)', v_actor_id
+      'bank_transfer', '2025-03-21', 'Imported from historical register (row 268)', v_actor_id, ('2025-03-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9044,29 +9044,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5808/AWP/2025', 'paid', 'IDR',
       '2025-03-04', '700CAN PLATONE 8000', 145600000.00, 0, 11, 12,
       12.000, NULL, NULL, 133466666.67, 16016000.00,
       0.00, 0.00, 16016000.00, 161616000.00, 161616000.00, '2025-03-14'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":269,"no_seri_fpn":"040.004-25.31275808","no_po_customer":"9000790893","stated":{"harga_jual":145600000.0,"dpp":133466667.0,"ppn":16016000.0,"total":161616000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":269,"no_seri_fpn":"040.004-25.31275808","no_po_customer":"9000790893","stated":{"harga_jual":145600000.0,"dpp":133466667.0,"ppn":16016000.0,"total":161616000.0}}}'::jsonb, v_actor_id, ('2025-03-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '700CAN PLATONE 8000', 1, 145600000.00
+      '700CAN PLATONE 8000', 1, 145600000.00, ('2025-03-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5808-AWP-2025-1', 161616000.00, 'IDR',
-      'bank_transfer', '2025-03-14', 'Imported from historical register (row 269)', v_actor_id
+      'bank_transfer', '2025-03-14', 'Imported from historical register (row 269)', v_actor_id, ('2025-03-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9080,29 +9080,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5809/AWP/2025', 'paid', 'IDR',
       '2025-03-06', '8EA DRESSING TABLE+POUF,24SET WARDROBE 2DOORS WO MIRROR', 92800000.00, 0, 11, 12,
       12.000, NULL, 5.000, 85066666.67, 10208000.00,
       0.00, 4640000.00, 10208000.00, 98368000.00, 98368000.00, '2025-03-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":270,"no_seri_fpn":"040.004-25.31275809","no_po_customer":"9000765424","stated":{"harga_jual":92800000.0,"dpp":85066667.0,"ppn":10208000.0,"retensi":4640000.0,"total":98368000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":270,"no_seri_fpn":"040.004-25.31275809","no_po_customer":"9000765424","stated":{"harga_jual":92800000.0,"dpp":85066667.0,"ppn":10208000.0,"retensi":4640000.0,"total":98368000.0}}}'::jsonb, v_actor_id, ('2025-03-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '8EA DRESSING TABLE+POUF,24SET WARDROBE 2DOORS WO MIRROR', 1, 92800000.00
+      '8EA DRESSING TABLE+POUF,24SET WARDROBE 2DOORS WO MIRROR', 1, 92800000.00, ('2025-03-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5809-AWP-2025-1', 98368000.00, 'IDR',
-      'bank_transfer', '2025-03-21', 'Imported from historical register (row 270)', v_actor_id
+      'bank_transfer', '2025-03-21', 'Imported from historical register (row 270)', v_actor_id, ('2025-03-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9116,29 +9116,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5810/AWP/2025', 'partial', 'IDR',
       '2025-03-10', '500CAN PL.8000 (250WHITE,250VERMILLION)', 104000000.00, 0, 11, 12,
       12.000, NULL, NULL, 95333333.33, 11440000.00,
       0.00, 0.00, 11440000.00, 115440000.00, 11544000.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":271,"no_seri_fpn":"040.004-25.31275810","no_po_customer":"9000790661","stated":{"harga_jual":104000000.0,"dpp":95333333.0,"ppn":11440000.0,"total":115440000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":271,"no_seri_fpn":"040.004-25.31275810","no_po_customer":"9000790661","stated":{"harga_jual":104000000.0,"dpp":95333333.0,"ppn":11440000.0,"total":115440000.0}}}'::jsonb, v_actor_id, ('2025-03-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '500CAN PL.8000 (250WHITE,250VERMILLION)', 1, 104000000.00
+      '500CAN PL.8000 (250WHITE,250VERMILLION)', 1, 104000000.00, ('2025-03-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5810-AWP-2025-1', 11544000.00, 'IDR',
-      'bank_transfer', '2025-03-21', 'Imported from historical register (row 271)', v_actor_id
+      'bank_transfer', '2025-03-21', 'Imported from historical register (row 271)', v_actor_id, ('2025-03-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9152,29 +9152,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5811/AWP/2025', 'paid', 'IDR',
       '2025-03-12', 'PROGRESS I LANDSCAPE PEDESTRIAN DAN DRAINASE', 275151380.78, 0, 11, 12,
       12.000, 2.000, 5.000, 252222099.05, 30266651.89,
       5503027.62, 13757569.04, 30266651.89, 286157436.00, 286157436.00, '2025-03-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":272,"no_seri_fpn":"041.004-25.31275811","no_po_customer":"9000791224","stated":{"harga_jual":275151381.0,"dpp":252222099.0,"ppn":30266652.0,"pph":5503028.0,"retensi":13757569.0,"total":286157436.0},"import_notes":["stored rates reproduce TOTAL to within Rp 0.01"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":272,"no_seri_fpn":"041.004-25.31275811","no_po_customer":"9000791224","stated":{"harga_jual":275151381.0,"dpp":252222099.0,"ppn":30266652.0,"pph":5503028.0,"retensi":13757569.0,"total":286157436.0},"import_notes":["stored rates reproduce TOTAL to within Rp 0.01"]}}'::jsonb, v_actor_id, ('2025-03-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS I LANDSCAPE PEDESTRIAN DAN DRAINASE', 1, 275151380.78
+      'PROGRESS I LANDSCAPE PEDESTRIAN DAN DRAINASE', 1, 275151380.78, ('2025-03-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5811-AWP-2025-1', 286157436.00, 'IDR',
-      'bank_transfer', '2025-03-21', 'Imported from historical register (row 272)', v_actor_id
+      'bank_transfer', '2025-03-21', 'Imported from historical register (row 272)', v_actor_id, ('2025-03-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9188,29 +9188,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5812/AWP/2025', 'paid', 'IDR',
       '2025-03-12', 'PROGRESS I PEK TOILET DAN TUGU BOLA TB PANGKER', 320129624.04, 0, 11, 12,
       12.000, 2.000, 5.000, 293452155.37, 35214258.64,
       6402592.48, 16006481.20, 35214258.64, 332934809.00, 332934809.00, '2025-03-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":273,"no_seri_fpn":"041.004-25.31275812","no_po_customer":"9000787221","stated":{"harga_jual":320129624.0,"dpp":293452155.0,"ppn":35214259.0,"pph":6402592.0,"retensi":16006481.0,"total":332934809.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":273,"no_seri_fpn":"041.004-25.31275812","no_po_customer":"9000787221","stated":{"harga_jual":320129624.0,"dpp":293452155.0,"ppn":35214259.0,"pph":6402592.0,"retensi":16006481.0,"total":332934809.0}}}'::jsonb, v_actor_id, ('2025-03-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS I PEK TOILET DAN TUGU BOLA TB PANGKER', 1, 320129624.04
+      'PROGRESS I PEK TOILET DAN TUGU BOLA TB PANGKER', 1, 320129624.04, ('2025-03-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5812-AWP-2025-1', 332934809.00, 'IDR',
-      'bank_transfer', '2025-03-21', 'Imported from historical register (row 273)', v_actor_id
+      'bank_transfer', '2025-03-21', 'Imported from historical register (row 273)', v_actor_id, ('2025-03-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9224,29 +9224,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5813/AWP/2026', 'paid', 'IDR',
       '2025-03-19', '8EA DRESSING TABLE+POUF,24SET WARDROBE 2DOORS WO MIRROR', 92800000.00, 0, 11, 12,
       12.000, NULL, 5.000, 85066666.67, 10208000.00,
       0.00, 4640000.00, 10208000.00, 98368000.00, 98368000.00, '2025-03-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":274,"no_seri_fpn":"040.004-25.31275813","no_po_customer":"9000765424","stated":{"harga_jual":92800000.0,"dpp":85066666.0,"ppn":10208000.0,"retensi":4640000.0,"total":98368000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":274,"no_seri_fpn":"040.004-25.31275813","no_po_customer":"9000765424","stated":{"harga_jual":92800000.0,"dpp":85066666.0,"ppn":10208000.0,"retensi":4640000.0,"total":98368000.0}}}'::jsonb, v_actor_id, ('2025-03-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '8EA DRESSING TABLE+POUF,24SET WARDROBE 2DOORS WO MIRROR', 1, 92800000.00
+      '8EA DRESSING TABLE+POUF,24SET WARDROBE 2DOORS WO MIRROR', 1, 92800000.00, ('2025-03-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5813-AWP-2026-1', 98368000.00, 'IDR',
-      'bank_transfer', '2025-03-27', 'Imported from historical register (row 274)', v_actor_id
+      'bank_transfer', '2025-03-27', 'Imported from historical register (row 274)', v_actor_id, ('2025-03-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9260,29 +9260,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5814/AWP/2026', 'paid', 'IDR',
       '2025-03-19', '4EA DRESSING TABLE+POUF,12SET WARDROBE 2DOORS WO MIRROR', 46400000.00, 0, 11, 12,
       12.000, NULL, 5.000, 42533333.33, 5104000.00,
       0.00, 2320000.00, 5104000.00, 49184000.00, 49184000.00, '2025-03-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":275,"no_seri_fpn":"040.004-25.31275814","no_po_customer":"9000765424","stated":{"harga_jual":46400000.0,"dpp":42533333.0,"ppn":5104000.0,"retensi":2320000.0,"total":49184000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":275,"no_seri_fpn":"040.004-25.31275814","no_po_customer":"9000765424","stated":{"harga_jual":46400000.0,"dpp":42533333.0,"ppn":5104000.0,"retensi":2320000.0,"total":49184000.0}}}'::jsonb, v_actor_id, ('2025-03-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '4EA DRESSING TABLE+POUF,12SET WARDROBE 2DOORS WO MIRROR', 1, 46400000.00
+      '4EA DRESSING TABLE+POUF,12SET WARDROBE 2DOORS WO MIRROR', 1, 46400000.00, ('2025-03-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5814-AWP-2026-1', 49184000.00, 'IDR',
-      'bank_transfer', '2025-03-27', 'Imported from historical register (row 275)', v_actor_id
+      'bank_transfer', '2025-03-27', 'Imported from historical register (row 275)', v_actor_id, ('2025-03-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9296,29 +9296,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5815/AWP/2026', 'paid', 'IDR',
       '2025-03-21', '4EA DRESSING TABLE+POUF,12SET WARDROBE 2DOORS WO MIRROR', 46400000.00, 0, 11, 12,
       12.000, NULL, 5.000, 42533333.33, 5104000.00,
       0.00, 2320000.00, 5104000.00, 49184000.00, 49184000.00, '2025-04-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":276,"no_seri_fpn":"040.004-25.31275815","no_po_customer":"9000765424","stated":{"harga_jual":46400000.0,"dpp":42533333.0,"ppn":5104000.0,"retensi":2320000.0,"total":49184000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":276,"no_seri_fpn":"040.004-25.31275815","no_po_customer":"9000765424","stated":{"harga_jual":46400000.0,"dpp":42533333.0,"ppn":5104000.0,"retensi":2320000.0,"total":49184000.0}}}'::jsonb, v_actor_id, ('2025-03-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '4EA DRESSING TABLE+POUF,12SET WARDROBE 2DOORS WO MIRROR', 1, 46400000.00
+      '4EA DRESSING TABLE+POUF,12SET WARDROBE 2DOORS WO MIRROR', 1, 46400000.00, ('2025-03-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5815-AWP-2026-1', 49184000.00, 'IDR',
-      'bank_transfer', '2025-04-10', 'Imported from historical register (row 276)', v_actor_id
+      'bank_transfer', '2025-04-10', 'Imported from historical register (row 276)', v_actor_id, ('2025-04-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9332,29 +9332,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5816/AWP/2025', 'paid', 'IDR',
       '2025-03-25', 'PROGRESS II PEK TOILET DAN TUGU BOLA TB PANGKER', 191267594.23, 0, 11, 12,
       12.000, 2.000, 5.000, 175328628.04, 21039435.36,
       3825351.88, 9563379.71, 21039435.36, 198918298.00, 198918298.00, '2025-04-11'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":277,"no_seri_fpn":"040.004-25.31275816","no_po_customer":"9000787221","stated":{"harga_jual":191267594.0,"dpp":175328628.0,"ppn":21039435.0,"pph":3825352.0,"retensi":9563380.0,"total":198918298.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":277,"no_seri_fpn":"040.004-25.31275816","no_po_customer":"9000787221","stated":{"harga_jual":191267594.0,"dpp":175328628.0,"ppn":21039435.0,"pph":3825352.0,"retensi":9563380.0,"total":198918298.0}}}'::jsonb, v_actor_id, ('2025-03-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS II PEK TOILET DAN TUGU BOLA TB PANGKER', 1, 191267594.23
+      'PROGRESS II PEK TOILET DAN TUGU BOLA TB PANGKER', 1, 191267594.23, ('2025-03-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5816-AWP-2025-1', 198918298.00, 'IDR',
-      'bank_transfer', '2025-04-11', 'Imported from historical register (row 277)', v_actor_id
+      'bank_transfer', '2025-04-11', 'Imported from historical register (row 277)', v_actor_id, ('2025-04-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9368,29 +9368,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5817/AWP/2026', 'paid', 'IDR',
       '2025-03-25', 'PROGRESS II LANDSCAPE PEDESTRIAN DAN DRAINASE', 578571659.61, 0, 11, 12,
       12.000, 2.000, 5.000, 530357354.64, 63642882.56,
       11571433.19, 28928582.98, 63642882.56, 601714526.00, 601714526.00, '2025-04-11'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":278,"no_seri_fpn":"040.004-25.31275817","no_po_customer":"9000791224","stated":{"harga_jual":578571660.0,"dpp":530357355.0,"ppn":63642883.0,"pph":11571433.0,"retensi":28928583.0,"total":601714526.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":278,"no_seri_fpn":"040.004-25.31275817","no_po_customer":"9000791224","stated":{"harga_jual":578571660.0,"dpp":530357355.0,"ppn":63642883.0,"pph":11571433.0,"retensi":28928583.0,"total":601714526.0}}}'::jsonb, v_actor_id, ('2025-03-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS II LANDSCAPE PEDESTRIAN DAN DRAINASE', 1, 578571659.61
+      'PROGRESS II LANDSCAPE PEDESTRIAN DAN DRAINASE', 1, 578571659.61, ('2025-03-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5817-AWP-2026-1', 601714526.00, 'IDR',
-      'bank_transfer', '2025-04-11', 'Imported from historical register (row 278)', v_actor_id
+      'bank_transfer', '2025-04-11', 'Imported from historical register (row 278)', v_actor_id, ('2025-04-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9404,29 +9404,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5818/AWP/2025', 'paid', 'IDR',
       '2025-03-27', '10EA DRESSING TABLE+POUF,30SET WARDROBE 2DOORS WO MIRROR', 116000000.00, 0, 11, 12,
       12.000, NULL, 5.000, 106333333.33, 12760000.00,
       0.00, 5800000.00, 12760000.00, 122960000.00, 122960000.00, '2025-04-17'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":279,"no_seri_fpn":"041.004-25.31275818","no_po_customer":"9000765424","stated":{"harga_jual":116000000.0,"dpp":106333333.0,"ppn":12760000.0,"retensi":5800000.0,"total":122960000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":279,"no_seri_fpn":"041.004-25.31275818","no_po_customer":"9000765424","stated":{"harga_jual":116000000.0,"dpp":106333333.0,"ppn":12760000.0,"retensi":5800000.0,"total":122960000.0}}}'::jsonb, v_actor_id, ('2025-03-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10EA DRESSING TABLE+POUF,30SET WARDROBE 2DOORS WO MIRROR', 1, 116000000.00
+      '10EA DRESSING TABLE+POUF,30SET WARDROBE 2DOORS WO MIRROR', 1, 116000000.00, ('2025-03-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5818-AWP-2025-1', 122960000.00, 'IDR',
-      'bank_transfer', '2025-04-17', 'Imported from historical register (row 279)', v_actor_id
+      'bank_transfer', '2025-04-17', 'Imported from historical register (row 279)', v_actor_id, ('2025-04-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9440,29 +9440,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5819/AWP/2025', 'paid', 'IDR',
       '2025-04-21', '600CAN PL.8000 (350SUNSHINE,200WHITE,50VERMILLION)', 124800000.00, 0, 11, 12,
       12.000, NULL, NULL, 114400000.00, 13728000.00,
       0.00, 0.00, 13728000.00, 138528000.00, 138528000.00, '2025-04-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":280,"no_seri_fpn":"040.004-25.31275819","no_po_customer":"9000790661","stated":{"harga_jual":124800000.0,"dpp":114400000.0,"ppn":13728000.0,"total":138528000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":280,"no_seri_fpn":"040.004-25.31275819","no_po_customer":"9000790661","stated":{"harga_jual":124800000.0,"dpp":114400000.0,"ppn":13728000.0,"total":138528000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-04-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '600CAN PL.8000 (350SUNSHINE,200WHITE,50VERMILLION)', 1, 124800000.00
+      '600CAN PL.8000 (350SUNSHINE,200WHITE,50VERMILLION)', 1, 124800000.00, ('2025-04-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5819-AWP-2025-1', 138528000.00, 'IDR',
-      'bank_transfer', '2025-04-30', 'Imported from historical register (row 280)', v_actor_id
+      'bank_transfer', '2025-04-30', 'Imported from historical register (row 280)', v_actor_id, ('2025-04-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9476,29 +9476,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5820/AWP/2025', 'paid', 'IDR',
       '2025-04-21', '77CAN PL.8000 BLACK', 16016000.00, 0, 11, 12,
       12.000, NULL, NULL, 14681333.33, 1761760.00,
       0.00, 0.00, 1761760.00, 17777760.00, 17777760.00, '2025-04-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":281,"no_seri_fpn":"040.004-25.31275820","no_po_customer":"9000795310","stated":{"harga_jual":16016000.0,"dpp":14681333.0,"ppn":1761760.0,"total":17777760.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":281,"no_seri_fpn":"040.004-25.31275820","no_po_customer":"9000795310","stated":{"harga_jual":16016000.0,"dpp":14681333.0,"ppn":1761760.0,"total":17777760.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-04-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '77CAN PL.8000 BLACK', 1, 16016000.00
+      '77CAN PL.8000 BLACK', 1, 16016000.00, ('2025-04-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5820-AWP-2025-1', 17777760.00, 'IDR',
-      'bank_transfer', '2025-04-30', 'Imported from historical register (row 281)', v_actor_id
+      'bank_transfer', '2025-04-30', 'Imported from historical register (row 281)', v_actor_id, ('2025-04-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9512,29 +9512,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5821/AWP/2025', 'paid', 'IDR',
       '2025-04-21', '5CAN PL.8000 BLUE, 5CAN WHITE', 2080000.00, 0, 11, 12,
       12.000, NULL, NULL, 1906666.67, 228800.00,
       0.00, 0.00, 228800.00, 2308800.00, 2308800.00, '2025-04-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":282,"no_seri_fpn":"040.004-25.31275821","no_po_customer":"9000795169","stated":{"harga_jual":2080000.0,"dpp":1906667.0,"ppn":228800.0,"total":2308800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":282,"no_seri_fpn":"040.004-25.31275821","no_po_customer":"9000795169","stated":{"harga_jual":2080000.0,"dpp":1906667.0,"ppn":228800.0,"total":2308800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-04-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '5CAN PL.8000 BLUE, 5CAN WHITE', 1, 2080000.00
+      '5CAN PL.8000 BLUE, 5CAN WHITE', 1, 2080000.00, ('2025-04-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5821-AWP-2025-1', 2308800.00, 'IDR',
-      'bank_transfer', '2025-04-30', 'Imported from historical register (row 282)', v_actor_id
+      'bank_transfer', '2025-04-30', 'Imported from historical register (row 282)', v_actor_id, ('2025-04-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9548,29 +9548,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5822/AWP/2025', 'paid', 'IDR',
       '2025-04-21', '4CAN PL.8000 TRAFFIC GREEN, 4CAN WHITE', 1664000.00, 0, 11, 12,
       12.000, NULL, NULL, 1525333.33, 183040.00,
       0.00, 0.00, 183040.00, 1847040.00, 1847040.00, '2025-04-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":283,"no_seri_fpn":"040.004-25.31275822","no_po_customer":"9000792396","stated":{"harga_jual":1664000.0,"dpp":1525333.0,"ppn":183040.0,"total":1847040.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":283,"no_seri_fpn":"040.004-25.31275822","no_po_customer":"9000792396","stated":{"harga_jual":1664000.0,"dpp":1525333.0,"ppn":183040.0,"total":1847040.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-04-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '4CAN PL.8000 TRAFFIC GREEN, 4CAN WHITE', 1, 1664000.00
+      '4CAN PL.8000 TRAFFIC GREEN, 4CAN WHITE', 1, 1664000.00, ('2025-04-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5822-AWP-2025-1', 1847040.00, 'IDR',
-      'bank_transfer', '2025-04-30', 'Imported from historical register (row 283)', v_actor_id
+      'bank_transfer', '2025-04-30', 'Imported from historical register (row 283)', v_actor_id, ('2025-04-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9584,29 +9584,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5823/AWP/2025', 'paid', 'IDR',
       '2025-04-21', '5CAN PL.8000 BLACK', 1040000.00, 0, 11, 12,
       12.000, NULL, NULL, 953333.33, 114400.00,
       0.00, 0.00, 114400.00, 1154400.00, 1154400.00, '2025-04-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":284,"no_seri_fpn":"040.004-25.31275823","no_po_customer":"9000795336","stated":{"harga_jual":1040000.0,"dpp":953333.0,"ppn":114400.0,"total":1154400.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":284,"no_seri_fpn":"040.004-25.31275823","no_po_customer":"9000795336","stated":{"harga_jual":1040000.0,"dpp":953333.0,"ppn":114400.0,"total":1154400.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-04-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '5CAN PL.8000 BLACK', 1, 1040000.00
+      '5CAN PL.8000 BLACK', 1, 1040000.00, ('2025-04-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5823-AWP-2025-1', 1154400.00, 'IDR',
-      'bank_transfer', '2025-04-30', 'Imported from historical register (row 284)', v_actor_id
+      'bank_transfer', '2025-04-30', 'Imported from historical register (row 284)', v_actor_id, ('2025-04-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9620,29 +9620,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5824/AWP/2025', 'paid', 'IDR',
       '2025-04-21', '150CAN PL.8000 TRAFFIC GREEN', 31200000.00, 0, 11, 12,
       12.000, NULL, NULL, 28600000.00, 3432000.00,
       0.00, 0.00, 3432000.00, 34632000.00, 34632000.00, '2025-04-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":285,"no_seri_fpn":"040.004-25.31275824","no_po_customer":"9000794326","stated":{"harga_jual":31200000.0,"dpp":28600000.0,"ppn":3432000.0,"total":34632000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":285,"no_seri_fpn":"040.004-25.31275824","no_po_customer":"9000794326","stated":{"harga_jual":31200000.0,"dpp":28600000.0,"ppn":3432000.0,"total":34632000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-04-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '150CAN PL.8000 TRAFFIC GREEN', 1, 31200000.00
+      '150CAN PL.8000 TRAFFIC GREEN', 1, 31200000.00, ('2025-04-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5824-AWP-2025-1', 34632000.00, 'IDR',
-      'bank_transfer', '2025-04-30', 'Imported from historical register (row 285)', v_actor_id
+      'bank_transfer', '2025-04-30', 'Imported from historical register (row 285)', v_actor_id, ('2025-04-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9656,29 +9656,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5825/AWP/2025', 'paid', 'IDR',
       '2025-04-21', '546CAN PL.8000 TRAFFIC GREEN,2BLACK', 113984000.00, 0, 11, 12,
       12.000, NULL, NULL, 104485333.33, 12538240.00,
       0.00, 0.00, 12538240.00, 126522240.00, 126522240.00, '2025-04-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":286,"no_seri_fpn":"040.004-25.31275825","no_po_customer":"9000795310","stated":{"harga_jual":113984000.0,"dpp":104485333.0,"ppn":12538240.0,"total":126522240.0},"import_notes":["source figure Rp 322,770,240 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":286,"no_seri_fpn":"040.004-25.31275825","no_po_customer":"9000795310","stated":{"harga_jual":113984000.0,"dpp":104485333.0,"ppn":12538240.0,"total":126522240.0},"import_notes":["source figure Rp 322,770,240 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id, ('2025-04-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '546CAN PL.8000 TRAFFIC GREEN,2BLACK', 1, 113984000.00
+      '546CAN PL.8000 TRAFFIC GREEN,2BLACK', 1, 113984000.00, ('2025-04-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5825-AWP-2025-1', 126522240.00, 'IDR',
-      'bank_transfer', '2025-04-30', 'Imported from historical register (row 286)', v_actor_id
+      'bank_transfer', '2025-04-30', 'Imported from historical register (row 286)', v_actor_id, ('2025-04-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9692,29 +9692,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5826/AWP/2025', 'paid', 'IDR',
       '2025-04-23', '3CAN PL.8000 BLACK', 624000.00, 0, 11, 12,
       12.000, NULL, NULL, 572000.00, 68640.00,
       0.00, 0.00, 68640.00, 692640.00, 692640.00, '2025-05-09'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":287,"no_seri_fpn":"040.004-25.31275826","no_po_customer":"9000795170","stated":{"harga_jual":624000.0,"dpp":572000.0,"ppn":68640.0,"total":692640.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":287,"no_seri_fpn":"040.004-25.31275826","no_po_customer":"9000795170","stated":{"harga_jual":624000.0,"dpp":572000.0,"ppn":68640.0,"total":692640.0}}}'::jsonb, v_actor_id, ('2025-04-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '3CAN PL.8000 BLACK', 1, 624000.00
+      '3CAN PL.8000 BLACK', 1, 624000.00, ('2025-04-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5826-AWP-2025-1', 692640.00, 'IDR',
-      'bank_transfer', '2025-05-09', 'Imported from historical register (row 287)', v_actor_id
+      'bank_transfer', '2025-05-09', 'Imported from historical register (row 287)', v_actor_id, ('2025-05-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9728,29 +9728,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5827/AWP/2025', 'paid', 'IDR',
       '2025-04-23', '10CAN PL.8000 BLACK', 2080000.00, 0, 11, 12,
       12.000, NULL, NULL, 1906666.67, 228800.00,
       0.00, 0.00, 228800.00, 2308800.00, 2308800.00, '2025-05-09'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":288,"no_seri_fpn":"040.004-25.31275827","no_po_customer":"9000795313","stated":{"harga_jual":2080000.0,"dpp":1906667.0,"ppn":228800.0,"total":2308800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":288,"no_seri_fpn":"040.004-25.31275827","no_po_customer":"9000795313","stated":{"harga_jual":2080000.0,"dpp":1906667.0,"ppn":228800.0,"total":2308800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-04-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10CAN PL.8000 BLACK', 1, 2080000.00
+      '10CAN PL.8000 BLACK', 1, 2080000.00, ('2025-04-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5827-AWP-2025-1', 2308800.00, 'IDR',
-      'bank_transfer', '2025-05-09', 'Imported from historical register (row 288)', v_actor_id
+      'bank_transfer', '2025-05-09', 'Imported from historical register (row 288)', v_actor_id, ('2025-05-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9764,29 +9764,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5828/AWP/2025', 'paid', 'IDR',
       '2025-04-28', '3CAN PL.8000 BLACK', 624000.00, 0, 11, 12,
       12.000, NULL, NULL, 572000.00, 68640.00,
       0.00, 0.00, 68640.00, 692640.00, 692640.00, '2025-05-09'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":289,"no_seri_fpn":"040.004-25.31275828","no_po_customer":"9000795171","stated":{"harga_jual":624000.0,"dpp":572000.0,"ppn":68640.0,"total":692640.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":289,"no_seri_fpn":"040.004-25.31275828","no_po_customer":"9000795171","stated":{"harga_jual":624000.0,"dpp":572000.0,"ppn":68640.0,"total":692640.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-04-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '3CAN PL.8000 BLACK', 1, 624000.00
+      '3CAN PL.8000 BLACK', 1, 624000.00, ('2025-04-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5828-AWP-2025-1', 692640.00, 'IDR',
-      'bank_transfer', '2025-05-09', 'Imported from historical register (row 289)', v_actor_id
+      'bank_transfer', '2025-05-09', 'Imported from historical register (row 289)', v_actor_id, ('2025-05-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9800,29 +9800,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '5829/AWP/2025', 'paid', 'IDR',
       '2025-04-28', '25CAN PL.8000 WHITE,3SUNSHINE,3BLUE', 6448000.00, 0, 11, 12,
       12.000, NULL, NULL, 5910666.67, 709280.00,
       0.00, 0.00, 709280.00, 7157280.00, 7157280.00, '2025-05-09'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":290,"no_seri_fpn":"040.004-25.31275829","no_po_customer":"9000792878","stated":{"harga_jual":6448000.0,"dpp":5910667.0,"ppn":709280.0,"total":7157280.0},"unattributed_rows":[{"note":"register stated Rp 10,158,720 here; trimmed to the balance outstanding","amount":10158720.0,"date":"2025-05-09"}]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":290,"no_seri_fpn":"040.004-25.31275829","no_po_customer":"9000792878","stated":{"harga_jual":6448000.0,"dpp":5910667.0,"ppn":709280.0,"total":7157280.0},"unattributed_rows":[{"note":"register stated Rp 10,158,720 here; trimmed to the balance outstanding","amount":10158720.0,"date":"2025-05-09"}]}}'::jsonb, v_actor_id, ('2025-04-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '25CAN PL.8000 WHITE,3SUNSHINE,3BLUE', 1, 6448000.00
+      '25CAN PL.8000 WHITE,3SUNSHINE,3BLUE', 1, 6448000.00, ('2025-04-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-5829-AWP-2025-1', 7157280.00, 'IDR',
-      'bank_transfer', '2025-05-09', 'Imported from historical register (row 290)', v_actor_id
+      'bank_transfer', '2025-05-09', 'Imported from historical register (row 290)', v_actor_id, ('2025-05-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9836,29 +9836,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/04/001', 'paid', 'IDR',
       '2025-04-28', '2PAIL NIPPON ZINC CHROMATE', 1360000.00, 0, 11, 12,
       12.000, NULL, NULL, 1246666.67, 149600.00,
       0.00, 0.00, 149600.00, 1509600.00, 1509600.00, '2025-04-28'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":291,"no_seri_fpn":"400250011646933 0","stated":{"harga_jual":1360000.0,"dpp":1246667.0,"ppn":149600.0,"total":1509600.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":291,"no_seri_fpn":"400250011646933 0","stated":{"harga_jual":1360000.0,"dpp":1246667.0,"ppn":149600.0,"total":1509600.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-04-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '2PAIL NIPPON ZINC CHROMATE', 1, 1360000.00
+      '2PAIL NIPPON ZINC CHROMATE', 1, 1360000.00, ('2025-04-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-04-001-1', 1509600.00, 'IDR',
-      'bank_transfer', '2025-04-28', 'Imported from historical register (row 291)', v_actor_id
+      'bank_transfer', '2025-04-28', 'Imported from historical register (row 291)', v_actor_id, ('2025-04-28'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9872,29 +9872,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/05/001', 'paid', 'IDR',
       '2025-05-05', '150CAN PL.8000 VERMILLION', 31200000.00, 0, 11, 12,
       12.000, NULL, NULL, 28600000.00, 3432000.00,
       0.00, 0.00, 3432000.00, 34632000.00, 34632000.00, '2025-05-16'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":292,"no_seri_fpn":"04002500141841016","no_po_customer":"9000794326","stated":{"harga_jual":31200000.0,"dpp":28600000.0,"ppn":3432000.0,"total":34632000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":292,"no_seri_fpn":"04002500141841016","no_po_customer":"9000794326","stated":{"harga_jual":31200000.0,"dpp":28600000.0,"ppn":3432000.0,"total":34632000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-05-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '150CAN PL.8000 VERMILLION', 1, 31200000.00
+      '150CAN PL.8000 VERMILLION', 1, 31200000.00, ('2025-05-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-05-001-1', 34632000.00, 'IDR',
-      'bank_transfer', '2025-05-16', 'Imported from historical register (row 292)', v_actor_id
+      'bank_transfer', '2025-05-16', 'Imported from historical register (row 292)', v_actor_id, ('2025-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9908,29 +9908,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/05/002', 'paid', 'IDR',
       '2025-05-05', '567CAN PL.8000 (96tRAFIC GREEN,471BLACK)', 117936000.00, 0, 11, 12,
       12.000, NULL, NULL, 108108000.00, 12972960.00,
       0.00, 0.00, 12972960.00, 130908960.00, 130908960.00, '2025-05-16'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":293,"no_seri_fpn":"04002500141841016","no_po_customer":"9000795310","stated":{"harga_jual":117936000.0,"dpp":108108000.0,"ppn":12972960.0,"total":130908960.0},"import_notes":["source figure Rp 165,540,960 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":293,"no_seri_fpn":"04002500141841016","no_po_customer":"9000795310","stated":{"harga_jual":117936000.0,"dpp":108108000.0,"ppn":12972960.0,"total":130908960.0},"import_notes":["source figure Rp 165,540,960 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id, ('2025-05-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '567CAN PL.8000 (96tRAFIC GREEN,471BLACK)', 1, 117936000.00
+      '567CAN PL.8000 (96tRAFIC GREEN,471BLACK)', 1, 117936000.00, ('2025-05-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-05-002-1', 130908960.00, 'IDR',
-      'bank_transfer', '2025-05-16', 'Imported from historical register (row 293)', v_actor_id
+      'bank_transfer', '2025-05-16', 'Imported from historical register (row 293)', v_actor_id, ('2025-05-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9944,29 +9944,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/05/003', 'paid', 'IDR',
       '2025-05-14', '5CAN PL.8000 TRAFFIC GREEN', 1040000.00, 0, 11, 12,
       12.000, NULL, NULL, 953333.33, 114400.00,
       0.00, 0.00, 114400.00, 1154400.00, 1154400.00, '2025-05-23'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":294,"no_seri_fpn":"04002500138728272","no_po_customer":"9000795730","stated":{"harga_jual":1040000.0,"dpp":953333.0,"ppn":114400.0,"total":1154400.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":294,"no_seri_fpn":"04002500138728272","no_po_customer":"9000795730","stated":{"harga_jual":1040000.0,"dpp":953333.0,"ppn":114400.0,"total":1154400.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-05-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '5CAN PL.8000 TRAFFIC GREEN', 1, 1040000.00
+      '5CAN PL.8000 TRAFFIC GREEN', 1, 1040000.00, ('2025-05-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-05-003-1', 1154400.00, 'IDR',
-      'bank_transfer', '2025-05-23', 'Imported from historical register (row 294)', v_actor_id
+      'bank_transfer', '2025-05-23', 'Imported from historical register (row 294)', v_actor_id, ('2025-05-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -9980,29 +9980,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/05/004', 'paid', 'IDR',
       '2025-05-15', '58CAN PL.8000 TRAFFIC GREEN', 12064000.00, 0, 11, 12,
       12.000, NULL, NULL, 11058666.67, 1327040.00,
       0.00, 0.00, 1327040.00, 13391040.00, 13391040.00, '2025-05-23'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":295,"no_seri_fpn":"04002500138728267","no_po_customer":"9000795310","stated":{"harga_jual":12064000.0,"dpp":11058667.0,"ppn":1327040.0,"total":13391040.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":295,"no_seri_fpn":"04002500138728267","no_po_customer":"9000795310","stated":{"harga_jual":12064000.0,"dpp":11058667.0,"ppn":1327040.0,"total":13391040.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-05-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '58CAN PL.8000 TRAFFIC GREEN', 1, 12064000.00
+      '58CAN PL.8000 TRAFFIC GREEN', 1, 12064000.00, ('2025-05-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-05-004-1', 13391040.00, 'IDR',
-      'bank_transfer', '2025-05-23', 'Imported from historical register (row 295)', v_actor_id
+      'bank_transfer', '2025-05-23', 'Imported from historical register (row 295)', v_actor_id, ('2025-05-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10016,29 +10016,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/05/005', 'paid', 'IDR',
       '2025-05-15', '20CAN PL.8000 BLUE', 4160000.00, 0, 11, 12,
       12.000, NULL, NULL, 3813333.33, 457600.00,
       0.00, 0.00, 457600.00, 4617600.00, 4617600.00, '2025-05-23'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":296,"no_seri_fpn":"04002500138728268","no_po_customer":"9000804992","stated":{"harga_jual":4160000.0,"dpp":3813333.0,"ppn":457600.0,"total":4617600.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":296,"no_seri_fpn":"04002500138728268","no_po_customer":"9000804992","stated":{"harga_jual":4160000.0,"dpp":3813333.0,"ppn":457600.0,"total":4617600.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-05-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '20CAN PL.8000 BLUE', 1, 4160000.00
+      '20CAN PL.8000 BLUE', 1, 4160000.00, ('2025-05-15'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-05-005-1', 4617600.00, 'IDR',
-      'bank_transfer', '2025-05-23', 'Imported from historical register (row 296)', v_actor_id
+      'bank_transfer', '2025-05-23', 'Imported from historical register (row 296)', v_actor_id, ('2025-05-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10052,29 +10052,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/05/006', 'paid', 'IDR',
       '2025-05-19', 'PROGRESS III PEK TOILET DAN TUGU BOLA TB PANGKER', 154058563.46, 0, 11, 12,
       12.000, 2.000, 5.000, 141220349.84, 16946441.98,
       3081171.27, 7702928.17, 16946441.98, 160220906.00, 160220906.00, '2025-05-23'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":297,"no_seri_fpn":"04002500141841016","no_po_customer":"9000787221","stated":{"harga_jual":154058563.0,"dpp":141220349.0,"ppn":16946442.0,"pph":3081171.0,"retensi":7702928.0,"total":160220906.0},"import_notes":["source figure Rp 179,383,946 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":297,"no_seri_fpn":"04002500141841016","no_po_customer":"9000787221","stated":{"harga_jual":154058563.0,"dpp":141220349.0,"ppn":16946442.0,"pph":3081171.0,"retensi":7702928.0,"total":160220906.0},"import_notes":["source figure Rp 179,383,946 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id, ('2025-05-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS III PEK TOILET DAN TUGU BOLA TB PANGKER', 1, 154058563.46
+      'PROGRESS III PEK TOILET DAN TUGU BOLA TB PANGKER', 1, 154058563.46, ('2025-05-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-05-006-1', 160220906.00, 'IDR',
-      'bank_transfer', '2025-05-23', 'Imported from historical register (row 297)', v_actor_id
+      'bank_transfer', '2025-05-23', 'Imported from historical register (row 297)', v_actor_id, ('2025-05-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10088,29 +10088,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/05/007', 'paid', 'IDR',
       '2025-05-26', '700CAN PL.8000 WHITE', 145600000.00, 0, 11, 12,
       12.000, NULL, NULL, 133466666.67, 16016000.00,
       0.00, 0.00, 16016000.00, 161616000.00, 161616000.00, '2025-06-05'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":298,"no_seri_fpn":"04002500149049436","no_po_customer":"9000802732","stated":{"harga_jual":145600000.0,"dpp":133466667.0,"ppn":16016000.0,"total":161616000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":298,"no_seri_fpn":"04002500149049436","no_po_customer":"9000802732","stated":{"harga_jual":145600000.0,"dpp":133466667.0,"ppn":16016000.0,"total":161616000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '700CAN PL.8000 WHITE', 1, 145600000.00
+      '700CAN PL.8000 WHITE', 1, 145600000.00, ('2025-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-05-007-1', 161616000.00, 'IDR',
-      'bank_transfer', '2025-06-05', 'Imported from historical register (row 298)', v_actor_id
+      'bank_transfer', '2025-06-05', 'Imported from historical register (row 298)', v_actor_id, ('2025-06-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10124,29 +10124,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/05/008', 'paid', 'IDR',
       '2025-05-27', '706CAN PL.8000 SUNSHINE', 146848000.00, 0, 11, 12,
       12.000, NULL, NULL, 134610666.67, 16153280.00,
       0.00, 0.00, 16153280.00, 163001280.00, 163001280.00, '2025-06-05'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":299,"no_seri_fpn":"04002500149049437","no_po_customer":"9000802732","stated":{"harga_jual":146848000.0,"dpp":134610667.0,"ppn":16153280.0,"total":163001280.0},"import_notes":["source figure Rp 324,617,280 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":299,"no_seri_fpn":"04002500149049437","no_po_customer":"9000802732","stated":{"harga_jual":146848000.0,"dpp":134610667.0,"ppn":16153280.0,"total":163001280.0},"import_notes":["source figure Rp 324,617,280 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id, ('2025-05-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '706CAN PL.8000 SUNSHINE', 1, 146848000.00
+      '706CAN PL.8000 SUNSHINE', 1, 146848000.00, ('2025-05-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-05-008-1', 163001280.00, 'IDR',
-      'bank_transfer', '2025-06-05', 'Imported from historical register (row 299)', v_actor_id
+      'bank_transfer', '2025-06-05', 'Imported from historical register (row 299)', v_actor_id, ('2025-06-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10160,29 +10160,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/06/001', 'paid', 'IDR',
       '2025-06-12', 'PROGRESS III LANDSCAPE PEDESTRIAN DAN DRAINASE', 662754852.88, 0, 11, 12,
       12.000, 2.000, 5.000, 607525281.81, 72903033.82,
       13255097.06, 33137742.64, 72903033.82, 689265047.00, 689265047.00, '2025-06-20'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":300,"no_seri_fpn":"04002500166777125","no_po_customer":"9000791224","stated":{"harga_jual":662754853.0,"dpp":607525282.0,"ppn":72903034.0,"pph":13255097.0,"retensi":33137743.0,"total":689265047.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":300,"no_seri_fpn":"04002500166777125","no_po_customer":"9000791224","stated":{"harga_jual":662754853.0,"dpp":607525282.0,"ppn":72903034.0,"pph":13255097.0,"retensi":33137743.0,"total":689265047.0}}}'::jsonb, v_actor_id, ('2025-06-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS III LANDSCAPE PEDESTRIAN DAN DRAINASE', 1, 662754852.88
+      'PROGRESS III LANDSCAPE PEDESTRIAN DAN DRAINASE', 1, 662754852.88, ('2025-06-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-06-001-1', 689265047.00, 'IDR',
-      'bank_transfer', '2025-06-20', 'Imported from historical register (row 300)', v_actor_id
+      'bank_transfer', '2025-06-20', 'Imported from historical register (row 300)', v_actor_id, ('2025-06-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10196,29 +10196,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/R91000758813', 'paid', 'IDR',
       '2025-06-16', 'RETENSI CIVIL WORKS LAP BOLA PANGKER&DRAINASE', 32861800.00, 0, 1, 1,
       0.000, NULL, NULL, 32861800.00, 0.00,
       0.00, 0.00, 0.00, 32861800.00, 32861800.00, '2025-06-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":301,"no_po_customer":"9000758813","stated":{"harga_jual":32861800.0,"total":32861800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":301,"no_po_customer":"9000758813","stated":{"harga_jual":32861800.0,"total":32861800.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-06-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI CIVIL WORKS LAP BOLA PANGKER&DRAINASE', 1, 32861800.00
+      'RETENSI CIVIL WORKS LAP BOLA PANGKER&DRAINASE', 1, 32861800.00, ('2025-06-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-R91000758813-1', 32861800.00, 'IDR',
-      'bank_transfer', '2025-06-30', 'Imported from historical register (row 301)', v_actor_id
+      'bank_transfer', '2025-06-30', 'Imported from historical register (row 301)', v_actor_id, ('2025-06-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10232,29 +10232,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/R9000768663', 'paid', 'IDR',
       '2025-06-16', 'RETENSI PEKERJAAN Conblock TB pangker', 1725000.00, 0, 1, 1,
       0.000, NULL, NULL, 1725000.00, 0.00,
       0.00, 0.00, 0.00, 1725000.00, 1725000.00, '2025-06-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":302,"no_po_customer":"9000768663","stated":{"harga_jual":1725000.0,"total":1725000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":302,"no_po_customer":"9000768663","stated":{"harga_jual":1725000.0,"total":1725000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-06-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI PEKERJAAN Conblock TB pangker', 1, 1725000.00
+      'RETENSI PEKERJAAN Conblock TB pangker', 1, 1725000.00, ('2025-06-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-R9000768663-1', 1725000.00, 'IDR',
-      'bank_transfer', '2025-06-30', 'Imported from historical register (row 302)', v_actor_id
+      'bank_transfer', '2025-06-30', 'Imported from historical register (row 302)', v_actor_id, ('2025-06-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10268,29 +10268,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/06/002', 'paid', 'IDR',
       '2025-06-16', '80CAN PL.8000 BLACK', 16640000.00, 0, 11, 12,
       12.000, NULL, NULL, 15253333.33, 1830400.00,
       0.00, 0.00, 1830400.00, 18470400.00, 18470400.00, '2025-06-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":303,"no_seri_fpn":"04002500175392564","no_po_customer":"9000804549","stated":{"harga_jual":16640000.0,"dpp":15253333.0,"ppn":1830400.0,"total":18470400.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":303,"no_seri_fpn":"04002500175392564","no_po_customer":"9000804549","stated":{"harga_jual":16640000.0,"dpp":15253333.0,"ppn":1830400.0,"total":18470400.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-06-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '80CAN PL.8000 BLACK', 1, 16640000.00
+      '80CAN PL.8000 BLACK', 1, 16640000.00, ('2025-06-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-06-002-1', 18470400.00, 'IDR',
-      'bank_transfer', '2025-06-30', 'Imported from historical register (row 303)', v_actor_id
+      'bank_transfer', '2025-06-30', 'Imported from historical register (row 303)', v_actor_id, ('2025-06-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10304,29 +10304,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/06/003', 'paid', 'IDR',
       '2025-06-16', '340CAN PL.8000 SUNSHINE', 70720000.00, 0, 11, 12,
       12.000, NULL, NULL, 64826666.67, 7779200.00,
       0.00, 0.00, 7779200.00, 78499200.00, 78499200.00, '2025-06-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":304,"no_seri_fpn":"04002500175392562","no_po_customer":"9000811065","stated":{"harga_jual":70720000.0,"dpp":64826667.0,"ppn":7779200.0,"total":78499200.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":304,"no_seri_fpn":"04002500175392562","no_po_customer":"9000811065","stated":{"harga_jual":70720000.0,"dpp":64826667.0,"ppn":7779200.0,"total":78499200.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-06-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '340CAN PL.8000 SUNSHINE', 1, 70720000.00
+      '340CAN PL.8000 SUNSHINE', 1, 70720000.00, ('2025-06-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-06-003-1', 78499200.00, 'IDR',
-      'bank_transfer', '2025-06-30', 'Imported from historical register (row 304)', v_actor_id
+      'bank_transfer', '2025-06-30', 'Imported from historical register (row 304)', v_actor_id, ('2025-06-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10340,29 +10340,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/06/004', 'paid', 'IDR',
       '2025-06-16', '194CAN PL.8000 (94 BLACK,100 VERMILLION)', 40352000.00, 0, 11, 12,
       12.000, NULL, NULL, 36989333.33, 4438720.00,
       0.00, 0.00, 4438720.00, 44790720.00, 44790720.00, '2025-06-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":305,"no_seri_fpn":"04002500175392561","no_po_customer":"9000811068","stated":{"harga_jual":40352000.0,"dpp":36989333.0,"ppn":4438720.0,"total":44790720.0},"import_notes":["source figure Rp 176,347,120 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":305,"no_seri_fpn":"04002500175392561","no_po_customer":"9000811068","stated":{"harga_jual":40352000.0,"dpp":36989333.0,"ppn":4438720.0,"total":44790720.0},"import_notes":["source figure Rp 176,347,120 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id, ('2025-06-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '194CAN PL.8000 (94 BLACK,100 VERMILLION)', 1, 40352000.00
+      '194CAN PL.8000 (94 BLACK,100 VERMILLION)', 1, 40352000.00, ('2025-06-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-06-004-1', 44790720.00, 'IDR',
-      'bank_transfer', '2025-06-30', 'Imported from historical register (row 305)', v_actor_id
+      'bank_transfer', '2025-06-30', 'Imported from historical register (row 305)', v_actor_id, ('2025-06-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10376,29 +10376,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/06/005', 'paid', 'IDR',
       '2025-06-18', '4GLN PL800 LEAFBROWN,4PWBOND MAX 2002,6P VINILEX 300WHITE', 10940000.00, 0, 11, 12,
       12.000, NULL, NULL, 10028333.33, 1203400.00,
       0.00, 0.00, 1203400.00, 12143400.00, 12143400.00, '2025-06-18'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":306,"no_seri_fpn":"04002500179853407","no_po_customer":"012/SMS-PO/VI/2025","stated":{"harga_jual":10940000.0,"dpp":10028333.0,"ppn":1203400.0,"total":12143400.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":306,"no_seri_fpn":"04002500179853407","no_po_customer":"012/SMS-PO/VI/2025","stated":{"harga_jual":10940000.0,"dpp":10028333.0,"ppn":1203400.0,"total":12143400.0}}}'::jsonb, v_actor_id, ('2025-06-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '4GLN PL800 LEAFBROWN,4PWBOND MAX 2002,6P VINILEX 300WHITE', 1, 10940000.00
+      '4GLN PL800 LEAFBROWN,4PWBOND MAX 2002,6P VINILEX 300WHITE', 1, 10940000.00, ('2025-06-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-06-005-1', 12143400.00, 'IDR',
-      'bank_transfer', '2025-06-18', 'Imported from historical register (row 306)', v_actor_id
+      'bank_transfer', '2025-06-18', 'Imported from historical register (row 306)', v_actor_id, ('2025-06-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10412,29 +10412,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/06/006', 'paid', 'IDR',
       '2025-06-25', '10P 8100WBONDSEALER,12P WBMAX1697P,10PWBMAX3443A,10PVINILEXPRO BWHITE', 46700000.00, 0, 11, 12,
       12.000, NULL, NULL, 42808333.33, 5137000.00,
       0.00, 0.00, 5137000.00, 51837000.00, 51837000.00, '2025-06-25'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":307,"no_seri_fpn":"04002500187023246","stated":{"harga_jual":46700000.0,"dpp":42808333.0,"ppn":5137000.0,"total":51837000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":307,"no_seri_fpn":"04002500187023246","stated":{"harga_jual":46700000.0,"dpp":42808333.0,"ppn":5137000.0,"total":51837000.0}}}'::jsonb, v_actor_id, ('2025-06-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10P 8100WBONDSEALER,12P WBMAX1697P,10PWBMAX3443A,10PVINILEXPRO BWHITE', 1, 46700000.00
+      '10P 8100WBONDSEALER,12P WBMAX1697P,10PWBMAX3443A,10PVINILEXPRO BWHITE', 1, 46700000.00, ('2025-06-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-06-006-1', 51837000.00, 'IDR',
-      'bank_transfer', '2025-06-25', 'Imported from historical register (row 307)', v_actor_id
+      'bank_transfer', '2025-06-25', 'Imported from historical register (row 307)', v_actor_id, ('2025-06-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10448,29 +10448,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/07/001', 'paid', 'IDR',
       '2025-07-02', '25K-DRYMIX MORTAR NIPPONCAME', 2790000.00, 0, 11, 12,
       12.000, NULL, NULL, 2557500.00, 306900.00,
       0.00, 0.00, 306900.00, 3096900.00, 3096900.00, '2025-07-02'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":308,"no_seri_fpn":"04002500216264875","stated":{"harga_jual":2790000.0,"dpp":2557500.0,"ppn":306900.0,"total":3096900.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":308,"no_seri_fpn":"04002500216264875","stated":{"harga_jual":2790000.0,"dpp":2557500.0,"ppn":306900.0,"total":3096900.0}}}'::jsonb, v_actor_id, ('2025-07-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '25K-DRYMIX MORTAR NIPPONCAME', 1, 2790000.00
+      '25K-DRYMIX MORTAR NIPPONCAME', 1, 2790000.00, ('2025-07-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-07-001-1', 3096900.00, 'IDR',
-      'bank_transfer', '2025-07-02', 'Imported from historical register (row 308)', v_actor_id
+      'bank_transfer', '2025-07-02', 'Imported from historical register (row 308)', v_actor_id, ('2025-07-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10484,29 +10484,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/07/002', 'paid', 'IDR',
       '2025-07-10', '10PVINILEXPRO BWHITE', 4300000.00, 0, 11, 12,
       12.000, NULL, NULL, 3941666.67, 473000.00,
       0.00, 0.00, 473000.00, 4773000.00, 4773000.00, '2025-07-11'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":309,"no_seri_fpn":"04002500216264871","stated":{"harga_jual":4300000.0,"dpp":3941667.0,"ppn":473000.0,"total":4773000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":309,"no_seri_fpn":"04002500216264871","stated":{"harga_jual":4300000.0,"dpp":3941667.0,"ppn":473000.0,"total":4773000.0}}}'::jsonb, v_actor_id, ('2025-07-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10PVINILEXPRO BWHITE', 1, 4300000.00
+      '10PVINILEXPRO BWHITE', 1, 4300000.00, ('2025-07-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-07-002-1', 4773000.00, 'IDR',
-      'bank_transfer', '2025-07-11', 'Imported from historical register (row 309)', v_actor_id
+      'bank_transfer', '2025-07-11', 'Imported from historical register (row 309)', v_actor_id, ('2025-07-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10520,29 +10520,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/07/003', 'paid', 'IDR',
       '2025-07-17', '300CAN PL.8000 BLUE', 62400000.00, 0, 11, 12,
       12.000, NULL, NULL, 57200000.00, 6864000.00,
       0.00, 0.00, 6864000.00, 69264000.00, 69264000.00, '2025-08-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":310,"no_seri_fpn":"04002500216264872","no_po_customer":"9000802732","stated":{"harga_jual":62400000.0,"dpp":57200000.0,"ppn":6864000.0,"total":69264000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":310,"no_seri_fpn":"04002500216264872","no_po_customer":"9000802732","stated":{"harga_jual":62400000.0,"dpp":57200000.0,"ppn":6864000.0,"total":69264000.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-07-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '300CAN PL.8000 BLUE', 1, 62400000.00
+      '300CAN PL.8000 BLUE', 1, 62400000.00, ('2025-07-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-07-003-1', 69264000.00, 'IDR',
-      'bank_transfer', '2025-08-08', 'Imported from historical register (row 310)', v_actor_id
+      'bank_transfer', '2025-08-08', 'Imported from historical register (row 310)', v_actor_id, ('2025-08-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10556,29 +10556,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/07/004', 'paid', 'IDR',
       '2025-07-18', '400CAN PL.8000 ( VERMILLION)', 83200000.00, 0, 11, 12,
       12.000, NULL, NULL, 76266666.67, 9152000.00,
       0.00, 0.00, 9152000.00, 92352000.00, 92352000.00, '2025-08-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":311,"no_seri_fpn":"04002500216264873","no_po_customer":"9000802737","stated":{"harga_jual":83200000.0,"dpp":76266667.0,"ppn":9152000.04,"total":92352000.0},"import_notes":["source figure Rp 161,616,000 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":311,"no_seri_fpn":"04002500216264873","no_po_customer":"9000802737","stated":{"harga_jual":83200000.0,"dpp":76266667.0,"ppn":9152000.04,"total":92352000.0},"import_notes":["source figure Rp 161,616,000 was one credit settling several invoices; this invoice credited its own TOTAL"]}}'::jsonb, v_actor_id, ('2025-07-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '400CAN PL.8000 ( VERMILLION)', 1, 83200000.00
+      '400CAN PL.8000 ( VERMILLION)', 1, 83200000.00, ('2025-07-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-07-004-1', 92352000.00, 'IDR',
-      'bank_transfer', '2025-08-08', 'Imported from historical register (row 311)', v_actor_id
+      'bank_transfer', '2025-08-08', 'Imported from historical register (row 311)', v_actor_id, ('2025-08-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10592,29 +10592,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/07/005', 'paid', 'IDR',
       '2025-07-18', 'PROGRESS I ADD PEK ADDITIONAL WORK', 359252393.27, 0, 11, 12,
       12.000, 2.000, 5.000, 329314693.83, 39517763.26,
       7185047.87, 17962619.66, 39517763.26, 373622489.00, 373622489.00, '2025-08-29'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":312,"no_seri_fpn":"04002500216264874","no_po_customer":"9000814169","stated":{"harga_jual":359252393.0,"dpp":329314694.0,"ppn":39517763.28,"pph":7185048.0,"retensi":17962620.0,"total":373622489.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":312,"no_seri_fpn":"04002500216264874","no_po_customer":"9000814169","stated":{"harga_jual":359252393.0,"dpp":329314694.0,"ppn":39517763.28,"pph":7185048.0,"retensi":17962620.0,"total":373622489.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-07-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS I ADD PEK ADDITIONAL WORK', 1, 359252393.27
+      'PROGRESS I ADD PEK ADDITIONAL WORK', 1, 359252393.27, ('2025-07-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-07-005-1', 373622489.00, 'IDR',
-      'bank_transfer', '2025-08-29', 'Imported from historical register (row 312)', v_actor_id
+      'bank_transfer', '2025-08-29', 'Imported from historical register (row 312)', v_actor_id, ('2025-08-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10628,29 +10628,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/07/006', 'paid', 'IDR',
       '2025-07-18', 'PROGRESS I RENOVASI TK,SD,SMP SMH TOWNSITE I', 325032375.96, 0, 11, 12,
       12.000, 2.000, 5.000, 297946344.63, 35753561.36,
       6500647.52, 16251618.80, 35753561.36, 338033671.00, 338033670.00, '2025-08-22'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":313,"no_seri_fpn":"04002500216281273","no_po_customer":"YMHW-068","stated":{"harga_jual":325032376.0,"dpp":297946345.0,"ppn":35753561.4,"pph":6500648.0,"retensi":16251619.0,"total":338033671.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":313,"no_seri_fpn":"04002500216281273","no_po_customer":"YMHW-068","stated":{"harga_jual":325032376.0,"dpp":297946345.0,"ppn":35753561.4,"pph":6500648.0,"retensi":16251619.0,"total":338033671.0}}}'::jsonb, v_actor_id, ('2025-07-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS I RENOVASI TK,SD,SMP SMH TOWNSITE I', 1, 325032375.96
+      'PROGRESS I RENOVASI TK,SD,SMP SMH TOWNSITE I', 1, 325032375.96, ('2025-07-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-07-006-1', 338033670.00, 'IDR',
-      'bank_transfer', '2025-08-22', 'Imported from historical register (row 313)', v_actor_id
+      'bank_transfer', '2025-08-22', 'Imported from historical register (row 313)', v_actor_id, ('2025-08-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10664,29 +10664,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/07/007', 'paid', 'IDR',
       '2025-07-21', '60P 25K-ROADLINE 268 WHITE', 120000000.00, 0, 11, 12,
       12.000, NULL, NULL, 110000000.00, 13200000.00,
       0.00, 0.00, 13200000.00, 133200000.00, 133200000.00, '2025-07-21'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":314,"no_seri_fpn":"04002500218013553","stated":{"harga_jual":120000000.0,"dpp":110000000.0,"ppn":13200000.0,"total":133200000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":314,"no_seri_fpn":"04002500218013553","stated":{"harga_jual":120000000.0,"dpp":110000000.0,"ppn":13200000.0,"total":133200000.0}}}'::jsonb, v_actor_id, ('2025-07-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '60P 25K-ROADLINE 268 WHITE', 1, 120000000.00
+      '60P 25K-ROADLINE 268 WHITE', 1, 120000000.00, ('2025-07-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-07-007-1', 133200000.00, 'IDR',
-      'bank_transfer', '2025-07-21', 'Imported from historical register (row 314)', v_actor_id
+      'bank_transfer', '2025-07-21', 'Imported from historical register (row 314)', v_actor_id, ('2025-07-21'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10700,29 +10700,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/07/008', 'paid', 'IDR',
       '2025-07-19', '10P 20K-5200 WALL SEALER', 4900000.00, 0, 11, 12,
       12.000, NULL, NULL, 4491666.67, 539000.00,
       0.00, 0.00, 539000.00, 5439000.00, 5439000.00, '2025-07-19'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":315,"no_seri_fpn":"04002500231819359","stated":{"harga_jual":4900000.0,"dpp":4491667.0,"ppn":539000.04,"total":5439000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":315,"no_seri_fpn":"04002500231819359","stated":{"harga_jual":4900000.0,"dpp":4491667.0,"ppn":539000.04,"total":5439000.0}}}'::jsonb, v_actor_id, ('2025-07-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10P 20K-5200 WALL SEALER', 1, 4900000.00
+      '10P 20K-5200 WALL SEALER', 1, 4900000.00, ('2025-07-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-07-008-1', 5439000.00, 'IDR',
-      'bank_transfer', '2025-07-19', 'Imported from historical register (row 315)', v_actor_id
+      'bank_transfer', '2025-07-19', 'Imported from historical register (row 315)', v_actor_id, ('2025-07-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10736,29 +10736,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/07/009', 'paid', 'IDR',
       '2025-07-24', '1P 20L-8100 WBOND SEALER', 850000.00, 0, 11, 12,
       12.000, NULL, NULL, 779166.67, 93500.00,
       0.00, 0.00, 93500.00, 943500.00, 943500.00, '2025-07-24'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":316,"no_seri_fpn":"04002500231819358","stated":{"harga_jual":850000.0,"dpp":779167.0,"ppn":93500.04,"total":943500.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":316,"no_seri_fpn":"04002500231819358","stated":{"harga_jual":850000.0,"dpp":779167.0,"ppn":93500.04,"total":943500.0}}}'::jsonb, v_actor_id, ('2025-07-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '1P 20L-8100 WBOND SEALER', 1, 850000.00
+      '1P 20L-8100 WBOND SEALER', 1, 850000.00, ('2025-07-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-07-009-1', 943500.00, 'IDR',
-      'bank_transfer', '2025-07-24', 'Imported from historical register (row 316)', v_actor_id
+      'bank_transfer', '2025-07-24', 'Imported from historical register (row 316)', v_actor_id, ('2025-07-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10772,29 +10772,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/07/010', 'partial', 'IDR',
       '2025-07-30', '10P 25K-VINILEX 2002 B.WHITE', 6000000.00, 0, 11, 12,
       12.000, NULL, NULL, 5500000.00, 660000.00,
       0.00, 0.00, 660000.00, 6660000.00, 660000.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":317,"no_seri_fpn":"04002500231819360","stated":{"harga_jual":6000000.0,"dpp":5500000.0,"ppn":660000.0,"total":6660000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":317,"no_seri_fpn":"04002500231819360","stated":{"harga_jual":6000000.0,"dpp":5500000.0,"ppn":660000.0,"total":6660000.0}}}'::jsonb, v_actor_id, ('2025-07-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10P 25K-VINILEX 2002 B.WHITE', 1, 6000000.00
+      '10P 25K-VINILEX 2002 B.WHITE', 1, 6000000.00, ('2025-07-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-07-010-1', 660000.00, 'IDR',
-      'bank_transfer', '2025-07-31', 'Imported from historical register (row 317)', v_actor_id
+      'bank_transfer', '2025-07-31', 'Imported from historical register (row 317)', v_actor_id, ('2025-07-31'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10808,29 +10808,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/001', 'paid', 'IDR',
       '2025-08-01', '10P 25K-VINILEX PRO 1000 B.WHITE', 4300000.00, 0, 11, 12,
       12.000, NULL, NULL, 3941666.67, 473000.00,
       0.00, 0.00, 473000.00, 4773000.00, 4773000.00, '2025-11-07'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":318,"no_seri_fpn":"04002500231819361","stated":{"harga_jual":4300000.0,"dpp":3941667.0,"ppn":473000.04,"total":4773000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":318,"no_seri_fpn":"04002500231819361","stated":{"harga_jual":4300000.0,"dpp":3941667.0,"ppn":473000.04,"total":4773000.0}}}'::jsonb, v_actor_id, ('2025-08-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10P 25K-VINILEX PRO 1000 B.WHITE', 1, 4300000.00
+      '10P 25K-VINILEX PRO 1000 B.WHITE', 1, 4300000.00, ('2025-08-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-001-1', 4773000.00, 'IDR',
-      'bank_transfer', '2025-11-07', 'Imported from historical register (row 318)', v_actor_id
+      'bank_transfer', '2025-11-07', 'Imported from historical register (row 318)', v_actor_id, ('2025-11-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10844,29 +10844,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/004', 'paid', 'IDR',
       '2025-08-05', '75P ROADLINE 268 (70WHITE,4YELLOW,1BLACK)', 150000000.00, 0, 11, 12,
       12.000, NULL, NULL, 137500000.00, 16500000.00,
       0.00, 0.00, 16500000.00, 166500000.00, 166500000.00, '2025-08-05'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":319,"no_seri_fpn":"04002500232647204","stated":{"harga_jual":150000000.0,"dpp":137500000.0,"ppn":16500000.0,"total":166500000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":319,"no_seri_fpn":"04002500232647204","stated":{"harga_jual":150000000.0,"dpp":137500000.0,"ppn":16500000.0,"total":166500000.0}}}'::jsonb, v_actor_id, ('2025-08-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '75P ROADLINE 268 (70WHITE,4YELLOW,1BLACK)', 1, 150000000.00
+      '75P ROADLINE 268 (70WHITE,4YELLOW,1BLACK)', 1, 150000000.00, ('2025-08-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-004-1', 166500000.00, 'IDR',
-      'bank_transfer', '2025-08-05', 'Imported from historical register (row 319)', v_actor_id
+      'bank_transfer', '2025-08-05', 'Imported from historical register (row 319)', v_actor_id, ('2025-08-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10880,29 +10880,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/006', 'paid', 'IDR',
       '2025-08-07', '6P 20K-5200 WALL SEALER', 2940000.00, 0, 11, 12,
       12.000, NULL, NULL, 2695000.00, 323400.00,
       0.00, 0.00, 323400.00, 3263400.00, 3263400.00, '2025-08-07'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":320,"no_seri_fpn":"04002500238175557","stated":{"harga_jual":2940000.0,"dpp":2695000.0,"ppn":323400.0,"total":3263400.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":320,"no_seri_fpn":"04002500238175557","stated":{"harga_jual":2940000.0,"dpp":2695000.0,"ppn":323400.0,"total":3263400.0}}}'::jsonb, v_actor_id, ('2025-08-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '6P 20K-5200 WALL SEALER', 1, 2940000.00
+      '6P 20K-5200 WALL SEALER', 1, 2940000.00, ('2025-08-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-006-1', 3263400.00, 'IDR',
-      'bank_transfer', '2025-08-07', 'Imported from historical register (row 320)', v_actor_id
+      'bank_transfer', '2025-08-07', 'Imported from historical register (row 320)', v_actor_id, ('2025-08-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10916,29 +10916,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/005', 'paid', 'IDR',
       '2025-08-08', '17P ROADLINE 268 WHITE', 34000000.00, 0, 11, 12,
       12.000, NULL, NULL, 31166666.67, 3740000.00,
       0.00, 0.00, 3740000.00, 37740000.00, 37740000.00, '2025-08-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":321,"no_seri_fpn":"04002500238175565","stated":{"harga_jual":34000000.0,"dpp":31166667.0,"ppn":3740000.04,"total":37740000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":321,"no_seri_fpn":"04002500238175565","stated":{"harga_jual":34000000.0,"dpp":31166667.0,"ppn":3740000.04,"total":37740000.0}}}'::jsonb, v_actor_id, ('2025-08-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '17P ROADLINE 268 WHITE', 1, 34000000.00
+      '17P ROADLINE 268 WHITE', 1, 34000000.00, ('2025-08-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-005-1', 37740000.00, 'IDR',
-      'bank_transfer', '2025-08-08', 'Imported from historical register (row 321)', v_actor_id
+      'bank_transfer', '2025-08-08', 'Imported from historical register (row 321)', v_actor_id, ('2025-08-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10952,29 +10952,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/008', 'paid', 'IDR',
       '2025-08-09', '10P 25K-VINILEX 2002 B.WHITE', 6000000.00, 0, 11, 12,
       12.000, NULL, NULL, 5500000.00, 660000.00,
       0.00, 0.00, 660000.00, 6660000.00, 6660000.00, '2025-08-09'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":322,"no_seri_fpn":"04002500246183726","stated":{"harga_jual":6000000.0,"dpp":5500000.0,"ppn":660000.0,"total":6660000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":322,"no_seri_fpn":"04002500246183726","stated":{"harga_jual":6000000.0,"dpp":5500000.0,"ppn":660000.0,"total":6660000.0}}}'::jsonb, v_actor_id, ('2025-08-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10P 25K-VINILEX 2002 B.WHITE', 1, 6000000.00
+      '10P 25K-VINILEX 2002 B.WHITE', 1, 6000000.00, ('2025-08-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-008-1', 6660000.00, 'IDR',
-      'bank_transfer', '2025-08-09', 'Imported from historical register (row 322)', v_actor_id
+      'bank_transfer', '2025-08-09', 'Imported from historical register (row 322)', v_actor_id, ('2025-08-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -10988,29 +10988,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/007', 'paid', 'IDR',
       '2025-08-13', '18P ROADLINE 268 (15WHITE,3YELLOW)', 36000000.00, 0, 11, 12,
       12.000, NULL, NULL, 33000000.00, 3960000.00,
       0.00, 0.00, 3960000.00, 39960000.00, 39960000.00, '2025-08-13'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":323,"no_seri_fpn":"040025002346005998","stated":{"harga_jual":36000000.0,"dpp":33000000.0,"ppn":3960000.0,"total":39960000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":323,"no_seri_fpn":"040025002346005998","stated":{"harga_jual":36000000.0,"dpp":33000000.0,"ppn":3960000.0,"total":39960000.0}}}'::jsonb, v_actor_id, ('2025-08-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '18P ROADLINE 268 (15WHITE,3YELLOW)', 1, 36000000.00
+      '18P ROADLINE 268 (15WHITE,3YELLOW)', 1, 36000000.00, ('2025-08-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-007-1', 39960000.00, 'IDR',
-      'bank_transfer', '2025-08-13', 'Imported from historical register (row 323)', v_actor_id
+      'bank_transfer', '2025-08-13', 'Imported from historical register (row 323)', v_actor_id, ('2025-08-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11024,29 +11024,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/009', 'paid', 'IDR',
       '2025-08-16', '10P 25K-VINILEX 2002 B.WHITE', 6000000.00, 0, 11, 12,
       12.000, NULL, NULL, 5500000.00, 660000.00,
       0.00, 0.00, 660000.00, 6660000.00, 6660000.00, '2025-08-16'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":324,"no_seri_fpn":"04002500255308004","stated":{"harga_jual":6000000.0,"dpp":5500000.0,"ppn":660000.0,"total":6660000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":324,"no_seri_fpn":"04002500255308004","stated":{"harga_jual":6000000.0,"dpp":5500000.0,"ppn":660000.0,"total":6660000.0}}}'::jsonb, v_actor_id, ('2025-08-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10P 25K-VINILEX 2002 B.WHITE', 1, 6000000.00
+      '10P 25K-VINILEX 2002 B.WHITE', 1, 6000000.00, ('2025-08-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-009-1', 6660000.00, 'IDR',
-      'bank_transfer', '2025-08-16', 'Imported from historical register (row 324)', v_actor_id
+      'bank_transfer', '2025-08-16', 'Imported from historical register (row 324)', v_actor_id, ('2025-08-16'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11060,29 +11060,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/010', 'paid', 'IDR',
       '2025-08-19', 'HAND RAILING KORIDOR KLINIK WING B', 61600000.00, 0, 11, 12,
       12.000, 2.000, NULL, 56466666.67, 6776000.00,
       1232000.00, 0.00, 6776000.00, 67144000.00, 67144000.00, '2025-09-04'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":325,"no_seri_fpn":"04002500255308005","no_po_customer":"9000819652","stated":{"harga_jual":61600000.0,"dpp":56466667.0,"ppn":6776000.0,"pph":1232000.0,"total":67144000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":325,"no_seri_fpn":"04002500255308005","no_po_customer":"9000819652","stated":{"harga_jual":61600000.0,"dpp":56466667.0,"ppn":6776000.0,"pph":1232000.0,"total":67144000.0}}}'::jsonb, v_actor_id, ('2025-08-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'HAND RAILING KORIDOR KLINIK WING B', 1, 61600000.00
+      'HAND RAILING KORIDOR KLINIK WING B', 1, 61600000.00, ('2025-08-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-010-1', 67144000.00, 'IDR',
-      'bank_transfer', '2025-09-04', 'Imported from historical register (row 325)', v_actor_id
+      'bank_transfer', '2025-09-04', 'Imported from historical register (row 325)', v_actor_id, ('2025-09-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11096,29 +11096,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/011', 'paid', 'IDR',
       '2025-08-19', '16P ROADLINE 268 (13WHITE,3YELLOW)', 32000000.00, 0, 11, 12,
       12.000, NULL, NULL, 29333333.33, 3520000.00,
       0.00, 0.00, 3520000.00, 35520000.00, 35520000.00, '2025-08-19'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":326,"no_seri_fpn":"04002500256563365","stated":{"harga_jual":32000000.0,"dpp":29333333.0,"ppn":3519999.96,"total":35520000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":326,"no_seri_fpn":"04002500256563365","stated":{"harga_jual":32000000.0,"dpp":29333333.0,"ppn":3519999.96,"total":35520000.0}}}'::jsonb, v_actor_id, ('2025-08-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '16P ROADLINE 268 (13WHITE,3YELLOW)', 1, 32000000.00
+      '16P ROADLINE 268 (13WHITE,3YELLOW)', 1, 32000000.00, ('2025-08-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-011-1', 35520000.00, 'IDR',
-      'bank_transfer', '2025-08-19', 'Imported from historical register (row 326)', v_actor_id
+      'bank_transfer', '2025-08-19', 'Imported from historical register (row 326)', v_actor_id, ('2025-08-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11132,29 +11132,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/012', 'paid', 'IDR',
       '2025-08-19', '20CAN PL.8000 BLACK', 4160000.00, 0, 11, 12,
       12.000, NULL, NULL, 3813333.33, 457600.00,
       0.00, 0.00, 457600.00, 4617600.00, 4617600.00, '2025-08-29'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":327,"no_seri_fpn":"0400250025858240","no_po_customer":"9000811348","stated":{"harga_jual":4160000.0,"dpp":3813333.3333333335,"ppn":457600.0,"total":4617600.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":327,"no_seri_fpn":"0400250025858240","no_po_customer":"9000811348","stated":{"harga_jual":4160000.0,"dpp":3813333.3333333335,"ppn":457600.0,"total":4617600.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-08-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '20CAN PL.8000 BLACK', 1, 4160000.00
+      '20CAN PL.8000 BLACK', 1, 4160000.00, ('2025-08-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-012-1', 4617600.00, 'IDR',
-      'bank_transfer', '2025-08-29', 'Imported from historical register (row 327)', v_actor_id
+      'bank_transfer', '2025-08-29', 'Imported from historical register (row 327)', v_actor_id, ('2025-08-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11168,29 +11168,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/013', 'paid', 'IDR',
       '2025-08-19', '6CAN PL.8000 BLACK', 1248000.00, 0, 11, 12,
       12.000, NULL, NULL, 1144000.00, 137280.00,
       0.00, 0.00, 137280.00, 1385280.00, 1385280.00, '2025-09-04'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":328,"no_seri_fpn":"0400250025858243","no_po_customer":"3170035061","stated":{"harga_jual":1248000.0,"dpp":1144000.0,"ppn":137280.0,"total":1385280.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":328,"no_seri_fpn":"0400250025858243","no_po_customer":"3170035061","stated":{"harga_jual":1248000.0,"dpp":1144000.0,"ppn":137280.0,"total":1385280.0}}}'::jsonb, v_actor_id, ('2025-08-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '6CAN PL.8000 BLACK', 1, 1248000.00
+      '6CAN PL.8000 BLACK', 1, 1248000.00, ('2025-08-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-013-1', 1385280.00, 'IDR',
-      'bank_transfer', '2025-09-04', 'Imported from historical register (row 328)', v_actor_id
+      'bank_transfer', '2025-09-04', 'Imported from historical register (row 328)', v_actor_id, ('2025-09-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11204,29 +11204,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/014', 'paid', 'IDR',
       '2025-08-19', '41CAN PL.8000 SUNSHINE', 8528000.00, 0, 11, 12,
       12.000, NULL, NULL, 7817333.33, 938080.00,
       0.00, 0.00, 938080.00, 9466080.00, 9466080.00, '2025-08-29'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":329,"no_seri_fpn":"0400250025858244","no_po_customer":"9000811348","stated":{"harga_jual":8528000.0,"dpp":7817333.333333334,"ppn":938080.0,"total":9466080.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":329,"no_seri_fpn":"0400250025858244","no_po_customer":"9000811348","stated":{"harga_jual":8528000.0,"dpp":7817333.333333334,"ppn":938080.0,"total":9466080.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-08-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '41CAN PL.8000 SUNSHINE', 1, 8528000.00
+      '41CAN PL.8000 SUNSHINE', 1, 8528000.00, ('2025-08-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-014-1', 9466080.00, 'IDR',
-      'bank_transfer', '2025-08-29', 'Imported from historical register (row 329)', v_actor_id
+      'bank_transfer', '2025-08-29', 'Imported from historical register (row 329)', v_actor_id, ('2025-08-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11240,29 +11240,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/015', 'paid', 'IDR',
       '2025-08-20', '20CAN PL.8000 TRAFFIC GREEN', 4160000.00, 0, 11, 12,
       12.000, NULL, NULL, 3813333.33, 457600.00,
       0.00, 0.00, 457600.00, 4617600.00, 4617600.00, '2025-08-29'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":330,"no_seri_fpn":"0400250025858241","no_po_customer":"9000816080","stated":{"harga_jual":4160000.0,"dpp":3813333.3333333335,"ppn":457600.0,"total":4617600.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":330,"no_seri_fpn":"0400250025858241","no_po_customer":"9000816080","stated":{"harga_jual":4160000.0,"dpp":3813333.3333333335,"ppn":457600.0,"total":4617600.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-08-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '20CAN PL.8000 TRAFFIC GREEN', 1, 4160000.00
+      '20CAN PL.8000 TRAFFIC GREEN', 1, 4160000.00, ('2025-08-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-015-1', 4617600.00, 'IDR',
-      'bank_transfer', '2025-08-29', 'Imported from historical register (row 330)', v_actor_id
+      'bank_transfer', '2025-08-29', 'Imported from historical register (row 330)', v_actor_id, ('2025-08-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11276,29 +11276,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/016', 'paid', 'IDR',
       '2025-08-20', '212CAN PL.8000 TRAFFIC GREEN', 44096000.00, 0, 11, 12,
       12.000, NULL, NULL, 40421333.33, 4850560.00,
       0.00, 0.00, 4850560.00, 48946560.00, 48946560.00, '2025-08-29'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":331,"no_seri_fpn":"0400250025858242","no_po_customer":"9000815372","stated":{"harga_jual":44096000.0,"dpp":40421333.333333336,"ppn":4850560.0,"total":48946560.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":331,"no_seri_fpn":"0400250025858242","no_po_customer":"9000815372","stated":{"harga_jual":44096000.0,"dpp":40421333.333333336,"ppn":4850560.0,"total":48946560.0},"import_notes":["payment amount absent in source; taken as TOTAL"]}}'::jsonb, v_actor_id, ('2025-08-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '212CAN PL.8000 TRAFFIC GREEN', 1, 44096000.00
+      '212CAN PL.8000 TRAFFIC GREEN', 1, 44096000.00, ('2025-08-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-016-1', 48946560.00, 'IDR',
-      'bank_transfer', '2025-08-29', 'Imported from historical register (row 331)', v_actor_id
+      'bank_transfer', '2025-08-29', 'Imported from historical register (row 331)', v_actor_id, ('2025-08-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11312,29 +11312,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/017', 'paid', 'IDR',
       '2025-08-20', '10CAN 5K-ROADLINE WHITE', 3396400.00, 0, 11, 12,
       12.000, NULL, NULL, 3113366.67, 373604.00,
       0.00, 0.00, 373604.00, 3770004.00, 3770004.00, '2025-08-29'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":332,"no_seri_fpn":"04002500258582845","no_po_customer":"9000808297","stated":{"harga_jual":3396400.0,"dpp":3113366.666666667,"ppn":373604.0,"total":3770004.0},"unattributed_rows":[{"note":"register stated Rp 445,040,332 here; trimmed to the balance outstanding","amount":445040332.0,"date":"2025-08-29"}]}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":332,"no_seri_fpn":"04002500258582845","no_po_customer":"9000808297","stated":{"harga_jual":3396400.0,"dpp":3113366.666666667,"ppn":373604.0,"total":3770004.0},"unattributed_rows":[{"note":"register stated Rp 445,040,332 here; trimmed to the balance outstanding","amount":445040332.0,"date":"2025-08-29"}]}}'::jsonb, v_actor_id, ('2025-08-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10CAN 5K-ROADLINE WHITE', 1, 3396400.00
+      '10CAN 5K-ROADLINE WHITE', 1, 3396400.00, ('2025-08-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-017-1', 3770004.00, 'IDR',
-      'bank_transfer', '2025-08-29', 'Imported from historical register (row 332)', v_actor_id
+      'bank_transfer', '2025-08-29', 'Imported from historical register (row 332)', v_actor_id, ('2025-08-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11348,29 +11348,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/07/018', 'paid', 'IDR',
       '2025-08-20', '7P 20K-5200 WALL SEALER', 3430000.00, 0, 11, 12,
       12.000, NULL, NULL, 3144166.67, 377300.00,
       0.00, 0.00, 377300.00, 3807300.00, 3807300.00, '2025-08-20'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":333,"no_seri_fpn":"04002500264090102","stated":{"harga_jual":3430000.0,"dpp":3144166.666666667,"ppn":377300.0,"total":3807300.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":333,"no_seri_fpn":"04002500264090102","stated":{"harga_jual":3430000.0,"dpp":3144166.666666667,"ppn":377300.0,"total":3807300.0}}}'::jsonb, v_actor_id, ('2025-08-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '7P 20K-5200 WALL SEALER', 1, 3430000.00
+      '7P 20K-5200 WALL SEALER', 1, 3430000.00, ('2025-08-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-07-018-1', 3807300.00, 'IDR',
-      'bank_transfer', '2025-08-20', 'Imported from historical register (row 333)', v_actor_id
+      'bank_transfer', '2025-08-20', 'Imported from historical register (row 333)', v_actor_id, ('2025-08-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11384,29 +11384,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/019', 'paid', 'IDR',
       '2025-08-26', '15P 25K-VINILEX 2002 B.WHITE', 9000000.00, 0, 11, 12,
       12.000, NULL, NULL, 8250000.00, 990000.00,
       0.00, 0.00, 990000.00, 9990000.00, 9990000.00, '2025-08-26'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":334,"no_seri_fpn":"04002500264090105","stated":{"harga_jual":9000000.0,"dpp":8250000.0,"ppn":990000.0,"total":9990000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":334,"no_seri_fpn":"04002500264090105","stated":{"harga_jual":9000000.0,"dpp":8250000.0,"ppn":990000.0,"total":9990000.0}}}'::jsonb, v_actor_id, ('2025-08-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '15P 25K-VINILEX 2002 B.WHITE', 1, 9000000.00
+      '15P 25K-VINILEX 2002 B.WHITE', 1, 9000000.00, ('2025-08-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-019-1', 9990000.00, 'IDR',
-      'bank_transfer', '2025-08-26', 'Imported from historical register (row 334)', v_actor_id
+      'bank_transfer', '2025-08-26', 'Imported from historical register (row 334)', v_actor_id, ('2025-08-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11420,29 +11420,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/020', 'paid', 'IDR',
       '2025-08-26', '10P ROADLINE 268 (9WHITE,1YELLOW)', 20000000.00, 0, 11, 12,
       12.000, NULL, NULL, 18333333.33, 2200000.00,
       0.00, 0.00, 2200000.00, 22200000.00, 22200000.00, '2025-08-26'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":335,"no_seri_fpn":"04002500264090104","stated":{"harga_jual":20000000.0,"dpp":18333333.333333336,"ppn":2200000.0,"total":22200000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":335,"no_seri_fpn":"04002500264090104","stated":{"harga_jual":20000000.0,"dpp":18333333.333333336,"ppn":2200000.0,"total":22200000.0}}}'::jsonb, v_actor_id, ('2025-08-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10P ROADLINE 268 (9WHITE,1YELLOW)', 1, 20000000.00
+      '10P ROADLINE 268 (9WHITE,1YELLOW)', 1, 20000000.00, ('2025-08-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-020-1', 22200000.00, 'IDR',
-      'bank_transfer', '2025-08-26', 'Imported from historical register (row 335)', v_actor_id
+      'bank_transfer', '2025-08-26', 'Imported from historical register (row 335)', v_actor_id, ('2025-08-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11456,29 +11456,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/021', 'paid', 'IDR',
       '2025-08-27', '12P ROADLINE 268 WHITE', 24000000.00, 0, 11, 12,
       12.000, NULL, NULL, 22000000.00, 2640000.00,
       0.00, 0.00, 2640000.00, 26640000.00, 26640000.00, '2025-08-27'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":336,"no_seri_fpn":"04002500264090103","stated":{"harga_jual":24000000.0,"dpp":22000000.0,"ppn":2640000.0,"total":26640000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":336,"no_seri_fpn":"04002500264090103","stated":{"harga_jual":24000000.0,"dpp":22000000.0,"ppn":2640000.0,"total":26640000.0}}}'::jsonb, v_actor_id, ('2025-08-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '12P ROADLINE 268 WHITE', 1, 24000000.00
+      '12P ROADLINE 268 WHITE', 1, 24000000.00, ('2025-08-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-021-1', 26640000.00, 'IDR',
-      'bank_transfer', '2025-08-27', 'Imported from historical register (row 336)', v_actor_id
+      'bank_transfer', '2025-08-27', 'Imported from historical register (row 336)', v_actor_id, ('2025-08-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11492,29 +11492,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/022', 'paid', 'IDR',
       '2025-08-29', '6P ROADLINE 268 (5WHITE,1yellow)', 12000000.00, 0, 11, 12,
       12.000, NULL, NULL, 11000000.00, 1320000.00,
       0.00, 0.00, 1320000.00, 13320000.00, 13320000.00, '2025-08-29'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":337,"no_seri_fpn":"04002500266532128","stated":{"harga_jual":12000000.0,"dpp":11000000.0,"ppn":1320000.0,"total":13320000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":337,"no_seri_fpn":"04002500266532128","stated":{"harga_jual":12000000.0,"dpp":11000000.0,"ppn":1320000.0,"total":13320000.0}}}'::jsonb, v_actor_id, ('2025-08-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '6P ROADLINE 268 (5WHITE,1yellow)', 1, 12000000.00
+      '6P ROADLINE 268 (5WHITE,1yellow)', 1, 12000000.00, ('2025-08-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-022-1', 13320000.00, 'IDR',
-      'bank_transfer', '2025-08-29', 'Imported from historical register (row 337)', v_actor_id
+      'bank_transfer', '2025-08-29', 'Imported from historical register (row 337)', v_actor_id, ('2025-08-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11528,29 +11528,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/023', 'paid', 'IDR',
       '2025-08-30', '10P 25K-VINILEX 2002 B.WHITE', 6000000.00, 0, 11, 12,
       12.000, NULL, NULL, 5500000.00, 660000.00,
       0.00, 0.00, 660000.00, 6660000.00, 6660000.00, '2025-09-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":338,"no_seri_fpn":"04002500272650176","stated":{"harga_jual":6000000.0,"dpp":5500000.0,"ppn":660000.0,"total":6660000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":338,"no_seri_fpn":"04002500272650176","stated":{"harga_jual":6000000.0,"dpp":5500000.0,"ppn":660000.0,"total":6660000.0}}}'::jsonb, v_actor_id, ('2025-08-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10P 25K-VINILEX 2002 B.WHITE', 1, 6000000.00
+      '10P 25K-VINILEX 2002 B.WHITE', 1, 6000000.00, ('2025-08-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-023-1', 6660000.00, 'IDR',
-      'bank_transfer', '2025-09-03', 'Imported from historical register (row 338)', v_actor_id
+      'bank_transfer', '2025-09-03', 'Imported from historical register (row 338)', v_actor_id, ('2025-09-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11564,29 +11564,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/08/024', 'paid', 'IDR',
       '2025-08-24', '20L-ELASTEX FIBER FLEX PU-05 GREY (PROJECT), 20L-NIPPON ALKALI KILLER SEALER WHITE (PROJECT)', 2545000.00, 0, 11, 12,
       12.000, NULL, NULL, 2332916.67, 279950.00,
       0.00, 0.00, 279950.00, 2824950.00, 2824950.00, '2025-09-05'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":339,"no_seri_fpn":"04002500274398711","stated":{"harga_jual":2545000.0,"dpp":2332916.666666667,"ppn":279950.0,"total":2824950.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":339,"no_seri_fpn":"04002500274398711","stated":{"harga_jual":2545000.0,"dpp":2332916.666666667,"ppn":279950.0,"total":2824950.0}}}'::jsonb, v_actor_id, ('2025-08-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '20L-ELASTEX FIBER FLEX PU-05 GREY (PROJECT), 20L-NIPPON ALKALI KILLER SEALER WHITE (PROJECT)', 1, 2545000.00
+      '20L-ELASTEX FIBER FLEX PU-05 GREY (PROJECT), 20L-NIPPON ALKALI KILLER SEALER WHITE (PROJECT)', 1, 2545000.00, ('2025-08-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-08-024-1', 2824950.00, 'IDR',
-      'bank_transfer', '2025-09-05', 'Imported from historical register (row 339)', v_actor_id
+      'bank_transfer', '2025-09-05', 'Imported from historical register (row 339)', v_actor_id, ('2025-09-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11600,29 +11600,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/09/001', 'paid', 'IDR',
       '2025-09-01', '2P 25K-NIPPON ROADLINE 268 WHITE (PROJECT)', 4000000.00, 0, 11, 12,
       12.000, NULL, NULL, 3666666.67, 440000.00,
       0.00, 0.00, 440000.00, 4440000.00, 4440000.00, '2025-09-01'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":340,"no_seri_fpn":"04002500272650175","stated":{"harga_jual":4000000.0,"dpp":3666666.666666667,"ppn":440000.0,"total":4440000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":340,"no_seri_fpn":"04002500272650175","stated":{"harga_jual":4000000.0,"dpp":3666666.666666667,"ppn":440000.0,"total":4440000.0}}}'::jsonb, v_actor_id, ('2025-09-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '2P 25K-NIPPON ROADLINE 268 WHITE (PROJECT)', 1, 4000000.00
+      '2P 25K-NIPPON ROADLINE 268 WHITE (PROJECT)', 1, 4000000.00, ('2025-09-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-09-001-1', 4440000.00, 'IDR',
-      'bank_transfer', '2025-09-01', 'Imported from historical register (row 340)', v_actor_id
+      'bank_transfer', '2025-09-01', 'Imported from historical register (row 340)', v_actor_id, ('2025-09-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11636,29 +11636,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/09/002', 'partial', 'IDR',
       '2025-09-02', '1P 20K-5200 WALL SEALER (PROJECT)', 490000.00, 0, 11, 12,
       12.000, NULL, NULL, 449166.67, 53900.00,
       0.00, 0.00, 53900.00, 543900.00, 443900.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":341,"no_seri_fpn":"04002500272650177","plus_minus":"-100000","stated":{"harga_jual":490000.0,"dpp":449166.6666666667,"ppn":53900.0,"total":543900.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":341,"no_seri_fpn":"04002500272650177","plus_minus":"-100000","stated":{"harga_jual":490000.0,"dpp":449166.6666666667,"ppn":53900.0,"total":543900.0}}}'::jsonb, v_actor_id, ('2025-09-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '1P 20K-5200 WALL SEALER (PROJECT)', 1, 490000.00
+      '1P 20K-5200 WALL SEALER (PROJECT)', 1, 490000.00, ('2025-09-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-09-002-1', 443900.00, 'IDR',
-      'bank_transfer', '2025-09-03', 'Imported from historical register (row 341)', v_actor_id
+      'bank_transfer', '2025-09-03', 'Imported from historical register (row 341)', v_actor_id, ('2025-09-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11672,29 +11672,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/09/003', 'paid', 'IDR',
       '2025-09-03', '12P 25K-VINILEX 2002-BRILLIANT WHITE (PROJECT)', 7200000.00, 0, 11, 12,
       12.000, NULL, NULL, 6600000.00, 792000.00,
       0.00, 0.00, 792000.00, 7992000.00, 7992000.00, '2025-09-05'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":342,"no_seri_fpn":"04002500274398711","stated":{"harga_jual":7200000.0,"dpp":6600000.0,"ppn":792000.0,"total":7992000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":342,"no_seri_fpn":"04002500274398711","stated":{"harga_jual":7200000.0,"dpp":6600000.0,"ppn":792000.0,"total":7992000.0}}}'::jsonb, v_actor_id, ('2025-09-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '12P 25K-VINILEX 2002-BRILLIANT WHITE (PROJECT)', 1, 7200000.00
+      '12P 25K-VINILEX 2002-BRILLIANT WHITE (PROJECT)', 1, 7200000.00, ('2025-09-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-09-003-1', 7992000.00, 'IDR',
-      'bank_transfer', '2025-09-05', 'Imported from historical register (row 342)', v_actor_id
+      'bank_transfer', '2025-09-05', 'Imported from historical register (row 342)', v_actor_id, ('2025-09-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11708,29 +11708,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/09/004', 'paid', 'IDR',
       '2025-09-04', '4P 25K-VINILEX 2002-BRILLIANT WHITE (PROJECT)', 1720000.00, 0, 11, 12,
       12.000, NULL, NULL, 1576666.67, 189200.00,
       0.00, 0.00, 189200.00, 1909200.00, 1909200.00, '2025-09-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":343,"no_seri_fpn":"04002500277635805","stated":{"harga_jual":1720000.0,"dpp":1576666.6666666667,"ppn":189200.0,"total":1909200.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":343,"no_seri_fpn":"04002500277635805","stated":{"harga_jual":1720000.0,"dpp":1576666.6666666667,"ppn":189200.0,"total":1909200.0}}}'::jsonb, v_actor_id, ('2025-09-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '4P 25K-VINILEX 2002-BRILLIANT WHITE (PROJECT)', 1, 1720000.00
+      '4P 25K-VINILEX 2002-BRILLIANT WHITE (PROJECT)', 1, 1720000.00, ('2025-09-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-09-004-1', 1909200.00, 'IDR',
-      'bank_transfer', '2025-09-08', 'Imported from historical register (row 343)', v_actor_id
+      'bank_transfer', '2025-09-08', 'Imported from historical register (row 343)', v_actor_id, ('2025-09-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11744,29 +11744,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/09/005', 'paid', 'IDR',
       '2025-09-09', 'PROGRESS II RENOVASI TK,SD,SMP SMH TOWNSITE I', 174967624.00, 0, 11, 12,
       12.000, 2.000, 5.000, 160386988.67, 19246438.64,
       3499352.48, 8748381.20, 19246438.64, 181966328.96, 181966328.96, '2025-10-08'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":344,"no_seri_fpn":"04002500277635804","no_po_customer":"YMHW-068","plus_minus":"0.03999999165534973","stated":{"harga_jual":174967624.0,"dpp":160386988.6666667,"ppn":19246438.64,"pph":3499352.48,"retensi":8748381.200000001,"total":181966328.96}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":344,"no_seri_fpn":"04002500277635804","no_po_customer":"YMHW-068","plus_minus":"0.03999999165534973","stated":{"harga_jual":174967624.0,"dpp":160386988.6666667,"ppn":19246438.64,"pph":3499352.48,"retensi":8748381.200000001,"total":181966328.96}}}'::jsonb, v_actor_id, ('2025-09-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS II RENOVASI TK,SD,SMP SMH TOWNSITE I', 1, 174967624.00
+      'PROGRESS II RENOVASI TK,SD,SMP SMH TOWNSITE I', 1, 174967624.00, ('2025-09-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-09-005-1', 181966328.96, 'IDR',
-      'bank_transfer', '2025-10-08', 'Imported from historical register (row 344)', v_actor_id
+      'bank_transfer', '2025-10-08', 'Imported from historical register (row 344)', v_actor_id, ('2025-10-08'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11780,29 +11780,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/R9000781718', 'paid', 'IDR',
       '2025-09-18', 'RETENSI PEK PEDESTRIAN G,H,I TB PANGKER', 9582142.00, 0, 1, 1,
       0.000, NULL, NULL, 9582142.00, 0.00,
       0.00, 0.00, 0.00, 9582142.00, 9582142.00, '2025-10-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":345,"no_po_customer":"9000781718","stated":{"harga_jual":9582142.0,"dpp":0.0,"ppn":0.0,"total":9582142.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":345,"no_po_customer":"9000781718","stated":{"harga_jual":9582142.0,"dpp":0.0,"ppn":0.0,"total":9582142.0}}}'::jsonb, v_actor_id, ('2025-09-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI PEK PEDESTRIAN G,H,I TB PANGKER', 1, 9582142.00
+      'RETENSI PEK PEDESTRIAN G,H,I TB PANGKER', 1, 9582142.00, ('2025-09-18'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-R9000781718-1', 9582142.00, 'IDR',
-      'bank_transfer', '2025-10-03', 'Imported from historical register (row 345)', v_actor_id
+      'bank_transfer', '2025-10-03', 'Imported from historical register (row 345)', v_actor_id, ('2025-10-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11816,29 +11816,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/09/006', 'paid', 'IDR',
       '2025-09-19', 'EXT.PAINTING RTC BUILDING FRONT SIDE', 272484350.00, 0, 11, 12,
       12.000, 2.000, 5.000, 249777320.83, 29973278.50,
       5449687.00, 13624217.50, 29973278.50, 283383724.00, 283383724.00, '2025-10-03'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":346,"no_seri_fpn":"04002500299510097","no_po_customer":"9000810624","stated":{"harga_jual":272484350.0,"dpp":249777320.83333334,"ppn":29973278.5,"pph":5449687.0,"retensi":13624217.5,"total":283383724.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":346,"no_seri_fpn":"04002500299510097","no_po_customer":"9000810624","stated":{"harga_jual":272484350.0,"dpp":249777320.83333334,"ppn":29973278.5,"pph":5449687.0,"retensi":13624217.5,"total":283383724.0}}}'::jsonb, v_actor_id, ('2025-09-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'EXT.PAINTING RTC BUILDING FRONT SIDE', 1, 272484350.00
+      'EXT.PAINTING RTC BUILDING FRONT SIDE', 1, 272484350.00, ('2025-09-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-09-006-1', 283383724.00, 'IDR',
-      'bank_transfer', '2025-10-03', 'Imported from historical register (row 346)', v_actor_id
+      'bank_transfer', '2025-10-03', 'Imported from historical register (row 346)', v_actor_id, ('2025-10-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11852,29 +11852,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/09/007', 'paid', 'IDR',
       '2025-09-13', '12P 25K-VINILEX 2002-BRILLIANT WHITE (PROJECT)', 7200000.00, 0, 11, 12,
       12.000, NULL, NULL, 6600000.00, 792000.00,
       0.00, 0.00, 792000.00, 7992000.00, 7992000.00, '2025-09-22'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":347,"no_seri_fpn":"04002500308049263","stated":{"harga_jual":7200000.0,"dpp":6600000.0,"ppn":792000.0,"total":7992000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":347,"no_seri_fpn":"04002500308049263","stated":{"harga_jual":7200000.0,"dpp":6600000.0,"ppn":792000.0,"total":7992000.0}}}'::jsonb, v_actor_id, ('2025-09-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '12P 25K-VINILEX 2002-BRILLIANT WHITE (PROJECT)', 1, 7200000.00
+      '12P 25K-VINILEX 2002-BRILLIANT WHITE (PROJECT)', 1, 7200000.00, ('2025-09-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-09-007-1', 7992000.00, 'IDR',
-      'bank_transfer', '2025-09-22', 'Imported from historical register (row 347)', v_actor_id
+      'bank_transfer', '2025-09-22', 'Imported from historical register (row 347)', v_actor_id, ('2025-09-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11888,29 +11888,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/09/008', 'paid', 'IDR',
       '2025-09-30', '6CAN PL.8000 SUNSHINE', 1248000.00, 0, 11, 12,
       12.000, NULL, NULL, 1144000.00, 137280.00,
       0.00, 0.00, 137280.00, 1385280.00, 1385280.00, '2025-10-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":348,"no_seri_fpn":"04002500308049259","no_po_customer":"9000804923","stated":{"harga_jual":1248000.0,"dpp":1144000.0,"ppn":137280.0,"total":1385280.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":348,"no_seri_fpn":"04002500308049259","no_po_customer":"9000804923","stated":{"harga_jual":1248000.0,"dpp":1144000.0,"ppn":137280.0,"total":1385280.0}}}'::jsonb, v_actor_id, ('2025-09-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '6CAN PL.8000 SUNSHINE', 1, 1248000.00
+      '6CAN PL.8000 SUNSHINE', 1, 1248000.00, ('2025-09-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-09-008-1', 1385280.00, 'IDR',
-      'bank_transfer', '2025-10-10', 'Imported from historical register (row 348)', v_actor_id
+      'bank_transfer', '2025-10-10', 'Imported from historical register (row 348)', v_actor_id, ('2025-10-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11924,29 +11924,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/09/009', 'paid', 'IDR',
       '2025-09-30', '6CAN PL.8000  BLUE', 1248000.00, 0, 11, 12,
       12.000, NULL, NULL, 1144000.00, 137280.00,
       0.00, 0.00, 137280.00, 1385280.00, 1385280.00, '2025-10-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":349,"no_seri_fpn":"04002500308049261","no_po_customer":"9000812395","stated":{"harga_jual":1248000.0,"dpp":1144000.0,"ppn":137280.0,"total":1385280.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":349,"no_seri_fpn":"04002500308049261","no_po_customer":"9000812395","stated":{"harga_jual":1248000.0,"dpp":1144000.0,"ppn":137280.0,"total":1385280.0}}}'::jsonb, v_actor_id, ('2025-09-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '6CAN PL.8000  BLUE', 1, 1248000.00
+      '6CAN PL.8000  BLUE', 1, 1248000.00, ('2025-09-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-09-009-1', 1385280.00, 'IDR',
-      'bank_transfer', '2025-10-10', 'Imported from historical register (row 349)', v_actor_id
+      'bank_transfer', '2025-10-10', 'Imported from historical register (row 349)', v_actor_id, ('2025-10-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11960,29 +11960,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/09/010', 'paid', 'IDR',
       '2025-09-30', '213CAN PL.8000 (132 SUNSHINE,81VERMILLION)', 44304000.00, 0, 11, 12,
       12.000, NULL, NULL, 40612000.00, 4873440.00,
       0.00, 0.00, 4873440.00, 49177440.00, 49177440.00, '2025-10-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":350,"no_seri_fpn":"04002500308049262","no_po_customer":"9000828993","stated":{"harga_jual":44304000.0,"dpp":40612000.0,"ppn":4873440.0,"total":49177440.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":350,"no_seri_fpn":"04002500308049262","no_po_customer":"9000828993","stated":{"harga_jual":44304000.0,"dpp":40612000.0,"ppn":4873440.0,"total":49177440.0}}}'::jsonb, v_actor_id, ('2025-09-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '213CAN PL.8000 (132 SUNSHINE,81VERMILLION)', 1, 44304000.00
+      '213CAN PL.8000 (132 SUNSHINE,81VERMILLION)', 1, 44304000.00, ('2025-09-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-09-010-1', 49177440.00, 'IDR',
-      'bank_transfer', '2025-10-10', 'Imported from historical register (row 350)', v_actor_id
+      'bank_transfer', '2025-10-10', 'Imported from historical register (row 350)', v_actor_id, ('2025-10-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -11996,29 +11996,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/09/011', 'paid', 'IDR',
       '2025-09-30', '48CAN PL.8000 BLUE', 9984000.00, 0, 11, 12,
       12.000, NULL, NULL, 9152000.00, 1098240.00,
       0.00, 0.00, 1098240.00, 11082240.00, 11082240.00, '2025-10-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":351,"no_seri_fpn":"04002500308049263","no_po_customer":"9000831202","stated":{"harga_jual":9984000.0,"dpp":9152000.0,"ppn":1098240.0,"total":11082240.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":351,"no_seri_fpn":"04002500308049263","no_po_customer":"9000831202","stated":{"harga_jual":9984000.0,"dpp":9152000.0,"ppn":1098240.0,"total":11082240.0}}}'::jsonb, v_actor_id, ('2025-09-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '48CAN PL.8000 BLUE', 1, 9984000.00
+      '48CAN PL.8000 BLUE', 1, 9984000.00, ('2025-09-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-09-011-1', 11082240.00, 'IDR',
-      'bank_transfer', '2025-10-10', 'Imported from historical register (row 351)', v_actor_id
+      'bank_transfer', '2025-10-10', 'Imported from historical register (row 351)', v_actor_id, ('2025-10-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12032,29 +12032,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/09/012', 'paid', 'IDR',
       '2025-09-30', '61CAN PL.8000 BLUE', 12688000.00, 0, 11, 12,
       12.000, NULL, NULL, 11630666.67, 1395680.00,
       0.00, 0.00, 1395680.00, 14083680.00, 14083680.00, '2025-10-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":352,"no_seri_fpn":"400250030804926 0","no_po_customer":"9000817558","stated":{"harga_jual":12688000.0,"dpp":11630666.666666668,"ppn":1395680.0,"total":14083680.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":352,"no_seri_fpn":"400250030804926 0","no_po_customer":"9000817558","stated":{"harga_jual":12688000.0,"dpp":11630666.666666668,"ppn":1395680.0,"total":14083680.0}}}'::jsonb, v_actor_id, ('2025-09-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '61CAN PL.8000 BLUE', 1, 12688000.00
+      '61CAN PL.8000 BLUE', 1, 12688000.00, ('2025-09-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-09-012-1', 14083680.00, 'IDR',
-      'bank_transfer', '2025-10-10', 'Imported from historical register (row 352)', v_actor_id
+      'bank_transfer', '2025-10-10', 'Imported from historical register (row 352)', v_actor_id, ('2025-10-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12068,29 +12068,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/09/013', 'paid', 'IDR',
       '2025-09-30', '60CAN PL.8000 TRAFFIC GREEN', 12480000.00, 0, 11, 12,
       12.000, NULL, NULL, 11440000.00, 1372800.00,
       0.00, 0.00, 1372800.00, 13852800.00, 13852800.00, '2025-10-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":353,"no_seri_fpn":"04002500308049258","no_po_customer":"9000816080","stated":{"harga_jual":12480000.0,"dpp":11440000.0,"ppn":1372800.0,"total":13852800.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":353,"no_seri_fpn":"04002500308049258","no_po_customer":"9000816080","stated":{"harga_jual":12480000.0,"dpp":11440000.0,"ppn":1372800.0,"total":13852800.0}}}'::jsonb, v_actor_id, ('2025-09-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '60CAN PL.8000 TRAFFIC GREEN', 1, 12480000.00
+      '60CAN PL.8000 TRAFFIC GREEN', 1, 12480000.00, ('2025-09-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-09-013-1', 13852800.00, 'IDR',
-      'bank_transfer', '2025-10-10', 'Imported from historical register (row 353)', v_actor_id
+      'bank_transfer', '2025-10-10', 'Imported from historical register (row 353)', v_actor_id, ('2025-10-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12104,29 +12104,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/09/014', 'paid', 'IDR',
       '2025-09-23', '4P 25K-VINILEX PRO 1000 B.WHITE', 1720000.00, 0, 11, 12,
       12.000, NULL, NULL, 1576666.67, 189200.00,
       0.00, 0.00, 189200.00, 1909200.00, 1909200.00, '2025-10-02'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":354,"no_seri_fpn":"400250031189241 0","stated":{"harga_jual":1720000.0,"dpp":1576666.6666666667,"ppn":189200.0,"total":1909200.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":354,"no_seri_fpn":"400250031189241 0","stated":{"harga_jual":1720000.0,"dpp":1576666.6666666667,"ppn":189200.0,"total":1909200.0}}}'::jsonb, v_actor_id, ('2025-09-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '4P 25K-VINILEX PRO 1000 B.WHITE', 1, 1720000.00
+      '4P 25K-VINILEX PRO 1000 B.WHITE', 1, 1720000.00, ('2025-09-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-09-014-1', 1909200.00, 'IDR',
-      'bank_transfer', '2025-10-02', 'Imported from historical register (row 354)', v_actor_id
+      'bank_transfer', '2025-10-02', 'Imported from historical register (row 354)', v_actor_id, ('2025-10-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12140,29 +12140,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/10/001', 'paid', 'IDR',
       '2025-10-01', '52CAN PL.8000 TRAFFIC GREEN', 10816000.00, 0, 11, 12,
       12.000, NULL, NULL, 9914666.67, 1189760.00,
       0.00, 0.00, 1189760.00, 12005760.00, 12005760.00, '2025-10-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":355,"no_seri_fpn":"04002500309364009","no_po_customer":"9000815189","stated":{"harga_jual":10816000.0,"dpp":9914666.666666668,"ppn":1189760.0,"total":12005760.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":355,"no_seri_fpn":"04002500309364009","no_po_customer":"9000815189","stated":{"harga_jual":10816000.0,"dpp":9914666.666666668,"ppn":1189760.0,"total":12005760.0}}}'::jsonb, v_actor_id, ('2025-10-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '52CAN PL.8000 TRAFFIC GREEN', 1, 10816000.00
+      '52CAN PL.8000 TRAFFIC GREEN', 1, 10816000.00, ('2025-10-01'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-10-001-1', 12005760.00, 'IDR',
-      'bank_transfer', '2025-10-10', 'Imported from historical register (row 355)', v_actor_id
+      'bank_transfer', '2025-10-10', 'Imported from historical register (row 355)', v_actor_id, ('2025-10-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12176,29 +12176,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/R9000765424', 'paid', 'IDR',
       '2025-10-09', 'RETENSI FURNITURE DRESSING TABLE + POUF, WARDROBE (2 DOORS) - (WITHOUT MIRROR)', 26680000.00, 0, 1, 1,
       0.000, NULL, NULL, 26680000.00, 0.00,
       0.00, 0.00, 0.00, 26680000.00, 26680000.00, '2025-10-30'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":356,"no_po_customer":"9000765424","stated":{"harga_jual":26680000.0,"dpp":0.0,"ppn":0.0,"total":26680000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":356,"no_po_customer":"9000765424","stated":{"harga_jual":26680000.0,"dpp":0.0,"ppn":0.0,"total":26680000.0}}}'::jsonb, v_actor_id, ('2025-10-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI FURNITURE DRESSING TABLE + POUF, WARDROBE (2 DOORS) - (WITHOUT MIRROR)', 1, 26680000.00
+      'RETENSI FURNITURE DRESSING TABLE + POUF, WARDROBE (2 DOORS) - (WITHOUT MIRROR)', 1, 26680000.00, ('2025-10-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-R9000765424-1', 26680000.00, 'IDR',
-      'bank_transfer', '2025-10-30', 'Imported from historical register (row 356)', v_actor_id
+      'bank_transfer', '2025-10-30', 'Imported from historical register (row 356)', v_actor_id, ('2025-10-30'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12212,29 +12212,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/10/002', 'paid', 'IDR',
       '2025-10-20', '20L-ELASTEX FIBER FLEX PU-05 GREY (PROJECT), 20L-NIPPON WBOND 8100 SEALER (PROJECT)', 1895000.00, 0, 11, 12,
       12.000, NULL, NULL, 1737083.33, 208450.00,
       0.00, 0.00, 208450.00, 2103450.00, 2103450.00, '2025-10-20'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":357,"no_seri_fpn":"04002500343239989","stated":{"harga_jual":1895000.0,"dpp":1737083.3333333335,"ppn":208450.0,"total":2103450.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":357,"no_seri_fpn":"04002500343239989","stated":{"harga_jual":1895000.0,"dpp":1737083.3333333335,"ppn":208450.0,"total":2103450.0}}}'::jsonb, v_actor_id, ('2025-10-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '20L-ELASTEX FIBER FLEX PU-05 GREY (PROJECT), 20L-NIPPON WBOND 8100 SEALER (PROJECT)', 1, 1895000.00
+      '20L-ELASTEX FIBER FLEX PU-05 GREY (PROJECT), 20L-NIPPON WBOND 8100 SEALER (PROJECT)', 1, 1895000.00, ('2025-10-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-10-002-1', 2103450.00, 'IDR',
-      'bank_transfer', '2025-10-20', 'Imported from historical register (row 357)', v_actor_id
+      'bank_transfer', '2025-10-20', 'Imported from historical register (row 357)', v_actor_id, ('2025-10-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12248,29 +12248,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/10/003', 'paid', 'IDR',
       '2025-10-23', 'ADD WORK PEK RENOVASI TK,SD,SMP SMH TOWNSITE I', 9000000.00, 0, 11, 12,
       12.000, 2.000, NULL, 8250000.00, 990000.00,
       180000.00, 0.00, 990000.00, 9810000.00, 9810000.00, '2025-12-17'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":358,"no_seri_fpn":"04002500343239990","no_po_customer":"YMHW-135","stated":{"harga_jual":9000000.0,"dpp":8250000.0,"ppn":990000.0,"pph":180000.0,"total":9810000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":358,"no_seri_fpn":"04002500343239990","no_po_customer":"YMHW-135","stated":{"harga_jual":9000000.0,"dpp":8250000.0,"ppn":990000.0,"pph":180000.0,"total":9810000.0}}}'::jsonb, v_actor_id, ('2025-10-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'ADD WORK PEK RENOVASI TK,SD,SMP SMH TOWNSITE I', 1, 9000000.00
+      'ADD WORK PEK RENOVASI TK,SD,SMP SMH TOWNSITE I', 1, 9000000.00, ('2025-10-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-10-003-1', 9810000.00, 'IDR',
-      'bank_transfer', '2025-12-17', 'Imported from historical register (row 358)', v_actor_id
+      'bank_transfer', '2025-12-17', 'Imported from historical register (row 358)', v_actor_id, ('2025-12-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12284,29 +12284,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/10/004', 'paid', 'IDR',
       '2025-10-29', 'ADD.EXT.PAINTING RTC BUILDING (FS)', 97782580.00, 0, 11, 12,
       12.000, 2.000, NULL, 89634031.67, 10756083.80,
       1955651.60, 0.00, 10756083.80, 106583012.20, 106583012.00, '2025-11-14'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":359,"no_seri_fpn":"04002500348135111","no_po_customer":"9000837050","plus_minus":"-0.20000000298023224","stated":{"harga_jual":97782580.0,"dpp":89634031.66666667,"ppn":10756083.8,"pph":1955651.6,"total":106583012.2}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":359,"no_seri_fpn":"04002500348135111","no_po_customer":"9000837050","plus_minus":"-0.20000000298023224","stated":{"harga_jual":97782580.0,"dpp":89634031.66666667,"ppn":10756083.8,"pph":1955651.6,"total":106583012.2}}}'::jsonb, v_actor_id, ('2025-10-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'ADD.EXT.PAINTING RTC BUILDING (FS)', 1, 97782580.00
+      'ADD.EXT.PAINTING RTC BUILDING (FS)', 1, 97782580.00, ('2025-10-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-10-004-1', 106583012.00, 'IDR',
-      'bank_transfer', '2025-11-14', 'Imported from historical register (row 359)', v_actor_id
+      'bank_transfer', '2025-11-14', 'Imported from historical register (row 359)', v_actor_id, ('2025-11-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12320,29 +12320,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/R9000765414', 'paid', 'IDR',
       '2025-10-31', 'RETENSI DRESSING TABLE+POUF,30SET WARDROBE 2DOORS WO MIRROR', 11600000.00, 0, 1, 1,
       0.000, NULL, NULL, 11600000.00, 0.00,
       0.00, 0.00, 0.00, 11600000.00, 11600000.00, '2025-11-14'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":360,"stated":{"harga_jual":11600000.0,"dpp":0.0,"ppn":0.0,"total":11600000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":360,"stated":{"harga_jual":11600000.0,"dpp":0.0,"ppn":0.0,"total":11600000.0}}}'::jsonb, v_actor_id, ('2025-10-31'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI DRESSING TABLE+POUF,30SET WARDROBE 2DOORS WO MIRROR', 1, 11600000.00
+      'RETENSI DRESSING TABLE+POUF,30SET WARDROBE 2DOORS WO MIRROR', 1, 11600000.00, ('2025-10-31'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-R9000765414-1', 11600000.00, 'IDR',
-      'bank_transfer', '2025-11-14', 'Imported from historical register (row 360)', v_actor_id
+      'bank_transfer', '2025-11-14', 'Imported from historical register (row 360)', v_actor_id, ('2025-11-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12356,29 +12356,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/11/001', 'paid', 'IDR',
       '2025-11-03', 'PENGECATAN TAPAK BOLLARD LAMP DAN LOBBY RGECC', 17475000.00, 0, 11, 12,
       12.000, 2.000, NULL, 16018750.00, 1922250.00,
       349500.00, 0.00, 1922250.00, 19047750.00, 19047750.00, '2025-11-06'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":361,"no_seri_fpn":"04002500353391912","stated":{"harga_jual":17475000.0,"dpp":16018750.0,"ppn":1922250.0,"pph":349500.0,"total":19047750.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":361,"no_seri_fpn":"04002500353391912","stated":{"harga_jual":17475000.0,"dpp":16018750.0,"ppn":1922250.0,"pph":349500.0,"total":19047750.0}}}'::jsonb, v_actor_id, ('2025-11-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PENGECATAN TAPAK BOLLARD LAMP DAN LOBBY RGECC', 1, 17475000.00
+      'PENGECATAN TAPAK BOLLARD LAMP DAN LOBBY RGECC', 1, 17475000.00, ('2025-11-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-11-001-1', 19047750.00, 'IDR',
-      'bank_transfer', '2025-11-06', 'Imported from historical register (row 361)', v_actor_id
+      'bank_transfer', '2025-11-06', 'Imported from historical register (row 361)', v_actor_id, ('2025-11-06'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12392,29 +12392,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/11/002', 'paid', 'IDR',
       '2025-11-05', '2CAN PL.8000 T.GREEN', 416000.00, 0, 11, 12,
       12.000, NULL, NULL, 381333.33, 45760.00,
       0.00, 0.00, 45760.00, 461760.00, 461760.00, '2025-11-24'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":362,"no_seri_fpn":"04002500358563588","no_po_customer":"3170036624","stated":{"harga_jual":416000.0,"dpp":381333.3333333334,"ppn":45760.0,"total":461760.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":362,"no_seri_fpn":"04002500358563588","no_po_customer":"3170036624","stated":{"harga_jual":416000.0,"dpp":381333.3333333334,"ppn":45760.0,"total":461760.0}}}'::jsonb, v_actor_id, ('2025-11-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '2CAN PL.8000 T.GREEN', 1, 416000.00
+      '2CAN PL.8000 T.GREEN', 1, 416000.00, ('2025-11-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-11-002-1', 461760.00, 'IDR',
-      'bank_transfer', '2025-11-24', 'Imported from historical register (row 362)', v_actor_id
+      'bank_transfer', '2025-11-24', 'Imported from historical register (row 362)', v_actor_id, ('2025-11-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12428,29 +12428,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/11/003', 'paid', 'IDR',
       '2025-11-05', '6CAN PL.8000 T.GREEN', 1248000.00, 0, 11, 12,
       12.000, NULL, NULL, 1144000.00, 137280.00,
       0.00, 0.00, 137280.00, 1385280.00, 1385280.00, '2025-11-24'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":363,"no_seri_fpn":"04002500358563587","no_po_customer":"3170035191","stated":{"harga_jual":1248000.0,"dpp":1144000.0,"ppn":137280.0,"total":1385280.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":363,"no_seri_fpn":"04002500358563587","no_po_customer":"3170035191","stated":{"harga_jual":1248000.0,"dpp":1144000.0,"ppn":137280.0,"total":1385280.0}}}'::jsonb, v_actor_id, ('2025-11-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '6CAN PL.8000 T.GREEN', 1, 1248000.00
+      '6CAN PL.8000 T.GREEN', 1, 1248000.00, ('2025-11-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-11-003-1', 1385280.00, 'IDR',
-      'bank_transfer', '2025-11-24', 'Imported from historical register (row 363)', v_actor_id
+      'bank_transfer', '2025-11-24', 'Imported from historical register (row 363)', v_actor_id, ('2025-11-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12464,29 +12464,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/11/004', 'paid', 'IDR',
       '2025-11-10', 'EPOXY STORAGE RGCC', 22500000.00, 0, 11, 12,
       12.000, 2.000, NULL, 20625000.00, 2475000.00,
       450000.00, 0.00, 2475000.00, 24525000.00, 24525000.00, '2025-11-20'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":364,"no_seri_fpn":"04002500363417615","no_po_customer":"9000835754","stated":{"harga_jual":22500000.0,"dpp":20625000.0,"ppn":2475000.0,"pph":450000.0,"total":24525000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":364,"no_seri_fpn":"04002500363417615","no_po_customer":"9000835754","stated":{"harga_jual":22500000.0,"dpp":20625000.0,"ppn":2475000.0,"pph":450000.0,"total":24525000.0}}}'::jsonb, v_actor_id, ('2025-11-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'EPOXY STORAGE RGCC', 1, 22500000.00
+      'EPOXY STORAGE RGCC', 1, 22500000.00, ('2025-11-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-11-004-1', 24525000.00, 'IDR',
-      'bank_transfer', '2025-11-20', 'Imported from historical register (row 364)', v_actor_id
+      'bank_transfer', '2025-11-20', 'Imported from historical register (row 364)', v_actor_id, ('2025-11-20'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12500,29 +12500,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/12/001', 'paid', 'IDR',
       '2025-12-11', '78CAN PL.8000 WHITE', 16224000.00, 0, 11, 12,
       12.000, NULL, NULL, 14872000.00, 1784640.00,
       0.00, 0.00, 1784640.00, 18008640.00, 18008640.00, '2025-12-19'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":365,"no_seri_fpn":"04002500409963021","no_po_customer":"9000837265","stated":{"harga_jual":16224000.0,"dpp":14872000.0,"ppn":1784640.0,"total":18008640.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":365,"no_seri_fpn":"04002500409963021","no_po_customer":"9000837265","stated":{"harga_jual":16224000.0,"dpp":14872000.0,"ppn":1784640.0,"total":18008640.0}}}'::jsonb, v_actor_id, ('2025-12-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '78CAN PL.8000 WHITE', 1, 16224000.00
+      '78CAN PL.8000 WHITE', 1, 16224000.00, ('2025-12-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-12-001-1', 18008640.00, 'IDR',
-      'bank_transfer', '2025-12-19', 'Imported from historical register (row 365)', v_actor_id
+      'bank_transfer', '2025-12-19', 'Imported from historical register (row 365)', v_actor_id, ('2025-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12536,29 +12536,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/12/002', 'paid', 'IDR',
       '2025-12-11', '18CAN PL.8000  BLUE', 3744000.00, 0, 11, 12,
       12.000, NULL, NULL, 3432000.00, 411840.00,
       0.00, 0.00, 411840.00, 4155840.00, 4155840.00, '2025-12-19'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":366,"no_seri_fpn":"04002500409963018","no_po_customer":"9000836080","stated":{"harga_jual":3744000.0,"dpp":3432000.0,"ppn":411840.0,"total":4155840.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":366,"no_seri_fpn":"04002500409963018","no_po_customer":"9000836080","stated":{"harga_jual":3744000.0,"dpp":3432000.0,"ppn":411840.0,"total":4155840.0}}}'::jsonb, v_actor_id, ('2025-12-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '18CAN PL.8000  BLUE', 1, 3744000.00
+      '18CAN PL.8000  BLUE', 1, 3744000.00, ('2025-12-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-12-002-1', 4155840.00, 'IDR',
-      'bank_transfer', '2025-12-19', 'Imported from historical register (row 366)', v_actor_id
+      'bank_transfer', '2025-12-19', 'Imported from historical register (row 366)', v_actor_id, ('2025-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12572,29 +12572,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/12/003', 'paid', 'IDR',
       '2025-12-11', '200CAN PL.8000 VERMILLION', 41600000.00, 0, 11, 12,
       12.000, NULL, NULL, 38133333.33, 4576000.00,
       0.00, 0.00, 4576000.00, 46176000.00, 46176000.00, '2025-12-19'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":367,"no_seri_fpn":"04002500409963022","no_po_customer":"9000802737","stated":{"harga_jual":41600000.0,"dpp":38133333.333333336,"ppn":4576000.0,"total":46176000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":367,"no_seri_fpn":"04002500409963022","no_po_customer":"9000802737","stated":{"harga_jual":41600000.0,"dpp":38133333.333333336,"ppn":4576000.0,"total":46176000.0}}}'::jsonb, v_actor_id, ('2025-12-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '200CAN PL.8000 VERMILLION', 1, 41600000.00
+      '200CAN PL.8000 VERMILLION', 1, 41600000.00, ('2025-12-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-12-003-1', 46176000.00, 'IDR',
-      'bank_transfer', '2025-12-19', 'Imported from historical register (row 367)', v_actor_id
+      'bank_transfer', '2025-12-19', 'Imported from historical register (row 367)', v_actor_id, ('2025-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12608,29 +12608,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/12/004', 'paid', 'IDR',
       '2025-12-11', '71CAN PL.8000 (60 SUNSHINE,21 BLUE)', 16848000.00, 0, 11, 12,
       12.000, NULL, NULL, 15444000.00, 1853280.00,
       0.00, 0.00, 1853280.00, 18701280.00, 18701280.00, '2025-12-19'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":368,"no_seri_fpn":"04002500409963023","no_po_customer":"9000802732","stated":{"harga_jual":16848000.0,"dpp":15444000.0,"ppn":1853280.0,"total":18701280.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":368,"no_seri_fpn":"04002500409963023","no_po_customer":"9000802732","stated":{"harga_jual":16848000.0,"dpp":15444000.0,"ppn":1853280.0,"total":18701280.0}}}'::jsonb, v_actor_id, ('2025-12-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '71CAN PL.8000 (60 SUNSHINE,21 BLUE)', 1, 16848000.00
+      '71CAN PL.8000 (60 SUNSHINE,21 BLUE)', 1, 16848000.00, ('2025-12-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-12-004-1', 18701280.00, 'IDR',
-      'bank_transfer', '2025-12-19', 'Imported from historical register (row 368)', v_actor_id
+      'bank_transfer', '2025-12-19', 'Imported from historical register (row 368)', v_actor_id, ('2025-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12644,29 +12644,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/12/005', 'paid', 'IDR',
       '2025-12-11', '50CAN PL.8000 TRAFFIC GREEN', 10400000.00, 0, 11, 12,
       12.000, NULL, NULL, 9533333.33, 1144000.00,
       0.00, 0.00, 1144000.00, 11544000.00, 11544000.00, '2025-12-19'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":369,"no_seri_fpn":"04002500409963019","no_po_customer":"9000842982","stated":{"harga_jual":10400000.0,"dpp":9533333.333333334,"ppn":1144000.0,"total":11544000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":369,"no_seri_fpn":"04002500409963019","no_po_customer":"9000842982","stated":{"harga_jual":10400000.0,"dpp":9533333.333333334,"ppn":1144000.0,"total":11544000.0}}}'::jsonb, v_actor_id, ('2025-12-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '50CAN PL.8000 TRAFFIC GREEN', 1, 10400000.00
+      '50CAN PL.8000 TRAFFIC GREEN', 1, 10400000.00, ('2025-12-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-12-005-1', 11544000.00, 'IDR',
-      'bank_transfer', '2025-12-19', 'Imported from historical register (row 369)', v_actor_id
+      'bank_transfer', '2025-12-19', 'Imported from historical register (row 369)', v_actor_id, ('2025-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12680,29 +12680,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/12/006', 'paid', 'IDR',
       '2025-12-11', '3CAN PL.8000 TRAFFIC GREEN', 624000.00, 0, 11, 12,
       12.000, NULL, NULL, 572000.00, 68640.00,
       0.00, 0.00, 68640.00, 692640.00, 692640.00, '2025-12-29'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":370,"no_seri_fpn":"04002500409963020","no_po_customer":"3170037132","stated":{"harga_jual":624000.0,"dpp":572000.0,"ppn":68640.0,"total":692640.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":370,"no_seri_fpn":"04002500409963020","no_po_customer":"3170037132","stated":{"harga_jual":624000.0,"dpp":572000.0,"ppn":68640.0,"total":692640.0}}}'::jsonb, v_actor_id, ('2025-12-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '3CAN PL.8000 TRAFFIC GREEN', 1, 624000.00
+      '3CAN PL.8000 TRAFFIC GREEN', 1, 624000.00, ('2025-12-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-12-006-1', 692640.00, 'IDR',
-      'bank_transfer', '2025-12-29', 'Imported from historical register (row 370)', v_actor_id
+      'bank_transfer', '2025-12-29', 'Imported from historical register (row 370)', v_actor_id, ('2025-12-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12716,29 +12716,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/12/013', 'paid', 'IDR',
       '2025-12-17', '40CAN PL.8000  (10VERMILLION,10SUNSHINE,10BLUE,10WHITE)', 8320000.00, 0, 11, 12,
       12.000, NULL, NULL, 7626666.67, 915200.00,
       0.00, 0.00, 915200.00, 9235200.00, 9235200.00, '2026-01-09'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":371,"no_seri_fpn":"0400250042089542 0","no_po_customer":"9000816700","stated":{"harga_jual":8320000.0,"dpp":7626666.666666667,"ppn":915200.0,"total":9235200.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":371,"no_seri_fpn":"0400250042089542 0","no_po_customer":"9000816700","stated":{"harga_jual":8320000.0,"dpp":7626666.666666667,"ppn":915200.0,"total":9235200.0}}}'::jsonb, v_actor_id, ('2025-12-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '40CAN PL.8000  (10VERMILLION,10SUNSHINE,10BLUE,10WHITE)', 1, 8320000.00
+      '40CAN PL.8000  (10VERMILLION,10SUNSHINE,10BLUE,10WHITE)', 1, 8320000.00, ('2025-12-17'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-12-013-1', 9235200.00, 'IDR',
-      'bank_transfer', '2026-01-09', 'Imported from historical register (row 371)', v_actor_id
+      'bank_transfer', '2026-01-09', 'Imported from historical register (row 371)', v_actor_id, ('2026-01-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12752,29 +12752,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/12/014', 'paid', 'IDR',
       '2025-12-19', 'PROGRESS IV FINAL LANDSCAPE PEDESTRIAN DAN DRAINASE', 414362960.00, 0, 11, 12,
       12.000, 2.000, 5.000, 379832713.33, 45579925.60,
       8287259.20, 20718148.00, 45579925.60, 430937478.40, 430937478.00, '2026-01-09'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":372,"no_seri_fpn":"04002500426251713","no_po_customer":"9000791224","plus_minus":"-0.40000003576278687","stated":{"harga_jual":414362960.0,"dpp":379832713.3333334,"ppn":45579925.6,"pph":8287259.2,"retensi":20718148.0,"total":430937478.40000004}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":372,"no_seri_fpn":"04002500426251713","no_po_customer":"9000791224","plus_minus":"-0.40000003576278687","stated":{"harga_jual":414362960.0,"dpp":379832713.3333334,"ppn":45579925.6,"pph":8287259.2,"retensi":20718148.0,"total":430937478.40000004}}}'::jsonb, v_actor_id, ('2025-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS IV FINAL LANDSCAPE PEDESTRIAN DAN DRAINASE', 1, 414362960.00
+      'PROGRESS IV FINAL LANDSCAPE PEDESTRIAN DAN DRAINASE', 1, 414362960.00, ('2025-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-12-014-1', 430937478.00, 'IDR',
-      'bank_transfer', '2026-01-09', 'Imported from historical register (row 372)', v_actor_id
+      'bank_transfer', '2026-01-09', 'Imported from historical register (row 372)', v_actor_id, ('2026-01-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12788,29 +12788,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/12/015', 'paid', 'IDR',
       '2025-12-19', 'PROGRESS IV FINAL PEK TOILET DAN TUGU BOLA TB PANGKER', 120775784.00, 0, 11, 12,
       12.000, 2.000, 5.000, 110711135.33, 13285336.24,
       2415515.68, 6038789.20, 13285336.24, 125606815.36, 125606815.00, '2026-01-09'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":373,"no_seri_fpn":"04002500426251715","no_po_customer":"9000787221","plus_minus":"-0.35999998450279236","stated":{"harga_jual":120775784.0,"dpp":110711135.33333334,"ppn":13285336.24,"pph":2415515.68,"retensi":6038789.2,"total":125606815.35999998}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":373,"no_seri_fpn":"04002500426251715","no_po_customer":"9000787221","plus_minus":"-0.35999998450279236","stated":{"harga_jual":120775784.0,"dpp":110711135.33333334,"ppn":13285336.24,"pph":2415515.68,"retensi":6038789.2,"total":125606815.35999998}}}'::jsonb, v_actor_id, ('2025-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS IV FINAL PEK TOILET DAN TUGU BOLA TB PANGKER', 1, 120775784.00
+      'PROGRESS IV FINAL PEK TOILET DAN TUGU BOLA TB PANGKER', 1, 120775784.00, ('2025-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-12-015-1', 125606815.00, 'IDR',
-      'bank_transfer', '2026-01-09', 'Imported from historical register (row 373)', v_actor_id
+      'bank_transfer', '2026-01-09', 'Imported from historical register (row 373)', v_actor_id, ('2026-01-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12824,29 +12824,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/12/016', 'paid', 'IDR',
       '2025-12-19', 'PROGRESS II ADD PEK ADDITIONAL WORK', 170069424.00, 0, 11, 12,
       12.000, 2.000, 5.000, 155896972.00, 18707636.64,
       3401388.48, 8503471.20, 18707636.64, 176872200.96, 176872200.96, '2026-01-09'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":374,"no_seri_fpn":"04012500426251714","no_po_customer":"9000814169","plus_minus":"0.03999999165534973","stated":{"harga_jual":170069424.0,"dpp":155896972.0,"ppn":18707636.64,"pph":3401388.48,"retensi":8503471.200000001,"total":176872200.96}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":374,"no_seri_fpn":"04012500426251714","no_po_customer":"9000814169","plus_minus":"0.03999999165534973","stated":{"harga_jual":170069424.0,"dpp":155896972.0,"ppn":18707636.64,"pph":3401388.48,"retensi":8503471.200000001,"total":176872200.96}}}'::jsonb, v_actor_id, ('2025-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS II ADD PEK ADDITIONAL WORK', 1, 170069424.00
+      'PROGRESS II ADD PEK ADDITIONAL WORK', 1, 170069424.00, ('2025-12-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-12-016-1', 176872200.96, 'IDR',
-      'bank_transfer', '2026-01-09', 'Imported from historical register (row 374)', v_actor_id
+      'bank_transfer', '2026-01-09', 'Imported from historical register (row 374)', v_actor_id, ('2026-01-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12860,29 +12860,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2025/AWP/12/017', 'paid', 'IDR',
       '2025-12-23', '162CAN PL.8000 VERMILLION', 33696000.00, 0, 11, 12,
       12.000, NULL, NULL, 30888000.00, 3706560.00,
       0.00, 0.00, 3706560.00, 37402560.00, 37402560.00, '2026-01-09'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":375,"no_seri_fpn":"04002500429854336","no_po_customer":"9000802737","stated":{"harga_jual":33696000.0,"dpp":30888000.0,"ppn":3706560.0,"total":37402560.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":375,"no_seri_fpn":"04002500429854336","no_po_customer":"9000802737","stated":{"harga_jual":33696000.0,"dpp":30888000.0,"ppn":3706560.0,"total":37402560.0}}}'::jsonb, v_actor_id, ('2025-12-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '162CAN PL.8000 VERMILLION', 1, 33696000.00
+      '162CAN PL.8000 VERMILLION', 1, 33696000.00, ('2025-12-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2025-AWP-12-017-1', 37402560.00, 'IDR',
-      'bank_transfer', '2026-01-09', 'Imported from historical register (row 375)', v_actor_id
+      'bank_transfer', '2026-01-09', 'Imported from historical register (row 375)', v_actor_id, ('2026-01-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12896,29 +12896,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/01/001', 'paid', 'IDR',
       '2026-01-13', '286CAN PL.8000  (168SUNSHINE,4BLUE,114WHITE)', 59488000.00, 0, 11, 12,
       12.000, NULL, NULL, 54530666.67, 6543680.00,
       0.00, 0.00, 6543680.00, 66031680.00, 66031680.00, '2026-01-23'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":376,"no_seri_fpn":"04002600006667866","no_po_customer":"9000802732","stated":{"harga_jual":59488000.0,"dpp":54530666.66666667,"ppn":6543680.0,"total":66031680.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":376,"no_seri_fpn":"04002600006667866","no_po_customer":"9000802732","stated":{"harga_jual":59488000.0,"dpp":54530666.66666667,"ppn":6543680.0,"total":66031680.0}}}'::jsonb, v_actor_id, ('2026-01-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '286CAN PL.8000  (168SUNSHINE,4BLUE,114WHITE)', 1, 59488000.00
+      '286CAN PL.8000  (168SUNSHINE,4BLUE,114WHITE)', 1, 59488000.00, ('2026-01-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-01-001-1', 66031680.00, 'IDR',
-      'bank_transfer', '2026-01-23', 'Imported from historical register (row 376)', v_actor_id
+      'bank_transfer', '2026-01-23', 'Imported from historical register (row 376)', v_actor_id, ('2026-01-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12932,29 +12932,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/01/002', 'paid', 'IDR',
       '2026-01-13', '145CAN PL.8000 VERMILLION', 30160000.00, 0, 11, 12,
       12.000, NULL, NULL, 27646666.67, 3317600.00,
       0.00, 0.00, 3317600.00, 33477600.00, 33477600.00, '2026-01-23'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":377,"no_seri_fpn":"04002600006667865","no_po_customer":"9000802737","stated":{"harga_jual":30160000.0,"dpp":27646666.666666668,"ppn":3317600.0,"total":33477600.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":377,"no_seri_fpn":"04002600006667865","no_po_customer":"9000802737","stated":{"harga_jual":30160000.0,"dpp":27646666.666666668,"ppn":3317600.0,"total":33477600.0}}}'::jsonb, v_actor_id, ('2026-01-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '145CAN PL.8000 VERMILLION', 1, 30160000.00
+      '145CAN PL.8000 VERMILLION', 1, 30160000.00, ('2026-01-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-01-002-1', 33477600.00, 'IDR',
-      'bank_transfer', '2026-01-23', 'Imported from historical register (row 377)', v_actor_id
+      'bank_transfer', '2026-01-23', 'Imported from historical register (row 377)', v_actor_id, ('2026-01-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -12968,29 +12968,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/01/003', 'paid', 'IDR',
       '2026-01-19', 'PROGRESS 1 RENOVASI FASILITAS TERMINAL AIRSTRP', 200323030.00, 0, 11, 12,
       12.000, 2.000, 5.000, 183629444.17, 22035533.30,
       4006460.60, 10016151.50, 22035533.30, 208335951.20, 208335951.00, '2026-02-13'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":378,"no_seri_fpn":"04002600009457824","no_po_customer":"9000829632","plus_minus":"-0.20000001788139343","stated":{"harga_jual":200323030.0,"dpp":183629444.1666667,"ppn":22035533.3,"pph":4006460.6,"retensi":10016151.5,"total":208335951.20000002}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":378,"no_seri_fpn":"04002600009457824","no_po_customer":"9000829632","plus_minus":"-0.20000001788139343","stated":{"harga_jual":200323030.0,"dpp":183629444.1666667,"ppn":22035533.3,"pph":4006460.6,"retensi":10016151.5,"total":208335951.20000002}}}'::jsonb, v_actor_id, ('2026-01-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 1 RENOVASI FASILITAS TERMINAL AIRSTRP', 1, 200323030.00
+      'PROGRESS 1 RENOVASI FASILITAS TERMINAL AIRSTRP', 1, 200323030.00, ('2026-01-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-01-003-1', 208335951.00, 'IDR',
-      'bank_transfer', '2026-02-13', 'Imported from historical register (row 378)', v_actor_id
+      'bank_transfer', '2026-02-13', 'Imported from historical register (row 378)', v_actor_id, ('2026-02-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13004,29 +13004,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/02/001', 'paid', 'IDR',
       '2026-02-03', '280CAN PL 8000 (50SUNSHINE,4OBLUE,190WHITE)', 58240000.00, 0, 11, 12,
       12.000, NULL, NULL, 53386666.67, 6406400.00,
       0.00, 0.00, 6406400.00, 64646400.00, 64646400.00, '2026-02-13'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":379,"no_seri_fpn":"04002600025750261","no_po_customer":"9000802732","stated":{"harga_jual":58240000.0,"dpp":53386666.66666667,"ppn":6406400.0,"total":64646400.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":379,"no_seri_fpn":"04002600025750261","no_po_customer":"9000802732","stated":{"harga_jual":58240000.0,"dpp":53386666.66666667,"ppn":6406400.0,"total":64646400.0}}}'::jsonb, v_actor_id, ('2026-02-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '280CAN PL 8000 (50SUNSHINE,4OBLUE,190WHITE)', 1, 58240000.00
+      '280CAN PL 8000 (50SUNSHINE,4OBLUE,190WHITE)', 1, 58240000.00, ('2026-02-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-02-001-1', 64646400.00, 'IDR',
-      'bank_transfer', '2026-02-13', 'Imported from historical register (row 379)', v_actor_id
+      'bank_transfer', '2026-02-13', 'Imported from historical register (row 379)', v_actor_id, ('2026-02-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13040,29 +13040,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/02/002', 'paid', 'IDR',
       '2026-02-03', '110CAN PL.8000 VERMILLION', 22880000.00, 0, 11, 12,
       12.000, NULL, NULL, 20973333.33, 2516800.00,
       0.00, 0.00, 2516800.00, 25396800.00, 25396800.00, '2026-02-13'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":380,"no_seri_fpn":"04002600025750263","no_po_customer":"9000802737","stated":{"harga_jual":22880000.0,"dpp":20973333.333333336,"ppn":2516800.0,"total":25396800.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":380,"no_seri_fpn":"04002600025750263","no_po_customer":"9000802737","stated":{"harga_jual":22880000.0,"dpp":20973333.333333336,"ppn":2516800.0,"total":25396800.0}}}'::jsonb, v_actor_id, ('2026-02-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '110CAN PL.8000 VERMILLION', 1, 22880000.00
+      '110CAN PL.8000 VERMILLION', 1, 22880000.00, ('2026-02-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-02-002-1', 25396800.00, 'IDR',
-      'bank_transfer', '2026-02-13', 'Imported from historical register (row 380)', v_actor_id
+      'bank_transfer', '2026-02-13', 'Imported from historical register (row 380)', v_actor_id, ('2026-02-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13076,29 +13076,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/02/003', 'paid', 'IDR',
       '2026-02-03', '50CAN PL.8000  BLUE', 10400000.00, 0, 11, 12,
       12.000, NULL, NULL, 9533333.33, 1144000.00,
       0.00, 0.00, 1144000.00, 11544000.00, 11544000.00, '2026-02-13'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":381,"no_seri_fpn":"04002600025750259","no_po_customer":"9000842362","stated":{"harga_jual":10400000.0,"dpp":9533333.333333334,"ppn":1144000.0,"total":11544000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":381,"no_seri_fpn":"04002600025750259","no_po_customer":"9000842362","stated":{"harga_jual":10400000.0,"dpp":9533333.333333334,"ppn":1144000.0,"total":11544000.0}}}'::jsonb, v_actor_id, ('2026-02-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '50CAN PL.8000  BLUE', 1, 10400000.00
+      '50CAN PL.8000  BLUE', 1, 10400000.00, ('2026-02-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-02-003-1', 11544000.00, 'IDR',
-      'bank_transfer', '2026-02-13', 'Imported from historical register (row 381)', v_actor_id
+      'bank_transfer', '2026-02-13', 'Imported from historical register (row 381)', v_actor_id, ('2026-02-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13112,29 +13112,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/02/004', 'paid', 'IDR',
       '2026-02-03', '50CAN PL.8000  BLUE', 10400000.00, 0, 11, 12,
       12.000, NULL, NULL, 9533333.33, 1144000.00,
       0.00, 0.00, 1144000.00, 11544000.00, 11544000.00, '2026-02-13'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":382,"no_seri_fpn":"04002600025750262","no_po_customer":"9000836080","stated":{"harga_jual":10400000.0,"dpp":9533333.333333334,"ppn":1144000.0,"total":11544000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":382,"no_seri_fpn":"04002600025750262","no_po_customer":"9000836080","stated":{"harga_jual":10400000.0,"dpp":9533333.333333334,"ppn":1144000.0,"total":11544000.0}}}'::jsonb, v_actor_id, ('2026-02-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '50CAN PL.8000  BLUE', 1, 10400000.00
+      '50CAN PL.8000  BLUE', 1, 10400000.00, ('2026-02-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-02-004-1', 11544000.00, 'IDR',
-      'bank_transfer', '2026-02-13', 'Imported from historical register (row 382)', v_actor_id
+      'bank_transfer', '2026-02-13', 'Imported from historical register (row 382)', v_actor_id, ('2026-02-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13148,29 +13148,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/02/005', 'paid', 'IDR',
       '2026-02-03', '59CAN 1L-NIPPE 2000 - 480 SUPER   BLACK', 5841000.00, 0, 11, 12,
       12.000, NULL, NULL, 5354250.00, 642510.00,
       0.00, 0.00, 642510.00, 6483510.00, 6483510.00, '2026-02-12'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":383,"no_seri_fpn":"400260002575026 0","no_po_customer":"3170037815","stated":{"harga_jual":5841000.0,"dpp":5354250.0,"ppn":642510.0,"total":6483510.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":383,"no_seri_fpn":"400260002575026 0","no_po_customer":"3170037815","stated":{"harga_jual":5841000.0,"dpp":5354250.0,"ppn":642510.0,"total":6483510.0}}}'::jsonb, v_actor_id, ('2026-02-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '59CAN 1L-NIPPE 2000 - 480 SUPER   BLACK', 1, 5841000.00
+      '59CAN 1L-NIPPE 2000 - 480 SUPER   BLACK', 1, 5841000.00, ('2026-02-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-02-005-1', 6483510.00, 'IDR',
-      'bank_transfer', '2026-02-12', 'Imported from historical register (row 383)', v_actor_id
+      'bank_transfer', '2026-02-12', 'Imported from historical register (row 383)', v_actor_id, ('2026-02-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13184,29 +13184,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/02/006', 'paid', 'IDR',
       '2026-02-03', '5CAN PL.8000 (1 BLUE,2SUNSHINE,2VERMILLION)', 1040000.00, 0, 11, 12,
       12.000, NULL, NULL, 953333.33, 114400.00,
       0.00, 0.00, 114400.00, 1154400.00, 1154400.00, '2026-02-12'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":384,"no_seri_fpn":"04002600025750258","no_po_customer":"3170037711","stated":{"harga_jual":1040000.0,"dpp":953333.3333333334,"ppn":114400.0,"total":1154400.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":384,"no_seri_fpn":"04002600025750258","no_po_customer":"3170037711","stated":{"harga_jual":1040000.0,"dpp":953333.3333333334,"ppn":114400.0,"total":1154400.0}}}'::jsonb, v_actor_id, ('2026-02-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '5CAN PL.8000 (1 BLUE,2SUNSHINE,2VERMILLION)', 1, 1040000.00
+      '5CAN PL.8000 (1 BLUE,2SUNSHINE,2VERMILLION)', 1, 1040000.00, ('2026-02-03'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-02-006-1', 1154400.00, 'IDR',
-      'bank_transfer', '2026-02-12', 'Imported from historical register (row 384)', v_actor_id
+      'bank_transfer', '2026-02-12', 'Imported from historical register (row 384)', v_actor_id, ('2026-02-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13220,29 +13220,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/03/001', 'paid', 'IDR',
       '2026-03-02', '3CAN PL.8000 TRAFFIC GREEN', 624000.00, 0, 11, 12,
       12.000, NULL, NULL, 572000.00, 68640.00,
       0.00, 0.00, 68640.00, 692640.00, 692640.00, '2026-04-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":385,"no_seri_fpn":"04002600097156767","no_po_customer":"3170037711","stated":{"harga_jual":624000.0,"dpp":572000.0,"ppn":68640.0,"total":692640.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":385,"no_seri_fpn":"04002600097156767","no_po_customer":"3170037711","stated":{"harga_jual":624000.0,"dpp":572000.0,"ppn":68640.0,"total":692640.0}}}'::jsonb, v_actor_id, ('2026-03-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '3CAN PL.8000 TRAFFIC GREEN', 1, 624000.00
+      '3CAN PL.8000 TRAFFIC GREEN', 1, 624000.00, ('2026-03-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-03-001-1', 692640.00, 'IDR',
-      'bank_transfer', '2026-04-10', 'Imported from historical register (row 385)', v_actor_id
+      'bank_transfer', '2026-04-10', 'Imported from historical register (row 385)', v_actor_id, ('2026-04-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13256,29 +13256,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/03/002', 'paid', 'IDR',
       '2026-03-07', '5CAN NIPPON PAINT ZINC CHROMATE GREY', 1300000.00, 0, 11, 12,
       12.000, NULL, NULL, 1191666.67, 143000.00,
       0.00, 0.00, 143000.00, 1443000.00, 1443000.00, '2026-04-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":386,"no_seri_fpn":"04002600097156769","no_po_customer":"9000853357","stated":{"harga_jual":1300000.0,"dpp":1191666.6666666667,"ppn":143000.0,"total":1443000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":386,"no_seri_fpn":"04002600097156769","no_po_customer":"9000853357","stated":{"harga_jual":1300000.0,"dpp":1191666.6666666667,"ppn":143000.0,"total":1443000.0}}}'::jsonb, v_actor_id, ('2026-03-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '5CAN NIPPON PAINT ZINC CHROMATE GREY', 1, 1300000.00
+      '5CAN NIPPON PAINT ZINC CHROMATE GREY', 1, 1300000.00, ('2026-03-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-03-002-1', 1443000.00, 'IDR',
-      'bank_transfer', '2026-04-10', 'Imported from historical register (row 386)', v_actor_id
+      'bank_transfer', '2026-04-10', 'Imported from historical register (row 386)', v_actor_id, ('2026-04-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13292,29 +13292,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/03/003R', 'paid', 'IDR',
       '2026-03-25', 'RETENSI RENOVASI TK,SD,SMP SMH TOWNSITE I', 25000000.00, 0, 1, 1,
       0.000, NULL, NULL, 25000000.00, 0.00,
       0.00, 0.00, 0.00, 25000000.00, 25000000.00, '2026-04-22'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":387,"no_po_customer":"YMHW-068","stated":{"harga_jual":25000000.0,"dpp":0.0,"ppn":0.0,"total":25000000.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":387,"no_po_customer":"YMHW-068","stated":{"harga_jual":25000000.0,"dpp":0.0,"ppn":0.0,"total":25000000.0}}}'::jsonb, v_actor_id, ('2026-03-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI RENOVASI TK,SD,SMP SMH TOWNSITE I', 1, 25000000.00
+      'RETENSI RENOVASI TK,SD,SMP SMH TOWNSITE I', 1, 25000000.00, ('2026-03-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-03-003R-1', 25000000.00, 'IDR',
-      'bank_transfer', '2026-04-22', 'Imported from historical register (row 387)', v_actor_id
+      'bank_transfer', '2026-04-22', 'Imported from historical register (row 387)', v_actor_id, ('2026-04-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13328,29 +13328,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/03/004R', 'paid', 'IDR',
       '2026-03-25', 'RETENSI EXT PAINTING RTC BUILDING FS', 13624218.00, 0, 1, 1,
       0.000, NULL, NULL, 13624218.00, 0.00,
       0.00, 0.00, 0.00, 13624218.00, 13624218.00, '2026-04-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":388,"no_po_customer":"9000810624","stated":{"harga_jual":13624218.0,"dpp":0.0,"ppn":0.0,"total":13624218.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":388,"no_po_customer":"9000810624","stated":{"harga_jual":13624218.0,"dpp":0.0,"ppn":0.0,"total":13624218.0}}}'::jsonb, v_actor_id, ('2026-03-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI EXT PAINTING RTC BUILDING FS', 1, 13624218.00
+      'RETENSI EXT PAINTING RTC BUILDING FS', 1, 13624218.00, ('2026-03-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-03-004R-1', 13624218.00, 'IDR',
-      'bank_transfer', '2026-04-10', 'Imported from historical register (row 388)', v_actor_id
+      'bank_transfer', '2026-04-10', 'Imported from historical register (row 388)', v_actor_id, ('2026-04-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13364,29 +13364,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/03/005R', 'paid', 'IDR',
       '2026-03-25', 'RETENSI ADD.PEKERJAAN ADDITIONAL WORK', 26466091.00, 0, 1, 1,
       0.000, NULL, NULL, 26466091.00, 0.00,
       0.00, 0.00, 0.00, 26466091.00, 26466091.00, '2026-04-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":389,"no_po_customer":"9000814169","stated":{"harga_jual":26466091.0,"dpp":0.0,"ppn":0.0,"total":26466091.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":389,"no_po_customer":"9000814169","stated":{"harga_jual":26466091.0,"dpp":0.0,"ppn":0.0,"total":26466091.0}}}'::jsonb, v_actor_id, ('2026-03-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI ADD.PEKERJAAN ADDITIONAL WORK', 1, 26466091.00
+      'RETENSI ADD.PEKERJAAN ADDITIONAL WORK', 1, 26466091.00, ('2026-03-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-03-005R-1', 26466091.00, 'IDR',
-      'bank_transfer', '2026-04-10', 'Imported from historical register (row 389)', v_actor_id
+      'bank_transfer', '2026-04-10', 'Imported from historical register (row 389)', v_actor_id, ('2026-04-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13400,29 +13400,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/03/006R', 'paid', 'IDR',
       '2026-03-25', 'RETENSI PEKERAAN TOILET DAN TUGU BOLA TB PANGKER', 39311578.00, 0, 1, 1,
       0.000, NULL, NULL, 39311578.00, 0.00,
       0.00, 0.00, 0.00, 39311578.00, 39311578.00, '2026-04-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":390,"no_po_customer":"9000787221","stated":{"harga_jual":39311578.0,"dpp":0.0,"ppn":0.0,"total":39311578.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":390,"no_po_customer":"9000787221","stated":{"harga_jual":39311578.0,"dpp":0.0,"ppn":0.0,"total":39311578.0}}}'::jsonb, v_actor_id, ('2026-03-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI PEKERAAN TOILET DAN TUGU BOLA TB PANGKER', 1, 39311578.00
+      'RETENSI PEKERAAN TOILET DAN TUGU BOLA TB PANGKER', 1, 39311578.00, ('2026-03-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-03-006R-1', 39311578.00, 'IDR',
-      'bank_transfer', '2026-04-10', 'Imported from historical register (row 390)', v_actor_id
+      'bank_transfer', '2026-04-10', 'Imported from historical register (row 390)', v_actor_id, ('2026-04-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13436,29 +13436,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/03/007R', 'paid', 'IDR',
       '2026-03-25', 'RETENSI LANDSCAPE PEDESTRIAN DAN DRAINANSE', 96542043.00, 0, 1, 1,
       0.000, NULL, NULL, 96542043.00, 0.00,
       0.00, 0.00, 0.00, 96542043.00, 96542043.00, '2026-04-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":391,"no_po_customer":"9000791224","stated":{"harga_jual":96542043.0,"dpp":0.0,"ppn":0.0,"total":96542043.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":391,"no_po_customer":"9000791224","stated":{"harga_jual":96542043.0,"dpp":0.0,"ppn":0.0,"total":96542043.0}}}'::jsonb, v_actor_id, ('2026-03-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI LANDSCAPE PEDESTRIAN DAN DRAINANSE', 1, 96542043.00
+      'RETENSI LANDSCAPE PEDESTRIAN DAN DRAINANSE', 1, 96542043.00, ('2026-03-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-03-007R-1', 96542043.00, 'IDR',
-      'bank_transfer', '2026-04-10', 'Imported from historical register (row 391)', v_actor_id
+      'bank_transfer', '2026-04-10', 'Imported from historical register (row 391)', v_actor_id, ('2026-04-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13472,29 +13472,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/04/001', 'paid', 'IDR',
       '2026-04-02', '45CAN PL.8000  BLUE', 9360000.00, 0, 11, 12,
       12.000, NULL, NULL, 8580000.00, 1029600.00,
       0.00, 0.00, 1029600.00, 10389600.00, 10389600.00, '2026-04-24'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":392,"no_seri_fpn":"04002600118426142","no_po_customer":"9000852628","stated":{"harga_jual":9360000.0,"dpp":8580000.0,"ppn":1029600.0,"total":10389600.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":392,"no_seri_fpn":"04002600118426142","no_po_customer":"9000852628","stated":{"harga_jual":9360000.0,"dpp":8580000.0,"ppn":1029600.0,"total":10389600.0}}}'::jsonb, v_actor_id, ('2026-04-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '45CAN PL.8000  BLUE', 1, 9360000.00
+      '45CAN PL.8000  BLUE', 1, 9360000.00, ('2026-04-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-04-001-1', 10389600.00, 'IDR',
-      'bank_transfer', '2026-04-24', 'Imported from historical register (row 392)', v_actor_id
+      'bank_transfer', '2026-04-24', 'Imported from historical register (row 392)', v_actor_id, ('2026-04-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13508,29 +13508,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/04/002', 'paid', 'IDR',
       '2026-04-02', '10CAN PL.8000  BLACK', 2080000.00, 0, 11, 12,
       12.000, NULL, NULL, 1906666.67, 228800.00,
       0.00, 0.00, 228800.00, 2308800.00, 2308800.00, '2026-04-24'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":393,"no_seri_fpn":"04002600118426145","no_po_customer":"9000861180","stated":{"harga_jual":2080000.0,"dpp":1906666.6666666667,"ppn":228800.0,"total":2308800.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":393,"no_seri_fpn":"04002600118426145","no_po_customer":"9000861180","stated":{"harga_jual":2080000.0,"dpp":1906666.6666666667,"ppn":228800.0,"total":2308800.0}}}'::jsonb, v_actor_id, ('2026-04-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '10CAN PL.8000  BLACK', 1, 2080000.00
+      '10CAN PL.8000  BLACK', 1, 2080000.00, ('2026-04-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-04-002-1', 2308800.00, 'IDR',
-      'bank_transfer', '2026-04-24', 'Imported from historical register (row 393)', v_actor_id
+      'bank_transfer', '2026-04-24', 'Imported from historical register (row 393)', v_actor_id, ('2026-04-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13544,29 +13544,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/04/003', 'paid', 'IDR',
       '2026-04-02', '51CAN PL.8000 VERMILLION', 10608000.00, 0, 11, 12,
       12.000, NULL, NULL, 9724000.00, 1166880.00,
       0.00, 0.00, 1166880.00, 11774880.00, 11774880.00, '2026-04-24'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":394,"no_seri_fpn":"04002600118426144","no_po_customer":"9000862487","stated":{"harga_jual":10608000.0,"dpp":9724000.0,"ppn":1166880.0,"total":11774880.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":394,"no_seri_fpn":"04002600118426144","no_po_customer":"9000862487","stated":{"harga_jual":10608000.0,"dpp":9724000.0,"ppn":1166880.0,"total":11774880.0}}}'::jsonb, v_actor_id, ('2026-04-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '51CAN PL.8000 VERMILLION', 1, 10608000.00
+      '51CAN PL.8000 VERMILLION', 1, 10608000.00, ('2026-04-02'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-04-003-1', 11774880.00, 'IDR',
-      'bank_transfer', '2026-04-24', 'Imported from historical register (row 394)', v_actor_id
+      'bank_transfer', '2026-04-24', 'Imported from historical register (row 394)', v_actor_id, ('2026-04-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13580,29 +13580,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/04/004', 'paid', 'IDR',
       '2026-04-04', '347CAN PL.8000 (66SUNSHINE,185BLUE,96WHITE)', 72176000.00, 0, 11, 12,
       12.000, NULL, NULL, 66161333.33, 7939360.00,
       0.00, 0.00, 7939360.00, 80115360.00, 80115360.00, '2026-04-24'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":395,"no_seri_fpn":"04002600118426143","no_po_customer":"9000802732","stated":{"harga_jual":72176000.0,"dpp":66161333.333333336,"ppn":7939360.0,"total":80115360.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":395,"no_seri_fpn":"04002600118426143","no_po_customer":"9000802732","stated":{"harga_jual":72176000.0,"dpp":66161333.333333336,"ppn":7939360.0,"total":80115360.0}}}'::jsonb, v_actor_id, ('2026-04-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '347CAN PL.8000 (66SUNSHINE,185BLUE,96WHITE)', 1, 72176000.00
+      '347CAN PL.8000 (66SUNSHINE,185BLUE,96WHITE)', 1, 72176000.00, ('2026-04-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-04-004-1', 80115360.00, 'IDR',
-      'bank_transfer', '2026-04-24', 'Imported from historical register (row 395)', v_actor_id
+      'bank_transfer', '2026-04-24', 'Imported from historical register (row 395)', v_actor_id, ('2026-04-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13616,29 +13616,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/04/005', 'paid', 'IDR',
       '2026-04-04', '83CAN PL.8000 VERMILLION', 17264000.00, 0, 11, 12,
       12.000, NULL, NULL, 15825333.33, 1899040.00,
       0.00, 0.00, 1899040.00, 19163040.00, 19163040.00, '2026-04-24'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":396,"no_seri_fpn":"04002600118426146","no_po_customer":"9000802737","stated":{"harga_jual":17264000.0,"dpp":15825333.333333334,"ppn":1899040.0,"total":19163040.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":396,"no_seri_fpn":"04002600118426146","no_po_customer":"9000802737","stated":{"harga_jual":17264000.0,"dpp":15825333.333333334,"ppn":1899040.0,"total":19163040.0}}}'::jsonb, v_actor_id, ('2026-04-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '83CAN PL.8000 VERMILLION', 1, 17264000.00
+      '83CAN PL.8000 VERMILLION', 1, 17264000.00, ('2026-04-04'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-04-005-1', 19163040.00, 'IDR',
-      'bank_transfer', '2026-04-24', 'Imported from historical register (row 396)', v_actor_id
+      'bank_transfer', '2026-04-24', 'Imported from historical register (row 396)', v_actor_id, ('2026-04-24'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13652,29 +13652,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/04/006', 'paid', 'IDR',
       '2026-04-14', 'PROGRESS 1 PENGECATAN DAK BETON & CABLE TRAY', 222390000.00, 0, 11, 12,
       12.000, 2.000, 5.000, 203857500.00, 24462900.00,
       4447800.00, 11119500.00, 24462900.00, 231285600.00, 231285600.00, '2026-04-29'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":397,"no_seri_fpn":"04002600132723919","no_po_customer":"9000859243","stated":{"harga_jual":222390000.0,"dpp":203857500.0,"ppn":24462900.0,"pph":4447800.0,"retensi":11119500.0,"total":231285600.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":397,"no_seri_fpn":"04002600132723919","no_po_customer":"9000859243","stated":{"harga_jual":222390000.0,"dpp":203857500.0,"ppn":24462900.0,"pph":4447800.0,"retensi":11119500.0,"total":231285600.0}}}'::jsonb, v_actor_id, ('2026-04-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'PROGRESS 1 PENGECATAN DAK BETON & CABLE TRAY', 1, 222390000.00
+      'PROGRESS 1 PENGECATAN DAK BETON & CABLE TRAY', 1, 222390000.00, ('2026-04-14'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-04-006-1', 231285600.00, 'IDR',
-      'bank_transfer', '2026-04-29', 'Imported from historical register (row 397)', v_actor_id
+      'bank_transfer', '2026-04-29', 'Imported from historical register (row 397)', v_actor_id, ('2026-04-29'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13688,29 +13688,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/04/008', 'paid', 'IDR',
       '2026-04-23', '25CAN NIPPE 2000- NP437 PURPLE', 2475000.00, 0, 11, 12,
       12.000, NULL, NULL, 2268750.00, 272250.00,
       0.00, 0.00, 272250.00, 2747250.00, 2747250.00, '2026-05-13'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":398,"no_seri_fpn":"04002600154943974","no_po_customer":"9000869698","stated":{"harga_jual":2475000.0,"dpp":2268750.0,"ppn":272250.0,"total":2747250.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":398,"no_seri_fpn":"04002600154943974","no_po_customer":"9000869698","stated":{"harga_jual":2475000.0,"dpp":2268750.0,"ppn":272250.0,"total":2747250.0}}}'::jsonb, v_actor_id, ('2026-04-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '25CAN NIPPE 2000- NP437 PURPLE', 1, 2475000.00
+      '25CAN NIPPE 2000- NP437 PURPLE', 1, 2475000.00, ('2026-04-23'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-04-008-1', 2747250.00, 'IDR',
-      'bank_transfer', '2026-05-13', 'Imported from historical register (row 398)', v_actor_id
+      'bank_transfer', '2026-05-13', 'Imported from historical register (row 398)', v_actor_id, ('2026-05-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13724,29 +13724,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/05/001', 'paid', 'IDR',
       '2026-05-07', '1030CAN PL 8000 (160 SUNSHINE,259 VERMILLION,411 WHITE,200 TRAFFIC GREEN)', 214240000.00, 0, 11, 12,
       12.000, NULL, NULL, 196386666.67, 23566400.00,
       0.00, 0.00, 23566400.00, 237806400.00, 237806400.00, '2026-05-22'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":399,"no_seri_fpn":"04002600162213434","no_po_customer":"9000869698","stated":{"harga_jual":214240000.0,"dpp":196386666.6666667,"ppn":23566400.0,"total":237806400.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":399,"no_seri_fpn":"04002600162213434","no_po_customer":"9000869698","stated":{"harga_jual":214240000.0,"dpp":196386666.6666667,"ppn":23566400.0,"total":237806400.0}}}'::jsonb, v_actor_id, ('2026-05-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '1030CAN PL 8000 (160 SUNSHINE,259 VERMILLION,411 WHITE,200 TRAFFIC GREEN)', 1, 214240000.00
+      '1030CAN PL 8000 (160 SUNSHINE,259 VERMILLION,411 WHITE,200 TRAFFIC GREEN)', 1, 214240000.00, ('2026-05-07'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-05-001-1', 237806400.00, 'IDR',
-      'bank_transfer', '2026-05-22', 'Imported from historical register (row 399)', v_actor_id
+      'bank_transfer', '2026-05-22', 'Imported from historical register (row 399)', v_actor_id, ('2026-05-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13760,29 +13760,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/05/002R', 'paid', 'IDR',
       '2026-05-11', 'RETENSI RENOVASI FASILITAS TERMINAL AIRSTRIP', 10016152.00, 0, 1, 1,
       0.000, NULL, NULL, 10016152.00, 0.00,
       0.00, 0.00, 0.00, 10016152.00, 10016152.00, '2026-05-22'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":400,"no_po_customer":"9000829632","stated":{"harga_jual":10016152.0,"dpp":0.0,"ppn":0.0,"total":10016152.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":400,"no_po_customer":"9000829632","stated":{"harga_jual":10016152.0,"dpp":0.0,"ppn":0.0,"total":10016152.0}}}'::jsonb, v_actor_id, ('2026-05-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'RETENSI RENOVASI FASILITAS TERMINAL AIRSTRIP', 1, 10016152.00
+      'RETENSI RENOVASI FASILITAS TERMINAL AIRSTRIP', 1, 10016152.00, ('2026-05-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-05-002R-1', 10016152.00, 'IDR',
-      'bank_transfer', '2026-05-22', 'Imported from historical register (row 400)', v_actor_id
+      'bank_transfer', '2026-05-22', 'Imported from historical register (row 400)', v_actor_id, ('2026-05-22'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13796,29 +13796,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/05/004', 'paid', 'IDR',
       '2026-05-26', '12CAN PL.8000 (2SUNSHINE, 2 VERMILLION,2BLUE,6 BLACK)', 2496000.00, 0, 11, 12,
       12.000, NULL, NULL, 2288000.00, 274560.00,
       0.00, 0.00, 274560.00, 2770560.00, 2770560.00, '2026-06-12'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":401,"no_seri_fpn":"04002600194622879","no_po_customer":"3170038717","stated":{"harga_jual":2496000.0,"dpp":2288000.0,"ppn":274560.0,"total":2770560.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":401,"no_seri_fpn":"04002600194622879","no_po_customer":"3170038717","stated":{"harga_jual":2496000.0,"dpp":2288000.0,"ppn":274560.0,"total":2770560.0}}}'::jsonb, v_actor_id, ('2026-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '12CAN PL.8000 (2SUNSHINE, 2 VERMILLION,2BLUE,6 BLACK)', 1, 2496000.00
+      '12CAN PL.8000 (2SUNSHINE, 2 VERMILLION,2BLUE,6 BLACK)', 1, 2496000.00, ('2026-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-05-004-1', 2770560.00, 'IDR',
-      'bank_transfer', '2026-06-12', 'Imported from historical register (row 401)', v_actor_id
+      'bank_transfer', '2026-06-12', 'Imported from historical register (row 401)', v_actor_id, ('2026-06-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13832,29 +13832,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/05/005', 'paid', 'IDR',
       '2026-05-26', '12CAN PL.8000  TRAFFIC GREEN', 2496000.00, 0, 11, 12,
       12.000, NULL, NULL, 2288000.00, 274560.00,
       0.00, 0.00, 274560.00, 2770560.00, 2770560.00, '2026-06-12'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":402,"no_seri_fpn":"04002600194622881","no_po_customer":"3170038713","stated":{"harga_jual":2496000.0,"dpp":2288000.0,"ppn":274560.0,"total":2770560.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":402,"no_seri_fpn":"04002600194622881","no_po_customer":"3170038713","stated":{"harga_jual":2496000.0,"dpp":2288000.0,"ppn":274560.0,"total":2770560.0}}}'::jsonb, v_actor_id, ('2026-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '12CAN PL.8000  TRAFFIC GREEN', 1, 2496000.00
+      '12CAN PL.8000  TRAFFIC GREEN', 1, 2496000.00, ('2026-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-05-005-1', 2770560.00, 'IDR',
-      'bank_transfer', '2026-06-12', 'Imported from historical register (row 402)', v_actor_id
+      'bank_transfer', '2026-06-12', 'Imported from historical register (row 402)', v_actor_id, ('2026-06-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13868,29 +13868,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/05/006', 'paid', 'IDR',
       '2026-05-26', '431CAN PL.8000 ( 131 TRAFIIC GREEN, 300 SUNSHINE)', 89648000.00, 0, 11, 12,
       12.000, NULL, NULL, 82177333.33, 9861280.00,
       0.00, 0.00, 9861280.00, 99509280.00, 99509280.00, '2026-06-25'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":403,"no_seri_fpn":"040026001946228,0","no_po_customer":"9000870552","stated":{"harga_jual":89648000.0,"dpp":82177333.33333334,"ppn":9861280.0,"total":99509280.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":403,"no_seri_fpn":"040026001946228,0","no_po_customer":"9000870552","stated":{"harga_jual":89648000.0,"dpp":82177333.33333334,"ppn":9861280.0,"total":99509280.0}}}'::jsonb, v_actor_id, ('2026-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '431CAN PL.8000 ( 131 TRAFIIC GREEN, 300 SUNSHINE)', 1, 89648000.00
+      '431CAN PL.8000 ( 131 TRAFIIC GREEN, 300 SUNSHINE)', 1, 89648000.00, ('2026-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-05-006-1', 99509280.00, 'IDR',
-      'bank_transfer', '2026-06-25', 'Imported from historical register (row 403)', v_actor_id
+      'bank_transfer', '2026-06-25', 'Imported from historical register (row 403)', v_actor_id, ('2026-06-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13904,29 +13904,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/05/007', 'paid', 'IDR',
       '2026-05-26', '85CAN PL.8000  BLUE', 17680000.00, 0, 11, 12,
       12.000, NULL, NULL, 16206666.67, 1944800.00,
       0.00, 0.00, 1944800.00, 19624800.00, 19624800.00, '2026-06-25'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":404,"no_seri_fpn":"04002600194622883","no_po_customer":"9000872759","stated":{"harga_jual":17680000.0,"dpp":16206666.666666668,"ppn":1944800.0,"total":19624800.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":404,"no_seri_fpn":"04002600194622883","no_po_customer":"9000872759","stated":{"harga_jual":17680000.0,"dpp":16206666.666666668,"ppn":1944800.0,"total":19624800.0}}}'::jsonb, v_actor_id, ('2026-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '85CAN PL.8000  BLUE', 1, 17680000.00
+      '85CAN PL.8000  BLUE', 1, 17680000.00, ('2026-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-05-007-1', 19624800.00, 'IDR',
-      'bank_transfer', '2026-06-25', 'Imported from historical register (row 404)', v_actor_id
+      'bank_transfer', '2026-06-25', 'Imported from historical register (row 404)', v_actor_id, ('2026-06-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13940,29 +13940,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/05/008', 'paid', 'IDR',
       '2026-05-26', '89CAN PL.8000 WHITE', 18512000.00, 0, 11, 12,
       12.000, NULL, NULL, 16969333.33, 2036320.00,
       0.00, 0.00, 2036320.00, 20548320.00, 20548320.00, '2026-06-19'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":405,"no_seri_fpn":"04002600194622878","no_po_customer":"9000869698","stated":{"harga_jual":18512000.0,"dpp":16969333.333333336,"ppn":2036320.0000000002,"total":20548320.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":405,"no_seri_fpn":"04002600194622878","no_po_customer":"9000869698","stated":{"harga_jual":18512000.0,"dpp":16969333.333333336,"ppn":2036320.0000000002,"total":20548320.0}}}'::jsonb, v_actor_id, ('2026-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '89CAN PL.8000 WHITE', 1, 18512000.00
+      '89CAN PL.8000 WHITE', 1, 18512000.00, ('2026-05-26'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-05-008-1', 20548320.00, 'IDR',
-      'bank_transfer', '2026-06-19', 'Imported from historical register (row 405)', v_actor_id
+      'bank_transfer', '2026-06-19', 'Imported from historical register (row 405)', v_actor_id, ('2026-06-19'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -13976,29 +13976,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/05/009', 'paid', 'IDR',
       '2026-05-27', '3CAN PL.8000 (2 SUNSHINE, 1BLUE)', 624000.00, 0, 11, 12,
       12.000, NULL, NULL, 572000.00, 68640.00,
       0.00, 0.00, 68640.00, 692640.00, 692640.00, '2026-06-12'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":406,"no_seri_fpn":"04002600194622882","no_po_customer":"9000870158","stated":{"harga_jual":624000.0,"dpp":572000.0,"ppn":68640.0,"total":692640.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":406,"no_seri_fpn":"04002600194622882","no_po_customer":"9000870158","stated":{"harga_jual":624000.0,"dpp":572000.0,"ppn":68640.0,"total":692640.0}}}'::jsonb, v_actor_id, ('2026-05-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '3CAN PL.8000 (2 SUNSHINE, 1BLUE)', 1, 624000.00
+      '3CAN PL.8000 (2 SUNSHINE, 1BLUE)', 1, 624000.00, ('2026-05-27'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-05-009-1', 692640.00, 'IDR',
-      'bank_transfer', '2026-06-12', 'Imported from historical register (row 406)', v_actor_id
+      'bank_transfer', '2026-06-12', 'Imported from historical register (row 406)', v_actor_id, ('2026-06-12'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -14012,29 +14012,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/06/003', 'paid', 'IDR',
       '2026-06-05', 'WALKPATH R CONTROL AMPHITHEATER RGECC', 18532208.00, 0, 11, 12,
       12.000, 2.000, 5.000, 16987857.33, 2038542.88,
       370644.16, 926610.40, 2038542.88, 19273496.32, 19273496.00, '2026-07-10'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":407,"no_seri_fpn":"04002600204216701","no_po_customer":"9000873184","plus_minus":"-0.3200000002980232","stated":{"harga_jual":18532208.0,"dpp":16987857.333333336,"ppn":2038542.8800000001,"pph":370644.16000000003,"retensi":926610.4,"total":19273496.32}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":407,"no_seri_fpn":"04002600204216701","no_po_customer":"9000873184","plus_minus":"-0.3200000002980232","stated":{"harga_jual":18532208.0,"dpp":16987857.333333336,"ppn":2038542.8800000001,"pph":370644.16000000003,"retensi":926610.4,"total":19273496.32}}}'::jsonb, v_actor_id, ('2026-06-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'WALKPATH R CONTROL AMPHITHEATER RGECC', 1, 18532208.00
+      'WALKPATH R CONTROL AMPHITHEATER RGECC', 1, 18532208.00, ('2026-06-05'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-06-003-1', 19273496.00, 'IDR',
-      'bank_transfer', '2026-07-10', 'Imported from historical register (row 407)', v_actor_id
+      'bank_transfer', '2026-07-10', 'Imported from historical register (row 407)', v_actor_id, ('2026-07-10'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -14048,29 +14048,29 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/06/004', 'paid', 'IDR',
       '2026-06-11', '881CAN PL 8000 (440 SUNSHINE, 441 VERMILLION)', 183248000.00, 0, 11, 12,
       12.000, NULL, NULL, 167977333.33, 20157280.00,
       0.00, 0.00, 20157280.00, 203405280.00, 203405280.00, '2026-06-25'::timestamptz,
-      '{"import":"old_invoice_register","source":{"sheet_row":408,"no_seri_fpn":"04002600218838114","no_po_customer":"9000869698","stated":{"harga_jual":183248000.0,"dpp":167977333.33333334,"ppn":20157280.0,"total":203405280.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":408,"no_seri_fpn":"04002600218838114","no_po_customer":"9000869698","stated":{"harga_jual":183248000.0,"dpp":167977333.33333334,"ppn":20157280.0,"total":203405280.0}}}'::jsonb, v_actor_id, ('2026-06-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '881CAN PL 8000 (440 SUNSHINE, 441 VERMILLION)', 1, 183248000.00
+      '881CAN PL 8000 (440 SUNSHINE, 441 VERMILLION)', 1, 183248000.00, ('2026-06-11'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
 
     INSERT INTO public.payments (
       workspace_id, invoice_id, payment_number, amount, currency,
-      payment_method, payment_date, notes, recorded_by
+      payment_method, payment_date, notes, recorded_by, created_at
     ) VALUES (
       v_workspace_id, v_invoice_id, 'HIST-2026-AWP-06-004-1', 203405280.00, 'IDR',
-      'bank_transfer', '2026-06-25', 'Imported from historical register (row 408)', v_actor_id
+      'bank_transfer', '2026-06-25', 'Imported from historical register (row 408)', v_actor_id, ('2026-06-25'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -14084,21 +14084,21 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/07/003', 'sent', 'IDR',
       '2026-07-09', '1AU TERMIN I-30%  PEK BANGUNAN & INFRASTRUKTUR TAMBAHAN MITSUBISHI DIPO SENILAI RP. 1.398.635.999', 419590800.00, 0, 11, 12,
       12.000, 4.000, NULL, 384624900.00, 46154988.00,
       16783632.00, 0.00, 46154988.00, 448962156.00, 0.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":409,"no_seri_fpn":"04002600281457472","plus_minus":"-448962156","stated":{"harga_jual":419590800.0,"dpp":384624900.0,"ppn":46154988.0,"pph":16783632.0,"total":448962156.0}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":409,"no_seri_fpn":"04002600281457472","plus_minus":"-448962156","stated":{"harga_jual":419590800.0,"dpp":384624900.0,"ppn":46154988.0,"pph":16783632.0,"total":448962156.0}}}'::jsonb, v_actor_id, ('2026-07-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      '1AU TERMIN I-30%  PEK BANGUNAN & INFRASTRUKTUR TAMBAHAN MITSUBISHI DIPO SENILAI RP. 1.398.635.999', 1, 419590800.00
+      '1AU TERMIN I-30%  PEK BANGUNAN & INFRASTRUKTUR TAMBAHAN MITSUBISHI DIPO SENILAI RP. 1.398.635.999', 1, 419590800.00, ('2026-07-09'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 
@@ -14112,21 +14112,21 @@ BEGIN
       issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,
       ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,
       pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,
-      custom_fields, created_by
+      custom_fields, created_by, created_at
     ) VALUES (
       v_workspace_id, v_client_id, v_project_id, '2026/AWP/07/004', 'sent', 'IDR',
       '2026-07-13', 'DP 30% PEK EPOXY GEDUNG RS SANTA MARIA 8LT x Rp1.690.770.558', 507231167.00, 0, 11, 12,
       12.000, 2.000, 5.000, 464961903.08, 55795428.37,
       10144623.34, 25361558.35, 55795428.37, 527520413.68, 0.00, NULL,
-      '{"import":"old_invoice_register","source":{"sheet_row":410,"no_po_customer":"017/SPK/PBE/IV/2026","plus_minus":"-527520413.67999995","stated":{"harga_jual":507231167.0,"dpp":464961903.0833333,"ppn":55795428.37,"pph":10144623.34,"retensi":25361558.35,"total":527520413.67999995}}}'::jsonb, v_actor_id
+      '{"import":"old_invoice_register","source":{"sheet_row":410,"no_po_customer":"017/SPK/PBE/IV/2026","plus_minus":"-527520413.67999995","stated":{"harga_jual":507231167.0,"dpp":464961903.0833333,"ppn":55795428.37,"pph":10144623.34,"retensi":25361558.35,"total":527520413.67999995}}}'::jsonb, v_actor_id, ('2026-07-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     ) RETURNING id INTO v_invoice_id;
 
     INSERT INTO public.line_items (
       workspace_id, entity_type, entity_id, category, sort_order,
-      description, quantity, unit_price
+      description, quantity, unit_price, created_at
     ) VALUES (
       v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,
-      'DP 30% PEK EPOXY GEDUNG RS SANTA MARIA 8LT x Rp1.690.770.558', 1, 507231167.00
+      'DP 30% PEK EPOXY GEDUNG RS SANTA MARIA 8LT x Rp1.690.770.558', 1, 507231167.00, ('2026-07-13'::timestamp AT TIME ZONE 'Asia/Jakarta')
     );
   END IF;
 

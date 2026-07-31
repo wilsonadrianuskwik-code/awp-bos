@@ -73,6 +73,22 @@ def q(s):
     return "'" + str(s).replace("'", "''") + "'"
 
 
+def wib_expr(quoted_date_literal):
+    """
+    SQL expression for midnight, Asia/Jakarta, on a given date -- as a
+    timestamptz. Every created_at below uses this rather than the column's
+    own DEFAULT now(): left alone, every imported row would be stamped with
+    whenever this migration happened to run, not the date the row actually
+    represents, which is the whole point of a historical import.
+    quoted_date_literal is already a SQL string literal, e.g. "'2025-06-12'",
+    or the literal string "NULL" -- passed through unchanged in that case,
+    since a payment with no date has nothing to compute this from.
+    """
+    if quoted_date_literal == "NULL":
+        return "NULL"
+    return "(%s::timestamp AT TIME ZONE 'Asia/Jakarta')" % quoted_date_literal
+
+
 def load(path):
     import openpyxl
     ws = openpyxl.load_workbook(path, data_only=True)[SHEET]
@@ -692,10 +708,11 @@ def emit(clients, invoices, stats, out):
         if t is None:
             L("    INSERT INTO public.invoices (")
             L("      workspace_id, client_id, project_id, invoice_number, status, currency,")
-            L("      issue_date, title, custom_fields, created_by")
+            L("      issue_date, title, custom_fields, created_by, created_at")
             L("    ) VALUES (")
             L("      v_workspace_id, v_client_id, v_project_id, %s, %s, 'IDR'," % (q(inv["number"]), q(inv["status"])))
-            L("      %s, %s, %s::jsonb, v_actor_id" % (q(inv["issue"]), q(inv["ket"]), q(cf)))
+            L("      %s, %s, %s::jsonb, v_actor_id, %s" % (
+                q(inv["issue"]), q(inv["ket"]), q(cf), wib_expr(q(inv["issue"]))))
             L("    ) RETURNING id INTO v_invoice_id;")
         else:
             L("    INSERT INTO public.invoices (")
@@ -703,7 +720,7 @@ def emit(clients, invoices, stats, out):
             L("      issue_date, title, subtotal, discount_amount, dpp_numerator, dpp_denominator,")
             L("      ppn_percent, pph_percent, retensi_percent, dpp_amount, ppn_amount,")
             L("      pph_amount, retensi_amount, tax_amount, total, amount_paid, paid_at,")
-            L("      custom_fields, created_by")
+            L("      custom_fields, created_by, created_at")
             L("    ) VALUES (")
             L("      v_workspace_id, v_client_id, v_project_id, %s, %s, 'IDR'," % (q(inv["number"]), q(inv["status"])))
             L("      %s, %s, %.2f, 0, %d, %d," % (q(inv["issue"]), q(inv["ket"]),
@@ -720,26 +737,28 @@ def emit(clients, invoices, stats, out):
             L("      %.2f, %.2f, %.2f, %.2f, %.2f, %s," % (
                 t["pph_amt"], t["ret_amt"], t["ppn_amt"], t["total"], inv["paid"],
                 (q(paid_at) + "::timestamptz") if paid_at else "NULL"))
-            L("      %s::jsonb, v_actor_id" % q(cf))
+            L("      %s::jsonb, v_actor_id, %s" % (q(cf), wib_expr(q(inv["issue"]))))
             L("    ) RETURNING id INTO v_invoice_id;")
             L("")
             L("    INSERT INTO public.line_items (")
             L("      workspace_id, entity_type, entity_id, category, sort_order,")
-            L("      description, quantity, unit_price")
+            L("      description, quantity, unit_price, created_at")
             L("    ) VALUES (")
             L("      v_workspace_id, 'invoice', v_invoice_id, 'per_unit', 0,")
-            L("      %s, 1, %.2f" % (q(inv["ket"] or "Imported historical invoice"), t["harga_jual"]))
+            L("      %s, 1, %.2f, %s" % (
+                q(inv["ket"] or "Imported historical invoice"), t["harga_jual"], wib_expr(q(inv["issue"]))))
             L("    );")
             for n, pay in enumerate(inv["pays"], start=1):
                 pn = "HIST-%s-%d" % (re.sub(r"[^A-Za-z0-9]+", "-", inv["number"]).strip("-"), n)
                 L("")
                 L("    INSERT INTO public.payments (")
                 L("      workspace_id, invoice_id, payment_number, amount, currency,")
-                L("      payment_method, payment_date, notes, recorded_by")
+                L("      payment_method, payment_date, notes, recorded_by, created_at")
                 L("    ) VALUES (")
                 L("      v_workspace_id, v_invoice_id, %s, %.2f, 'IDR'," % (q(pn), pay["amount"]))
-                L("      'bank_transfer', %s, %s, v_actor_id" % (
-                    q(pay["date"]), q("Imported from historical register (row %d)" % inv["row"])))
+                L("      'bank_transfer', %s, %s, v_actor_id, %s" % (
+                    q(pay["date"]), q("Imported from historical register (row %d)" % inv["row"]),
+                    wib_expr(q(pay["date"]))))
                 L("    );")
         L("  END IF;")
 
