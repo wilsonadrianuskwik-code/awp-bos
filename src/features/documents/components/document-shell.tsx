@@ -381,11 +381,6 @@ export function DocumentFootnote({
                   <div className="h-[62px]" />
                 )}
 
-                <div
-                  className={EXACT_COLOR}
-                  style={{ borderTop: `2px solid ${DOC_ACCENT}` }}
-                />
-
                 {signatoryName && (
                   <p className="mt-1.5 text-[13px] font-bold">{signatoryName}</p>
                 )}
