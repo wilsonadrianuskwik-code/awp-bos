@@ -59,6 +59,7 @@ export function QuotationPrintView({
       documentLabel="Quotation"
       companyName={companyProfile?.display_name || workspaceName}
       logoUrl={logoUrl}
+      companyProfile={companyProfile}
     >
       <DocumentParties
         partyHeading="Prepared For"
@@ -118,6 +119,7 @@ export function QuotationPrintView({
         branding={branding}
         notes={quotation.notes}
         terms={quotation.terms_and_conditions}
+        showSignature={quotation.show_signature}
       />
     </DocumentShell>
   );

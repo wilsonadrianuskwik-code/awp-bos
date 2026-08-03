@@ -49,6 +49,8 @@ type SimplePrintViewProps = {
   total?: { label: string; value: string };
   notes?: string | null;
   terms?: string | null;
+  /** Per-document signature override; defaults to shown. */
+  showSignature?: boolean;
 };
 
 /**
@@ -71,6 +73,7 @@ export function SimplePrintView({
   total,
   notes,
   terms,
+  showSignature = true,
 }: SimplePrintViewProps) {
   const fmt = (value: number) => formatCurrency(value);
 
@@ -79,6 +82,7 @@ export function SimplePrintView({
       documentLabel={documentLabel}
       companyName={companyProfile?.display_name || workspaceName}
       logoUrl={logoUrl}
+      companyProfile={companyProfile}
     >
       <DocumentParties
         partyHeading={party.heading}
@@ -139,6 +143,7 @@ export function SimplePrintView({
         branding={branding}
         notes={notes}
         terms={terms}
+        showSignature={showSignature}
       />
     </DocumentShell>
   );

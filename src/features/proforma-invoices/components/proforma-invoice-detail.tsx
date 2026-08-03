@@ -245,6 +245,7 @@ export function ProformaInvoiceDetail({
         branding={branding}
         paymentDetails={paymentDetails}
         documentLabel="Proforma Invoice"
+        showSignature={proformaInvoice.show_signature}
         party={{
           heading: "Bill To",
           name: proformaInvoice.client?.name ?? "Deleted client",

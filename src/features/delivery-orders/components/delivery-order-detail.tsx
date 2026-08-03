@@ -231,6 +231,7 @@ export function DeliveryOrderDetailView({
         companyProfile={companyProfile}
         branding={branding}
         documentLabel="Delivery Order"
+        showSignature={deliveryOrder.show_signature}
         party={{
           heading: "Deliver To",
           name: deliveryOrder.client?.name ?? "Deleted client",

@@ -38,7 +38,11 @@ import type { CatalogItem, CatalogItemClientPrice } from "@/features/catalog/typ
 import { useClientPriceResolver } from "@/features/catalog/use-client-price";
 import type { Project } from "@/features/projects/types";
 import { TaxBreakdownEditor } from "@/features/documents/components/tax-breakdown-editor";
-import { setDocumentTaxSettings } from "@/features/documents/actions";
+import {
+  setDocumentSignatureVisibility,
+  setDocumentTaxSettings,
+} from "@/features/documents/actions";
+import { SignatureToggle } from "@/features/documents/components/signature-toggle";
 import type { TaxSettings } from "@/features/documents/tax";
 import { CURRENCY } from "@/lib/utils/format-currency";
 
@@ -136,6 +140,10 @@ export function ProformaInvoiceBuilder({
     retensi_percent: proformaInvoice?.retensi_percent ?? null,
     show_dpp: proformaInvoice?.show_dpp ?? true,
   });
+  // Defaults on: the signature is the normal case, hiding it the exception.
+  const [showSignature, setShowSignature] = useState(
+    proformaInvoice?.show_signature ?? true
+  );
   const [insertPaletteOpen, setInsertPaletteOpen] = useState(false);
 
   const [isDirty, setIsDirty] = useState(false);
@@ -220,11 +228,23 @@ export function ProformaInvoiceBuilder({
         toast(taxResult.error, "error");
         return null;
       }
+
+      const sigResult = await setDocumentSignatureVisibility(
+        workspace.id,
+        "proforma_invoice",
+        savedId,
+        showSignature
+      );
+      if (sigResult.error) {
+        setSaveStatus("error");
+        toast(sigResult.error, "error");
+        return null;
+      }
     }
 
     return result.data;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPayload, piId, workspace.id, isEditable]);
+  }, [currentPayload, piId, workspace.id, isEditable, showSignature]);
 
   useEffect(() => {
     if (!isDirty || !isEditable) return;
@@ -606,6 +626,15 @@ export function ProformaInvoiceBuilder({
             settings={taxSettings}
             onChange={(next) => {
               setTaxSettings(next);
+              setIsDirty(true);
+            }}
+            disabled={!isEditable}
+          />
+
+          <SignatureToggle
+            checked={showSignature}
+            onChange={(next) => {
+              setShowSignature(next);
               setIsDirty(true);
             }}
             disabled={!isEditable}

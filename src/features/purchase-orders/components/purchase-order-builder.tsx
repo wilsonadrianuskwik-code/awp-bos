@@ -27,7 +27,11 @@ import type { LineItemInput } from "@/features/line-items/validators";
 import { computeLineItemTotals } from "@/features/line-items/helpers";
 import { ProjectSelector } from "@/features/projects/components/project-selector";
 import { TaxBreakdownEditor } from "@/features/documents/components/tax-breakdown-editor";
-import { setDocumentTaxSettings } from "@/features/documents/actions";
+import {
+  setDocumentSignatureVisibility,
+  setDocumentTaxSettings,
+} from "@/features/documents/actions";
+import { SignatureToggle } from "@/features/documents/components/signature-toggle";
 import type { TaxSettings } from "@/features/documents/tax";
 import type { LineItemCategory, TemplateWithItems } from "@/features/line-items/types";
 import type { SupplierSummary } from "@/features/suppliers/types";
@@ -143,6 +147,10 @@ export function PurchaseOrderBuilder({
     retensi_percent: purchaseOrder?.retensi_percent ?? null,
     show_dpp: purchaseOrder?.show_dpp ?? true,
   });
+  // Defaults on: the signature is the normal case, hiding it the exception.
+  const [showSignature, setShowSignature] = useState(
+    purchaseOrder?.show_signature ?? true
+  );
 
   const [isDirty, setIsDirty] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -235,11 +243,23 @@ export function PurchaseOrderBuilder({
         toast(taxResult.error, "error");
         return null;
       }
+
+      const sigResult = await setDocumentSignatureVisibility(
+        workspace.id,
+        "purchase_order",
+        savedId,
+        showSignature
+      );
+      if (sigResult.error) {
+        setSaveStatus("error");
+        toast(sigResult.error, "error");
+        return null;
+      }
     }
 
     return result.data;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPayload, poId, workspace.id, workspace.slug, isEditable]);
+  }, [currentPayload, poId, workspace.id, workspace.slug, isEditable, showSignature]);
 
   useEffect(() => {
     if (!isDirty || !isEditable) return;
@@ -688,6 +708,15 @@ export function PurchaseOrderBuilder({
             settings={taxSettings}
             onChange={(next) => {
               setTaxSettings(next);
+              setIsDirty(true);
+            }}
+            disabled={!isEditable}
+          />
+
+          <SignatureToggle
+            checked={showSignature}
+            onChange={(next) => {
+              setShowSignature(next);
               setIsDirty(true);
             }}
             disabled={!isEditable}

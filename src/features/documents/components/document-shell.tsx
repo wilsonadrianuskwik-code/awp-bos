@@ -1,4 +1,9 @@
-import type { BrandingSettings, PaymentDetails } from "@/features/templates/types";
+import type {
+  BrandingSettings,
+  CompanyProfile,
+  CompanyProfileAddress,
+  PaymentDetails,
+} from "@/features/templates/types";
 
 /**
  * The one place the document accent colour is defined. Every rule, label
@@ -26,11 +31,44 @@ function AccentBand() {
   );
 }
 
+/**
+ * The company's own address, collapsed to the single line that sits under
+ * the masthead. Reads the structured fields Settings → Company Profile
+ * already collects rather than a separate hardcoded string, so correcting
+ * the address is done in the app and every document follows.
+ *
+ * Empty parts are dropped, so a partly-filled profile degrades to whatever
+ * it does have instead of rendering stray commas. Postal code joins its
+ * province with a space, not a comma ("RIAU 28254"), which is how an
+ * Indonesian address is written.
+ */
+export function formatCompanyAddress(
+  address?: CompanyProfileAddress
+): string | null {
+  if (!address) return null;
+  const region = [address.state, address.postal_code]
+    .map((p) => p?.trim())
+    .filter(Boolean)
+    .join(" ");
+  const parts = [
+    address.line1,
+    address.line2,
+    address.city,
+    region,
+    address.country,
+  ]
+    .map((p) => p?.trim())
+    .filter(Boolean);
+  return parts.length ? parts.join(", ") : null;
+}
+
 type DocumentShellProps = {
   /** e.g. "INVOICE", "PURCHASE ORDER" — set small above the company name. */
   documentLabel: string;
   companyName: string;
   logoUrl?: string | null;
+  /** Supplies the address line under the company name. */
+  companyProfile?: CompanyProfile;
   children: React.ReactNode;
 };
 
@@ -49,8 +87,11 @@ export function DocumentShell({
   documentLabel,
   companyName,
   logoUrl,
+  companyProfile,
   children,
 }: DocumentShellProps) {
+  const companyAddress = formatCompanyAddress(companyProfile?.address);
+
   return (
     <div className="hidden text-[#1f2933] print:block">
       <div className="flex items-center gap-5 pb-3">
@@ -72,6 +113,15 @@ export function DocumentShell({
           <h1 className="text-[29px] font-extrabold uppercase leading-tight tracking-tight">
             {companyName}
           </h1>
+          {/* One line, deliberately: the masthead is an identifier, not a
+              contact block, and wrapping it would push the accent band
+              down and unbalance the header. Long addresses ellipsise
+              rather than reflow. */}
+          {companyAddress && (
+            <p className="mt-0.5 truncate text-[9px] uppercase leading-tight tracking-wide text-gray-600">
+              {companyAddress}
+            </p>
+          )}
         </div>
       </div>
 
@@ -265,17 +315,24 @@ export function DocumentFootnote({
   branding,
   notes,
   terms,
+  showSignature = true,
 }: {
   paymentDetails?: PaymentDetails;
   branding?: BrandingSettings;
   notes?: string | null;
   terms?: string | null;
+  /**
+   * Per-document override (documents.show_signature, 00104). Defaults to
+   * true so a caller that doesn't pass it — and every document created
+   * before the flag existed — keeps printing the signature as before.
+   */
+  showSignature?: boolean;
 }) {
   const accounts = paymentDetails?.bank_accounts ?? [];
   const hasPayment = accounts.length > 0;
   const signatoryName = branding?.signatory_name?.trim();
   const signatureUrl = branding?.signature_url?.trim();
-  const hasSignature = !!(signatoryName || signatureUrl);
+  const hasSignature = showSignature && !!(signatoryName || signatureUrl);
 
   // Primary first — that's the account the company actually wants paid.
   const ordered = [...accounts].sort(

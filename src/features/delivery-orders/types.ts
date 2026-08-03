@@ -25,6 +25,7 @@ export type DeliveryOrder = {
   delivery_address: DeliveryAddress;
   received_by: string | null;
   notes: string | null;
+  show_signature: boolean;
   created_by: string;
   created_at: string;
   updated_at: string;

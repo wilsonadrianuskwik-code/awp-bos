@@ -196,6 +196,7 @@ export function PurchaseOrderDetail({
         companyProfile={companyProfile}
         branding={branding}
         documentLabel="Purchase Order"
+        showSignature={purchaseOrder.show_signature}
         party={{
           heading: "Supplier",
           name: purchaseOrder.supplier?.name ?? "Deleted supplier",

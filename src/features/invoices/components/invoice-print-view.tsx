@@ -53,6 +53,7 @@ export function InvoicePrintView({
       documentLabel="Invoice"
       companyName={companyProfile?.display_name || workspaceName}
       logoUrl={logoUrl}
+      companyProfile={companyProfile}
     >
       <DocumentParties
         partyHeading="Bill To"
@@ -110,6 +111,7 @@ export function InvoicePrintView({
         branding={branding}
         notes={invoice.notes}
         terms={invoice.payment_terms}
+        showSignature={invoice.show_signature}
       />
     </DocumentShell>
   );

@@ -36,7 +36,11 @@ import type { CatalogItem, CatalogItemClientPrice } from "@/features/catalog/typ
 import { useClientPriceResolver } from "@/features/catalog/use-client-price";
 import type { Project } from "@/features/projects/types";
 import { TaxBreakdownEditor } from "@/features/documents/components/tax-breakdown-editor";
-import { setDocumentTaxSettings } from "@/features/documents/actions";
+import {
+  setDocumentSignatureVisibility,
+  setDocumentTaxSettings,
+} from "@/features/documents/actions";
+import { SignatureToggle } from "@/features/documents/components/signature-toggle";
 import type { TaxSettings } from "@/features/documents/tax";
 import { CURRENCY } from "@/lib/utils/format-currency";
 
@@ -146,6 +150,10 @@ export function InvoiceBuilder({
     retensi_percent: invoice?.retensi_percent ?? null,
     show_dpp: invoice?.show_dpp ?? true,
   });
+  // Defaults on: the signature is the normal case, hiding it the exception.
+  const [showSignature, setShowSignature] = useState(
+    invoice?.show_signature ?? true
+  );
   const [insertPaletteOpen, setInsertPaletteOpen] = useState(false);
   const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
 
@@ -254,11 +262,23 @@ export function InvoiceBuilder({
         toast(taxResult.error, "error");
         return null;
       }
+
+      const sigResult = await setDocumentSignatureVisibility(
+        workspace.id,
+        "invoice",
+        savedId,
+        showSignature
+      );
+      if (sigResult.error) {
+        setSaveStatus("error");
+        toast(sigResult.error, "error");
+        return null;
+      }
     }
 
     return result.data;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPayload, invoiceId, workspace.id, workspace.slug, isEditable]);
+  }, [currentPayload, invoiceId, workspace.id, workspace.slug, isEditable, showSignature]);
 
   // Debounced autosave shortly after the user stops editing.
   useEffect(() => {
@@ -790,6 +810,15 @@ export function InvoiceBuilder({
             settings={taxSettings}
             onChange={(next) => {
               setTaxSettings(next);
+              setIsDirty(true);
+            }}
+            disabled={!isEditable}
+          />
+
+          <SignatureToggle
+            checked={showSignature}
+            onChange={(next) => {
+              setShowSignature(next);
               setIsDirty(true);
             }}
             disabled={!isEditable}
