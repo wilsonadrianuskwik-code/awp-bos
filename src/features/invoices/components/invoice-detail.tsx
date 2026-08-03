@@ -3,11 +3,28 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Building2, Copy, FileText, Pencil, Printer } from "lucide-react";
+import {
+  Building2,
+  ChevronDown,
+  Copy,
+  FileText,
+  Hash,
+  Pencil,
+  Printer,
+  SlidersHorizontal,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import {
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { DetailHeader } from "@/components/shared/detail-header";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -15,20 +32,35 @@ import { LineItemsTable } from "@/features/line-items/components/line-items-tabl
 import { InvoiceStatusActions } from "@/features/invoices/components/invoice-status-actions";
 import { RecordPaymentDialog } from "@/features/invoices/components/record-payment-dialog";
 import { PaymentHistory } from "@/features/invoices/components/payment-history";
-import { InvoiceSummaryHero } from "@/features/invoices/components/invoice-summary-hero";
-import { InvoicePortalAccessCard } from "@/features/invoices/components/invoice-portal-access-card";
+import { InvoiceSettingsSheet } from "@/features/invoices/components/invoice-settings-sheet";
 import { InvoicePrintView } from "@/features/invoices/components/invoice-print-view";
 import { DeliveryOrdersSection } from "@/features/delivery-orders/components/delivery-orders-section";
 import { GenerateDocumentMenu } from "@/features/documents/components/generate-document-menu";
 import { GeneratePurchaseOrderDialog } from "@/features/documents/components/generate-purchase-order-dialog";
-import { LinkedDocumentsCard } from "@/features/documents/components/linked-documents-card";
-import { TaxSettingsCard } from "@/features/documents/components/tax-settings-card";
-import { InvoiceReferencesCard } from "@/features/invoices/components/invoice-references-card";
+import { LinkedDocumentsList } from "@/features/documents/components/linked-documents-card";
+import { TaxBreakdownBlock } from "@/features/documents/components/tax-breakdown";
+import {
+  DocumentChip,
+  DocumentToolbar,
+  partyLabel,
+} from "@/features/documents/components/detail/document-toolbar";
+import { DocumentSummaryBar } from "@/features/documents/components/detail/document-summary-bar";
+import {
+  DocumentTabsList,
+  useHashTab,
+} from "@/features/documents/components/detail/document-tabs";
+import {
+  Fact,
+  FactGrid,
+  Panel,
+  PanelHeader,
+} from "@/features/documents/components/detail/detail-panel";
 import type { DeliveryOrderWithRelations } from "@/features/delivery-orders/types";
 import type { DocumentLink } from "@/features/documents/queries";
 import type { Supplier } from "@/features/suppliers/types";
 import { formatCurrency } from "@/lib/utils/format-currency";
-import { getOverdueDays } from "@/lib/utils/date";
+import { formatDate, getOverdueDays } from "@/lib/utils/date";
+import { getPaymentProgress } from "@/features/invoices/helpers";
 import type { InvoiceDetail as InvoiceDetailType } from "@/features/invoices/types";
 import type { Activity } from "@/features/activities/types";
 import type { FulfillmentItemWithProgress } from "@/features/fulfillment/types";
@@ -68,6 +100,24 @@ type InvoiceDetailProps = {
   suppliers?: Supplier[];
 };
 
+const TAB_VALUES = ["items", "payments", "deliveries", "activity"];
+
+/**
+ * The invoice workspace: header, money line, then one tab at a time.
+ *
+ * This page used to stack nine cards in two columns — line items, notes,
+ * deliveries, references, totals, payments, linked documents, portal,
+ * activity — all mounted at once, so the two things looked at every day
+ * (what is owed, and what is on the invoice) shared the screen with six
+ * surfaces that are touched a handful of times per invoice. Everything
+ * still exists; it is arranged by how often it is needed:
+ *
+ *   always visible   status, amount due/total/paid, the primary action
+ *   one click        items, payments, deliveries, activity — tabs
+ *   behind a button  references, tax rates, portal link — settings sheet
+ *
+ * No calculation, permission rule, action or server call changed.
+ */
 export function InvoiceDetail({
   invoice,
   activities,
@@ -85,6 +135,8 @@ export function InvoiceDetail({
   const searchParams = useSearchParams();
   const [recordPaymentOpen, setRecordPaymentOpen] = useState(false);
   const [generatePoOpen, setGeneratePoOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [tab, setTab] = useHashTab(TAB_VALUES, "items");
 
   // An invoice that was never issued shouldn't be seeding deliveries or
   // supplier orders; a cancelled/refunded one shouldn't either.
@@ -127,60 +179,83 @@ export function InvoiceDetail({
     toast("Invoice number copied", "success");
   }
 
+  function handleCopyPortalLink() {
+    const url = `${window.location.origin}/portal/invoices/${invoice.share_token}`;
+    navigator.clipboard.writeText(url);
+    toast("Public link copied", "success");
+  }
+
+  const isPaid = invoice.status === "paid";
+  const isOverdue = invoice.status === "overdue";
+  const hasNotes = !!(invoice.notes || invoice.payment_terms);
+
+  // Sits beside the number wherever the number ends up: in the
+  // subtitle when the document has its own title, otherwise next to
+  // the heading, which is the number itself.
+  const copyNumberButton = (
+    <button
+      type="button"
+      onClick={handleCopyNumber}
+      title="Copy invoice number"
+      className="text-muted-foreground/70 hover:text-foreground"
+    >
+      <Copy className="h-3.5 w-3.5" />
+    </button>
+  );
+
   return (
     <div>
-      <div className="space-y-6 print:hidden">
-        <DetailHeader
+      <div className="space-y-4 print:hidden">
+        <DocumentToolbar
           backHref={`/${workspace.slug}/invoices`}
           backLabel="Back to Invoices"
           title={invoice.title || invoice.invoice_number}
           badges={
-            <StatusBadge
+            <>
+              {!invoice.title && copyNumberButton}
+              <StatusBadge
               status={invoice.status}
               label={
                 invoice.status === "overdue" && invoice.due_date
                   ? `Overdue • ${getOverdueDays(invoice.due_date)} days`
                   : undefined
-              }
-            />
+                }
+              />
+            </>
           }
           subtitle={
-            <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-              {invoice.invoice_number}
-              {invoice.internal_id && (
-                <span className="text-muted-foreground/70">
-                  · Internal ID {invoice.internal_id}
-                </span>
+            <>
+              {/* The number is the heading when the document has no title of
+                  its own — no point printing it twice. */}
+              {invoice.title && (
+                <>
+                  <span className="font-medium text-foreground/80">
+                    {invoice.invoice_number}
+                  </span>
+                  {copyNumberButton}
+                  <span aria-hidden>·</span>
+                </>
               )}
-              · {invoice.client?.name ?? "Deleted client"}
-              {invoice.client?.company ? ` · ${invoice.client.company}` : ""}
-              <button
-                type="button"
-                onClick={handleCopyNumber}
-                title="Copy invoice number"
-                className="text-muted-foreground/70 hover:text-foreground"
-              >
-                <Copy className="h-3.5 w-3.5" />
-              </button>
+              <span className="truncate">
+                {partyLabel(invoice.client?.name, invoice.client?.company, "Deleted client")}
+              </span>
               {invoice.source_quotation && (
-                <Link
+                <DocumentChip
                   href={`/${workspace.slug}/quotations/${invoice.source_quotation.id}`}
-                  className="ml-1 inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
+                  icon={<FileText className="h-3 w-3 shrink-0" />}
                 >
-                  <FileText className="h-3 w-3" />
-                  Converted from {invoice.source_quotation.quotation_number}
-                </Link>
+                  From {invoice.source_quotation.quotation_number}
+                </DocumentChip>
               )}
               {invoice.project && (
-                <Link
+                <DocumentChip
                   href={`/${workspace.slug}/projects/${invoice.project.id}`}
-                  className="ml-1 inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
+                  icon={<Building2 className="h-3 w-3 shrink-0" />}
                 >
-                  <Building2 className="h-3 w-3" />
                   {invoice.project.code} — {invoice.project.name}
-                </Link>
+                </DocumentChip>
               )}
-            </span>
+            </>
           }
           actions={
             <>
@@ -205,151 +280,227 @@ export function InvoiceDetail({
                 />
               )}
               {isEditable && (
-                <Button variant="outline" asChild>
+                <Button variant="outline" size="sm" asChild>
                   <Link href={`/${workspace.slug}/invoices/${invoice.id}/edit`}>
-                    <Pencil className="mr-2 h-4 w-4" />
+                    <Pencil className="mr-1.5 h-3.5 w-3.5" />
                     Edit
                   </Link>
                 </Button>
               )}
-              <Button variant="outline" onClick={handlePrint}>
-                <Printer className="mr-2 h-4 w-4" />
+              <Button variant="outline" size="sm" onClick={handlePrint}>
+                <Printer className="mr-1.5 h-3.5 w-3.5" />
                 Print
               </Button>
             </>
           }
         />
 
-        <InvoiceSummaryHero
-          invoice={invoice}
+        <DocumentSummaryBar
+          primary={{
+            label: isPaid ? "Amount Paid" : "Amount Due",
+            value: formatCurrency(isPaid ? invoice.amount_paid : invoice.amount_due),
+            tone: isPaid ? "success" : isOverdue ? "danger" : "default",
+            hint: invoice.due_date
+              ? `${isPaid ? "Was due" : "Due"} ${formatDate(invoice.due_date)}`
+              : undefined,
+          }}
+          metrics={[
+            { label: "Total", value: formatCurrency(invoice.total) },
+            { label: "Paid", value: formatCurrency(invoice.amount_paid) },
+            {
+              label: "Issued",
+              value: formatDate(invoice.issue_date),
+            },
+          ]}
+          progress={{
+            value: isPaid
+              ? 100
+              : getPaymentProgress(invoice.amount_paid, invoice.total),
+            tone: isPaid ? "success" : isOverdue ? "danger" : "default",
+          }}
           actions={
             <InvoiceStatusActions
               invoice={invoice}
               onRecordPayment={() => setRecordPaymentOpen(true)}
+              menuExtras={
+                <>
+                  <DropdownMenuItem onClick={() => setSettingsOpen(true)}>
+                    <SlidersHorizontal className="mr-2 h-4 w-4" />
+                    Invoice settings
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleCopyPortalLink}>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copy portal link
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleCopyNumber}>
+                    <Hash className="mr-2 h-4 w-4" />
+                    Copy invoice number
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              }
             />
           }
         />
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Left: the document itself — line items, its notes and terms,
-              and the fulfillment tied to them. */}
-          <div className="space-y-6 lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Line Items</CardTitle>
-              </CardHeader>
-              <CardContent>
+        <Tabs value={tab} onValueChange={setTab} className="space-y-3">
+          <DocumentTabsList
+            value={tab}
+            tabs={[
+              { value: "items", label: "Items", count: invoice.line_items.length },
+              {
+                value: "payments",
+                label: "Payments",
+                count: invoice.payments.length,
+              },
+              {
+                value: "deliveries",
+                label: "Deliveries",
+                count: deliveryOrders.length,
+              },
+              { value: "activity", label: "Activity" },
+            ]}
+          />
+
+          {/* Items: the document itself. Line items get the width; the
+              totals block sits beside them on desktop and beneath them on
+              anything narrower, which is the same order it reads in on
+              the printed page. */}
+          <TabsContent value="items" className="mt-0">
+            <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
+              <Panel>
                 <LineItemsTable
                   lineItems={invoice.line_items}
                   packageBreakdowns={packageBreakdowns}
                 />
-              </CardContent>
-            </Card>
 
-            {(invoice.notes || invoice.payment_terms) && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Notes &amp; Terms</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-5">
-                  {invoice.notes && (
-                    <div
-                      className="text-sm [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
-                      dangerouslySetInnerHTML={{ __html: invoice.notes }}
-                    />
-                  )}
-                  {invoice.payment_terms && (
-                    <div className={invoice.notes ? "border-t pt-4" : undefined}>
-                      <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                        Payment Terms
-                      </p>
-                      <p className="mt-1 text-sm">{invoice.payment_terms}</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
+                {hasNotes && (
+                  <Collapsible className="mt-4 border-t pt-3">
+                    <CollapsibleTrigger className="group flex w-full items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground">
+                      <ChevronDown className="h-3.5 w-3.5 transition-transform group-data-[state=open]:rotate-180" />
+                      Notes &amp; payment terms
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-4 pt-3">
+                      {invoice.notes && (
+                        <div
+                          className="text-sm [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
+                          dangerouslySetInnerHTML={{ __html: invoice.notes }}
+                        />
+                      )}
+                      {invoice.payment_terms && (
+                        <div className={invoice.notes ? "border-t pt-3" : undefined}>
+                          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                            Payment Terms
+                          </p>
+                          <p className="mt-1 text-sm">{invoice.payment_terms}</p>
+                        </div>
+                      )}
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
+              </Panel>
 
-            {/* One delivery surface, not two: the progress readout and the
-                delivery orders that produced it live in the same card. */}
-            <Card id="deliveries" className="scroll-mt-6">
-              <CardHeader>
-                <CardTitle className="text-base">Deliveries</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <DeliveryOrdersSection
-                  invoiceId={invoice.id}
-                  workspaceId={workspace.id}
-                  workspaceSlug={workspace.slug}
-                  deliveryOrders={deliveryOrders}
-                  progressByLine={fulfillmentItems}
-                  invoiceLineItems={invoice.line_items.map((li) => ({
-                    id: li.id,
-                    description: li.description,
-                    quantity: li.quantity,
-                    unit: li.unit,
-                  }))}
-                />
-              </CardContent>
-            </Card>
-          </div>
+              <div className="space-y-3">
+                <Panel>
+                  <PanelHeader
+                    title="Totals"
+                    actions={
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs"
+                        onClick={() => setSettingsOpen(true)}
+                      >
+                        <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" />
+                        Adjust
+                      </Button>
+                    }
+                  />
+                  <TaxBreakdownBlock
+                    hargaJual={invoice.subtotal - invoice.discount_amount}
+                    settings={{
+                      dpp_numerator: invoice.dpp_numerator,
+                      dpp_denominator: invoice.dpp_denominator,
+                      ppn_percent: invoice.ppn_percent,
+                      pph_percent: invoice.pph_percent,
+                      retensi_percent: invoice.retensi_percent,
+                      show_dpp: invoice.show_dpp,
+                    }}
+                    dense
+                  />
+                </Panel>
 
-          {/* Right rail: everything that happened to the invoice —
-              payment history, the client portal link, and the audit
-              trail — kept out of the document column. */}
-          <div className="space-y-6">
-            {/* scroll-mt gives the anchor breathing room when the invoice
-                card's "View Payment History" quick action links here. */}
-            <InvoiceReferencesCard
-              workspaceId={workspace.id}
-              invoiceId={invoice.id}
-              customerPoNumber={invoice.customer_po_number}
-              taxInvoiceNumber={invoice.tax_invoice_number}
-            />
+                <Panel>
+                  <PanelHeader title="Details" />
+                  <FactGrid className="grid-cols-2 sm:grid-cols-2 lg:grid-cols-2">
+                    <Fact label="Customer PO">
+                      {invoice.customer_po_number || (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </Fact>
+                    <Fact label="Faktur Pajak">
+                      {invoice.tax_invoice_number || (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </Fact>
+                    {invoice.internal_id && (
+                      <Fact label="Internal ID">{invoice.internal_id}</Fact>
+                    )}
+                    <Fact label="Portal views">
+                      {invoice.view_count > 0 ? invoice.view_count : "Not viewed"}
+                    </Fact>
+                  </FactGrid>
+                </Panel>
+              </div>
+            </div>
+          </TabsContent>
 
-            <TaxSettingsCard
-              workspaceId={workspace.id}
-              documentType="invoice"
-              documentId={invoice.id}
-              hargaJual={invoice.subtotal - invoice.discount_amount}
-              settings={{
-                dpp_numerator: invoice.dpp_numerator,
-                dpp_denominator: invoice.dpp_denominator,
-                ppn_percent: invoice.ppn_percent,
-                pph_percent: invoice.pph_percent,
-                retensi_percent: invoice.retensi_percent,
-              show_dpp: invoice.show_dpp,
-              }}
-              // Same rule as the builder: editable until a payment lands.
-              editable={
-                !["cancelled", "refunded"].includes(invoice.status) &&
-                (invoice.amount_paid ?? 0) === 0
-              }
-            />
+          <TabsContent value="payments" className="mt-0">
+            <Panel>
+              <PanelHeader
+                title="Payments"
+                hint={`${formatCurrency(invoice.amount_paid)} received of ${formatCurrency(invoice.total)}`}
+              />
+              <PaymentHistory payments={invoice.payments} />
+            </Panel>
+          </TabsContent>
 
-            <Card id="payments" className="scroll-mt-6">
-              <CardHeader>
-                <CardTitle className="text-base">Payments</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <PaymentHistory payments={invoice.payments} />
-              </CardContent>
-            </Card>
+          <TabsContent value="deliveries" className="mt-0">
+            <Panel>
+              <DeliveryOrdersSection
+                invoiceId={invoice.id}
+                workspaceId={workspace.id}
+                workspaceSlug={workspace.slug}
+                deliveryOrders={deliveryOrders}
+                progressByLine={fulfillmentItems}
+                invoiceLineItems={invoice.line_items.map((li) => ({
+                  id: li.id,
+                  description: li.description,
+                  quantity: li.quantity,
+                  unit: li.unit,
+                }))}
+              />
+            </Panel>
+          </TabsContent>
 
-            <LinkedDocumentsCard links={links} workspaceSlug={workspace.slug} />
-
-            <InvoicePortalAccessCard invoice={invoice} />
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
+          <TabsContent value="activity" className="mt-0">
+            <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
+              <Panel>
+                <PanelHeader title="Activity" />
                 <ActivityTimeline activities={activities} />
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+              </Panel>
+              {links.length > 0 && (
+                <Panel>
+                  <PanelHeader title="Linked documents" />
+                  <LinkedDocumentsList
+                    links={links}
+                    workspaceSlug={workspace.slug}
+                  />
+                </Panel>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Printed straight from InvoicePrintView rather than through the
@@ -365,6 +516,13 @@ export function InvoiceDetail({
         companyProfile={workspaceInfo.settings?.company_profile}
         branding={workspaceInfo.settings?.branding}
         paymentDetails={workspaceInfo.settings?.payment_details}
+      />
+
+      <InvoiceSettingsSheet
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+        invoice={invoice}
+        workspaceId={workspace.id}
       />
 
       <GeneratePurchaseOrderDialog

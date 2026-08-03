@@ -2,7 +2,15 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { Eye, MoreHorizontal, Send, Trash2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +28,12 @@ import type { Invoice, InvoiceStatus } from "@/features/invoices/types";
 type InvoiceStatusActionsProps = {
   invoice: Invoice;
   onRecordPayment: () => void;
+  /**
+   * Page-level items appended to this component's overflow menu — copy
+   * number, portal link, document settings. They live here so the page
+   * has one "…" menu rather than a status menu beside a page menu.
+   */
+  menuExtras?: React.ReactNode;
 };
 
 const CONFIRM_COPY: Record<
@@ -38,9 +52,21 @@ const CONFIRM_COPY: Record<
   },
 };
 
+/**
+ * The invoice's state-changing actions: one primary button for the step
+ * the invoice is actually waiting on, everything else behind "…".
+ *
+ * Previously every applicable action rendered as a button, so a sent
+ * invoice showed three (Mark as Viewed, Record Payment, Cancel) with no
+ * indication which one mattered. Only one of them is the common daily
+ * action — money arriving — so that one is the button and the rest step
+ * back. Nothing was removed; Edit moved to the toolbar, where it applies
+ * to the document rather than to its status.
+ */
 export function InvoiceStatusActions({
   invoice,
   onRecordPayment,
+  menuExtras,
 }: InvoiceStatusActionsProps) {
   const router = useRouter();
   const { workspace } = useWorkspace();
@@ -84,35 +110,17 @@ export function InvoiceStatusActions({
   const canRecordPayment = ["sent", "viewed", "partial", "overdue"].includes(
     invoice.status
   );
+  const canMarkViewed = invoice.status === "sent";
+  const canCancel = invoice.status === "sent" || invoice.status === "viewed";
+  const isDraft = invoice.status === "draft";
+  const hasStatusMenuItems = canMarkViewed || canCancel || isDraft;
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {invoice.status === "draft" && (
-        <>
-          <Button onClick={() => setConfirmTarget("sent")} disabled={isPending}>
-            Send Invoice
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() =>
-              router.push(`/${workspace.slug}/invoices/${invoice.id}/edit`)
-            }
-          >
-            Edit
-          </Button>
-          <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
-            Delete
-          </Button>
-        </>
-      )}
-
-      {invoice.status === "sent" && (
-        <Button
-          variant="outline"
-          onClick={() => transition("viewed")}
-          disabled={isPending}
-        >
-          Mark as Viewed
+    <>
+      {isDraft && (
+        <Button onClick={() => setConfirmTarget("sent")} disabled={isPending}>
+          <Send className="mr-1.5 h-4 w-4" />
+          Send Invoice
         </Button>
       )}
 
@@ -122,14 +130,46 @@ export function InvoiceStatusActions({
         </Button>
       )}
 
-      {(invoice.status === "sent" || invoice.status === "viewed") && (
-        <Button
-          variant="outline"
-          onClick={() => setConfirmTarget("cancelled")}
-          disabled={isPending}
-        >
-          Cancel
-        </Button>
+      {(hasStatusMenuItems || menuExtras) && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" aria-label="More actions">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            {menuExtras}
+            {menuExtras && hasStatusMenuItems && <DropdownMenuSeparator />}
+            {canMarkViewed && (
+              <DropdownMenuItem
+                onClick={() => transition("viewed")}
+                disabled={isPending}
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                Mark as Viewed
+              </DropdownMenuItem>
+            )}
+            {canCancel && (
+              <DropdownMenuItem
+                onClick={() => setConfirmTarget("cancelled")}
+                disabled={isPending}
+              >
+                <XCircle className="mr-2 h-4 w-4" />
+                Cancel Invoice
+              </DropdownMenuItem>
+            )}
+            {isDraft && (
+              <DropdownMenuItem
+                onClick={handleDelete}
+                disabled={isPending}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       )}
 
       <Dialog
@@ -166,6 +206,6 @@ export function InvoiceStatusActions({
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

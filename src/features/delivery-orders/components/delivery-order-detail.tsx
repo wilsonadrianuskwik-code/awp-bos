@@ -2,10 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { DetailHeader } from "@/components/shared/detail-header";
-import { FieldList, DetailItem } from "@/components/shared/detail-item";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,6 +18,13 @@ import { addressLines, formatAddress } from "@/features/documents/address";
 import { DELIVERY_ORDER_STATUSES, type DeliveryOrderDetail } from "@/features/delivery-orders/types";
 import { SimplePrintView } from "@/features/documents/components/simple-print-view";
 import { PrintButton } from "@/features/documents/components/print-button";
+import { DocumentToolbar } from "@/features/documents/components/detail/document-toolbar";
+import {
+  Fact,
+  FactGrid,
+  Panel,
+  PanelHeader,
+} from "@/features/documents/components/detail/detail-panel";
 import type { BrandingSettings, CompanyProfile } from "@/features/templates/types";
 
 const NEXT_STATUS: Record<string, string | null> = {
@@ -108,122 +112,140 @@ export function DeliveryOrderDetailView({
     <>
       {/* print:hidden so the on-screen layout doesn't print alongside the
           document view below it. */}
-      <div className="space-y-6 print:hidden">
-      <DetailHeader
-        title={deliveryOrder.do_number}
-        backHref={`/${workspaceSlug}/delivery-orders`}
-        backLabel="Delivery Orders"
-        badges={<StatusBadge status={status} />}
-        subtitle={deliveryOrder.client?.name ?? undefined}
-        actions={
-          <div className="flex items-center gap-2">
-            <PrintButton
-              filename={`${deliveryOrder.client?.name ?? "Client"} - ${deliveryOrder.do_number}`}
-            />
-            {next && (
-            <div className="flex items-center gap-2">
-              {next === "delivered" && (
-                <Input
-                  placeholder="Received by"
-                  value={receivedBy}
-                  onChange={(e) => setReceivedBy(e.target.value)}
-                  className="w-40"
-                />
+      <div className="space-y-4 print:hidden">
+        <DocumentToolbar
+          title={deliveryOrder.do_number}
+          backHref={`/${workspaceSlug}/delivery-orders`}
+          backLabel="Back to Delivery Orders"
+          badges={<StatusBadge status={status} />}
+          subtitle={
+            <span className="truncate">
+              {deliveryOrder.client?.name ?? "No client"}
+            </span>
+          }
+          actions={
+            <>
+              <PrintButton
+                size="sm"
+                filename={`${deliveryOrder.client?.name ?? "Client"} - ${deliveryOrder.do_number}`}
+              />
+              {next && (
+                <>
+                  {/* Who signed for the goods — captured at the moment it
+                      is recorded, not in a separate step afterwards. */}
+                  {next === "delivered" && (
+                    <Input
+                      placeholder="Received by"
+                      value={receivedBy}
+                      onChange={(e) => setReceivedBy(e.target.value)}
+                      className="h-8 w-40"
+                    />
+                  )}
+                  <Button size="sm" disabled={isPending} onClick={handleAdvance}>
+                    Mark as {next}
+                  </Button>
+                </>
               )}
-              <Button size="sm" disabled={isPending} onClick={handleAdvance}>
-                Mark as {next}
-              </Button>
-            </div>
-            )}
-          </div>
-        }
-      />
+            </>
+          }
+        />
 
-      <Card className="p-4">
-        <FieldList>
-          <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Invoice</dt>
-            <dd className="mt-1 text-sm">
+        {/* One panel, not three: a delivery order is a short document —
+            where it goes, what is on it, and who received it. */}
+        <Panel>
+          <FactGrid>
+            <Fact label="Invoice">
               {deliveryOrder.invoice ? (
-                <Link href={`/${workspaceSlug}/invoices/${deliveryOrder.invoice.id}`} className="hover:underline">
+                <Link
+                  href={`/${workspaceSlug}/invoices/${deliveryOrder.invoice.id}`}
+                  className="hover:underline"
+                >
                   {deliveryOrder.invoice.invoice_number}
                 </Link>
               ) : (
                 "—"
               )}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Project</dt>
-            <dd className="mt-1 text-sm">
+            </Fact>
+            <Fact label="Project">
               {deliveryOrder.project ? (
-                <Link href={`/${workspaceSlug}/projects/${deliveryOrder.project.id}`} className="hover:underline">
+                <Link
+                  href={`/${workspaceSlug}/projects/${deliveryOrder.project.id}`}
+                  className="hover:underline"
+                >
                   {deliveryOrder.project.code} — {deliveryOrder.project.name}
                 </Link>
               ) : (
                 "—"
               )}
-            </dd>
+            </Fact>
+            <Fact label="Client">{deliveryOrder.client?.name ?? "—"}</Fact>
+            <Fact label="Delivery date">
+              {deliveryOrder.delivery_date ?? "—"}
+            </Fact>
+            <Fact label="Received by">{deliveryOrder.received_by ?? "—"}</Fact>
+            {deliveryOrder.notes && (
+              <Fact label="Notes" className="col-span-2">
+                {deliveryOrder.notes}
+              </Fact>
+            )}
+          </FactGrid>
+
+          <div className="mt-4 border-t pt-4">
+            <PanelHeader
+              title="Deliver to"
+              hint="Where the goods go. Leave blank to address the client's own address instead."
+              className="mb-2"
+            />
+            <DeliveryAddressField
+              value={address}
+              onChange={setAddress}
+              suggestions={suggestions}
+              disabled={!addressEditable}
+            />
+            {addressDirty && addressEditable && (
+              <Button
+                size="sm"
+                className="mt-2"
+                disabled={isPending}
+                onClick={handleSaveAddress}
+              >
+                Save address
+              </Button>
+            )}
           </div>
-          <DetailItem label="Client" value={deliveryOrder.client?.name} />
-          <DetailItem label="Delivery Date" value={deliveryOrder.delivery_date} />
-          <DetailItem label="Received By" value={deliveryOrder.received_by} />
-          <DetailItem label="Notes" value={deliveryOrder.notes} />
-        </FieldList>
+        </Panel>
 
-        <div className="mt-4 border-t pt-4">
-          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-            Deliver To
-          </p>
-          <p className="mb-2 mt-1 text-xs text-muted-foreground">
-            Where the goods go. Leave blank to address the client&apos;s own
-            address instead.
-          </p>
-          <DeliveryAddressField
-            value={address}
-            onChange={setAddress}
-            suggestions={suggestions}
-            disabled={!addressEditable}
+        <Panel>
+          <PanelHeader
+            title="Items"
+            hint={
+              status === "delivered"
+                ? "These quantities have been recorded against the invoice's fulfillment."
+                : "Marking this delivered records these quantities against the invoice's fulfillment."
+            }
           />
-          {addressDirty && addressEditable && (
-            <Button
-              size="sm"
-              className="mt-2"
-              disabled={isPending}
-              onClick={handleSaveAddress}
-            >
-              Save address
-            </Button>
-          )}
-        </div>
-      </Card>
-
-      <Card className="p-4">
-        <h3 className="mb-3 text-[15px] font-semibold">Items</h3>
-        <ul className="divide-y">
-          {deliveryOrder.line_items.map((item) => (
-            <li key={item.id} className="flex items-center justify-between gap-3 py-2 text-[13px]">
-              <span className="min-w-0">
-                <span className="block truncate">{item.description}</span>
-                {!item.source_line_item_id && (
-                  <span className="block text-xs text-muted-foreground">
-                    Not linked to an invoice line — won&apos;t update fulfillment
-                  </span>
-                )}
-              </span>
-              <span className="shrink-0 tabular-nums text-muted-foreground">
-                {item.quantity} {item.unit ?? ""}
-              </span>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-3 border-t pt-2.5 text-xs text-muted-foreground">
-          {status === "delivered"
-            ? "These quantities have been recorded against the invoice's fulfillment."
-            : "Marking this delivered records these quantities against the invoice's fulfillment."}
-        </p>
-      </Card>
-    </div>
+          <ul className="divide-y">
+            {deliveryOrder.line_items.map((item) => (
+              <li
+                key={item.id}
+                className="flex items-center justify-between gap-3 py-2 text-[13px]"
+              >
+                <span className="min-w-0">
+                  <span className="block truncate">{item.description}</span>
+                  {!item.source_line_item_id && (
+                    <span className="block text-xs text-muted-foreground">
+                      Not linked to an invoice line — won&apos;t update fulfillment
+                    </span>
+                  )}
+                </span>
+                <span className="shrink-0 tabular-nums text-muted-foreground">
+                  {item.quantity} {item.unit ?? ""}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      </div>
 
       <SimplePrintView
         workspaceName={workspaceName}

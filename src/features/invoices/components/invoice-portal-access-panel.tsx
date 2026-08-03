@@ -3,7 +3,6 @@
 import { useState, useTransition } from "react";
 import { Copy, Hash, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -18,16 +17,16 @@ import { regenerateInvoiceShareToken } from "@/features/invoices/actions";
 import { formatTimelineTimestamp } from "@/features/invoices/helpers";
 import type { Invoice } from "@/features/invoices/types";
 
-type InvoicePortalAccessCardProps = {
+type InvoicePortalAccessPanelProps = {
   invoice: Pick<
     Invoice,
     "id" | "invoice_number" | "share_token" | "view_count" | "last_viewed_at"
   >;
 };
 
-export function InvoicePortalAccessCard({
+export function InvoicePortalAccessPanel({
   invoice,
-}: InvoicePortalAccessCardProps) {
+}: InvoicePortalAccessPanelProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
   const [shareToken, setShareToken] = useState(invoice.share_token);
@@ -59,11 +58,8 @@ export function InvoicePortalAccessCard({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Customer Portal</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <>
+      <div className="space-y-4">
         <div className="text-sm">
           {invoice.view_count > 0 ? (
             <>
@@ -100,7 +96,7 @@ export function InvoicePortalAccessCard({
             Regenerate Link
           </Button>
         </div>
-      </CardContent>
+      </div>
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent>
@@ -130,6 +126,6 @@ export function InvoicePortalAccessCard({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Card>
+    </>
   );
 }

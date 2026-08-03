@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +19,7 @@ import { setInvoiceReferences } from "@/features/invoices/actions";
  * payment — the serial usually arrives late, and refusing it then would
  * leave the register permanently incomplete.
  */
-export function InvoiceReferencesCard({
+export function InvoiceReferencesPanel({
   workspaceId,
   invoiceId,
   customerPoNumber,
@@ -55,11 +54,7 @@ export function InvoiceReferencesCard({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">References</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="customer-po">Customer PO No.</Label>
           <Input
@@ -89,7 +84,6 @@ export function InvoiceReferencesCard({
           Both appear in the invoice register export. Neither affects any
           total.
         </p>
-      </CardContent>
-    </Card>
+    </div>
   );
 }

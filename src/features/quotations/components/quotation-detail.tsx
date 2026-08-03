@@ -3,11 +3,23 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Building2, Copy, GitCompare, Pencil, Printer, Receipt } from "lucide-react";
+import {
+  Building2,
+  ChevronDown,
+  Copy,
+  GitCompare,
+  Pencil,
+  Printer,
+  Receipt,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { DetailHeader } from "@/components/shared/detail-header";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
@@ -15,17 +27,31 @@ import { QuotationLifecycleTimeline } from "./quotation-lifecycle-timeline";
 import { LineItemsTable } from "@/features/line-items/components/line-items-table";
 import { QuotationStatusActions } from "./quotation-status-actions";
 import { isEditableStatus } from "@/features/quotations/helpers";
-import { QuotationSummaryHero } from "./quotation-summary-hero";
 import { QuotationVersionHistory } from "./quotation-version-history";
 import { QuotationVersionDiffDialog } from "./quotation-version-diff-dialog";
 import { GenerateInvoiceDialog } from "./generate-invoice-dialog";
 import { GenerateDocumentMenu } from "@/features/documents/components/generate-document-menu";
 import { GeneratePurchaseOrderDialog } from "@/features/documents/components/generate-purchase-order-dialog";
 import { QuotationPortalAccessCard } from "./quotation-portal-access-card";
-import { LinkedDocumentsCard } from "@/features/documents/components/linked-documents-card";
+import { LinkedDocumentsList } from "@/features/documents/components/linked-documents-card";
 import { PricingSummary } from "@/features/line-items/components/pricing-summary";
 import { QuotationPrintView } from "./quotation-print-view";
+import {
+  DocumentChip,
+  DocumentToolbar,
+  partyLabel,
+} from "@/features/documents/components/detail/document-toolbar";
+import { DocumentSummaryBar } from "@/features/documents/components/detail/document-summary-bar";
+import {
+  DocumentTabsList,
+  useHashTab,
+} from "@/features/documents/components/detail/document-tabs";
+import {
+  Panel,
+  PanelHeader,
+} from "@/features/documents/components/detail/detail-panel";
 import { formatCurrency } from "@/lib/utils/format-currency";
+import { formatDate } from "@/lib/utils/date";
 import type {
   QuotationDetail as QuotationDetailType,
   QuotationWithClient,
@@ -69,6 +95,8 @@ type QuotationDetailProps = {
   links?: DocumentLink[];
 };
 
+const TAB_VALUES = ["items", "versions", "activity"];
+
 export function QuotationDetail({
   quotation,
   activities,
@@ -87,6 +115,7 @@ export function QuotationDetail({
   const [generateInvoiceOpen, setGenerateInvoiceOpen] = useState(false);
   const [generatePoOpen, setGeneratePoOpen] = useState(false);
   const [diffOpen, setDiffOpen] = useState(false);
+  const [tab, setTab] = useHashTab(TAB_VALUES, "items");
 
   // Terminal states can't seed new documents — everything else can,
   // including draft (generating never consumes or locks the source, so
@@ -123,15 +152,42 @@ export function QuotationDetail({
     toast("Quotation number copied", "success");
   }
 
+  const expired =
+    !!quotation.expiry_date &&
+    new Date(quotation.expiry_date) < new Date() &&
+    quotation.status !== "approved";
+
+  const hasProse = !!(
+    quotation.notes ||
+    quotation.terms_and_conditions ||
+    quotation.internal_notes ||
+    quotation.customer_response_notes
+  );
+
+  // Sits beside the number wherever the number ends up: in the
+  // subtitle when the document has its own title, otherwise next to
+  // the heading, which is the number itself.
+  const copyNumberButton = (
+    <button
+      type="button"
+      onClick={handleCopyNumber}
+      title="Copy quotation number"
+      className="text-muted-foreground/70 hover:text-foreground"
+    >
+      <Copy className="h-3.5 w-3.5" />
+    </button>
+  );
+
   return (
     <div>
-      <div className="space-y-6 print:hidden">
-        <DetailHeader
+      <div className="space-y-4 print:hidden">
+        <DocumentToolbar
           backHref={`/${workspace.slug}/quotations`}
           backLabel="Back to Quotations"
           title={quotation.title || quotation.quotation_number}
           badges={
             <>
+              {!quotation.title && copyNumberButton}
               {quotation.version > 1 && (
                 <span className="rounded bg-muted px-2 py-0.5 font-mono text-xs font-medium text-muted-foreground">
                   V{quotation.version}
@@ -141,51 +197,41 @@ export function QuotationDetail({
             </>
           }
           subtitle={
-            <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-              {quotation.quotation_number}
-              {quotation.internal_id && (
-                <span className="text-muted-foreground/70">
-                  · Internal ID {quotation.internal_id}
-                </span>
+            <>
+              {/* The number is the heading when the document has no title of
+                  its own — no point printing it twice. */}
+              {quotation.title && (
+                <>
+                  <span className="font-medium text-foreground/80">
+                    {quotation.quotation_number}
+                  </span>
+                  {copyNumberButton}
+                  <span aria-hidden>·</span>
+                </>
               )}
-              · {quotation.client?.name ?? "Deleted client"}
-              {quotation.client?.company ? ` · ${quotation.client.company}` : ""}
-              <button
-                type="button"
-                onClick={handleCopyNumber}
-                title="Copy quotation number"
-                className="text-muted-foreground/70 hover:text-foreground"
-              >
-                <Copy className="h-3.5 w-3.5" />
-              </button>
+              <span className="truncate">
+                {partyLabel(quotation.client?.name, quotation.client?.company, "Deleted client")}
+              </span>
               {quotation.converted_invoice && (
-                <Link
+                <DocumentChip
                   href={`/${workspace.slug}/invoices/${quotation.converted_invoice.id}`}
-                  className="ml-1 inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
+                  icon={<Receipt className="h-3 w-3 shrink-0" />}
                 >
-                  <Receipt className="h-3 w-3" />
-                  Generated {quotation.converted_invoice.invoice_number}
-                </Link>
+                  {quotation.converted_invoice.invoice_number}
+                </DocumentChip>
               )}
               {quotation.project && (
-                <Link
+                <DocumentChip
                   href={`/${workspace.slug}/projects/${quotation.project.id}`}
-                  className="ml-1 inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
+                  icon={<Building2 className="h-3 w-3 shrink-0" />}
                 >
-                  <Building2 className="h-3 w-3" />
                   {quotation.project.code} — {quotation.project.name}
-                </Link>
+                </DocumentChip>
               )}
-            </span>
+            </>
           }
           actions={
             <>
-              {previousVersion && (
-                <Button variant="outline" onClick={() => setDiffOpen(true)}>
-                  <GitCompare className="mr-2 h-4 w-4" />
-                  Compare with V{previousVersion.version}
-                </Button>
-              )}
               {/* Invoice is deliberately absent here: it has its own
                   approved-only flow via GenerateInvoiceDialog (which also
                   sets the generated_invoice_id back-link and enforces
@@ -214,23 +260,37 @@ export function QuotationDetail({
                 />
               )}
               {isEditableStatus(quotation.status) && (
-                <Button variant="outline" asChild>
+                <Button variant="outline" size="sm" asChild>
                   <Link href={`/${workspace.slug}/quotations/${quotation.id}/edit`}>
-                    <Pencil className="mr-2 h-4 w-4" />
+                    <Pencil className="mr-1.5 h-3.5 w-3.5" />
                     Edit
                   </Link>
                 </Button>
               )}
-              <Button variant="outline" onClick={handlePrint}>
-                <Printer className="mr-2 h-4 w-4" />
+              <Button variant="outline" size="sm" onClick={handlePrint}>
+                <Printer className="mr-1.5 h-3.5 w-3.5" />
                 Print
               </Button>
             </>
           }
         />
 
-        <QuotationSummaryHero
-          quotation={quotation}
+        <DocumentSummaryBar
+          primary={{
+            label: "Quoted Total",
+            value: formatCurrency(quotation.total),
+          }}
+          metrics={[
+            {
+              label: "Valid Until",
+              value: quotation.expiry_date
+                ? formatDate(quotation.expiry_date)
+                : "—",
+              tone: expired ? "danger" : "default",
+              hint: expired ? "Expired" : undefined,
+            },
+            { label: "Items", value: quotation.line_items.length },
+          ]}
           actions={
             <QuotationStatusActions
               quotation={quotation}
@@ -239,132 +299,133 @@ export function QuotationDetail({
           }
         />
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Line Items</CardTitle>
-              </CardHeader>
-              <CardContent>
+        <Tabs value={tab} onValueChange={setTab} className="space-y-3">
+          <DocumentTabsList
+            value={tab}
+            tabs={[
+              {
+                value: "items",
+                label: "Items",
+                count: quotation.line_items.length,
+              },
+              { value: "versions", label: "Versions", count: versions.length },
+              { value: "activity", label: "Activity" },
+            ]}
+          />
+
+          <TabsContent value="items" className="mt-0">
+            <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
+              <Panel>
                 <LineItemsTable
                   lineItems={quotation.line_items}
                   packageBreakdowns={packageBreakdowns}
                 />
-              </CardContent>
-            </Card>
 
-            {quotation.notes && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Notes</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div
-                    className="text-sm [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
-                    dangerouslySetInnerHTML={{ __html: quotation.notes }}
-                  />
-                </CardContent>
-              </Card>
-            )}
+                {hasProse && (
+                  <Collapsible className="mt-4 border-t pt-3">
+                    <CollapsibleTrigger className="group flex w-full items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground">
+                      <ChevronDown className="h-3.5 w-3.5 transition-transform group-data-[state=open]:rotate-180" />
+                      Notes, terms &amp; responses
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-4 pt-3">
+                      {quotation.notes && (
+                        <Prose label="Notes" html={quotation.notes} />
+                      )}
+                      {quotation.terms_and_conditions && (
+                        <Prose
+                          label="Terms & Conditions"
+                          html={quotation.terms_and_conditions}
+                        />
+                      )}
+                      {quotation.internal_notes && (
+                        <Prose
+                          label="Internal Notes (staff only)"
+                          html={quotation.internal_notes}
+                        />
+                      )}
+                      {quotation.customer_response_notes && (
+                        <div className="rounded-lg border border-amber-200 p-3 dark:border-amber-900">
+                          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                            Customer Response
+                          </p>
+                          <p className="mt-1 text-sm">
+                            {quotation.customer_response_notes}
+                          </p>
+                        </div>
+                      )}
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
+              </Panel>
 
-            {quotation.terms_and_conditions && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Terms &amp; Conditions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div
-                    className="text-sm [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
-                    dangerouslySetInnerHTML={{
-                      __html: quotation.terms_and_conditions,
-                    }}
-                  />
-                </CardContent>
-              </Card>
-            )}
+              <PricingSummary
+                totals={{
+                  subtotal: quotation.subtotal,
+                  discount_amount: quotation.discount_amount,
+                  tax_amount: quotation.tax_amount,
+                  total: quotation.total,
+                }}
+                itemCount={quotation.line_items.length}
+                sticky={false}
+              />
+            </div>
+          </TabsContent>
 
-            {quotation.internal_notes && (
-              <Card className="border-dashed">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-1.5 text-base">
-                    Internal Notes
-                    <span className="text-xs font-normal text-muted-foreground">
-                      (staff only)
-                    </span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div
-                    className="text-sm [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
-                    dangerouslySetInnerHTML={{ __html: quotation.internal_notes }}
-                  />
-                </CardContent>
-              </Card>
-            )}
-
-            {quotation.customer_response_notes && (
-              <Card className="border-amber-200 dark:border-amber-900">
-                <CardHeader>
-                  <CardTitle className="text-base">Customer Response</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm">{quotation.customer_response_notes}</p>
-                </CardContent>
-              </Card>
-            )}
-
-          </div>
-
-          <div className="space-y-6">
-            <PricingSummary
-              totals={{
-                subtotal: quotation.subtotal,
-                discount_amount: quotation.discount_amount,
-                tax_amount: quotation.tax_amount,
-                total: quotation.total,
-              }}
-              itemCount={quotation.line_items.length}
-              sticky={false}
-            />
-
-            <LinkedDocumentsCard links={links} workspaceSlug={workspace.slug} />
-
-            <QuotationPortalAccessCard quotation={quotation} />
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Timeline</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <QuotationLifecycleTimeline
-                  quotation={quotation}
-                  activities={activities}
+          <TabsContent value="versions" className="mt-0">
+            <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
+              <Panel>
+                <PanelHeader
+                  title="Versions"
+                  actions={
+                    previousVersion ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 px-2 text-xs"
+                        onClick={() => setDiffOpen(true)}
+                      >
+                        <GitCompare className="mr-1.5 h-3.5 w-3.5" />
+                        Compare with V{previousVersion.version}
+                      </Button>
+                    ) : undefined
+                  }
                 />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Versions</CardTitle>
-              </CardHeader>
-              <CardContent>
                 <QuotationVersionHistory
                   versions={versions}
                   currentId={quotation.id}
                 />
-              </CardContent>
-            </Card>
+              </Panel>
+              <Panel>
+                <PanelHeader title="Lifecycle" />
+                <QuotationLifecycleTimeline
+                  quotation={quotation}
+                  activities={activities}
+                />
+              </Panel>
+            </div>
+          </TabsContent>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
+          <TabsContent value="activity" className="mt-0">
+            <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
+              <Panel>
+                <PanelHeader title="Activity" />
                 <ActivityTimeline activities={activities} />
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+              </Panel>
+              <div className="space-y-3">
+                {links.length > 0 && (
+                  <Panel>
+                    <PanelHeader title="Linked documents" />
+                    <LinkedDocumentsList
+                      links={links}
+                      workspaceSlug={workspace.slug}
+                    />
+                  </Panel>
+                )}
+                <QuotationPortalAccessCard quotation={quotation} />
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* See InvoiceDetail: printed directly rather than via the template
@@ -401,6 +462,20 @@ export function QuotationDetail({
           previous={previousVersion}
         />
       )}
+    </div>
+  );
+}
+
+function Prose({ label, html }: { label: string; html: string }) {
+  return (
+    <div>
+      <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+        {label}
+      </p>
+      <div
+        className="mt-1 text-sm [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
     </div>
   );
 }

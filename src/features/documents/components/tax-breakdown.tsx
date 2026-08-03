@@ -73,9 +73,9 @@ export function TaxBreakdownBlock({
           value={`(${formatCurrency(b.retensiAmount)})`}
         />
       )}
-      <div className="mt-1 flex items-baseline justify-between gap-6 border-t-2 border-double pt-2">
+      <div className="mt-1 flex items-baseline justify-between gap-3 border-t-2 border-double pt-2">
         <dt className="text-[11px] font-semibold uppercase tracking-wider">Total</dt>
-        <dd className="text-base font-bold tabular-nums">
+        <dd className="whitespace-nowrap text-base font-bold tabular-nums">
           {formatCurrency(b.total)}
         </dd>
       </div>
@@ -93,11 +93,14 @@ function Row({
   className: string;
 }) {
   return (
-    <div className={`flex items-baseline justify-between gap-6 ${className}`}>
+    // gap-3 and nowrap on the amount: in the detail page's totals panel
+    // the block is ~300px wide, and a wrapped "(Rp 16.274.038.462)" reads
+    // as two different figures.
+    <div className={`flex items-baseline justify-between gap-3 ${className}`}>
       <dt className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
         {label}
       </dt>
-      <dd className="tabular-nums">{value}</dd>
+      <dd className="whitespace-nowrap tabular-nums">{value}</dd>
     </div>
   );
 }

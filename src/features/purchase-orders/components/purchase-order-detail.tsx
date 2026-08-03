@@ -1,19 +1,39 @@
 "use client";
 
 import Link from "next/link";
-import { Pencil } from "lucide-react";
+import { Building2, ChevronDown, Copy, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { DetailHeader } from "@/components/shared/detail-header";
 import { LineItemsTable } from "@/features/line-items/components/line-items-table";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
 import { PurchaseOrderStatusActions } from "@/features/purchase-orders/components/purchase-order-status-actions";
-import { PurchaseOrderInspector } from "@/features/purchase-orders/components/purchase-order-inspector";
+import { PurchaseOrderLinks } from "@/features/purchase-orders/components/purchase-order-links";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { formatCurrency } from "@/lib/utils/format-currency";
+import { formatDate } from "@/lib/utils/date";
 import { computeTaxBreakdown, taxTotalRows } from "@/features/documents/tax";
+import { TaxBreakdownBlock } from "@/features/documents/components/tax-breakdown";
+import {
+  DocumentChip,
+  DocumentToolbar,
+  partyLabel,
+} from "@/features/documents/components/detail/document-toolbar";
+import { DocumentSummaryBar } from "@/features/documents/components/detail/document-summary-bar";
+import {
+  DocumentTabsList,
+  useHashTab,
+} from "@/features/documents/components/detail/document-tabs";
+import {
+  Panel,
+  PanelHeader,
+} from "@/features/documents/components/detail/detail-panel";
 import type {
   DocumentRelationship,
   PurchaseOrderDetail as PurchaseOrderDetailType,
@@ -34,10 +54,12 @@ type PurchaseOrderDetailProps = {
   branding?: BrandingSettings;
 };
 
-// Mirrors InvoiceDetail's structure (line items + notes/terms on the
-// left, activity on the right) with one addition: the Inspector panel,
-// a distinct visually-separated right-rail column previewing the layout
-// pattern every other new Document Engine type will reuse.
+const TAB_VALUES = ["items", "activity"];
+
+// Same shape as the Invoice and Proforma pages: toolbar, money line,
+// tabs. The Inspector's metadata moved into the summary bar and the
+// Details panel — it was restating the status, supplier and dates that
+// the header already shows.
 export function PurchaseOrderDetail({
   purchaseOrder,
   activities,
@@ -49,6 +71,7 @@ export function PurchaseOrderDetail({
 }: PurchaseOrderDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
+  const [tab, setTab] = useHashTab(TAB_VALUES, "items");
 
   const fmtPo = (value: number) => formatCurrency(value);
   const poSettings = {
@@ -63,131 +86,193 @@ export function PurchaseOrderDetail({
     purchaseOrder.subtotal - purchaseOrder.discount_amount,
     poSettings
   );
+  const hasNotes = !!(
+    purchaseOrder.notes || purchaseOrder.terms_and_conditions
+  );
 
   function handleCopyNumber() {
     navigator.clipboard.writeText(purchaseOrder.po_number);
     toast("PO number copied", "success");
   }
 
+  // Sits beside the number wherever the number ends up: in the
+  // subtitle when the document has its own title, otherwise next to
+  // the heading, which is the number itself.
+  const copyNumberButton = (
+    <button
+      type="button"
+      onClick={handleCopyNumber}
+      title="Copy PO number"
+      className="text-muted-foreground/70 hover:text-foreground"
+    >
+      <Copy className="h-3.5 w-3.5" />
+    </button>
+  );
+
   return (
     <>
       {/* print:hidden so the on-screen layout doesn't print alongside the
           document view below it. */}
-      <div className="space-y-6 print:hidden">
-      <DetailHeader
-        backHref={`/${workspace.slug}/purchase-orders`}
-        backLabel="Back to Purchase Orders"
-        title={purchaseOrder.title || purchaseOrder.po_number}
-        badges={<StatusBadge status={purchaseOrder.status} />}
-        subtitle={
-          <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-            {purchaseOrder.po_number}
-            · {purchaseOrder.supplier?.name ?? "Deleted supplier"}
-            {purchaseOrder.supplier?.company ? ` · ${purchaseOrder.supplier.company}` : ""}
-            <button
-              type="button"
-              onClick={handleCopyNumber}
-              title="Copy PO number"
-              className="text-muted-foreground/70 hover:text-foreground"
-            >
-              Copy
-            </button>
-          </span>
-        }
-        actions={
-          <>
-            {/* Mirrors update_purchase_order (00087): a sent or acknowledged
-                PO can still be revised; goods arriving is what locks it. */}
-            {!["cancelled", "partially_received", "received"].includes(
-              purchaseOrder.status
-            ) && (
-              <Button variant="outline" asChild>
-                <Link
-                  href={`/${workspace.slug}/purchase-orders/${purchaseOrder.id}/edit`}
+      <div className="space-y-4 print:hidden">
+        <DocumentToolbar
+          backHref={`/${workspace.slug}/purchase-orders`}
+          backLabel="Back to Purchase Orders"
+          title={purchaseOrder.title || purchaseOrder.po_number}
+          badges={
+            <>
+              {!purchaseOrder.title && copyNumberButton}
+              <StatusBadge status={purchaseOrder.status} />
+            </>
+          }
+          subtitle={
+            <>
+              {/* The number is the heading when the document has no title of
+                  its own — no point printing it twice. */}
+              {purchaseOrder.title && (
+                <>
+                  <span className="font-medium text-foreground/80">
+                    {purchaseOrder.po_number}
+                  </span>
+                  {copyNumberButton}
+                  <span aria-hidden>·</span>
+                </>
+              )}
+              <span className="truncate">
+                {partyLabel(purchaseOrder.supplier?.name, purchaseOrder.supplier?.company, "Deleted supplier")}
+              </span>
+              {purchaseOrder.project && (
+                <DocumentChip
+                  href={`/${workspace.slug}/projects/${purchaseOrder.project.id}`}
+                  icon={<Building2 className="h-3 w-3 shrink-0" />}
                 >
-                  <Pencil className="mr-2 h-4 w-4" />
-                  Edit
-                </Link>
-              </Button>
-            )}
-            <PrintButton
-              filename={`${purchaseOrder.supplier?.name ?? "Supplier"} - ${purchaseOrder.po_number}`}
-            />
-          </>
-        }
-      />
-
-      <Card>
-        <CardContent className="flex flex-wrap items-center justify-between gap-4 py-5">
-          <div>
-            <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-              Total
-            </p>
-            <p className="text-3xl font-semibold tabular-nums tracking-tight">
-              {formatCurrency(purchaseOrder.total)}
-            </p>
-          </div>
-          <PurchaseOrderStatusActions purchaseOrder={purchaseOrder} />
-        </CardContent>
-      </Card>
-
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Line Items</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <LineItemsTable
-                lineItems={purchaseOrder.line_items}
+                  {purchaseOrder.project.code} — {purchaseOrder.project.name}
+                </DocumentChip>
+              )}
+            </>
+          }
+          actions={
+            <>
+              {/* Mirrors update_purchase_order (00087): a sent or acknowledged
+                  PO can still be revised; goods arriving is what locks it. */}
+              {!["cancelled", "partially_received", "received"].includes(
+                purchaseOrder.status
+              ) && (
+                <Button variant="outline" size="sm" asChild>
+                  <Link
+                    href={`/${workspace.slug}/purchase-orders/${purchaseOrder.id}/edit`}
+                  >
+                    <Pencil className="mr-1.5 h-3.5 w-3.5" />
+                    Edit
+                  </Link>
+                </Button>
+              )}
+              <PrintButton
+                size="sm"
+                filename={`${purchaseOrder.supplier?.name ?? "Supplier"} - ${purchaseOrder.po_number}`}
               />
-            </CardContent>
-          </Card>
+            </>
+          }
+        />
 
-          {(purchaseOrder.notes || purchaseOrder.terms_and_conditions) && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Notes &amp; Terms</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-5">
-                {purchaseOrder.notes && (
-                  <div
-                    className="text-sm [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
-                    dangerouslySetInnerHTML={{ __html: purchaseOrder.notes }}
-                  />
-                )}
-                {purchaseOrder.terms_and_conditions && (
-                  <div className={purchaseOrder.notes ? "border-t pt-4" : undefined}>
-                    <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                      Terms &amp; Conditions
-                    </p>
-                    <p className="mt-1 text-sm">{purchaseOrder.terms_and_conditions}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+        <DocumentSummaryBar
+          primary={{
+            label: "Total",
+            value: formatCurrency(purchaseOrder.total),
+          }}
+          metrics={[
+            { label: "Issued", value: formatDate(purchaseOrder.issue_date) },
+            {
+              label: "Expected",
+              value: purchaseOrder.expected_date
+                ? formatDate(purchaseOrder.expected_date)
+                : "—",
+            },
+            { label: "Items", value: purchaseOrder.line_items.length },
+          ]}
+          actions={
+            <PurchaseOrderStatusActions purchaseOrder={purchaseOrder} />
+          }
+        />
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Activity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ActivityTimeline activities={activities} />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Inspector: kept as its own visually-distinct column rather than
-            folded into the left content — see purchase-order-inspector.tsx. */}
-        <div>
-          <PurchaseOrderInspector
-            purchaseOrder={purchaseOrder}
-            relationships={relationships}
-            workspaceSlug={workspace.slug}
+        <Tabs value={tab} onValueChange={setTab} className="space-y-3">
+          <DocumentTabsList
+            value={tab}
+            tabs={[
+              {
+                value: "items",
+                label: "Items",
+                count: purchaseOrder.line_items.length,
+              },
+              { value: "activity", label: "Activity" },
+            ]}
           />
-        </div>
-      </div>
+
+          <TabsContent value="items" className="mt-0">
+            <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
+              <Panel>
+                <LineItemsTable lineItems={purchaseOrder.line_items} />
+
+                {hasNotes && (
+                  <Collapsible className="mt-4 border-t pt-3">
+                    <CollapsibleTrigger className="group flex w-full items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground">
+                      <ChevronDown className="h-3.5 w-3.5 transition-transform group-data-[state=open]:rotate-180" />
+                      Notes &amp; terms
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-4 pt-3">
+                      {purchaseOrder.notes && (
+                        <div
+                          className="text-sm [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
+                          dangerouslySetInnerHTML={{ __html: purchaseOrder.notes }}
+                        />
+                      )}
+                      {purchaseOrder.terms_and_conditions && (
+                        <div
+                          className={
+                            purchaseOrder.notes ? "border-t pt-3" : undefined
+                          }
+                        >
+                          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                            Terms &amp; Conditions
+                          </p>
+                          <p className="mt-1 text-sm">
+                            {purchaseOrder.terms_and_conditions}
+                          </p>
+                        </div>
+                      )}
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
+              </Panel>
+
+              <Panel>
+                <PanelHeader title="Totals" />
+                <TaxBreakdownBlock
+                  hargaJual={
+                    purchaseOrder.subtotal - purchaseOrder.discount_amount
+                  }
+                  settings={poSettings}
+                  dense
+                />
+              </Panel>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="activity" className="mt-0">
+            <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
+              <Panel>
+                <PanelHeader title="Activity" />
+                <ActivityTimeline activities={activities} />
+              </Panel>
+              <Panel>
+                <PanelHeader title="Linked documents" />
+                <PurchaseOrderLinks
+                  relationships={relationships}
+                  workspaceSlug={workspace.slug}
+                />
+              </Panel>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
 
       <SimplePrintView

@@ -36,7 +36,11 @@ export function LineItemsTable({ lineItems, packageBreakdowns = {} }: LineItemsT
             <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               {CATEGORY_LABEL[cat]}
             </h4>
-            <table className="w-full text-sm">
+            {/* Six columns of figures don't fit a phone: the table scrolls
+                inside its own box rather than pushing the whole page
+                sideways, which used to make every card overflow. */}
+            <div className="-mx-1 overflow-x-auto px-1">
+            <table className="w-full min-w-[520px] text-sm">
               <thead>
                 <tr className="border-b text-left text-xs text-muted-foreground">
                   <th className="py-2 font-medium">Description</th>
@@ -89,6 +93,7 @@ export function LineItemsTable({ lineItems, packageBreakdowns = {} }: LineItemsT
                 })}
               </tbody>
             </table>
+            </div>
             <p className="mt-1 text-right text-xs text-muted-foreground">
               Subtotal: {fmt(subtotal)}
             </p>

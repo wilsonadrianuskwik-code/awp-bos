@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -11,7 +10,7 @@ import { setDocumentTaxSettings } from "@/features/documents/actions";
 import { TaxBreakdownBlock } from "@/features/documents/components/tax-breakdown";
 import type { TaxSettings } from "@/features/documents/tax";
 
-type TaxSettingsCardProps = {
+type TaxSettingsPanelProps = {
   workspaceId: string;
   documentType: "invoice" | "proforma_invoice";
   documentId: string;
@@ -23,18 +22,19 @@ type TaxSettingsCardProps = {
 
 /**
  * Edits the tax settings behind the totals block, with a live preview of
- * the resulting figures. PPH and Retensi are checkboxes rather than a
+ * the resulting figures. Renders bare — the caller supplies the heading,
+ * so this can sit in a sheet, a panel or a tab without nested chrome. PPH and Retensi are checkboxes rather than a
  * "0%" default because "not applicable" and "0%" are different statements
  * on the printed document.
  */
-export function TaxSettingsCard({
+export function TaxSettingsPanel({
   workspaceId,
   documentType,
   documentId,
   hargaJual,
   settings,
   editable,
-}: TaxSettingsCardProps) {
+}: TaxSettingsPanelProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
@@ -70,97 +70,92 @@ export function TaxSettingsCard({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Totals</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <TaxBreakdownBlock
-          hargaJual={hargaJual}
-          settings={draft}
-        />
+    <div className="space-y-4">
+      <TaxBreakdownBlock
+        hargaJual={hargaJual}
+        settings={draft}
+      />
 
-        {editable && (
-          <div className="space-y-3 border-t pt-4">
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="DPP fraction">
-                <div className="flex items-center gap-1">
-                  <Input
-                    type="number"
-                    min={1}
-                    className="h-8"
-                    value={draft.dpp_numerator}
-                    onChange={(e) =>
-                      patch({ dpp_numerator: Number(e.target.value) || 0 })
-                    }
-                  />
-                  <span className="text-muted-foreground">/</span>
-                  <Input
-                    type="number"
-                    min={1}
-                    className="h-8"
-                    value={draft.dpp_denominator}
-                    onChange={(e) =>
-                      patch({ dpp_denominator: Number(e.target.value) || 1 })
-                    }
-                  />
-                </div>
-              </Field>
-
-              {/* Blank means this document carries no PPN — a
-                  PPN-exclusive price — which is not the same as 0%. */}
-              <Field label="PPN % (blank = no PPN)">
+      {editable && (
+        <div className="space-y-3 border-t pt-4">
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="DPP fraction">
+              <div className="flex items-center gap-1">
                 <Input
                   type="number"
-                  min={0}
-                  step="0.001"
+                  min={1}
                   className="h-8"
-                  value={draft.ppn_percent ?? ""}
+                  value={draft.dpp_numerator}
                   onChange={(e) =>
-                    patch({
-                      ppn_percent:
-                        e.target.value === "" ? null : Number(e.target.value) || 0,
-                    })
+                    patch({ dpp_numerator: Number(e.target.value) || 0 })
                   }
                 />
-              </Field>
-            </div>
+                <span className="text-muted-foreground">/</span>
+                <Input
+                  type="number"
+                  min={1}
+                  className="h-8"
+                  value={draft.dpp_denominator}
+                  onChange={(e) =>
+                    patch({ dpp_denominator: Number(e.target.value) || 1 })
+                  }
+                />
+              </div>
+            </Field>
 
-            {/* Show/hide only — DPP is still computed either way, since
-                PPN is derived from it. */}
-            <label className="flex items-center gap-2 text-[13px]">
-              <Checkbox
-                checked={draft.show_dpp}
-                onCheckedChange={(checked) => patch({ show_dpp: checked === true })}
+            {/* Blank means this document carries no PPN — a
+                PPN-exclusive price — which is not the same as 0%. */}
+            <Field label="PPN % (blank = no PPN)">
+              <Input
+                type="number"
+                min={0}
+                step="0.001"
+                className="h-8"
+                value={draft.ppn_percent ?? ""}
+                onChange={(e) =>
+                  patch({
+                    ppn_percent:
+                      e.target.value === "" ? null : Number(e.target.value) || 0,
+                  })
+                }
               />
-              Show DPP {draft.dpp_numerator}/{draft.dpp_denominator}
-            </label>
-
-            <ToggleRate
-              label="Potong PPH"
-              value={draft.pph_percent}
-              defaultRate={2}
-              onChange={(v) => patch({ pph_percent: v })}
-            />
-            <ToggleRate
-              label="Potong Retensi"
-              value={draft.retensi_percent}
-              defaultRate={5}
-              onChange={(v) => patch({ retensi_percent: v })}
-            />
-
-            <Button
-              size="sm"
-              disabled={!dirty || isPending}
-              loading={isPending}
-              onClick={handleSave}
-            >
-              Save totals
-            </Button>
+            </Field>
           </div>
-        )}
-      </CardContent>
-    </Card>
+
+          {/* Show/hide only — DPP is still computed either way, since
+              PPN is derived from it. */}
+          <label className="flex items-center gap-2 text-[13px]">
+            <Checkbox
+              checked={draft.show_dpp}
+              onCheckedChange={(checked) => patch({ show_dpp: checked === true })}
+            />
+            Show DPP {draft.dpp_numerator}/{draft.dpp_denominator}
+          </label>
+
+          <ToggleRate
+            label="Potong PPH"
+            value={draft.pph_percent}
+            defaultRate={2}
+            onChange={(v) => patch({ pph_percent: v })}
+          />
+          <ToggleRate
+            label="Potong Retensi"
+            value={draft.retensi_percent}
+            defaultRate={5}
+            onChange={(v) => patch({ retensi_percent: v })}
+          />
+
+          <Button
+            size="sm"
+            disabled={!dirty || isPending}
+            loading={isPending}
+            onClick={handleSave}
+          >
+            Save totals
+          </Button>
+        </div>
+      )}
+    </div>
   );
 }
 

@@ -30,33 +30,53 @@ export function LinkedDocumentsCard({
 }) {
   if (links.length === 0) return null;
 
-  const upstream = links.filter((l) => l.direction === "generated_from");
-  const downstream = links.filter((l) => l.direction === "generated_to");
-
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-base">Linked Documents</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {upstream.length > 0 && (
-          <LinkGroup
-            title="Generated from"
-            icon={<ArrowUpRight className="h-3.5 w-3.5" />}
-            links={upstream}
-            workspaceSlug={workspaceSlug}
-          />
-        )}
-        {downstream.length > 0 && (
-          <LinkGroup
-            title="Generated"
-            icon={<ArrowDownRight className="h-3.5 w-3.5" />}
-            links={downstream}
-            workspaceSlug={workspaceSlug}
-          />
-        )}
+      <CardContent>
+        <LinkedDocumentsList links={links} workspaceSlug={workspaceSlug} />
       </CardContent>
     </Card>
+  );
+}
+
+/**
+ * The same chain without the card chrome, for pages that supply their
+ * own heading (the document detail tabs).
+ */
+export function LinkedDocumentsList({
+  links,
+  workspaceSlug,
+}: {
+  links: DocumentLink[];
+  workspaceSlug: string;
+}) {
+  if (links.length === 0) return null;
+
+  const upstream = links.filter((l) => l.direction === "generated_from");
+  const downstream = links.filter((l) => l.direction === "generated_to");
+
+  return (
+    <div className="space-y-4">
+      {upstream.length > 0 && (
+        <LinkGroup
+          title="Generated from"
+          icon={<ArrowUpRight className="h-3.5 w-3.5" />}
+          links={upstream}
+          workspaceSlug={workspaceSlug}
+        />
+      )}
+      {downstream.length > 0 && (
+        <LinkGroup
+          title="Generated"
+          icon={<ArrowDownRight className="h-3.5 w-3.5" />}
+          links={downstream}
+          workspaceSlug={workspaceSlug}
+        />
+      )}
+    </div>
   );
 }
 
