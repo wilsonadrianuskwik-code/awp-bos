@@ -14,7 +14,6 @@ import { DocumentPreviewDialog } from "@/features/documents/components/document-
 import { LineItemsEditor } from "@/features/documents/components/line-items-editor";
 import { SaveAsTemplateDialog } from "@/features/line-items/components/save-as-template-dialog";
 import { InsertPalette } from "@/features/documents/components/insert-palette";
-import { ReviewSendOverlay } from "@/features/documents/components/review-send-overlay";
 import {
   createInvoice,
   updateInvoice,
@@ -409,11 +408,8 @@ export function InvoiceBuilder({
   if (submittableLineItems.length === 0)
     readyReasons.push("Add at least one item");
 
-  // The send moment: Review & Send opens the overlay; the actual send
-  // reuses the existing validate → save → mark-sent → route path.
-  const [reviewOpen, setReviewOpen] = useState(false);
-  // Preview reuses the review overlay in read-only mode, so the two
-  // can never show a different document. One instance, either mode.
+  // Send commits straight through the validate → save → mark-sent → route
+  // path. Preview renders the real printed document from live state.
   const [previewOpen, setPreviewOpen] = useState(false);
 
   // Bill To presentation: once a client is chosen the block reads as a
@@ -604,9 +600,9 @@ export function InvoiceBuilder({
         onCancel={handleCancel}
         onSave={() => startTransition(() => handleManualSave())}
         onPreview={() => setPreviewOpen(true)}
-        onSend={() => setReviewOpen(true)}
+        onSend={() => startTransition(() => handleSendShortcut())}
         readyReasons={readyReasons}
-        sendLabel="Review & Send"
+        sendLabel="Send"
       />
 
       {/* The document sheet: one continuous surface that reads like the
@@ -832,25 +828,6 @@ export function InvoiceBuilder({
         </div>
       </div>
 
-      <ReviewSendOverlay
-        open={reviewOpen}
-        onOpenChange={setReviewOpen}
-        docNoun="invoice"
-        workspaceName={workspace.name}
-        title={title}
-        recipientName={selectedClient?.name ?? "—"}
-        recipientDetail={[selectedClient?.company, selectedClient?.email]
-          .filter(Boolean)
-          .join(" · ")}
-        meta={[
-          { label: "Issue date", value: issueDate || "—" },
-          { label: "Due date", value: dueDate || "—" },
-        ]}
-        items={submittableLineItems}
-        totals={totals}
-        sending={isPending}
-        onSend={() => startTransition(() => handleSendShortcut())}
-      />
       <InsertPalette
         open={insertPaletteOpen}
         onOpenChange={setInsertPaletteOpen}

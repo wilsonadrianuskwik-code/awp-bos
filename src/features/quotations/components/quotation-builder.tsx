@@ -14,7 +14,6 @@ import { DocumentPreviewDialog } from "@/features/documents/components/document-
 import { LineItemsEditor } from "@/features/documents/components/line-items-editor";
 import { SaveAsTemplateDialog } from "@/features/line-items/components/save-as-template-dialog";
 import { InsertPalette } from "@/features/documents/components/insert-palette";
-import { ReviewSendOverlay } from "@/features/documents/components/review-send-overlay";
 import {
   createQuotation,
   updateQuotation,
@@ -459,9 +458,7 @@ export function QuotationBuilder({
   if (!projectId) readyReasons.push("Choose a project");
   if (submittableLineItems.length === 0)
     readyReasons.push("Add at least one item");
-  const [reviewOpen, setReviewOpen] = useState(false);
-  // Preview reuses the review overlay in read-only mode, so the two
-  // can never show a different document. One instance, either mode.
+  // Preview renders the real printed document from live state.
   const [previewOpen, setPreviewOpen] = useState(false);
 
   function updateLineItem(index: number, patch: Partial<LineItemInput>) {
@@ -583,9 +580,9 @@ export function QuotationBuilder({
         onCancel={handleCancel}
         onSave={() => startTransition(() => handleManualSave())}
         onPreview={() => setPreviewOpen(true)}
-        onSend={() => setReviewOpen(true)}
+        onSend={() => startTransition(() => handleSendShortcut())}
         readyReasons={readyReasons}
-        sendLabel="Review & Send"
+        sendLabel="Send"
       />
 
       {/* The document sheet: one continuous surface that reads like the
@@ -833,25 +830,6 @@ export function QuotationBuilder({
         </div>
       </div>
 
-      <ReviewSendOverlay
-        open={reviewOpen}
-        onOpenChange={setReviewOpen}
-        docNoun="quotation"
-        workspaceName={workspace.name}
-        title={title}
-        recipientName={selectedClient?.name ?? "—"}
-        recipientDetail={[selectedClient?.company, selectedClient?.email]
-          .filter(Boolean)
-          .join(" · ")}
-        meta={[
-          { label: "Issue date", value: issueDate || "—" },
-          { label: "Valid until", value: expiryDate || "—" },
-        ]}
-        items={submittableLineItems}
-        totals={totals}
-        sending={isPending}
-        onSend={() => startTransition(() => handleSendShortcut())}
-      />
       <InsertPalette
         open={insertPaletteOpen}
         onOpenChange={setInsertPaletteOpen}

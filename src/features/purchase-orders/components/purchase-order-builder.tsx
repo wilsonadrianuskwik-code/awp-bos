@@ -14,7 +14,6 @@ import { DocumentPreviewDialog } from "@/features/documents/components/document-
 import { LineItemsEditor } from "@/features/documents/components/line-items-editor";
 import { SaveAsTemplateDialog } from "@/features/line-items/components/save-as-template-dialog";
 import { InsertPalette } from "@/features/documents/components/insert-palette";
-import { ReviewSendOverlay } from "@/features/documents/components/review-send-overlay";
 import {
   createPurchaseOrder,
   updatePurchaseOrder,
@@ -381,9 +380,7 @@ export function PurchaseOrderBuilder({
   if (!projectId) readyReasons.push("Choose a project");
   if (submittableLineItems.length === 0) readyReasons.push("Add at least one item");
 
-  const [reviewOpen, setReviewOpen] = useState(false);
-  // Preview reuses the review overlay in read-only mode, so the two
-  // can never show a different document. One instance, either mode.
+  // Preview renders the real printed document from live state.
   const [previewOpen, setPreviewOpen] = useState(false);
   const [changingSupplier, setChangingSupplier] = useState(false);
   const selectedSupplier = suppliers.find((s) => s.id === supplierId) ?? null;
@@ -536,9 +533,9 @@ export function PurchaseOrderBuilder({
         onCancel={handleCancel}
         onSave={() => startTransition(() => handleManualSave())}
         onPreview={() => setPreviewOpen(true)}
-        onSend={() => setReviewOpen(true)}
+        onSend={() => startTransition(() => handleSendShortcut())}
         readyReasons={readyReasons}
-        sendLabel="Review & Send"
+        sendLabel="Send"
       />
 
       <div className="rounded-xl border bg-card px-5 py-8 shadow-2xs sm:px-14 sm:py-12">
@@ -730,25 +727,6 @@ export function PurchaseOrderBuilder({
         </div>
       </div>
 
-      <ReviewSendOverlay
-        open={reviewOpen}
-        onOpenChange={setReviewOpen}
-        docNoun="purchase order"
-        workspaceName={workspace.name}
-        title={title}
-        recipientName={selectedSupplier?.name ?? "—"}
-        recipientDetail={[selectedSupplier?.company, selectedSupplier?.email]
-          .filter(Boolean)
-          .join(" · ")}
-        meta={[
-          { label: "Issue date", value: issueDate || "—" },
-          { label: "Expected date", value: expectedDate || "—" },
-        ]}
-        items={submittableLineItems}
-        totals={totals}
-        sending={isPending}
-        onSend={() => startTransition(() => handleSendShortcut())}
-      />
       <InsertPalette
         open={insertPaletteOpen}
         onOpenChange={setInsertPaletteOpen}
