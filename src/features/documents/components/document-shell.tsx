@@ -322,9 +322,13 @@ export function DocumentFootnote({
   notes?: string | null;
   terms?: string | null;
   /**
-   * Per-document override (documents.show_signature, 00104). Defaults to
-   * true so a caller that doesn't pass it — and every document created
-   * before the flag existed — keeps printing the signature as before.
+   * Whether to stamp the saved signature image (documents.show_signature,
+   * 00104). Off leaves the space empty for a wet signature; the label,
+   * signatory name and company still print either way, since they're what
+   * identifies who is meant to be signing.
+   *
+   * Defaults to true so a caller that doesn't pass it — and every document
+   * created before the flag existed — keeps printing as before.
    */
   showSignature?: boolean;
 }) {
@@ -332,7 +336,11 @@ export function DocumentFootnote({
   const hasPayment = accounts.length > 0;
   const signatoryName = branding?.signatory_name?.trim();
   const signatureUrl = branding?.signature_url?.trim();
-  const hasSignature = showSignature && !!(signatoryName || signatureUrl);
+  // The block itself renders whenever there's anything to anchor it. The
+  // toggle decides only whether the saved signature image is stamped into
+  // it — with it off, the label, name and company still print and the
+  // space where the image would go is left empty to be signed by hand.
+  const hasSignature = !!(signatoryName || signatureUrl);
 
   // Primary first — that's the account the company actually wants paid.
   const ordered = [...accounts].sort(
@@ -426,8 +434,14 @@ export function DocumentFootnote({
                 {/* Stacked, not overlapped: reproducing the paper overlap
                     digitally strikes a rule through the name, and a
                     scanned signature often already carries the company
-                    stamp. Leave the company line blank when it does. */}
-                {signatureUrl ? (
+                    stamp. Leave the company line blank when it does.
+
+                    The empty box is the same height as the image, so a
+                    hand-signed document and a stamped one occupy exactly
+                    the same space and paginate identically — and the room
+                    left for the pen is, by definition, the room the real
+                    signature takes. */}
+                {showSignature && signatureUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={signatureUrl}
