@@ -21,6 +21,32 @@
 -- the figures would risk them disagreeing with what the app would
 -- recompute the moment one of these is opened and saved.
 --
+-- THE TWO PAK DHANI / MASJID AL HIJRAH INVOICES ARE DIFFERENT
+-- AWP-P/06072026-211 and AWP-P/08072026-213 were quoted at prices that
+-- already included PPN, so their stored totals are gross, not harga
+-- jual. Adding 11% on top of them the way the other 21 are treated
+-- would overstate both the invoice and what was actually received.
+-- Instead the PPN is separated out of the price: each unit price is
+-- divided by 1.11 to recover the ex-PPN figure, and PPN is then applied
+-- on top, landing back on the same gross the client paid. The money
+-- does not move; only its split between harga jual and PPN appears.
+--
+-- 1.11 is the divisor because PPN 12% on an 11/12 DPP is exactly 11% of
+-- harga jual — the same effective rate the other 21 get, just worked
+-- backwards.
+--
+-- Guarded by ppn_percent IS NULL rather than by matching the old prices,
+-- so a second run cannot divide an already-divided price again.
+--
+-- One rupiah cent of rounding on -213: its single line is 2 PAIL, and
+-- the exact ex-PPN unit price is 1,315,315.315 — a third decimal
+-- NUMERIC(15,2) cannot hold. Rounding the unit to 1,315,315.32 makes
+-- the total 2,920,000.01 rather than 2,920,000. Preferred over splitting
+-- the line into two 1-PAIL rows to absorb the cent, which would make
+-- the printed invoice differ from the original document; a hundredth of
+-- a rupiah is below the smallest unit of the currency and displays as
+-- Rp 2,920,000 everywhere in the app.
+--
 -- amount_paid is raised to the new total, per instruction that the paid
 -- figure should tally with the post-PPN amount, and the matching
 -- payment row from 00096 is raised with it. Both, not just the invoice
@@ -51,12 +77,28 @@ DECLARE
     'AWP-P/29072026-220', 'AWP-P/29072026-221', 'AWP-P/30052026-203',
     'AWP-P/30062026-206', 'AWP-P/30062026-207'
   ];
+  -- The two whose prices already included PPN — see header.
+  v_gross        TEXT[] := ARRAY[
+    'AWP-P/06072026-211', 'AWP-P/08072026-213'
+  ];
   v_id           UUID;
 BEGIN
   SELECT id INTO v_workspace_id FROM public.workspaces WHERE slug = 'awp-k68w';
   IF v_workspace_id IS NULL THEN
     RAISE EXCEPTION 'Workspace awp-k68w not found -- aborting PPN correction';
   END IF;
+
+  -- Separate the included PPN out of the two gross-priced invoices,
+  -- before the loop below applies PPN on top of whatever it finds.
+  UPDATE public.line_items li
+     SET unit_price = ROUND(li.unit_price / 1.11, 2)
+    FROM public.invoices i
+   WHERE li.entity_type = 'invoice'
+     AND li.entity_id   = i.id
+     AND i.workspace_id = v_workspace_id
+     AND i.invoice_number = ANY(v_gross)
+     AND i.deleted_at IS NULL
+     AND i.ppn_percent IS NULL;
 
   FOR v_id IN
     SELECT id FROM public.invoices
