@@ -69,6 +69,17 @@ type DocumentShellProps = {
   logoUrl?: string | null;
   /** Supplies the address line under the company name. */
   companyProfile?: CompanyProfile;
+  /**
+   * Renders the document on screen instead of only when printing.
+   *
+   * The shell is normally `hidden print:block` — it lives inside the
+   * detail page purely so the browser has something to print, and must
+   * stay invisible the rest of the time. The builder's Preview needs the
+   * same markup visible in a dialog, and rendering it there rather than
+   * approximating it is the point: a preview that isn't the print output
+   * is just a second thing to keep in sync.
+   */
+  onScreen?: boolean;
   children: React.ReactNode;
 };
 
@@ -88,12 +99,19 @@ export function DocumentShell({
   companyName,
   logoUrl,
   companyProfile,
+  onScreen = false,
   children,
 }: DocumentShellProps) {
   const companyAddress = formatCompanyAddress(companyProfile?.address);
 
   return (
-    <div className="hidden text-[#1f2933] print:block">
+    <div
+      className={
+        onScreen
+          ? "bg-white text-[#1f2933]"
+          : "hidden text-[#1f2933] print:block"
+      }
+    >
       <div className="flex items-center gap-5 pb-3">
         {logoUrl && (
           // eslint-disable-next-line @next/next/no-img-element

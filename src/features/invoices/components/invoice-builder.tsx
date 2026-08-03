@@ -10,6 +10,7 @@ import { useToast } from "@/providers/toast-provider";
 import { useConfirm } from "@/providers/confirm-provider";
 import { ClientSelector } from "@/features/line-items/components/client-selector";
 import { BuilderCommandBar } from "@/features/documents/components/builder-command-bar";
+import { DocumentPreviewDialog } from "@/features/documents/components/document-preview-dialog";
 import { LineItemsEditor } from "@/features/documents/components/line-items-editor";
 import { SaveAsTemplateDialog } from "@/features/line-items/components/save-as-template-dialog";
 import { InsertPalette } from "@/features/documents/components/insert-palette";
@@ -41,8 +42,9 @@ import {
   setDocumentTaxSettings,
 } from "@/features/documents/actions";
 import { SignatureToggle } from "@/features/documents/components/signature-toggle";
+import { computeTaxBreakdown, taxTotalRows } from "@/features/documents/tax";
 import type { TaxSettings } from "@/features/documents/tax";
-import { CURRENCY } from "@/lib/utils/format-currency";
+import { CURRENCY, formatCurrency } from "@/lib/utils/format-currency";
 
 
 function emptyItem(category: LineItemCategory): LineItemInput {
@@ -831,13 +833,8 @@ export function InvoiceBuilder({
       </div>
 
       <ReviewSendOverlay
-        open={reviewOpen || previewOpen}
-        onOpenChange={(next) => {
-          if (next) return;
-          setReviewOpen(false);
-          setPreviewOpen(false);
-        }}
-        previewOnly={previewOpen}
+        open={reviewOpen}
+        onOpenChange={setReviewOpen}
         docNoun="invoice"
         workspaceName={workspace.name}
         title={title}
@@ -868,6 +865,52 @@ export function InvoiceBuilder({
         onOpenChange={setSaveTemplateOpen}
         items={submittableLineItems}
         onSaved={(t) => setTemplates((prev) => [t, ...prev])}
+      />
+
+      <DocumentPreviewDialog
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        workspaceName={workspace.name}
+        logoUrl={workspace.logo_url}
+        companyProfile={workspace.settings?.company_profile}
+        branding={workspace.settings?.branding}
+        paymentDetails={workspace.settings?.payment_details}
+        documentLabel="Invoice"
+        party={{
+          heading: "Bill To",
+          name: selectedClient?.name ?? "No client selected",
+          lines: [selectedClient?.company, selectedClient?.email],
+        }}
+        meta={[
+          { label: "Invoice Date", value: issueDate || "—" },
+          { label: "Invoice Number", value: invoice?.invoice_number ?? "Draft" },
+        ]}
+        lines={submittableLineItems.map((item, i) => ({
+          id: String(i),
+          description: item.description,
+          quantity: item.quantity,
+          unit: item.unit || null,
+          unit_price: item.unit_price,
+          line_total:
+            item.quantity *
+            item.unit_price *
+            (1 - (item.discount_percent ?? 0) / 100),
+        }))}
+        totalRows={taxTotalRows(
+          computeTaxBreakdown(totals.subtotal - totals.discount_amount, taxSettings),
+          taxSettings,
+          formatCurrency
+        )}
+        total={{
+          label: "Total",
+          value: formatCurrency(
+            computeTaxBreakdown(totals.subtotal - totals.discount_amount, taxSettings)
+              .total
+          ),
+        }}
+        notes={notes}
+        terms={paymentTerms}
+        showSignature={showSignature}
       />
     </div>
   );

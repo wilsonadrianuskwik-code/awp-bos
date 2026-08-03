@@ -51,6 +51,8 @@ type SimplePrintViewProps = {
   terms?: string | null;
   /** Per-document signature override; defaults to shown. */
   showSignature?: boolean;
+  /** Render visibly instead of print-only — see DocumentShell.onScreen. */
+  onScreen?: boolean;
 };
 
 /**
@@ -74,6 +76,7 @@ export function SimplePrintView({
   notes,
   terms,
   showSignature = true,
+  onScreen = false,
 }: SimplePrintViewProps) {
   const fmt = (value: number) => formatCurrency(value);
 
@@ -83,6 +86,7 @@ export function SimplePrintView({
       companyName={companyProfile?.display_name || workspaceName}
       logoUrl={logoUrl}
       companyProfile={companyProfile}
+      onScreen={onScreen}
     >
       <DocumentParties
         partyHeading={party.heading}
