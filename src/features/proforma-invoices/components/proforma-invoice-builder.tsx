@@ -12,6 +12,7 @@ import { ClientSelector } from "@/features/line-items/components/client-selector
 import { BuilderCommandBar } from "@/features/documents/components/builder-command-bar";
 import { LineItemsEditor } from "@/features/documents/components/line-items-editor";
 import { InsertPalette } from "@/features/documents/components/insert-palette";
+import { ReviewSendOverlay } from "@/features/documents/components/review-send-overlay";
 import {
   createProformaInvoice,
   updateProformaInvoice,
@@ -323,6 +324,10 @@ export function ProformaInvoiceBuilder({
   const handleFocusHandled = useCallback(() => setFocusRequest(null), []);
 
   const [changingClient, setChangingClient] = useState(false);
+  // This builder sends directly (no review step), so the overlay is only
+  // ever opened read-only here — Preview still shows the same render the
+  // other three builders review against.
+  const [previewOpen, setPreviewOpen] = useState(false);
   const selectedClient = clients.find((c) => c.id === clientId) ?? null;
 
   const [showNotes, setShowNotes] = useState(() => (proformaInvoice?.notes ?? "") !== "");
@@ -452,6 +457,7 @@ export function ProformaInvoiceBuilder({
         isPending={isPending}
         onCancel={handleCancel}
         onSave={() => startTransition(() => handleManualSave())}
+        onPreview={() => setPreviewOpen(true)}
         onSend={() => startTransition(() => handleSend())}
         readyReasons={readyReasons}
         sendLabel="Save & Send"
@@ -650,6 +656,25 @@ export function ProformaInvoiceBuilder({
         priceFor={priceFor}
         onInsertCatalog={handleInsertCatalogItem}
         onInsertTemplate={handleInsertTemplate}
+      />
+
+      <ReviewSendOverlay
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        previewOnly
+        docNoun="proforma invoice"
+        workspaceName={workspace.name}
+        title={title}
+        recipientName={selectedClient?.name ?? "No client selected"}
+        recipientDetail={selectedClient?.company ?? undefined}
+        meta={[
+          { label: "Issue date", value: issueDate || "—" },
+          { label: "Valid until", value: expiryDate || "—" },
+        ]}
+        items={submittableLineItems}
+        totals={totals}
+        sending={false}
+        onSend={() => {}}
       />
     </div>
   );

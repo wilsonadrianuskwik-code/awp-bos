@@ -410,6 +410,9 @@ export function InvoiceBuilder({
   // The send moment: Review & Send opens the overlay; the actual send
   // reuses the existing validate → save → mark-sent → route path.
   const [reviewOpen, setReviewOpen] = useState(false);
+  // Preview reuses the review overlay in read-only mode, so the two
+  // can never show a different document. One instance, either mode.
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   // Bill To presentation: once a client is chosen the block reads as a
   // document recipient; "change" reopens the selector. Pure UI state.
@@ -598,6 +601,7 @@ export function InvoiceBuilder({
         isPending={isPending}
         onCancel={handleCancel}
         onSave={() => startTransition(() => handleManualSave())}
+        onPreview={() => setPreviewOpen(true)}
         onSend={() => setReviewOpen(true)}
         readyReasons={readyReasons}
         sendLabel="Review & Send"
@@ -827,8 +831,13 @@ export function InvoiceBuilder({
       </div>
 
       <ReviewSendOverlay
-        open={reviewOpen}
-        onOpenChange={setReviewOpen}
+        open={reviewOpen || previewOpen}
+        onOpenChange={(next) => {
+          if (next) return;
+          setReviewOpen(false);
+          setPreviewOpen(false);
+        }}
+        previewOnly={previewOpen}
         docNoun="invoice"
         workspaceName={workspace.name}
         title={title}

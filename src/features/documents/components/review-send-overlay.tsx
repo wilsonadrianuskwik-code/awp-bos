@@ -26,6 +26,13 @@ type ReviewSendOverlayProps = {
   totals: LineItemTotals;
   sending: boolean;
   onSend: () => void;
+  /**
+   * Opens the same view as a plain preview: no "Sending to" framing and
+   * no Send button, just the document and a way back. Reuses this
+   * component rather than building a second one so what Preview shows and
+   * what Review shows can never drift apart — they are the same render.
+   */
+  previewOnly?: boolean;
 };
 
 // The send moment: a focused review of what the client will receive,
@@ -47,11 +54,14 @@ export function ReviewSendOverlay({
   totals,
   sending,
   onSend,
+  previewOnly = false,
 }: ReviewSendOverlayProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl gap-0 p-0">
-        <DialogTitle className="sr-only">Review and send</DialogTitle>
+        <DialogTitle className="sr-only">
+          {previewOnly ? "Document preview" : "Review and send"}
+        </DialogTitle>
         <div className="grid md:grid-cols-[minmax(0,1fr)_260px]">
           {/* The document, as the client will read it. */}
           <div className="max-h-[70vh] overflow-y-auto border-b p-8 md:border-b-0 md:border-r">
@@ -136,7 +146,7 @@ export function ReviewSendOverlay({
           <div className="flex flex-col justify-between p-6">
             <div>
               <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                Sending to
+                {previewOnly ? "Prepared for" : "Sending to"}
               </p>
               <p className="mt-1.5 text-sm font-medium">{recipientName}</p>
               {recipientDetail && (
@@ -144,9 +154,11 @@ export function ReviewSendOverlay({
                   {recipientDetail}
                 </p>
               )}
-              <p className="mt-2 text-xs text-muted-foreground">
-                Delivered via their client portal link.
-              </p>
+              {!previewOnly && (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Delivered via their client portal link.
+                </p>
+              )}
               <div className="mt-5 space-y-2 border-t pt-4 text-[13px]">
                 {meta.map((m) => (
                   <div key={m.label} className="flex justify-between gap-3">
@@ -163,22 +175,24 @@ export function ReviewSendOverlay({
               </div>
             </div>
             <div className="mt-8 space-y-2">
+              {!previewOnly && (
+                <Button
+                  type="button"
+                  className="w-full"
+                  onClick={onSend}
+                  disabled={sending}
+                >
+                  {sending ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="mr-2 h-4 w-4" />
+                  )}
+                  Send {docNoun}
+                </Button>
+              )}
               <Button
                 type="button"
-                className="w-full"
-                onClick={onSend}
-                disabled={sending}
-              >
-                {sending ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="mr-2 h-4 w-4" />
-                )}
-                Send {docNoun}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
+                variant={previewOnly ? "default" : "outline"}
                 className="w-full"
                 onClick={() => onOpenChange(false)}
                 disabled={sending}

@@ -380,6 +380,9 @@ export function PurchaseOrderBuilder({
   if (submittableLineItems.length === 0) readyReasons.push("Add at least one item");
 
   const [reviewOpen, setReviewOpen] = useState(false);
+  // Preview reuses the review overlay in read-only mode, so the two
+  // can never show a different document. One instance, either mode.
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [changingSupplier, setChangingSupplier] = useState(false);
   const selectedSupplier = suppliers.find((s) => s.id === supplierId) ?? null;
 
@@ -530,6 +533,7 @@ export function PurchaseOrderBuilder({
         isPending={isPending}
         onCancel={handleCancel}
         onSave={() => startTransition(() => handleManualSave())}
+        onPreview={() => setPreviewOpen(true)}
         onSend={() => setReviewOpen(true)}
         readyReasons={readyReasons}
         sendLabel="Review & Send"
@@ -725,8 +729,13 @@ export function PurchaseOrderBuilder({
       </div>
 
       <ReviewSendOverlay
-        open={reviewOpen}
-        onOpenChange={setReviewOpen}
+        open={reviewOpen || previewOpen}
+        onOpenChange={(next) => {
+          if (next) return;
+          setReviewOpen(false);
+          setPreviewOpen(false);
+        }}
+        previewOnly={previewOpen}
         docNoun="purchase order"
         workspaceName={workspace.name}
         title={title}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Send } from "lucide-react";
+import { Eye, Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -26,6 +26,8 @@ type BuilderCommandBarProps = {
   readyReasons?: string[];
   onCancel: () => void;
   onSave: () => void;
+  /** Opens the document preview. Omitted = no Preview button. */
+  onPreview?: () => void;
   /** The existing ⌘⏎ save-and-send path, surfaced as a visible button. */
   onSend: () => void;
   /** Verb for the primary action, e.g. "Send" (invoice) / "Send" (quotation). */
@@ -45,6 +47,7 @@ export function BuilderCommandBar({
   readyReasons = [],
   onCancel,
   onSave,
+  onPreview,
   onSend,
   sendLabel = "Save & Send",
 }: BuilderCommandBarProps) {
@@ -99,6 +102,18 @@ export function BuilderCommandBar({
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Save Draft
           </Button>
+          {onPreview && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onPreview}
+              title="Preview the document"
+            >
+              <Eye className="mr-1.5 h-3.5 w-3.5" />
+              Preview
+            </Button>
+          )}
           {readyReasons.length > 0 ? (
             <Popover open={showReasons} onOpenChange={setShowReasons}>
               <PopoverTrigger asChild>
