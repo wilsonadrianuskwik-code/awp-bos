@@ -41,7 +41,10 @@ import type {
 import type { Activity } from "@/features/activities/types";
 import type { BrandingSettings, CompanyProfile } from "@/features/templates/types";
 import { SimplePrintView } from "@/features/documents/components/simple-print-view";
-import { PrintButton } from "@/features/documents/components/print-button";
+import {
+  documentFilename,
+  PrintButton,
+} from "@/features/documents/components/print-button";
 
 type PurchaseOrderDetailProps = {
   purchaseOrder: PurchaseOrderDetailType;
@@ -168,7 +171,11 @@ export function PurchaseOrderDetail({
               )}
               <PrintButton
                 size="sm"
-                filename={`${purchaseOrder.supplier?.name ?? "Supplier"} - ${purchaseOrder.po_number}`}
+                filename={documentFilename(
+                  purchaseOrder.po_number,
+                  purchaseOrder.supplier?.name ?? "Supplier",
+                  formatCurrency(purchaseOrder.total)
+                )}
               />
             </>
           }

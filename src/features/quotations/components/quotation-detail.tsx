@@ -50,6 +50,10 @@ import {
   Panel,
   PanelHeader,
 } from "@/features/documents/components/detail/detail-panel";
+import {
+  documentFilename,
+  printDocument,
+} from "@/features/documents/components/print-button";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import { formatDate } from "@/lib/utils/date";
 import type {
@@ -125,13 +129,13 @@ export function QuotationDetail({
   );
 
   function handlePrint() {
-    const clientName = quotation.client?.name ?? "Client";
-    const total = formatCurrency(quotation.total ?? 0);
-    const filename = sanitizeFilename(`${clientName} - ${quotation.quotation_number} - ${total}`);
-    const prevTitle = document.title;
-    document.title = filename;
-    window.print();
-    document.title = prevTitle;
+    printDocument(
+      documentFilename(
+        quotation.quotation_number,
+        quotation.client?.name ?? "Client",
+        formatCurrency(quotation.total ?? 0)
+      )
+    );
   }
 
   // Lets the quotation card's "Download PDF"/"Print" quick actions trigger
@@ -478,8 +482,4 @@ function Prose({ label, html }: { label: string; html: string }) {
       />
     </div>
   );
-}
-
-function sanitizeFilename(name: string): string {
-  return name.replace(/[<>:"/\\|?*]/g, "").replace(/\s+/g, " ").trim();
 }

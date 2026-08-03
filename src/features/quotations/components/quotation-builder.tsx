@@ -114,8 +114,12 @@ export function QuotationBuilder({
   );
   const priceFor = useClientPriceResolver(clientPrices, clientId);
   const [projectId, setProjectId] = useState(quotation?.project_id ?? "");
-  const [title, setTitle] = useState(quotation?.title ?? "");
-  const [summary, setSummary] = useState(quotation?.summary ?? "");
+  // Neither is edited any more — the masthead inputs are gone (the
+  // document is identified by its number). Read through from the
+  // saved record so editing an older document that does have a title
+  // keeps it instead of silently clearing it.
+  const title = quotation?.title ?? "";
+  const summary = quotation?.summary ?? "";
   // Rupiah-only app: no picker, no per-document currency.
   const currency = CURRENCY;
   const [issueDate, setIssueDate] = useState(quotation?.issue_date ?? todayISO());
@@ -192,8 +196,6 @@ export function QuotationBuilder({
   const currentPayload: CreateQuotationInput = {
     client_id: clientId,
     project_id: projectId,
-    title,
-    summary,
     currency,
     issue_date: issueDate,
     expiry_date: expiryDate,
@@ -615,20 +617,6 @@ export function QuotationBuilder({
             Quotation
           </span>
         </div>
-
-        {/* Masthead — the document names itself; no boxed inputs. */}
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Untitled quotation"
-          className="mt-9 w-full border-none bg-transparent text-3xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/30"
-        />
-        <input
-          value={summary}
-          onChange={(e) => setSummary(e.target.value)}
-          placeholder="Add a one-line summary shown to the client…"
-          className="mt-1.5 w-full border-none bg-transparent text-sm text-muted-foreground outline-none placeholder:text-muted-foreground/40"
-        />
 
         {/* Recipient + document properties */}
         <div className="mt-8 grid gap-x-16 gap-y-8 border-t pt-8 md:grid-cols-2">

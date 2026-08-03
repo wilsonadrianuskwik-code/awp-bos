@@ -58,6 +58,10 @@ import {
 import type { DeliveryOrderWithRelations } from "@/features/delivery-orders/types";
 import type { DocumentLink } from "@/features/documents/queries";
 import type { Supplier } from "@/features/suppliers/types";
+import {
+  documentFilename,
+  printDocument,
+} from "@/features/documents/components/print-button";
 import { formatCurrency } from "@/lib/utils/format-currency";
 import { formatDate, getOverdueDays } from "@/lib/utils/date";
 import { getPaymentProgress } from "@/features/invoices/helpers";
@@ -152,13 +156,13 @@ export function InvoiceDetail({
     (invoice.amount_paid ?? 0) === 0;
 
   function handlePrint() {
-    const clientName = invoice.client?.name ?? "Client";
-    const total = formatCurrency(invoice.total ?? 0);
-    const filename = sanitizeFilename(`${clientName} - ${invoice.invoice_number} - ${total}`);
-    const prevTitle = document.title;
-    document.title = filename;
-    window.print();
-    document.title = prevTitle;
+    printDocument(
+      documentFilename(
+        invoice.invoice_number,
+        invoice.client?.name ?? "Client",
+        formatCurrency(invoice.total ?? 0)
+      )
+    );
   }
 
   // Lets the invoice card's "Download PDF"/"Print" quick actions trigger
@@ -541,8 +545,4 @@ export function InvoiceDetail({
       />
     </div>
   );
-}
-
-function sanitizeFilename(name: string): string {
-  return name.replace(/[<>:"/\\|?*]/g, "").replace(/\s+/g, " ").trim();
 }

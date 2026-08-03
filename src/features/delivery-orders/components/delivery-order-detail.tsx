@@ -17,7 +17,10 @@ import {
 import { addressLines, formatAddress } from "@/features/documents/address";
 import { DELIVERY_ORDER_STATUSES, type DeliveryOrderDetail } from "@/features/delivery-orders/types";
 import { SimplePrintView } from "@/features/documents/components/simple-print-view";
-import { PrintButton } from "@/features/documents/components/print-button";
+import {
+  documentFilename,
+  PrintButton,
+} from "@/features/documents/components/print-button";
 import { DocumentToolbar } from "@/features/documents/components/detail/document-toolbar";
 import {
   Fact,
@@ -127,7 +130,10 @@ export function DeliveryOrderDetailView({
             <>
               <PrintButton
                 size="sm"
-                filename={`${deliveryOrder.client?.name ?? "Client"} - ${deliveryOrder.do_number}`}
+                filename={documentFilename(
+                  deliveryOrder.do_number,
+                  deliveryOrder.client?.name ?? "Client"
+                )}
               />
               {next && (
                 <>

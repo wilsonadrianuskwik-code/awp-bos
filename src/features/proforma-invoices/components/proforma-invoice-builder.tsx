@@ -108,7 +108,11 @@ export function ProformaInvoiceBuilder({
   );
   const priceFor = useClientPriceResolver(clientPrices, clientId);
   const [projectId, setProjectId] = useState(proformaInvoice?.project_id ?? "");
-  const [title, setTitle] = useState(proformaInvoice?.title ?? "");
+  // Neither is edited any more — the masthead inputs are gone (the
+  // document is identified by its number). Read through from the
+  // saved record so editing an older document that does have a title
+  // keeps it instead of silently clearing it.
+  const title = proformaInvoice?.title ?? "";
   // Rupiah-only app: no picker, no per-document currency.
   const currency = CURRENCY;
   const [issueDate, setIssueDate] = useState(
@@ -478,13 +482,6 @@ export function ProformaInvoiceBuilder({
             Proforma Invoice
           </span>
         </div>
-
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Untitled proforma invoice"
-          className="mt-9 w-full border-none bg-transparent text-3xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/30"
-        />
 
         <div className="mt-8 grid gap-x-16 gap-y-8 border-t pt-8 md:grid-cols-2">
           <div>

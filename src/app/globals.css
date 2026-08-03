@@ -484,4 +484,25 @@
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
+  /* Floating screen chrome must never reach the paper. These are
+     portalled to <body>, so they sit outside the `print:hidden` wrapper
+     each page puts around its on-screen layout, and a toast that happened
+     to be open — "Public link copied" — printed on top of the invoice.
+     Matched by role so any future overlay is covered by default.
+
+     [data-print-keep] is the escape hatch for a portalled surface that
+     should print. Nothing uses it today: the printable document is
+     rendered inline by the page, not in a portal. */
+  [data-radix-popper-content-wrapper],
+  [role="dialog"],
+  [role="alertdialog"],
+  [role="tooltip"],
+  [role="status"],
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+  [data-print-keep],
+  [data-print-keep] * {
+    display: revert !important;
+  }
 }

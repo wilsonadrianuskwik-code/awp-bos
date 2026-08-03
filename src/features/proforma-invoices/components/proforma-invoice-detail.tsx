@@ -21,7 +21,10 @@ import { TaxSettingsSheet } from "@/features/documents/components/detail/tax-set
 import { TaxBreakdownBlock } from "@/features/documents/components/tax-breakdown";
 import { SimplePrintView } from "@/features/documents/components/simple-print-view";
 import { computeTaxBreakdown, taxTotalRows } from "@/features/documents/tax";
-import { PrintButton } from "@/features/documents/components/print-button";
+import {
+  documentFilename,
+  PrintButton,
+} from "@/features/documents/components/print-button";
 import {
   DocumentToolbar,
   partyLabel,
@@ -173,7 +176,11 @@ export function ProformaInvoiceDetail({
               )}
               <PrintButton
                 size="sm"
-                filename={`${proformaInvoice.client?.name ?? "Client"} - ${proformaInvoice.pi_number}`}
+                filename={documentFilename(
+                  proformaInvoice.pi_number,
+                  proformaInvoice.client?.name ?? "Client",
+                  formatCurrency(proformaInvoice.total)
+                )}
               />
             </>
           }

@@ -109,7 +109,11 @@ export function PurchaseOrderBuilder({
     purchaseOrder?.supplier_id ?? initialSupplierId ?? ""
   );
   const [projectId, setProjectId] = useState(purchaseOrder?.project_id ?? "");
-  const [title, setTitle] = useState(purchaseOrder?.title ?? "");
+  // Neither is edited any more — the masthead inputs are gone (the
+  // document is identified by its number). Read through from the
+  // saved record so editing an older document that does have a title
+  // keeps it instead of silently clearing it.
+  const title = purchaseOrder?.title ?? "";
   // Rupiah-only app: no picker, no per-document currency.
   const currency = CURRENCY;
   const [issueDate, setIssueDate] = useState(purchaseOrder?.issue_date ?? todayISO());
@@ -552,13 +556,6 @@ export function PurchaseOrderBuilder({
             Purchase Order
           </span>
         </div>
-
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Untitled purchase order"
-          className="mt-9 w-full border-none bg-transparent text-3xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/30"
-        />
 
         <div className="mt-8 grid gap-x-16 gap-y-8 border-t pt-8 md:grid-cols-2">
           <div>
