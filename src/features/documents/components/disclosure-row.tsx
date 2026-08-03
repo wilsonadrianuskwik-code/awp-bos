@@ -28,6 +28,53 @@ const CATEGORY_LABEL: Record<LineItemCategory, string> = {
 const quietField =
   "h-7 rounded-md border border-transparent bg-transparent px-1.5 text-sm tabular-nums transition-colors duration-100 hover:border-input/60 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/25 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none";
 
+/**
+ * A number field that doesn't fight the person typing in it.
+ *
+ * Bound directly to a number, an empty field renders "0", the caret sits
+ * after it, and typing a price produced "02233" — right value, wrong
+ * looking, and it reads as a typo every time. Here zero renders as empty
+ * (with a "0" placeholder, so the field still says what it holds), and
+ * any leading zero is dropped as you type.
+ *
+ * The draft is a string while focused so a half-typed "1." or "0.0"
+ * survives; on blur it's dropped and the canonical number is shown
+ * again, which is also what lets an external change — applying a
+ * document default, inserting a catalog price — reach the field.
+ */
+function QuietNumberInput({
+  value,
+  onValueChange,
+  className,
+  ...rest
+}: {
+  value: number;
+  onValueChange: (value: number) => void;
+} & Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "value" | "onChange" | "type"
+>) {
+  const [draft, setDraft] = useState<string | null>(null);
+  const shown = draft ?? (value === 0 ? "" : String(value));
+
+  return (
+    <input
+      type="number"
+      value={shown}
+      placeholder="0"
+      onChange={(e) => {
+        // "007" -> "7", "-05" -> "-5", but "0" and "0.5" are left alone.
+        const cleaned = e.target.value.replace(/^(-?)0+(?=\d)/, "$1");
+        setDraft(cleaned);
+        onValueChange(Number(cleaned) || 0);
+      }}
+      onBlur={() => setDraft(null)}
+      className={className}
+      {...rest}
+    />
+  );
+}
+
 type DisclosureRowProps = {
   item: LineItemInput;
   /** The live catalog package this line was inserted from, if it's a
@@ -186,10 +233,9 @@ export function DisclosureRow({
         <div className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-2 gap-y-1 md:flex-none md:flex-nowrap">
           {/* Quantity and Unit travel together — "how much" of what — so
               the eye never has to jump across the row to connect them. */}
-          <input
-            type="number"
+          <QuietNumberInput
             value={item.quantity}
-            onChange={(e) => onChange({ quantity: Number(e.target.value) || 0 })}
+            onValueChange={(quantity) => onChange({ quantity })}
             min={0}
             step="0.01"
             className={cn(quietField, "w-14 shrink-0 text-right")}
@@ -209,12 +255,9 @@ export function DisclosureRow({
                 {currencyPrefix}
               </span>
             )}
-            <input
-              type="number"
+            <QuietNumberInput
               value={item.unit_price}
-              onChange={(e) =>
-                onChange({ unit_price: Number(e.target.value) || 0 })
-              }
+              onValueChange={(unit_price) => onChange({ unit_price })}
               min={0}
               step="0.01"
               disabled={isPackageLine}
@@ -292,12 +335,9 @@ export function DisclosureRow({
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-2 pb-2.5 pt-0.5 text-[13px] text-muted-foreground duration-150 animate-in fade-in">
           <label className="flex items-center gap-1.5">
             Discount
-            <input
-              type="number"
+            <QuietNumberInput
               value={discountPct}
-              onChange={(e) =>
-                onChange({ discount_percent: Number(e.target.value) || 0 })
-              }
+              onValueChange={(discount_percent) => onChange({ discount_percent })}
               min={0}
               max={100}
               className={cn(quietField, "w-14 border-input/60 text-right")}
