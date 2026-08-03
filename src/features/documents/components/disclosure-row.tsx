@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ChevronDown, Trash2 } from "lucide-react";
 import {
   Select,
@@ -69,7 +69,7 @@ export function DisclosureRow({
   onSlashInsert,
 }: DisclosureRowProps) {
   const [expanded, setExpanded] = useState(false);
-  const descRef = useRef<HTMLInputElement>(null);
+  const descRef = useRef<HTMLTextAreaElement>(null);
   const currencyPrefix = getCurrencyPrefix();
   const isPackageLine = !!packageInfo;
 
@@ -86,6 +86,28 @@ export function DisclosureRow({
     }
     onFocusHandled?.();
   }, [requestFocus, onFocusHandled]);
+
+  // The description is a textarea so long item names wrap instead of
+  // scrolling out of sight — construction line items run to a full
+  // sentence ("NIPPON PLATONE 8000 818(600) VERMILION 20KG"), and a
+  // single-line input hid everything past the field's width.
+  //
+  // Height is driven from content rather than a fixed `rows`, so the row
+  // is exactly as tall as its text: reset to auto first, because
+  // scrollHeight can only grow while a height is set. Re-measured on
+  // resize too — the same text wraps to a different number of lines when
+  // the column width changes.
+  useLayoutEffect(() => {
+    const el = descRef.current;
+    if (!el) return;
+    const fit = () => {
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight}px`;
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [item.description]);
 
   const itemSubtotal = item.quantity * item.unit_price;
   const discount = itemSubtotal * ((item.discount_percent ?? 0) / 100);
@@ -112,21 +134,22 @@ export function DisclosureRow({
         {/* Description — the row's voice; document reading size. Enter
             composes the next line; Backspace on an empty line deletes it
             (the Notion editing grammar). */}
-        <input
+        <textarea
           ref={descRef}
+          rows={1}
           value={item.description}
           onChange={(e) => onChange({ description: e.target.value })}
           onKeyDown={(e) => {
             // Plain Enter only — ⌘/Ctrl+Enter belongs to the builder's
             // global save-and-send shortcut and must pass through.
-            if (
-              e.key === "Enter" &&
-              !e.metaKey &&
-              !e.ctrlKey &&
-              item.description.trim() !== ""
-            ) {
+            //
+            // Enter is always swallowed, even on an empty line that has
+            // no next row to compose: this is a textarea now, so letting
+            // it through would type a literal newline into the item name,
+            // which the printed document renders as a space anyway.
+            if (e.key === "Enter" && !e.metaKey && !e.ctrlKey) {
               e.preventDefault();
-              onEnter?.();
+              if (item.description.trim() !== "") onEnter?.();
             } else if (e.key === "Backspace" && item.description === "") {
               e.preventDefault();
               onBackspaceEmpty?.();
@@ -140,7 +163,11 @@ export function DisclosureRow({
             }
           }}
           placeholder="What are you charging for?"
-          className="min-w-0 basis-full border-none bg-transparent py-1 text-[15px] outline-none placeholder:text-muted-foreground/40 md:basis-auto md:flex-1"
+          // resize-none + overflow-hidden: the height is ours to control
+          // (above), so neither the drag handle nor a scrollbar should
+          // appear. break-words catches a single unbroken product code
+          // that is wider than the column.
+          className="min-w-0 basis-full resize-none overflow-hidden break-words border-none bg-transparent py-1 text-[15px] leading-snug outline-none placeholder:text-muted-foreground/40 md:basis-auto md:flex-1"
         />
 
         {/* Honesty badges: hidden values that move the total. */}
@@ -150,7 +177,13 @@ export function DisclosureRow({
           </span>
         )}
 
-        <div className="flex min-w-0 flex-1 items-center justify-end gap-x-2 md:flex-none">
+        {/* flex-wrap for phones: quantity, unit, rate, amount and the two
+            row controls are wider than a narrow screen once an amount runs
+            to billions, and with justify-end the overflow used to fall off
+            the left edge where it couldn't even be scrolled to. Wrapping
+            keeps every field reachable; on md the cluster is one line
+            again. */}
+        <div className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-2 gap-y-1 md:flex-none md:flex-nowrap">
           {/* Quantity and Unit travel together — "how much" of what — so
               the eye never has to jump across the row to connect them. */}
           <input
@@ -159,18 +192,18 @@ export function DisclosureRow({
             onChange={(e) => onChange({ quantity: Number(e.target.value) || 0 })}
             min={0}
             step="0.01"
-            className={cn(quietField, "w-14 text-right")}
+            className={cn(quietField, "w-14 shrink-0 text-right")}
             aria-label="Quantity"
           />
           <input
             value={item.unit ?? ""}
             onChange={(e) => onChange({ unit: e.target.value })}
             placeholder="unit"
-            className={cn(quietField, "w-14 text-left")}
+            className={cn(quietField, "w-14 shrink-0 text-left")}
             aria-label="Unit"
           />
           <span className="shrink-0 text-[13px] text-muted-foreground/60">×</span>
-          <div className="relative">
+          <div className="relative shrink-0">
             {currencyPrefix && (
               <span className="pointer-events-none absolute left-1.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground/60">
                 {currencyPrefix}
@@ -188,7 +221,7 @@ export function DisclosureRow({
               title={isPackageLine ? "Package price — set from the catalog" : undefined}
               className={cn(
                 quietField,
-                "w-32 text-right",
+                "w-32 shrink-0 text-right",
                 currencyPrefix && "pl-8",
                 isPackageLine && "cursor-not-allowed text-muted-foreground"
               )}
@@ -200,7 +233,12 @@ export function DisclosureRow({
               pre-tax line subtotal. Tax is a document concept; it only
               ever appears in the doc-level control and the totals block
               below, never here. */}
-          <span className="w-28 shrink-0 text-right text-[15px] font-medium tabular-nums tracking-tight">
+          {/* whitespace-nowrap: at a fixed w-28 a billion-rupiah line
+              broke after "Rp", printing the currency on one line and the
+              figure on the next. The fixed width is desktop-only — on a
+              phone the amount sizes to its content so it can't squeeze
+              the quantity and unit fields out of the row. */}
+          <span className="shrink-0 whitespace-nowrap text-right text-[15px] font-medium tabular-nums tracking-tight md:w-40">
             {formatCurrency(rollingLineTotal)}
           </span>
 
