@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { ChevronDown, Copy, Pencil, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, Copy, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import {
@@ -17,8 +16,7 @@ import { useToast } from "@/providers/toast-provider";
 import { LineItemsTable } from "@/features/line-items/components/line-items-table";
 import { GenerateDocumentMenu } from "@/features/documents/components/generate-document-menu";
 import { LinkedDocumentsList } from "@/features/documents/components/linked-documents-card";
-import { TaxSettingsSheet } from "@/features/documents/components/detail/tax-settings-sheet";
-import { TaxBreakdownBlock } from "@/features/documents/components/tax-breakdown";
+import { TaxSettingsPanel } from "@/features/documents/components/tax-settings-panel";
 import { SimplePrintView } from "@/features/documents/components/simple-print-view";
 import { computeTaxBreakdown, taxTotalRows } from "@/features/documents/tax";
 import {
@@ -77,7 +75,6 @@ export function ProformaInvoiceDetail({
 }: ProformaInvoiceDetailProps) {
   const { workspace } = useWorkspace();
   const { toast } = useToast();
-  const [taxOpen, setTaxOpen] = useState(false);
   const [tab, setTab] = useHashTab(TAB_VALUES, "items");
 
   function handleCopyNumber() {
@@ -220,7 +217,7 @@ export function ProformaInvoiceDetail({
           />
 
           <TabsContent value="items" className="mt-0">
-            <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_360px]">
               <Panel>
                 <LineItemsTable lineItems={proformaInvoice.line_items} />
 
@@ -261,27 +258,25 @@ export function ProformaInvoiceDetail({
                 )}
               </Panel>
 
+              {/* Edited in place, like the invoice — see InvoiceDetail. */}
               <Panel>
                 <PanelHeader
                   title="Totals"
-                  actions={
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-2 text-xs"
-                      onClick={() => setTaxOpen(true)}
-                    >
-                      <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" />
-                      Adjust
-                    </Button>
+                  hint={
+                    isEditableStatus(proformaInvoice.status)
+                      ? undefined
+                      : "Locked — an issued document keeps the rates it was issued under."
                   }
                 />
-                <TaxBreakdownBlock
+                <TaxSettingsPanel
+                  workspaceId={workspace.id}
+                  documentType="proforma_invoice"
+                  documentId={proformaInvoice.id}
                   hargaJual={
                     proformaInvoice.subtotal - proformaInvoice.discount_amount
                   }
                   settings={piSettings}
-                  dense
+                  editable={isEditableStatus(proformaInvoice.status)}
                 />
               </Panel>
             </div>
@@ -306,17 +301,6 @@ export function ProformaInvoiceDetail({
           </TabsContent>
         </Tabs>
       </div>
-
-      <TaxSettingsSheet
-        open={taxOpen}
-        onOpenChange={setTaxOpen}
-        workspaceId={workspace.id}
-        documentType="proforma_invoice"
-        documentId={proformaInvoice.id}
-        hargaJual={proformaInvoice.subtotal - proformaInvoice.discount_amount}
-        settings={piSettings}
-        editable={isEditableStatus(proformaInvoice.status)}
-      />
 
       <SimplePrintView
         workspaceName={workspaceName}

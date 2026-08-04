@@ -11,7 +11,6 @@ import {
   Hash,
   Pencil,
   Printer,
-  SlidersHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -32,13 +31,14 @@ import { LineItemsTable } from "@/features/line-items/components/line-items-tabl
 import { InvoiceStatusActions } from "@/features/invoices/components/invoice-status-actions";
 import { RecordPaymentDialog } from "@/features/invoices/components/record-payment-dialog";
 import { PaymentHistory } from "@/features/invoices/components/payment-history";
-import { InvoiceSettingsSheet } from "@/features/invoices/components/invoice-settings-sheet";
+import { InvoiceReferencesPanel } from "@/features/invoices/components/invoice-references-panel";
+import { InvoicePortalAccessPanel } from "@/features/invoices/components/invoice-portal-access-panel";
 import { InvoicePrintView } from "@/features/invoices/components/invoice-print-view";
 import { DeliveryOrdersSection } from "@/features/delivery-orders/components/delivery-orders-section";
 import { GenerateDocumentMenu } from "@/features/documents/components/generate-document-menu";
 import { GeneratePurchaseOrderDialog } from "@/features/documents/components/generate-purchase-order-dialog";
 import { LinkedDocumentsList } from "@/features/documents/components/linked-documents-card";
-import { TaxBreakdownBlock } from "@/features/documents/components/tax-breakdown";
+import { TaxSettingsPanel } from "@/features/documents/components/tax-settings-panel";
 import {
   DocumentChip,
   DocumentToolbar,
@@ -118,7 +118,11 @@ const TAB_VALUES = ["items", "payments", "deliveries", "activity"];
  *
  *   always visible   status, amount due/total/paid, the primary action
  *   one click        items, payments, deliveries, activity — tabs
- *   behind a button  references, tax rates, portal link — settings sheet
+ *
+ * Tax rates and the two register references sit inline in the Items tab
+ * and are edited in place — they are entered while reading the document,
+ * so a sheet meant opening a panel, losing sight of the invoice, and
+ * closing it again for a two-field edit.
  *
  * No calculation, permission rule, action or server call changed.
  */
@@ -139,7 +143,6 @@ export function InvoiceDetail({
   const searchParams = useSearchParams();
   const [recordPaymentOpen, setRecordPaymentOpen] = useState(false);
   const [generatePoOpen, setGeneratePoOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [tab, setTab] = useHashTab(TAB_VALUES, "items");
 
   // An invoice that was never issued shouldn't be seeding deliveries or
@@ -154,6 +157,11 @@ export function InvoiceDetail({
   const isEditable =
     !["cancelled", "refunded"].includes(invoice.status) &&
     (invoice.amount_paid ?? 0) === 0;
+
+  // Same rule, named for what it gates: set_document_tax_settings (00087)
+  // refuses once money has landed, so the totals panel renders read-only
+  // rather than offering fields the server will reject.
+  const taxEditable = isEditable;
 
   function handlePrint() {
     printDocument(
@@ -328,10 +336,6 @@ export function InvoiceDetail({
               onRecordPayment={() => setRecordPaymentOpen(true)}
               menuExtras={
                 <>
-                  <DropdownMenuItem onClick={() => setSettingsOpen(true)}>
-                    <SlidersHorizontal className="mr-2 h-4 w-4" />
-                    Invoice settings
-                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleCopyPortalLink}>
                     <Copy className="mr-2 h-4 w-4" />
                     Copy portal link
@@ -371,7 +375,7 @@ export function InvoiceDetail({
               anything narrower, which is the same order it reads in on
               the printed page. */}
           <TabsContent value="items" className="mt-0">
-            <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_360px]">
               <Panel>
                 <LineItemsTable
                   lineItems={invoice.line_items}
@@ -405,22 +409,27 @@ export function InvoiceDetail({
               </Panel>
 
               <div className="space-y-3">
+                {/* Editable in place. The tax rates and the two register
+                    references used to live behind a settings sheet, but
+                    they are entered while reading the invoice — the DPP
+                    fraction against the printed totals, the Faktur Pajak
+                    serial against the line the invoice is being matched
+                    to — so making them a second surface meant opening a
+                    panel, losing sight of the document, and closing it
+                    again for a two-field edit. */}
                 <Panel>
                   <PanelHeader
                     title="Totals"
-                    actions={
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 px-2 text-xs"
-                        onClick={() => setSettingsOpen(true)}
-                      >
-                        <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" />
-                        Adjust
-                      </Button>
+                    hint={
+                      taxEditable
+                        ? undefined
+                        : "Locked — a paid or closed invoice keeps the rates it was issued under."
                     }
                   />
-                  <TaxBreakdownBlock
+                  <TaxSettingsPanel
+                    workspaceId={workspace.id}
+                    documentType="invoice"
+                    documentId={invoice.id}
                     hargaJual={invoice.subtotal - invoice.discount_amount}
                     settings={{
                       dpp_numerator: invoice.dpp_numerator,
@@ -430,30 +439,32 @@ export function InvoiceDetail({
                       retensi_percent: invoice.retensi_percent,
                       show_dpp: invoice.show_dpp,
                     }}
-                    dense
+                    editable={taxEditable}
                   />
                 </Panel>
 
                 <Panel>
-                  <PanelHeader title="Details" />
-                  <FactGrid className="grid-cols-2 sm:grid-cols-2 lg:grid-cols-2">
-                    <Fact label="Customer PO">
-                      {invoice.customer_po_number || (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </Fact>
-                    <Fact label="Faktur Pajak">
-                      {invoice.tax_invoice_number || (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </Fact>
-                    {invoice.internal_id && (
-                      <Fact label="Internal ID">{invoice.internal_id}</Fact>
-                    )}
-                    <Fact label="Portal views">
-                      {invoice.view_count > 0 ? invoice.view_count : "Not viewed"}
-                    </Fact>
-                  </FactGrid>
+                  <PanelHeader title="References" />
+                  <InvoiceReferencesPanel
+                    workspaceId={workspace.id}
+                    invoiceId={invoice.id}
+                    customerPoNumber={invoice.customer_po_number}
+                    taxInvoiceNumber={invoice.tax_invoice_number}
+                  />
+                  {(invoice.internal_id || invoice.view_count > 0) && (
+                    <div className="mt-4 border-t pt-3">
+                      <FactGrid className="grid-cols-2 sm:grid-cols-2 lg:grid-cols-2">
+                        {invoice.internal_id && (
+                          <Fact label="Internal ID">{invoice.internal_id}</Fact>
+                        )}
+                        <Fact label="Portal views">
+                          {invoice.view_count > 0
+                            ? invoice.view_count
+                            : "Not viewed"}
+                        </Fact>
+                      </FactGrid>
+                    </div>
+                  )}
                 </Panel>
               </div>
             </div>
@@ -493,15 +504,24 @@ export function InvoiceDetail({
                 <PanelHeader title="Activity" />
                 <ActivityTimeline activities={activities} />
               </Panel>
-              {links.length > 0 && (
+              <div className="space-y-3">
+                {links.length > 0 && (
+                  <Panel>
+                    <PanelHeader title="Linked documents" />
+                    <LinkedDocumentsList
+                      links={links}
+                      workspaceSlug={workspace.slug}
+                    />
+                  </Panel>
+                )}
+                {/* Left out of the Items tab deliberately: regenerating a
+                    share link is rare and destructive, and does not belong
+                    beside fields being typed into every day. */}
                 <Panel>
-                  <PanelHeader title="Linked documents" />
-                  <LinkedDocumentsList
-                    links={links}
-                    workspaceSlug={workspace.slug}
-                  />
+                  <PanelHeader title="Customer portal" />
+                  <InvoicePortalAccessPanel invoice={invoice} />
                 </Panel>
-              )}
+              </div>
             </div>
           </TabsContent>
         </Tabs>
@@ -520,13 +540,6 @@ export function InvoiceDetail({
         companyProfile={workspaceInfo.settings?.company_profile}
         branding={workspaceInfo.settings?.branding}
         paymentDetails={workspaceInfo.settings?.payment_details}
-      />
-
-      <InvoiceSettingsSheet
-        open={settingsOpen}
-        onOpenChange={setSettingsOpen}
-        invoice={invoice}
-        workspaceId={workspace.id}
       />
 
       <GeneratePurchaseOrderDialog
