@@ -2,7 +2,7 @@
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { TaxBreakdownBlock } from "@/features/documents/components/tax-breakdown";
-import { hasPpn, type TaxSettings } from "@/features/documents/tax";
+import { dppLabel, hasPpn, type TaxSettings } from "@/features/documents/tax";
 
 type TaxBreakdownEditorProps = {
   hargaJual: number;
@@ -55,7 +55,7 @@ export function TaxBreakdownEditor({
               onChange({ ...settings, show_dpp: checked === true })
             }
           />
-          Show DPP {settings.dpp_numerator}/{settings.dpp_denominator}
+          Show {dppLabel(settings)}
         </label>
         )}
         <Toggle

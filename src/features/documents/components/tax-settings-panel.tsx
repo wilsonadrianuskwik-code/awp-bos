@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/providers/toast-provider";
 import { setDocumentTaxSettings } from "@/features/documents/actions";
 import { TaxBreakdownBlock } from "@/features/documents/components/tax-breakdown";
-import type { TaxSettings } from "@/features/documents/tax";
+import { dppLabel, type TaxSettings } from "@/features/documents/tax";
 
 type TaxSettingsPanelProps = {
   workspaceId: string;
@@ -129,7 +129,7 @@ export function TaxSettingsPanel({
               checked={draft.show_dpp}
               onCheckedChange={(checked) => patch({ show_dpp: checked === true })}
             />
-            Show DPP {draft.dpp_numerator}/{draft.dpp_denominator}
+            Show {dppLabel(draft)}
           </label>
 
           <ToggleRate

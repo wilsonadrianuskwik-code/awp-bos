@@ -67,8 +67,24 @@ export function hasPpn(settings: Pick<TaxSettings, "ppn_percent">) {
 }
 
 /** e.g. "DPP 11/12" — the fraction is shown, since it's the legal basis. */
+/**
+ * What the DPP row is called on the document.
+ *
+ * A DPP computed from a fraction of the selling price rather than the
+ * price itself is a "nilai lain" (other value) basis in Indonesian tax
+ * law — the 11/12 basis PMK 131/2024 introduced for 2025 is exactly
+ * that. So the row is named for the basis rather than printed as a bare
+ * fraction, which is what the term is on a faktur and in the register.
+ *
+ * A 1/1 fraction is not a nilai lain: the DPP is the full selling price,
+ * which is the ordinary basis and the one every pre-2025 document used.
+ * It stays plain "DPP" so a 2024 document doesn't claim a rule that did
+ * not exist when it was issued.
+ */
 export function dppLabel(settings: Pick<TaxSettings, "dpp_numerator" | "dpp_denominator">) {
-  return `DPP ${settings.dpp_numerator}/${settings.dpp_denominator}`;
+  const isOtherValue =
+    settings.dpp_numerator !== settings.dpp_denominator;
+  return isOtherValue ? "DPP Nilai Lain" : "DPP";
 }
 
 /** Trims trailing zeros so 12.000 prints as "12". */
