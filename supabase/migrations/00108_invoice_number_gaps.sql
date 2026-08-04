@@ -38,7 +38,7 @@ DECLARE
   v_id            UUID;
   v_issue         DATE;
   v_next          INTEGER := 0;
-  v_next_internal INTEGER := 0;
+  v_reserved      INTEGER[];
   v_new_number    TEXT;
   v_new_internal  TEXT;
 BEGIN
@@ -67,6 +67,16 @@ BEGIN
    WHERE workspace_id = v_workspace_id
      AND deleted_at IS NOT NULL
      AND status = 'draft'
+     AND invoice_number ~ ('^INV/AWP/\d{4}' || v_scope || '-\d+$');
+
+  -- Sequences that must never be reissued: anything ever issued, live
+  -- or since deleted -- its number is on a document that left the
+  -- building.
+  SELECT COALESCE(array_agg((regexp_match(invoice_number, '-(\d+)$'))[1]::INTEGER), '{}')
+    INTO v_reserved
+    FROM public.invoices
+   WHERE workspace_id = v_workspace_id
+     AND status <> 'draft'
      AND invoice_number ~ ('^INV/AWP/\d{4}' || v_scope || '-\d+$');
 
   -- The drafts to renumber, oldest first, captured before anything moves.
@@ -98,26 +108,21 @@ BEGIN
   LOOP
     SELECT issue_date INTO v_issue FROM public.invoices WHERE id = v_id;
 
+    -- Freeness is judged on the SEQUENCE, not the whole string. The
+    -- sequence is workspace-and-year scoped (one counter per year, see
+    -- generate_document_number in 00091), but it sits inside a
+    -- date-stamped number -- so INV/AWP/03082026-001 and
+    -- INV/AWP/04082026-001 are different strings holding the same
+    -- sequence, and a string comparison hands 001 out twice.
     LOOP
       v_next := v_next + 1;
-      v_new_number := 'INV/AWP/' || TO_CHAR(v_issue, 'DDMMYYYY')
-                   || '-' || LPAD(v_next::TEXT, 3, '0');
-      EXIT WHEN NOT EXISTS (
-        SELECT 1 FROM public.invoices
-         WHERE workspace_id = v_workspace_id
-           AND invoice_number = v_new_number
-           AND id <> v_id);
+      EXIT WHEN NOT (v_next = ANY(v_reserved));
     END LOOP;
+    v_new_number := 'INV/AWP/' || TO_CHAR(v_issue, 'DDMMYYYY')
+                 || '-' || LPAD(v_next::TEXT, 3, '0');
 
-    LOOP
-      v_next_internal := v_next_internal + 1;
-      v_new_internal := v_scope || '-' || LPAD(v_next_internal::TEXT, 5, '0');
-      EXIT WHEN NOT EXISTS (
-        SELECT 1 FROM public.invoices
-         WHERE workspace_id = v_workspace_id
-           AND internal_id = v_new_internal
-           AND id <> v_id);
-    END LOOP;
+    -- internal_id follows the invoice sequence, so the two stay in step.
+    v_new_internal := v_scope || '-' || LPAD(v_next::TEXT, 5, '0');
 
     UPDATE public.invoices
        SET invoice_number = v_new_number,
@@ -129,17 +134,21 @@ BEGIN
   -- Point both counters at the last number actually in use, so the next
   -- invoice continues the sequence instead of resuming from the burnt
   -- high-water mark.
-  UPDATE public.document_number_counters
-     SET current_number = v_next
-   WHERE workspace_id = v_workspace_id
-     AND document_type = 'invoice'
-     AND scope_key = v_scope;
+  -- Upsert, not update: if the counter row is missing the next
+  -- create_invoice would insert it at 1 and reissue a number already in
+  -- use, which is the same class of collision this migration exists to
+  -- clear up.
+  INSERT INTO public.document_number_counters
+              (workspace_id, document_type, scope_key, current_number)
+       VALUES (v_workspace_id, 'invoice', v_scope, v_next)
+  ON CONFLICT (workspace_id, document_type, scope_key)
+  DO UPDATE SET current_number = EXCLUDED.current_number;
 
-  UPDATE public.document_sequences
-     SET current_number = v_next_internal
-   WHERE workspace_id = v_workspace_id
-     AND document_type = 'invoice_internal'
-     AND period = v_scope::INTEGER;
+  INSERT INTO public.document_sequences
+              (workspace_id, document_type, prefix, current_number, period)
+       VALUES (v_workspace_id, 'invoice_internal', '', v_next, v_scope::INTEGER)
+  ON CONFLICT (workspace_id, document_type, period)
+  DO UPDATE SET current_number = EXCLUDED.current_number;
 END $$;
 
 -- ---------------------------------------------------------------------
