@@ -1,3 +1,4 @@
+import { sanitizeSearchTerm } from "@/lib/utils/search-term";
 import { createClient } from "@/lib/supabase/server";
 import type {
   PaymentWithContext,
@@ -117,5 +118,5 @@ async function getPaymentsForInvoiceIds(
 }
 
 function sanitizeLike(term: string): string {
-  return term.replace(/[%_]/g, "");
+  return sanitizeSearchTerm(term);
 }

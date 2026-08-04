@@ -35,6 +35,10 @@ const SORT_OPTIONS = [
   { value: "total:desc", label: "Highest value" },
   { value: "total:asc", label: "Lowest value" },
   { value: "expected_date:asc", label: "Expected soon" },
+  // Kept in step with the sortable Issue Date column: without these the
+  // Select trigger went blank whenever that header was clicked.
+  { value: "issue_date:desc", label: "Issue date (newest)" },
+  { value: "issue_date:asc", label: "Issue date (oldest)" },
 ] as const;
 
 const PAGE_SIZE = 20;

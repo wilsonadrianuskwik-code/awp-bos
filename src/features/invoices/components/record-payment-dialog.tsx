@@ -51,7 +51,21 @@ export function RecordPaymentDialog({
   const confirm = useConfirm();
   const [isPending, startTransition] = useTransition();
 
+  // Re-seeded whenever the dialog opens, not just on mount. reset() runs
+  // before router.refresh() and closes over the pre-payment invoice, so
+  // after a partial payment the field used to re-open showing the old
+  // full balance — accepting that default double-paid the invoice.
   const [amount, setAmount] = useState(String(invoice.amount_due));
+
+  // Render-phase re-seed rather than an effect — the same pattern the
+  // list pages use to reset selection when their data changes. Re-seeds
+  // when the dialog opens, and when the outstanding balance changes
+  // underneath it after a refresh.
+  const [seed, setSeed] = useState({ open, due: invoice.amount_due });
+  if (seed.open !== open || seed.due !== invoice.amount_due) {
+    setSeed({ open, due: invoice.amount_due });
+    if (open) setAmount(String(invoice.amount_due));
+  }
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("bank_transfer");
   const [paymentDate, setPaymentDate] = useState(todayISO());
   const [reference, setReference] = useState("");

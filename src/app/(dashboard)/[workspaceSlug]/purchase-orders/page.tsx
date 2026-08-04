@@ -15,7 +15,9 @@ import {
   type PurchaseOrderStatus,
 } from "@/features/purchase-orders/types";
 
-const SORT_FIELDS = ["created_at", "total", "expected_date"] as const;
+// issue_date is here because purchase-order-table marks that column
+// sortable; without it the header showed an arrow and reordered nothing.
+const SORT_FIELDS = ["created_at", "total", "expected_date", "issue_date"] as const;
 
 function parseFilters(params: {
   q?: string;

@@ -168,6 +168,11 @@ export function InvoiceBuilder({
   >("idle");
   const lastSavedRef = useRef<string>("");
   const isFirstRender = useRef(true);
+  // The save currently in flight, if any. Two overlapping saves on a
+  // new document both read the id as null from their own closure and
+  // both call create — which is how autosave firing at 2.5s and
+  // Cmd-Enter at 2.7s produced two documents and burned two numbers.
+  const inFlightRef = useRef<Promise<Invoice | null> | null>(null);
   const removedItemRef = useRef<{ item: LineItemInput; index: number } | null>(
     null
   );
@@ -226,10 +231,16 @@ export function InvoiceBuilder({
     lineItems,
   ]);
 
-  const saveDraft = useCallback(async (): Promise<Invoice | null> => {
+  const saveDraftInner = useCallback(async (): Promise<Invoice | null> => {
     if (!isEditable) return null;
     const parsed = createInvoiceSchema.safeParse(currentPayload);
-    if (!parsed.success) return null;
+    if (!parsed.success) {
+      // Autosave used to return here silently, so a document missing a
+      // client or project was never persisted while the pill kept
+      // reading "Unsaved changes" with no reason given.
+      setSaveStatus("error");
+      return null;
+    }
 
     setSaveStatus("saving");
     const result = invoiceId
@@ -282,6 +293,20 @@ export function InvoiceBuilder({
     return result.data;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPayload, invoiceId, workspace.id, workspace.slug, isEditable, showSignature]);
+
+  // One save at a time. A second caller awaits the first instead of
+  // starting its own; the ref is cleared in finally so a failed save
+  // does not wedge the builder.
+  const saveDraft = useCallback(async (): Promise<Invoice | null> => {
+    if (inFlightRef.current) return inFlightRef.current;
+    const run = saveDraftInner();
+    inFlightRef.current = run;
+    try {
+      return await run;
+    } finally {
+      inFlightRef.current = null;
+    }
+  }, [saveDraftInner]);
 
   // Debounced autosave shortly after the user stops editing.
   useEffect(() => {
@@ -362,20 +387,20 @@ export function InvoiceBuilder({
   }, [currentPayload, saveDraft, invoiceId, workspace.id, workspace.slug]);
 
   // Keyboard shortcuts: Cmd/Ctrl+S save, Cmd/Ctrl+Enter send.
+  // The arrow bodies below are expression form on purpose: with braces
+  // they return undefined, React has no promise to track, and isPending
+  // flips back immediately — so the keyboard path was never covered by
+  // the pending guard the buttons rely on.
   useEffect(() => {
     function handler(e: KeyboardEvent) {
       const mod = e.metaKey || e.ctrlKey;
       if (!mod) return;
       if (e.key.toLowerCase() === "s") {
         e.preventDefault();
-        startTransition(() => {
-          handleManualSave();
-        });
+        startTransition(() => handleManualSave());
       } else if (e.key === "Enter") {
         e.preventDefault();
-        startTransition(() => {
-          handleSendShortcut();
-        });
+        startTransition(() => handleSendShortcut());
       }
     }
     window.addEventListener("keydown", handler);

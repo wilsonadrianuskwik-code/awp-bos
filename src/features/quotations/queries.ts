@@ -1,3 +1,4 @@
+import { sanitizeSearchTerm } from "@/lib/utils/search-term";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type {
@@ -39,7 +40,7 @@ export async function getQuotations(
   }
 
   if (filters?.search) {
-    const term = filters.search.replace(/[%_]/g, "");
+    const term = sanitizeSearchTerm(filters.search);
     const like = `%${term}%`;
 
     const { data: matchingClients } = await supabase

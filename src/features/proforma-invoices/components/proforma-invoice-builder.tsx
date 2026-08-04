@@ -158,6 +158,11 @@ export function ProformaInvoiceBuilder({
   >("idle");
   const lastSavedRef = useRef<string>("");
   const isFirstRender = useRef(true);
+  // The save currently in flight, if any. Two overlapping saves on a
+  // new document both read the id as null from their own closure and
+  // both call create — which is how autosave firing at 2.5s and
+  // Cmd-Enter at 2.7s produced two documents and burned two numbers.
+  const inFlightRef = useRef<Promise<ProformaInvoice | null> | null>(null);
 
   // Mirrors update_proforma_invoice (00087): editable until it's been
   // cancelled, expired, or converted — once it becomes an Invoice, that
@@ -195,10 +200,16 @@ export function ProformaInvoiceBuilder({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientId, projectId, title, currency, issueDate, expiryDate, terms, notes, lineItems]);
 
-  const saveDraft = useCallback(async (): Promise<ProformaInvoice | null> => {
+  const saveDraftInner = useCallback(async (): Promise<ProformaInvoice | null> => {
     if (!isEditable) return null;
     const parsed = createProformaInvoiceSchema.safeParse(currentPayload);
-    if (!parsed.success) return null;
+    if (!parsed.success) {
+      // Autosave used to return here silently, so a document missing a
+      // client or project was never persisted while the pill kept
+      // reading "Unsaved changes" with no reason given.
+      setSaveStatus("error");
+      return null;
+    }
 
     setSaveStatus("saving");
     const result = piId
@@ -251,6 +262,20 @@ export function ProformaInvoiceBuilder({
     return result.data;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPayload, piId, workspace.id, isEditable, showSignature]);
+
+  // One save at a time. A second caller awaits the first instead of
+  // starting its own; the ref is cleared in finally so a failed save
+  // does not wedge the builder.
+  const saveDraft = useCallback(async (): Promise<ProformaInvoice | null> => {
+    if (inFlightRef.current) return inFlightRef.current;
+    const run = saveDraftInner();
+    inFlightRef.current = run;
+    try {
+      return await run;
+    } finally {
+      inFlightRef.current = null;
+    }
+  }, [saveDraftInner]);
 
   useEffect(() => {
     if (!isDirty || !isEditable) return;

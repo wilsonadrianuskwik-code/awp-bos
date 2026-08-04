@@ -1,3 +1,4 @@
+import { sanitizeSearchTerm } from "@/lib/utils/search-term";
 import { createClient } from "@/lib/supabase/server";
 import { logDbError } from "@/lib/log-db-error";
 import type {
@@ -37,7 +38,7 @@ export async function getPurchaseOrders(
   }
 
   if (filters?.search) {
-    const term = filters.search.replace(/[%_]/g, "");
+    const term = sanitizeSearchTerm(filters.search);
     const like = `%${term}%`;
 
     const { data: matchingSuppliers } = await supabase

@@ -1,3 +1,4 @@
+import { sanitizeSearchTerm } from "@/lib/utils/search-term";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type {
@@ -34,7 +35,7 @@ export async function getCatalogItems(
     query = query.eq("default_category", filters.category);
   }
   if (filters?.search) {
-    const term = filters.search.replace(/[%_]/g, "");
+    const term = sanitizeSearchTerm(filters.search);
     const like = `%${term}%`;
     query = query.or(
       `name.ilike.${like},sku.ilike.${like},description.ilike.${like}`
