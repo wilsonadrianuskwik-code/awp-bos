@@ -148,6 +148,7 @@ export function invoiceToRenderData(
       notes: invoice.notes ?? undefined,
       payment_terms: invoice.payment_terms ?? undefined,
       summary: invoice.summary ?? undefined,
+      customer_po_number: invoice.customer_po_number ?? undefined,
     },
     line_items: invoice.line_items.map((item) => ({
       category: item.category,

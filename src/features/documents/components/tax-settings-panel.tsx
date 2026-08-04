@@ -133,7 +133,7 @@ export function TaxSettingsPanel({
           </label>
 
           <ToggleRate
-            label="Potong PPH"
+            label="Potong PPH Final"
             value={draft.pph_percent}
             defaultRate={2}
             onChange={(v) => patch({ pph_percent: v })}

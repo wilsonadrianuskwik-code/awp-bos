@@ -95,6 +95,10 @@ export type DocumentRenderData = {
     terms?: string;
     payment_terms?: string;
     summary?: string;
+    // The client's own PO number (invoices only, 00092). Rendered in the
+    // header metadata whenever it is set — customers match an invoice
+    // against their purchase order by this, not by our number.
+    customer_po_number?: string;
   };
   line_items: RenderLineItem[];
   payments?: RenderPayment[];

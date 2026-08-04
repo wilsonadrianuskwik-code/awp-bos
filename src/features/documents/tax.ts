@@ -120,7 +120,7 @@ export function taxTotalRows(
 
   if (settings.pph_percent !== null) {
     rows.push({
-      label: `Potong PPH ${formatPercent(settings.pph_percent)}%`,
+      label: `Potong PPH Final ${formatPercent(settings.pph_percent)}%`,
       value: `(${format(breakdown.pphAmount)})`,
     });
   }

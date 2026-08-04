@@ -69,6 +69,11 @@ export function InvoicePrintView({
             }),
           },
           { label: "Invoice Number", value: invoice.invoice_number },
+          // Only when it exists — most invoices have no customer PO, and
+          // an empty "Customer PO —" row on those is noise.
+          ...(invoice.customer_po_number
+            ? [{ label: "Customer PO", value: invoice.customer_po_number }]
+            : []),
         ]}
       />
 

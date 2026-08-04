@@ -59,7 +59,7 @@ export function TaxBreakdownEditor({
         </label>
         )}
         <Toggle
-          label="Potong PPH"
+          label="Potong PPH Final"
           value={settings.pph_percent}
           defaultRate={2}
           disabled={disabled}

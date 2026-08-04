@@ -16,6 +16,7 @@ import { SaveAsTemplateDialog } from "@/features/line-items/components/save-as-t
 import { InsertPalette } from "@/features/documents/components/insert-palette";
 import {
   createInvoice,
+  setInvoiceReferences,
   updateInvoice,
   updateInvoiceStatus,
 } from "@/features/invoices/actions";
@@ -128,6 +129,12 @@ export function InvoiceBuilder({
   const [paymentTerms, setPaymentTerms] = useState(
     invoice?.payment_terms ?? defaultPaymentTerms ?? ""
   );
+  // The client's own PO number. Not part of CreateInvoiceInput — it goes
+  // through set_invoice_references (00092), which has no payment guard, so
+  // it can still be filled in on an invoice that has already been paid.
+  const [customerPo, setCustomerPo] = useState(
+    invoice?.customer_po_number ?? ""
+  );
   const [notes, setNotes] = useState(invoice?.notes ?? defaultNotes ?? "");
   const [lineItems, setLineItems] = useState<LineItemInput[]>(
     invoice?.line_items?.length
@@ -209,14 +216,21 @@ export function InvoiceBuilder({
 
   const totals = computeLineItemTotals(submittableLineItems);
 
+  // What autosave compares against. The customer PO saves through a
+  // separate RPC, so it is not in currentPayload — but editing it still
+  // has to mark the document dirty.
+  const dirtyKey = JSON.stringify({
+    payload: currentPayload,
+    customer_po_number: customerPo,
+  });
+
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
-      lastSavedRef.current = JSON.stringify(currentPayload);
+      lastSavedRef.current = dirtyKey;
       return;
     }
-    const serialized = JSON.stringify(currentPayload);
-    if (serialized !== lastSavedRef.current) setIsDirty(true);
+    if (dirtyKey !== lastSavedRef.current) setIsDirty(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     clientId,
@@ -227,6 +241,7 @@ export function InvoiceBuilder({
     issueDate,
     dueDate,
     paymentTerms,
+    customerPo,
     notes,
     lineItems,
   ]);
@@ -253,7 +268,7 @@ export function InvoiceBuilder({
       return null;
     }
 
-    lastSavedRef.current = JSON.stringify(currentPayload);
+    lastSavedRef.current = dirtyKey;
     setIsDirty(false);
     setSaveStatus("saved");
 
@@ -288,11 +303,28 @@ export function InvoiceBuilder({
         toast(sigResult.error, "error");
         return null;
       }
+
+      const refResult = await setInvoiceReferences(workspace.id, savedId, {
+        customer_po_number: customerPo.trim() || null,
+      });
+      if (refResult.error) {
+        setSaveStatus("error");
+        toast(refResult.error, "error");
+        return null;
+      }
     }
 
     return result.data;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPayload, invoiceId, workspace.id, workspace.slug, isEditable, showSignature]);
+  }, [
+    currentPayload,
+    invoiceId,
+    workspace.id,
+    workspace.slug,
+    isEditable,
+    showSignature,
+    customerPo,
+  ]);
 
   // One save at a time. A second caller awaits the first instead of
   // starting its own; the ref is cleared in finally so a failed save
@@ -741,6 +773,15 @@ export function InvoiceBuilder({
                 className="h-8"
               />
             </div>
+            <div className="grid grid-cols-[96px_1fr] items-center gap-3">
+              <span className="text-xs text-muted-foreground">Customer PO</span>
+              <Input
+                value={customerPo}
+                onChange={(e) => setCustomerPo(e.target.value)}
+                placeholder="Client's PO number (optional)"
+                className="h-8"
+              />
+            </div>
           </div>
         </div>
 
@@ -874,6 +915,9 @@ export function InvoiceBuilder({
         meta={[
           { label: "Invoice Date", value: issueDate || "—" },
           { label: "Invoice Number", value: invoice?.invoice_number ?? "Draft" },
+          ...(customerPo.trim()
+            ? [{ label: "Customer PO", value: customerPo.trim() }]
+            : []),
         ]}
         lines={submittableLineItems.map((item, i) => ({
           id: String(i),

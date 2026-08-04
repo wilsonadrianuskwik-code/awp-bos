@@ -224,12 +224,24 @@ function renderDocumentMeta(block: TemplateBlock, data: DocumentRenderData): str
         value = data.document.status;
         break;
       case "reference":
-        label = "Reference";
-        value = "";
+      case "customer_po":
+        label = "Customer PO";
+        value = data.document.customer_po_number ?? "";
         break;
     }
     if (!value) continue;
     rows.push({ label, value });
+  }
+
+  // Templates saved before the customer PO existed carry a `fields` list
+  // that can't mention it, and it is the number the client files the
+  // invoice under — so it is appended rather than left to config.
+  if (
+    data.document.customer_po_number &&
+    !fields.includes("reference") &&
+    !fields.includes("customer_po")
+  ) {
+    rows.push({ label: "Customer PO", value: data.document.customer_po_number });
   }
 
   // Title mirrors Xero: draft documents read "DRAFT INVOICE"; issued
@@ -422,7 +434,7 @@ const TOTALS_ROW_DEFAULTS: Record<string, string> = {
   harga_jual: "Total Harga Jual",
   dpp: "DPP",
   ppn: "PPN",
-  pph: "Potong PPH",
+  pph: "Potong PPH Final",
   retensi: "Potong Retensi",
 };
 

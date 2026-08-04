@@ -62,7 +62,7 @@ export function TaxBreakdownBlock({
       {settings.pph_percent !== null && (
         <Row
           className={rowClass}
-          label={`Potong PPH ${formatPercent(settings.pph_percent)}%`}
+          label={`Potong PPH Final ${formatPercent(settings.pph_percent)}%`}
           value={`(${formatCurrency(b.pphAmount)})`}
         />
       )}
