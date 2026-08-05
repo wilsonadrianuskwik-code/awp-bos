@@ -402,7 +402,7 @@ export function DocumentFootnote({
 
       {(hasPayment || hasSignature) && (
         <>
-          <div className="mt-10 flex items-start justify-between gap-10 break-inside-avoid">
+          <div className="mt-14 flex items-start justify-between gap-10 break-inside-avoid">
             <div className="min-w-0">
               {hasPayment && (
                 <>
@@ -454,20 +454,25 @@ export function DocumentFootnote({
                     scanned signature often already carries the company
                     stamp. Leave the company line blank when it does.
 
-                    The empty box is the same height as the image, so a
-                    hand-signed document and a stamped one occupy exactly
-                    the same space and paginate identically — and the room
-                    left for the pen is, by definition, the room the real
-                    signature takes. */}
+                    The empty box carries the same margin and height as the
+                    image, so a hand-signed document and a stamped one
+                    occupy exactly the same space and paginate identically
+                    — and the room left for the pen is, by definition, the
+                    room the real signature takes.
+
+                    Sized for a materai to be stuck on: the gap under the
+                    "Approved by," line and the box itself both leave room
+                    for a physical duty stamp above the signatory's name,
+                    which a signature-height box alone did not. */}
                 {showSignature && signatureUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={signatureUrl}
                     alt={signatoryName ? `Signature of ${signatoryName}` : "Signature"}
-                    className="mx-auto mt-1.5 h-[62px] w-auto max-w-[220px] object-contain"
+                    className="mx-auto mt-5 h-[96px] w-auto max-w-[220px] object-contain"
                   />
                 ) : (
-                  <div className="h-[62px]" />
+                  <div className="mt-5 h-[96px]" />
                 )}
 
                 {signatoryName && (
