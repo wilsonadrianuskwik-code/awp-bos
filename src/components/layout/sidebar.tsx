@@ -25,8 +25,43 @@ import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/button";
 import { useState, type CSSProperties } from "react";
 
+// Google's four brand colours. The nav used a continuous spectrum ramp
+// before, which meant adjacent items differed by a few degrees of hue and
+// the whole rail read as one wash — Quotations rose against Proforma
+// orange is not a distinction you can see at 18px. Four widely separated
+// colours, cycled, give every neighbour real contrast.
+//
+// Yellow carries its own foreground: white on #F9AB00 is about 2.3:1,
+// well under the 4.5:1 an icon glyph needs to stay readable on the active
+// tile. The other three take white.
+const NAV_BLUE = "#4285F4";
+const NAV_RED = "#EA4335";
+const NAV_YELLOW = "#F9AB00";
+const NAV_GREEN = "#34A853";
+
+// Foreground for the saturated active tile, keyed by its fill.
+const NAV_ON_COLOR: Record<string, string> = {
+  [NAV_YELLOW]: "#1f1600",
+};
+
+// The glyph colour on a hovered (not active) tile. Normally the item's
+// own hue, which sits legibly on a 32% wash of itself — except yellow,
+// where #F9AB00 on pale yellow is barely there. Yellow gets a darker
+// amber that stays readable on the tint in light mode and on the sidebar
+// in dark mode.
+const NAV_INK: Record<string, string> = {
+  [NAV_YELLOW]: "#B26A00",
+};
+
+function onColor(color: string) {
+  return NAV_ON_COLOR[color] ?? "#fff";
+}
+
 function navColorVar(color: string): CSSProperties {
-  return { "--nav-color": color } as CSSProperties;
+  return {
+    "--nav-color": color,
+    "--nav-ink": NAV_INK[color] ?? color,
+  } as CSSProperties;
 }
 
 type SidebarProps = {
@@ -43,32 +78,32 @@ type SidebarProps = {
 export const NAV_GROUPS = [
   {
     label: null,
-    items: [{ label: "Dashboard", href: "", icon: LayoutDashboard, color: "#6366f1" }],
+    items: [{ label: "Dashboard", href: "", icon: LayoutDashboard, color: NAV_BLUE }],
   },
   {
     label: "Projects",
     items: [
-      { label: "Projects", href: "/projects", icon: Building2, color: "#a855f7" },
+      { label: "Projects", href: "/projects", icon: Building2, color: NAV_RED },
       // Every document type in one filterable list — the cross-cutting
       // view the per-type list pages can't give you.
-      { label: "Documents", href: "/documents", icon: Files, color: "#d946ef" },
+      { label: "Documents", href: "/documents", icon: Files, color: NAV_YELLOW },
     ],
   },
   {
     label: "Sales",
     items: [
-      { label: "Clients", href: "/clients", icon: UserCheck, color: "#ec4899" },
-      { label: "Quotations", href: "/quotations", icon: FileText, color: "#f43f5e" },
-      { label: "Proforma Invoices", short: "Proforma", href: "/proforma-invoices", icon: FileSpreadsheet, color: "#fb923c" },
-      { label: "Invoices", href: "/invoices", icon: Receipt, color: "#f59e0b" },
-      { label: "Payments", href: "/payments", icon: CreditCard, color: "#eab308" },
+      { label: "Clients", href: "/clients", icon: UserCheck, color: NAV_BLUE },
+      { label: "Quotations", href: "/quotations", icon: FileText, color: NAV_GREEN },
+      { label: "Proforma Invoices", short: "Proforma", href: "/proforma-invoices", icon: FileSpreadsheet, color: NAV_RED },
+      { label: "Invoices", href: "/invoices", icon: Receipt, color: NAV_YELLOW },
+      { label: "Payments", href: "/payments", icon: CreditCard, color: NAV_GREEN },
     ],
   },
   {
     label: "Procurement",
     items: [
-      { label: "Suppliers", href: "/suppliers", icon: Truck, color: "#84cc16" },
-      { label: "Purchase Orders", short: "Purchase", href: "/purchase-orders", icon: ClipboardList, color: "#22c55e" },
+      { label: "Suppliers", href: "/suppliers", icon: Truck, color: NAV_BLUE },
+      { label: "Purchase Orders", short: "Purchase", href: "/purchase-orders", icon: ClipboardList, color: NAV_RED },
     ],
   },
   {
@@ -77,21 +112,21 @@ export const NAV_GROUPS = [
       // Delivery Orders are the whole delivery story: the documents
       // themselves, and the per-line delivered/remaining tally they roll
       // up to (shown on the invoice they belong to).
-      { label: "Delivery Orders", short: "Delivery", href: "/delivery-orders", icon: PackageCheck, color: "#10b981" },
+      { label: "Delivery Orders", short: "Delivery", href: "/delivery-orders", icon: PackageCheck, color: NAV_GREEN },
     ],
   },
   {
     label: "Catalog",
-    items: [{ label: "Items & Materials", short: "Items", href: "/catalog", icon: Package, color: "#14b8a6" }],
+    items: [{ label: "Items & Materials", short: "Items", href: "/catalog", icon: Package, color: NAV_YELLOW }],
   },
   {
     label: "Insights",
-    items: [{ label: "Reports", href: "/reports", icon: BarChart3, color: "#06b6d4" }],
+    items: [{ label: "Reports", href: "/reports", icon: BarChart3, color: NAV_BLUE }],
   },
 ] as const;
 
 export const BOTTOM_ITEMS = [
-  { label: "Settings", href: "/settings", icon: Settings, color: "#38bdf8" },
+  { label: "Settings", href: "/settings", icon: Settings, color: NAV_RED },
 ] as const;
 
 /** What the collapsed rail prints under an icon — the short form when
@@ -135,8 +170,13 @@ function NavIcon({
       <span
         className={cn(
           "relative grid h-8 w-8 place-items-center rounded-lg transition-[transform,color,background-color,box-shadow] duration-200 [transition-timing-function:var(--spring-standard)] group-active:scale-90",
+          // Colour appears on hover, not at rest — the rail stays calm and
+          // the pointer is what lights a tile up. The fill is stronger
+          // than it was (22% -> 32%) because the old spectrum ramp needed
+          // to stay quiet to avoid clashing with its neighbours; four
+          // well-separated hues can afford to be seen.
           !active &&
-            "text-sidebar-foreground/75 group-hover:text-[var(--nav-color)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_22%,transparent)]"
+            "text-sidebar-foreground/75 group-hover:text-[var(--nav-ink)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_32%,transparent)]"
         )}
         style={
           active
@@ -145,7 +185,7 @@ function NavIcon({
                 // hue — each module reads as its own place rather than
                 // as one row highlighted in a single house colour.
                 backgroundColor: color,
-                color: "#fff",
+                color: onColor(color),
                 boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.28)`,
               }
             : undefined
@@ -271,14 +311,14 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
     cn(
       "grid h-7 w-7 shrink-0 place-items-center rounded-md transition-[transform,color,background-color] duration-200 [transition-timing-function:var(--spring-standard)] group-active:scale-90",
       !isActive(href) &&
-        "text-sidebar-foreground/75 group-hover:text-[var(--nav-color)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_22%,transparent)]"
+        "text-sidebar-foreground/75 group-hover:text-[var(--nav-ink)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_32%,transparent)]"
     );
 
   const navIconStyle = (href: string, color: string): CSSProperties | undefined =>
     isActive(href)
       ? {
           backgroundColor: color,
-          color: "#fff",
+          color: onColor(color),
           boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.28), 0 0 12px 0 ${color}4d`,
         }
       : undefined;
