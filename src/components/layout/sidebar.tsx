@@ -31,37 +31,23 @@ import { useState, type CSSProperties } from "react";
 // orange is not a distinction you can see at 18px. Four widely separated
 // colours, cycled, give every neighbour real contrast.
 //
-// Yellow carries its own foreground: white on #F9AB00 is about 2.3:1,
-// well under the 4.5:1 an icon glyph needs to stay readable on the active
-// tile. The other three take white.
-const NAV_BLUE = "#4285F4";
-const NAV_RED = "#EA4335";
-const NAV_YELLOW = "#F9AB00";
-const NAV_GREEN = "#34A853";
+// These are Google's 300-level shades, not the 500s off the logo. The
+// logo colours are tuned for white paper; the sidebar is a deep ink
+// surface in both themes (globals.css), and #4285F4 on near-black is
+// muddy — it reads as a dark blue smudge rather than as blue. The 300s
+// are Google's own dark-theme palette and are what actually glows on it.
+const NAV_BLUE = "#8AB4F8";
+const NAV_RED = "#F28B82";
+const NAV_YELLOW = "#FDD663";
+const NAV_GREEN = "#81C995";
 
-// Foreground for the saturated active tile, keyed by its fill.
-const NAV_ON_COLOR: Record<string, string> = {
-  [NAV_YELLOW]: "#1f1600",
-};
-
-// The glyph colour on a hovered (not active) tile. Normally the item's
-// own hue, which sits legibly on a 32% wash of itself — except yellow,
-// where #F9AB00 on pale yellow is barely there. Yellow gets a darker
-// amber that stays readable on the tint in light mode and on the sidebar
-// in dark mode.
-const NAV_INK: Record<string, string> = {
-  [NAV_YELLOW]: "#B26A00",
-};
-
-function onColor(color: string) {
-  return NAV_ON_COLOR[color] ?? "#fff";
-}
+// Every fill is now a light tint, so the active tile takes a dark glyph
+// rather than a white one — one rule for all four, where the 500s needed
+// white on three and near-black on yellow alone.
+const NAV_ON_COLOR = "#12151c";
 
 function navColorVar(color: string): CSSProperties {
-  return {
-    "--nav-color": color,
-    "--nav-ink": NAV_INK[color] ?? color,
-  } as CSSProperties;
+  return { "--nav-color": color } as CSSProperties;
 }
 
 type SidebarProps = {
@@ -162,8 +148,8 @@ function NavIcon({
           "pointer-events-none absolute left-1/2 top-4 -z-10 h-9 w-9 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[11px]",
           "transition-[opacity,transform] duration-300 [transition-timing-function:var(--spring-standard)] motion-reduce:transition-none",
           active
-            ? "scale-[1.3] opacity-60"
-            : "scale-75 opacity-0 group-hover:scale-110 group-hover:opacity-45"
+            ? "scale-[1.45] opacity-90"
+            : "scale-75 opacity-0 group-hover:scale-125 group-hover:opacity-75"
         )}
         style={{ backgroundColor: color }}
       />
@@ -176,7 +162,7 @@ function NavIcon({
           // to stay quiet to avoid clashing with its neighbours; four
           // well-separated hues can afford to be seen.
           !active &&
-            "text-sidebar-foreground/75 group-hover:text-[var(--nav-ink)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_32%,transparent)]"
+            "text-sidebar-foreground/75 group-hover:text-[var(--nav-color)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_42%,transparent)]"
         )}
         style={
           active
@@ -185,7 +171,7 @@ function NavIcon({
                 // hue — each module reads as its own place rather than
                 // as one row highlighted in a single house colour.
                 backgroundColor: color,
-                color: onColor(color),
+                color: NAV_ON_COLOR,
                 boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.28)`,
               }
             : undefined
@@ -311,14 +297,14 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
     cn(
       "grid h-7 w-7 shrink-0 place-items-center rounded-md transition-[transform,color,background-color] duration-200 [transition-timing-function:var(--spring-standard)] group-active:scale-90",
       !isActive(href) &&
-        "text-sidebar-foreground/75 group-hover:text-[var(--nav-ink)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_32%,transparent)]"
+        "text-sidebar-foreground/75 group-hover:text-[var(--nav-color)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_42%,transparent)]"
     );
 
   const navIconStyle = (href: string, color: string): CSSProperties | undefined =>
     isActive(href)
       ? {
           backgroundColor: color,
-          color: onColor(color),
+          color: NAV_ON_COLOR,
           boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.28), 0 0 12px 0 ${color}4d`,
         }
       : undefined;
