@@ -39,13 +39,23 @@ const NAV_RED = "#EA4335";
 const NAV_YELLOW = "#F9AB00";
 const NAV_GREEN = "#34A853";
 
-// The glyph colour on the white tile. Normally the item's own hue, which
-// reads cleanly on white — except yellow, where #F9AB00 on white is about
-// 1.9:1 and effectively invisible at 16px. Yellow draws in a darker amber
-// instead; its identity comes from the bloom behind the tile either way.
+// Foreground for the saturated active tile, keyed by its fill.
+const NAV_ON_COLOR: Record<string, string> = {
+  [NAV_YELLOW]: "#1f1600",
+};
+
+// The glyph colour on a hovered (not active) tile. Normally the item's
+// own hue, which sits legibly on a 32% wash of itself — except yellow,
+// where #F9AB00 on pale yellow is barely there. Yellow gets a darker
+// amber that stays readable on the tint in light mode and on the sidebar
+// in dark mode.
 const NAV_INK: Record<string, string> = {
   [NAV_YELLOW]: "#B26A00",
 };
+
+function onColor(color: string) {
+  return NAV_ON_COLOR[color] ?? "#fff";
+}
 
 function navColorVar(color: string): CSSProperties {
   return {
@@ -140,38 +150,46 @@ function NavIcon({
 }) {
   return (
     <span className="relative isolate flex w-full flex-col items-center gap-1.5">
-      {/* The bloom lives on its own blurred layer rather than being a
+      {/* The backlight lives on its own blurred layer rather than being a
           box-shadow on the tile. Two reasons: a blurred element can be
           scaled and faded on the compositor, where a shadow has to be
           re-rasterised every frame; and a real bloom spreads past the
           tile's edge, which is what makes the colour feel lit rather
-          than merely applied.
-
-          It burns at rest, not only on hover — that is the whole of the
-          ClickUp look this is modelled on. The sidebar is a deep ink
-          surface in both themes (see globals.css), so a lit tile reads
-          the same way whichever theme is on. */}
+          than merely applied. */}
       <span
         aria-hidden
         className={cn(
-          "pointer-events-none absolute left-1/2 top-[18px] -z-10 h-9 w-9 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[16px]",
+          "pointer-events-none absolute left-1/2 top-4 -z-10 h-9 w-9 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[11px]",
           "transition-[opacity,transform] duration-300 [transition-timing-function:var(--spring-standard)] motion-reduce:transition-none",
           active
-            ? "scale-[1.7] opacity-100"
-            : "scale-[1.3] opacity-70 group-hover:scale-[1.5] group-hover:opacity-95"
+            ? "scale-[1.3] opacity-60"
+            : "scale-75 opacity-0 group-hover:scale-110 group-hover:opacity-45"
         )}
         style={{ backgroundColor: color }}
       />
       <span
         className={cn(
-          "relative grid h-9 w-9 place-items-center rounded-[11px] transition-[transform,box-shadow,background-color] duration-200 [transition-timing-function:var(--spring-standard)] group-active:scale-90",
-          // A bright tile with the glyph in the item's own hue, sitting on
-          // the bloom — rather than a coloured tile with a white glyph.
-          // At 18px the colour reads far better as a lit halo around a
-          // legible mark than as a wash behind one.
-          "bg-white text-[var(--nav-ink)]",
-          active ? "shadow-[0_2px_10px_-2px_rgba(0,0,0,0.55)]" : "shadow-[0_1px_4px_-1px_rgba(0,0,0,0.4)]"
+          "relative grid h-8 w-8 place-items-center rounded-lg transition-[transform,color,background-color,box-shadow] duration-200 [transition-timing-function:var(--spring-standard)] group-active:scale-90",
+          // Colour appears on hover, not at rest — the rail stays calm and
+          // the pointer is what lights a tile up. The fill is stronger
+          // than it was (22% -> 32%) because the old spectrum ramp needed
+          // to stay quiet to avoid clashing with its neighbours; four
+          // well-separated hues can afford to be seen.
+          !active &&
+            "text-sidebar-foreground/75 group-hover:text-[var(--nav-ink)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_32%,transparent)]"
         )}
+        style={
+          active
+            ? {
+                // Saturated fill on the active tile, in the item's own
+                // hue — each module reads as its own place rather than
+                // as one row highlighted in a single house colour.
+                backgroundColor: color,
+                color: onColor(color),
+                boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.28)`,
+              }
+            : undefined
+        }
       >
         <Icon className="h-[18px] w-[18px]" />
       </span>
@@ -186,7 +204,7 @@ function NavIcon({
               ? "font-semibold"
               : "font-medium text-sidebar-foreground/75"
           )}
-          style={active ? { color: "#fff" } : undefined}
+          style={active ? { color } : undefined}
         >
           {label}
         </span>
@@ -230,7 +248,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
                 <Link
                   key={item.label}
                   href={`${basePath}${item.href}`}
-                  className="group flex w-full justify-center py-[9px]"
+                  className="group flex w-full justify-center py-1"
                   title={item.label}
                   style={navColorVar(item.color)}
                 >
@@ -253,7 +271,7 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
             <Link
               key={item.label}
               href={`${basePath}${item.href}`}
-              className="group flex w-full justify-center py-[9px]"
+              className="group flex w-full justify-center py-1"
               title={item.label}
               style={navColorVar(item.color)}
             >
@@ -283,51 +301,27 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
   // Expanded sidebar
   const navItemClass = (href: string) =>
     cn(
-      "group relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium transition-all duration-100",
+      "group relative flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-all duration-100",
       isActive(href)
         ? "text-sidebar-accent-foreground"
         : "text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
     );
 
-  // The expanded rail gets the same lit tile as the collapsed one, one
-  // size down — keeping the two views on different markup is how they
-  // drifted apart before.
-  const NavTile = ({
-    href,
-    color,
-    icon: Icon,
-  }: {
-    href: string;
-    color: string;
-    icon: LucideIcon;
-  }) => {
-    const active = isActive(href);
-    return (
-      <span className="relative isolate grid h-7 w-7 shrink-0 place-items-center">
-        <span
-          aria-hidden
-          className={cn(
-            "pointer-events-none absolute left-1/2 top-1/2 -z-10 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[13px]",
-            "transition-[opacity,transform] duration-300 [transition-timing-function:var(--spring-standard)] motion-reduce:transition-none",
-            active
-              ? "scale-[1.7] opacity-100"
-              : "scale-[1.3] opacity-70 group-hover:scale-[1.5] group-hover:opacity-95"
-          )}
-          style={{ backgroundColor: color }}
-        />
-        <span
-          className={cn(
-            "relative grid h-7 w-7 place-items-center rounded-[9px] bg-white text-[var(--nav-ink)] transition-transform duration-200 [transition-timing-function:var(--spring-standard)] group-active:scale-90",
-            active
-              ? "shadow-[0_2px_8px_-2px_rgba(0,0,0,0.55)]"
-              : "shadow-[0_1px_3px_-1px_rgba(0,0,0,0.4)]"
-          )}
-        >
-          <Icon className="h-4 w-4" />
-        </span>
-      </span>
+  const navIconClass = (href: string) =>
+    cn(
+      "grid h-7 w-7 shrink-0 place-items-center rounded-md transition-[transform,color,background-color] duration-200 [transition-timing-function:var(--spring-standard)] group-active:scale-90",
+      !isActive(href) &&
+        "text-sidebar-foreground/75 group-hover:text-[var(--nav-ink)] group-hover:bg-[color-mix(in_srgb,var(--nav-color)_32%,transparent)]"
     );
-  };
+
+  const navIconStyle = (href: string, color: string): CSSProperties | undefined =>
+    isActive(href)
+      ? {
+          backgroundColor: color,
+          color: onColor(color),
+          boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.28), 0 0 12px 0 ${color}4d`,
+        }
+      : undefined;
 
   return (
     <aside className="flex h-full w-60 flex-col border-r bg-sidebar text-sidebar-foreground transition-all duration-200">
@@ -372,7 +366,12 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
                   className={navItemClass(item.href)}
                   style={navColorVar(item.color)}
                 >
-                  <NavTile href={item.href} color={item.color} icon={item.icon} />
+                  <span
+                    className={navIconClass(item.href)}
+                    style={navIconStyle(item.href, item.color)}
+                  >
+                    <item.icon className="h-4 w-4" />
+                  </span>
                   <span className="truncate">{item.label}</span>
                 </Link>
               ))}
@@ -389,7 +388,12 @@ export function Sidebar({ workspaceSlug, workspaceName }: SidebarProps) {
             className={navItemClass(item.href)}
             style={navColorVar(item.color)}
           >
-            <NavTile href={item.href} color={item.color} icon={item.icon} />
+            <span
+              className={navIconClass(item.href)}
+              style={navIconStyle(item.href, item.color)}
+            >
+              <item.icon className="h-4 w-4" />
+            </span>
             <span className="truncate">{item.label}</span>
           </Link>
         ))}
