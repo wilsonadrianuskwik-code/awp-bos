@@ -12,6 +12,7 @@ import { ClientSelector } from "@/features/line-items/components/client-selector
 import { BuilderCommandBar } from "@/features/documents/components/builder-command-bar";
 import { DocumentPreviewDialog } from "@/features/documents/components/document-preview-dialog";
 import { LineItemsEditor } from "@/features/documents/components/line-items-editor";
+import { BuilderSectionHeader } from "@/features/documents/components/builder-section-header";
 import { SaveAsTemplateDialog } from "@/features/line-items/components/save-as-template-dialog";
 import { InsertPalette } from "@/features/documents/components/insert-palette";
 import {
@@ -812,9 +813,14 @@ export function InvoiceBuilder({
           <div className="space-y-6">
             {showNotes ? (
               <div className="duration-200 animate-in fade-in slide-in-from-bottom-1">
-                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Note to Client
-                </p>
+                <BuilderSectionHeader
+                  label="Note to Client"
+                  removeLabel="Remove note"
+                  onRemove={() => {
+                    setShowNotes(false);
+                    setNotes("");
+                  }}
+                />
                 <div className="mt-2.5">
                   <RichTextEditor
                     value={notes}
@@ -826,9 +832,14 @@ export function InvoiceBuilder({
             ) : null}
             {showPaymentTerms ? (
               <div className="duration-200 animate-in fade-in slide-in-from-bottom-1">
-                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Payment Terms
-                </p>
+                <BuilderSectionHeader
+                  label="Payment Terms"
+                  removeLabel="Remove payment terms"
+                  onRemove={() => {
+                    setShowPaymentTerms(false);
+                    setPaymentTerms("");
+                  }}
+                />
                 <Input
                   value={paymentTerms}
                   onChange={(e) => setPaymentTerms(e.target.value)}

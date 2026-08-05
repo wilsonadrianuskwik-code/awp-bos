@@ -12,6 +12,7 @@ import { ClientSelector } from "@/features/line-items/components/client-selector
 import { BuilderCommandBar } from "@/features/documents/components/builder-command-bar";
 import { DocumentPreviewDialog } from "@/features/documents/components/document-preview-dialog";
 import { LineItemsEditor } from "@/features/documents/components/line-items-editor";
+import { BuilderSectionHeader } from "@/features/documents/components/builder-section-header";
 import { SaveAsTemplateDialog } from "@/features/line-items/components/save-as-template-dialog";
 import { InsertPalette } from "@/features/documents/components/insert-palette";
 import {
@@ -746,9 +747,14 @@ export function QuotationBuilder({
           <div className="space-y-6">
             {showNotes && (
               <div className="duration-200 animate-in fade-in slide-in-from-bottom-1">
-                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Note to Client
-                </p>
+                <BuilderSectionHeader
+                  label="Note to Client"
+                  removeLabel="Remove note"
+                  onRemove={() => {
+                    setShowNotes(false);
+                    setNotes("");
+                  }}
+                />
                 <div className="mt-2.5">
                   <RichTextEditor
                     value={notes}
@@ -760,9 +766,14 @@ export function QuotationBuilder({
             )}
             {showTerms && (
               <div className="duration-200 animate-in fade-in slide-in-from-bottom-1">
-                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Terms &amp; Conditions
-                </p>
+                <BuilderSectionHeader
+                  label="Terms & Conditions"
+                  removeLabel="Remove terms & conditions"
+                  onRemove={() => {
+                    setShowTerms(false);
+                    setTerms("");
+                  }}
+                />
                 <div className="mt-2.5">
                   <RichTextEditor
                     value={terms}
@@ -774,12 +785,14 @@ export function QuotationBuilder({
             )}
             {showInternalNotes && (
               <div className="duration-200 animate-in fade-in slide-in-from-bottom-1">
-                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Internal Notes{" "}
-                  <span className="normal-case tracking-normal text-muted-foreground/70">
-                    (staff only)
-                  </span>
-                </p>
+                <BuilderSectionHeader
+                  label="Internal Notes (staff only)"
+                  removeLabel="Remove internal notes"
+                  onRemove={() => {
+                    setShowInternalNotes(false);
+                    setInternalNotes("");
+                  }}
+                />
                 <div className="mt-2.5">
                   <RichTextEditor
                     value={internalNotes}

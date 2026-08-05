@@ -132,6 +132,27 @@ export async function deletePurchaseOrder(workspaceId: string, poId: string) {
 }
 
 /**
+ * Copies a PO into a fresh draft dated today, with its own number — the
+ * counterpart of duplicateInvoice. Status and any receipt history stay
+ * behind: the copy is a new order, not a restatement of the old one.
+ */
+export async function duplicatePurchaseOrder(workspaceId: string, poId: string) {
+  return withWorkspace(workspaceId, "staff", async (ctx) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("duplicate_purchase_order", {
+      p_po_id: poId,
+      p_workspace_id: ctx.workspaceId,
+      p_actor_id: ctx.userId,
+    });
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath(`/${ctx.workspaceSlug}/purchase-orders`);
+    return data as unknown as PurchaseOrder;
+  });
+}
+
+/**
  * "Generate From..." — creates a draft purchase order from any source
  * document type the document_generation_rules registry has a
  * (sourceType -> purchase_order) rule for (currently: quotation). Thin

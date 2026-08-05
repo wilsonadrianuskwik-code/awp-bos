@@ -12,6 +12,7 @@ import { ClientSelector } from "@/features/line-items/components/client-selector
 import { BuilderCommandBar } from "@/features/documents/components/builder-command-bar";
 import { DocumentPreviewDialog } from "@/features/documents/components/document-preview-dialog";
 import { LineItemsEditor } from "@/features/documents/components/line-items-editor";
+import { BuilderSectionHeader } from "@/features/documents/components/builder-section-header";
 import { InsertPalette } from "@/features/documents/components/insert-palette";
 import {
   createProformaInvoice,
@@ -605,9 +606,14 @@ export function ProformaInvoiceBuilder({
           <div className="space-y-6">
             {showNotes && (
               <div>
-                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Note to Client
-                </p>
+                <BuilderSectionHeader
+                  label="Note to Client"
+                  removeLabel="Remove note"
+                  onRemove={() => {
+                    setShowNotes(false);
+                    setNotes("");
+                  }}
+                />
                 <div className="mt-2.5">
                   <RichTextEditor value={notes} onChange={setNotes} placeholder="Add notes..." />
                 </div>
@@ -615,9 +621,14 @@ export function ProformaInvoiceBuilder({
             )}
             {showTerms && (
               <div>
-                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Terms &amp; Conditions
-                </p>
+                <BuilderSectionHeader
+                  label="Terms & Conditions"
+                  removeLabel="Remove terms & conditions"
+                  onRemove={() => {
+                    setShowTerms(false);
+                    setTerms("");
+                  }}
+                />
                 <div className="mt-2.5">
                   <RichTextEditor
                     value={terms}

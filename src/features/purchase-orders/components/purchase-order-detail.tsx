@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Building2, ChevronDown, Copy, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -43,6 +45,7 @@ import type { BrandingSettings, CompanyProfile } from "@/features/templates/type
 import { SimplePrintView } from "@/features/documents/components/simple-print-view";
 import {
   documentFilename,
+  printDocument,
   PrintButton,
 } from "@/features/documents/components/print-button";
 
@@ -75,6 +78,29 @@ export function PurchaseOrderDetail({
   const { workspace } = useWorkspace();
   const { toast } = useToast();
   const [tab, setTab] = useHashTab(TAB_VALUES, "items");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const printFilename = documentFilename(
+    purchaseOrder.po_number,
+    purchaseOrder.supplier?.name ?? "Supplier",
+    formatCurrency(purchaseOrder.total)
+  );
+
+  // Lets the PO list's "Download PDF"/"Print" quick actions open the
+  // browser print dialog on arrival, instead of landing here and making
+  // the user click Print. Same mechanism the invoice and quotation detail
+  // pages already use.
+  useEffect(() => {
+    if (searchParams.get("autoprint") !== "1") return;
+    printDocument(printFilename);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("autoprint");
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fmtPo = (value: number) => formatCurrency(value);
   const poSettings = {
@@ -169,14 +195,7 @@ export function PurchaseOrderDetail({
                   </Link>
                 </Button>
               )}
-              <PrintButton
-                size="sm"
-                filename={documentFilename(
-                  purchaseOrder.po_number,
-                  purchaseOrder.supplier?.name ?? "Supplier",
-                  formatCurrency(purchaseOrder.total)
-                )}
-              />
+              <PrintButton size="sm" filename={printFilename} />
             </>
           }
         />

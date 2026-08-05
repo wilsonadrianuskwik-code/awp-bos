@@ -2,7 +2,17 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Hash, MoreHorizontal, Pencil, Send, Ban, Trash2 } from "lucide-react";
+import {
+  Hash,
+  Copy,
+  Download,
+  Printer,
+  MoreHorizontal,
+  Pencil,
+  Send,
+  Ban,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,7 +25,11 @@ import {
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { useConfirm } from "@/providers/confirm-provider";
-import { deletePurchaseOrder, updatePurchaseOrderStatus } from "@/features/purchase-orders/actions";
+import {
+  deletePurchaseOrder,
+  duplicatePurchaseOrder,
+  updatePurchaseOrderStatus,
+} from "@/features/purchase-orders/actions";
 import type { PurchaseOrderWithRelations } from "@/features/purchase-orders/types";
 
 type PurchaseOrderRowActionsProps = {
@@ -40,6 +54,15 @@ export function PurchaseOrderRowActions({ purchaseOrder }: PurchaseOrderRowActio
   );
   const canSend = purchaseOrder.status === "draft";
   const canCancel = ["draft", "sent", "acknowledged"].includes(purchaseOrder.status);
+
+  function handleDuplicate() {
+    startTransition(async () => {
+      const result = await duplicatePurchaseOrder(workspace.id, purchaseOrder.id);
+      if (result.error) return toast(result.error, "error");
+      toast(`Duplicated as ${result.data!.po_number}`, "success");
+      router.push(`/${workspace.slug}/purchase-orders/${result.data!.id}`);
+    });
+  }
 
   function transition(status: Parameters<typeof updatePurchaseOrderStatus>[2]) {
     startTransition(async () => {
@@ -114,6 +137,25 @@ export function PurchaseOrderRowActions({ purchaseOrder }: PurchaseOrderRowActio
         >
           <Hash className="mr-2 h-4 w-4" />
           Copy Number
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleDuplicate}>
+          <Copy className="mr-2 h-4 w-4" />
+          Duplicate
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel>Supplier Copy</DropdownMenuLabel>
+        {/* Both land on the detail page with ?autoprint=1, which opens the
+            browser print dialog on arrival — "Download PDF" is the same
+            dialog with Save as PDF chosen, which is how the invoice and
+            quotation menus already do it. */}
+        <DropdownMenuItem onClick={() => router.push(`${href}?autoprint=1`)}>
+          <Download className="mr-2 h-4 w-4" />
+          Download PDF
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push(`${href}?autoprint=1`)}>
+          <Printer className="mr-2 h-4 w-4" />
+          Print
         </DropdownMenuItem>
 
         {canSend && (

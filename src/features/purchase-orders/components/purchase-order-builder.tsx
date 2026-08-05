@@ -12,6 +12,7 @@ import { SupplierSelector } from "@/features/purchase-orders/components/supplier
 import { BuilderCommandBar } from "@/features/documents/components/builder-command-bar";
 import { DocumentPreviewDialog } from "@/features/documents/components/document-preview-dialog";
 import { LineItemsEditor } from "@/features/documents/components/line-items-editor";
+import { BuilderSectionHeader } from "@/features/documents/components/builder-section-header";
 import { SaveAsTemplateDialog } from "@/features/line-items/components/save-as-template-dialog";
 import { InsertPalette } from "@/features/documents/components/insert-palette";
 import {
@@ -686,9 +687,14 @@ export function PurchaseOrderBuilder({
           <div className="space-y-6">
             {showNotes ? (
               <div className="duration-200 animate-in fade-in slide-in-from-bottom-1">
-                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Note to Supplier
-                </p>
+                <BuilderSectionHeader
+                  label="Note to Supplier"
+                  removeLabel="Remove note"
+                  onRemove={() => {
+                    setShowNotes(false);
+                    setNotes("");
+                  }}
+                />
                 <div className="mt-2.5">
                   <RichTextEditor
                     value={notes}
@@ -700,9 +706,14 @@ export function PurchaseOrderBuilder({
             ) : null}
             {showTerms ? (
               <div className="duration-200 animate-in fade-in slide-in-from-bottom-1">
-                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Terms &amp; Conditions
-                </p>
+                <BuilderSectionHeader
+                  label="Terms & Conditions"
+                  removeLabel="Remove terms & conditions"
+                  onRemove={() => {
+                    setShowTerms(false);
+                    setTermsAndConditions("");
+                  }}
+                />
                 <Input
                   value={termsAndConditions}
                   onChange={(e) => setTermsAndConditions(e.target.value)}
@@ -771,6 +782,10 @@ export function PurchaseOrderBuilder({
         onSaved={(t) => setTemplates((prev) => [t, ...prev])}
       />
 
+      {/* No paymentDetails: on a PO we are the buyer, so our own bank
+          accounts have no business being on it. The printed PO already
+          omitted them (see purchase-order-detail.tsx) — the preview was
+          passing them anyway and showing a block the paper never had. */}
       <DocumentPreviewDialog
         open={previewOpen}
         onOpenChange={setPreviewOpen}
@@ -778,7 +793,6 @@ export function PurchaseOrderBuilder({
         logoUrl={workspace.logo_url}
         companyProfile={workspace.settings?.company_profile}
         branding={workspace.settings?.branding}
-        paymentDetails={workspace.settings?.payment_details}
         documentLabel="Purchase Order"
         party={{
           heading: "Supplier",
