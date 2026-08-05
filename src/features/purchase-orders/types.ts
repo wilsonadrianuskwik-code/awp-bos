@@ -42,6 +42,7 @@ export type PurchaseOrder = {
   currency: string;
   issue_date: string;
   expected_date: string | null;
+  reference: string | null;
   title: string | null;
   terms_and_conditions: string | null;
   notes: string | null;

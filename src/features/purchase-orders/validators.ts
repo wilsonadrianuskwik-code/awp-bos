@@ -8,6 +8,7 @@ export const createPurchaseOrderSchema = z.object({
   currency: z.string().length(3),
   issue_date: z.string().min(1, "Issue date is required"),
   expected_date: z.string().optional().or(z.literal("")),
+  reference: z.string().max(255).optional().or(z.literal("")),
   title: z.string().max(255).optional().or(z.literal("")),
   terms_and_conditions: z.string().optional().or(z.literal("")),
   notes: z.string().optional().or(z.literal("")),

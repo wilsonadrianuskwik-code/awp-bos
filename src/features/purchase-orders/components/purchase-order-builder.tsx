@@ -117,7 +117,13 @@ export function PurchaseOrderBuilder({
   // Rupiah-only app: no picker, no per-document currency.
   const currency = CURRENCY;
   const [issueDate, setIssueDate] = useState(purchaseOrder?.issue_date ?? todayISO());
-  const [expectedDate, setExpectedDate] = useState(purchaseOrder?.expected_date ?? "");
+  // The expected date is no longer collected here — it never printed on
+  // the PO and was not being kept current. Existing values stay on the
+  // row and keep showing in the list.
+  const expectedDate = purchaseOrder?.expected_date ?? "";
+  // Free-text: the invoice number this PO is being bought for, or the
+  // client's own project reference. Prints on the document.
+  const [reference, setReference] = useState(purchaseOrder?.reference ?? "");
   const [termsAndConditions, setTermsAndConditions] = useState(
     purchaseOrder?.terms_and_conditions ?? defaultTerms ?? ""
   );
@@ -185,6 +191,7 @@ export function PurchaseOrderBuilder({
     currency,
     issue_date: issueDate,
     expected_date: expectedDate,
+    reference,
     title,
     terms_and_conditions: termsAndConditions,
     notes,
@@ -208,7 +215,7 @@ export function PurchaseOrderBuilder({
     title,
     currency,
     issueDate,
-    expectedDate,
+    reference,
     termsAndConditions,
     notes,
     lineItems,
@@ -645,11 +652,11 @@ export function PurchaseOrderBuilder({
               />
             </div>
             <div className="grid grid-cols-[96px_1fr] items-center gap-3">
-              <span className="text-xs text-muted-foreground">Expected date</span>
+              <span className="text-xs text-muted-foreground">Reference</span>
               <Input
-                type="date"
-                value={expectedDate}
-                onChange={(e) => setExpectedDate(e.target.value)}
+                value={reference}
+                onChange={(e) => setReference(e.target.value)}
+                placeholder="Invoice or project reference"
                 className="h-8"
               />
             </div>
@@ -780,7 +787,13 @@ export function PurchaseOrderBuilder({
         }}
         meta={[
           { label: "Issue Date", value: issueDate || "—" },
-          { label: "Expected Date", value: expectedDate || "—" },
+          {
+            label: "PO Number",
+            value: purchaseOrder?.po_number ?? "Draft",
+          },
+          ...(reference.trim()
+            ? [{ label: "Reference", value: reference.trim() }]
+            : []),
         ]}
         lines={submittableLineItems.map((item, i) => ({
           id: String(i),

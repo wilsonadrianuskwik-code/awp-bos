@@ -189,10 +189,8 @@ export function PurchaseOrderDetail({
           metrics={[
             { label: "Issued", value: formatDate(purchaseOrder.issue_date) },
             {
-              label: "Expected",
-              value: purchaseOrder.expected_date
-                ? formatDate(purchaseOrder.expected_date)
-                : "—",
+              label: "Reference",
+              value: purchaseOrder.reference ?? "—",
             },
             { label: "Items", value: purchaseOrder.line_items.length },
           ]}
@@ -308,6 +306,11 @@ export function PurchaseOrderDetail({
             }),
           },
           { label: "PO Number", value: purchaseOrder.po_number },
+          // Omitted when unset — most POs carry no reference and a blank
+          // row would just be noise on the printed page.
+          ...(purchaseOrder.reference
+            ? [{ label: "Reference", value: purchaseOrder.reference }]
+            : []),
         ]}
         lines={purchaseOrder.line_items}
         totalRows={taxTotalRows(poBreakdown, poSettings, fmtPo)}

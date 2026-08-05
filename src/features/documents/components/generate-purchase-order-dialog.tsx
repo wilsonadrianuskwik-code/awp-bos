@@ -65,7 +65,10 @@ export function GeneratePurchaseOrderDialog({
         fromType,
         fromId,
         "purchase_order",
-        { supplier_id: supplierId }
+        // The source's number becomes the PO's reference, so the supplier
+        // sees which job the order belongs to without anyone retyping it.
+        // Editable afterwards like any other field.
+        { supplier_id: supplierId, reference: fromNumber }
       );
       if (result.error) {
         toast(result.error, "error");
