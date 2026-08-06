@@ -20,10 +20,10 @@ type LoginFormProps = {
  * Two fields on one page is the cheaper side of that trade.
  */
 const FIELD =
-  "h-[54px] w-full rounded-full border border-input bg-background px-5 text-[15px] text-foreground " +
-  "placeholder:text-muted-foreground/70 outline-none transition-[border-color,box-shadow,background-color] duration-200 " +
-  "hover:border-muted-foreground/40 " +
-  "focus:border-[hsl(var(--auth-accent))] focus:bg-background focus:shadow-[0_0_0_4px_hsl(var(--auth-accent)/0.12)]";
+  "h-[54px] w-full rounded-full border border-white/12 bg-white/[0.07] px-5 text-[15px] text-white " +
+  "placeholder:text-white/40 outline-none transition-[border-color,box-shadow,background-color] duration-200 " +
+  "hover:border-white/25 hover:bg-white/[0.1] " +
+  "focus:border-[hsl(var(--auth-accent))] focus:bg-white/[0.1] focus:shadow-[0_0_0_4px_hsl(var(--auth-accent)/0.22)]";
 
 export function LoginForm({ next }: LoginFormProps) {
   const [error, setError] = useState<string | null>(null);
@@ -51,27 +51,22 @@ export function LoginForm({ next }: LoginFormProps) {
       // into the app's cobalt.
       style={{ "--auth-accent": "32 95% 44%" } as React.CSSProperties}
     >
-      {/* Masthead: mark left, the other door right — the one thing
+      {/* Masthead: name left, the other door right — the one thing
           someone who cannot sign in is actually looking for. */}
       <div className="auth-fade mb-14 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-foreground text-[13px] font-bold text-background">
-            A
-          </span>
-          <span className="text-[15px] font-semibold tracking-tight">
-            Andalan Warna Prima
-          </span>
-        </div>
+        <span className="text-[15px] font-semibold tracking-tight text-white">
+          Andalan Warna Prima
+        </span>
         <Link
           href={signupHref}
-          className="group flex items-center gap-1.5 text-[13px] text-muted-foreground transition-colors duration-200 hover:text-foreground"
+          className="group flex items-center gap-1.5 text-[13px] text-white/55 transition-colors duration-200 hover:text-white"
         >
           <UserPlus className="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-px" />
           Sign Up
         </Link>
       </div>
 
-      <h1 className="auth-fade mb-9 text-[42px] font-semibold leading-none tracking-[-0.03em] [animation-delay:60ms]">
+      <h1 className="auth-fade mb-9 text-[42px] font-semibold leading-none tracking-[-0.03em] text-white [animation-delay:60ms]">
         Sign In
       </h1>
 
@@ -81,7 +76,7 @@ export function LoginForm({ next }: LoginFormProps) {
         {error && (
           <div
             role="alert"
-            className="animate-page-enter rounded-2xl border border-destructive/25 bg-destructive/10 px-5 py-3 text-[13px] text-destructive"
+            className="animate-page-enter rounded-2xl border border-red-400/30 bg-red-500/15 px-5 py-3 text-[13px] text-red-200"
           >
             {error}
           </div>
@@ -126,7 +121,7 @@ export function LoginForm({ next }: LoginFormProps) {
               onClick={() => setShowPassword((v) => !v)}
               aria-label={showPassword ? "Hide password" : "Show password"}
               aria-pressed={showPassword}
-              className="absolute right-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground"
+              className="absolute right-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full text-white/50 transition-colors duration-200 hover:bg-white/10 hover:text-white"
             >
               {showPassword ? (
                 <EyeOff className="h-[18px] w-[18px]" />
@@ -176,7 +171,7 @@ export function LoginForm({ next }: LoginFormProps) {
         </div>
       </form>
 
-      <p className="auth-fade mt-14 text-[12px] text-muted-foreground [animation-delay:340ms]">
+      <p className="auth-fade mt-14 text-[12px] text-white/40 [animation-delay:340ms]">
         © {new Date().getFullYear()} PT Andalan Warna Prima
       </p>
     </div>
