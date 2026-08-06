@@ -442,8 +442,7 @@
 /* ------------------------------------------------------------------ */
 /* Sign-in.                                                            */
 /*                                                                     */
-/* One rounded card floating on a soft page: a dark photographic panel  */
-/* beside a light form panel.                                          */
+/* A full-bleed photograph beside the form, edge to edge.              */
 /*                                                                     */
 /* THE PHOTOGRAPH. Drop a wide image at /public/login-hero.jpg and it   */
 /* appears automatically. There is no build step and no import — the    */
@@ -452,23 +451,6 @@
 /* a finished-looking panel rather than a hole. To point at a different */
 /* file, change --auth-photo below.                                     */
 /* ------------------------------------------------------------------ */
-.auth-page {
-  background:
-    radial-gradient(80% 60% at 15% 0%, hsl(var(--muted)) 0%, transparent 60%),
-    radial-gradient(70% 55% at 100% 100%, hsl(var(--muted)) 0%, transparent 55%),
-    hsl(var(--background));
-}
-
-/* The card edge. A hairline plus a wide, soft shadow — the shadow does
-   the lifting, the border only stops it dissolving into a light page. */
-.auth-card {
-  border: 1px solid hsl(var(--border) / 0.7);
-  box-shadow:
-    0 1px 2px hsl(220 40% 12% / 0.04),
-    0 12px 28px -8px hsl(220 40% 12% / 0.1),
-    0 40px 80px -32px hsl(220 40% 12% / 0.22);
-}
-
 .auth-hero {
   /* Fallback, and the bed the photo sits on: a coated interior lit warm
      from one side, cool from the other. */

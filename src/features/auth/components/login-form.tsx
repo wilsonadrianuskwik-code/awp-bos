@@ -176,10 +176,9 @@ export function LoginForm({ next }: LoginFormProps) {
         </div>
       </form>
 
-      <div className="auth-fade mt-14 flex items-center justify-between text-[12px] text-muted-foreground [animation-delay:340ms]">
-        <span>© {new Date().getFullYear()} PT Andalan Warna Prima</span>
-        <span className="hidden sm:inline">Rupiah · Indonesia</span>
-      </div>
+      <p className="auth-fade mt-14 text-[12px] text-muted-foreground [animation-delay:340ms]">
+        © {new Date().getFullYear()} PT Andalan Warna Prima
+      </p>
     </div>
   );
 }
