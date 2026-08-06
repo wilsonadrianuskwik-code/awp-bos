@@ -46,6 +46,7 @@ export function BrandingForm({ workspaceId, branding, logoUrl }: BrandingFormPro
   const [signatoryCompany, setSignatoryCompany] = useState(
     branding.signatory_company ?? ""
   );
+  const [loginHeroUrl, setLoginHeroUrl] = useState(branding.login_hero_url ?? "");
 
   // The logo is a column and the rest is settings JSONB, so saving is two
   // writes. Done together so the form has one Save button.
@@ -57,6 +58,7 @@ export function BrandingForm({ workspaceId, branding, logoUrl }: BrandingFormPro
       signatory_name: signatoryName,
       signatory_title: signatoryTitle,
       signatory_company: signatoryCompany,
+      login_hero_url: loginHeroUrl,
     };
     const parsed = brandingSchema.safeParse(input);
     if (!parsed.success) {
@@ -182,6 +184,35 @@ export function BrandingForm({ workspaceId, branding, logoUrl }: BrandingFormPro
               />
             </div>
           </div>
+
+          {canEdit && (
+            <Button onClick={handleSave} disabled={isPending}>
+              {isPending ? "Saving..." : "Save Changes"}
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Sign-in wallpaper</CardTitle>
+          <CardDescription>
+            The photograph beside the sign-in form. Everyone sees it before
+            they have an account, so it is the one image that is not tied
+            to a workspace — uploading here replaces it for the whole app.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <BrandingImageUpload
+            workspaceId={workspaceId}
+            slot="login-hero"
+            value={loginHeroUrl}
+            onChange={setLoginHeroUrl}
+            disabled={!canEdit}
+            label="Wallpaper"
+            hint="A landscape photo, ideally around 2000px wide and under 2 MB. It fills roughly half the screen and is cropped to fit, so keep the subject near the middle. Leave it empty to fall back to the built-in gradient."
+            previewClassName="h-16 w-28"
+          />
 
           {canEdit && (
             <Button onClick={handleSave} disabled={isPending}>

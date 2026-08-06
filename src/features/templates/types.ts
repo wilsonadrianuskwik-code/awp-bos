@@ -195,6 +195,12 @@ export type BrandingSettings = {
   signatory_name?: string;
   signatory_title?: string;
   signatory_company?: string;
+  /**
+   * Public storage URL of the sign-in page wallpaper. Read without a
+   * session (see getLoginHeroUrl), so it must stay in the public
+   * `branding` bucket like the logo and signature.
+   */
+  login_hero_url?: string;
 };
 
 // ---------------------------------------------------------------------

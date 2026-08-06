@@ -6,13 +6,20 @@ import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/providers/toast-provider";
 
-const MAX_BYTES = 2 * 1024 * 1024;
+// Per slot, because a logo and a wallpaper are not the same kind of file.
+// Both stay under the bucket's own 8 MB ceiling (00120), which rejects
+// anything larger server-side regardless of what this allows.
+const MAX_BYTES: Record<string, number> = {
+  logo: 2 * 1024 * 1024,
+  signature: 2 * 1024 * 1024,
+  "login-hero": 8 * 1024 * 1024,
+};
 const ACCEPTED = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
 
 type BrandingImageUploadProps = {
   workspaceId: string;
   /** Storage path segment under the workspace folder, e.g. "logo". */
-  slot: "logo" | "signature";
+  slot: "logo" | "signature" | "login-hero";
   value: string;
   onChange: (url: string) => void;
   disabled?: boolean;
@@ -48,8 +55,12 @@ export function BrandingImageUpload({
       toast("Use a PNG, JPEG, WebP or SVG image", "error");
       return;
     }
-    if (file.size > MAX_BYTES) {
-      toast("Image must be under 2 MB", "error");
+    const maxBytes = MAX_BYTES[slot] ?? 2 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      toast(
+        `Image must be under ${Math.round(maxBytes / 1024 / 1024)} MB`,
+        "error"
+      );
       return;
     }
 

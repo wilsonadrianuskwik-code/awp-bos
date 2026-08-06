@@ -1,26 +1,42 @@
+import { getLoginHeroUrl } from "@/features/auth/queries";
+
 /**
  * The signed-out shell: full-bleed photograph on the left, form on the
  * right, edge to edge. Shared by login, signup and forgot-password so the
  * three read as one product.
  *
- * The photograph is /public/login-hero.jpg (see .auth-hero in
- * globals.css). If that file is absent the CSS backdrop underneath shows
- * instead, so the panel is never blank — it just loses the photo.
+ * The photograph is uploaded in Settings → Branding and read here with
+ * no session (see getLoginHeroUrl). A file committed at
+ * /public/login-hero.jpg still works as a second source, and under both
+ * sits the CSS backdrop in .auth-hero — so the panel is never blank, it
+ * only ever loses the photo.
  *
  * Below lg the image panel drops away and the form owns the screen: half
  * a phone is too much to spend on decoration when the keyboard is about
  * to take the other half.
  */
-export default function AuthLayout({
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const heroUrl = await getLoginHeroUrl();
+
   return (
     <div className="grid min-h-screen w-full bg-card lg:grid-cols-2">
       {/* Image panel — the photograph carries this side on its own. */}
       <div className="auth-hero relative hidden overflow-hidden lg:block">
-        <div aria-hidden className="auth-hero-photo absolute inset-0" />
+        <div
+          aria-hidden
+          className="auth-hero-photo absolute inset-0"
+          // The uploaded image wins when there is one; otherwise the
+          // stylesheet's own default (/login-hero.jpg) applies.
+          style={
+            heroUrl
+              ? ({ "--auth-photo": `url("${heroUrl}")` } as React.CSSProperties)
+              : undefined
+          }
+        />
         {/* A vignette, not a scrim: nothing is set over the photograph, so
             this only keeps the corners from glaring against the white
             panel beside it. */}

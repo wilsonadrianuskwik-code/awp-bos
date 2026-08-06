@@ -121,6 +121,8 @@ export const brandingSchema = z.object({
   signatory_name: z.string().max(120).optional().or(z.literal("")),
   signatory_title: z.string().max(120).optional().or(z.literal("")),
   signatory_company: z.string().max(160).optional().or(z.literal("")),
+  // Sign-in page wallpaper.
+  login_hero_url: z.string().url().optional().or(z.literal("")),
 });
 
 export type BrandingInput = z.infer<typeof brandingSchema>;
