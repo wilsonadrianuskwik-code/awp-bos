@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Eye, EyeOff, Loader2, UserPlus } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import { signIn } from "@/features/auth/actions";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils/cn";
@@ -20,10 +20,10 @@ type LoginFormProps = {
  * Two fields on one page is the cheaper side of that trade.
  */
 const FIELD =
-  "h-[54px] w-full rounded-full border border-white/12 bg-white/[0.07] px-5 text-[15px] text-white " +
+  "h-[54px] w-full rounded-full border border-white/12 bg-[#171310] px-5 text-[15px] text-white " +
   "placeholder:text-white/40 outline-none transition-[border-color,box-shadow,background-color] duration-200 " +
-  "hover:border-white/25 hover:bg-white/[0.1] " +
-  "focus:border-[hsl(var(--auth-accent))] focus:bg-white/[0.1] focus:shadow-[0_0_0_4px_hsl(var(--auth-accent)/0.22)]";
+  "hover:border-white/25 " +
+  "focus:border-[hsl(var(--auth-accent))] focus:shadow-[0_0_0_4px_hsl(var(--auth-accent)/0.22)]";
 
 export function LoginForm({ next }: LoginFormProps) {
   const [error, setError] = useState<string | null>(null);
@@ -51,26 +51,24 @@ export function LoginForm({ next }: LoginFormProps) {
       // into the app's cobalt.
       style={{ "--auth-accent": "32 95% 44%" } as React.CSSProperties}
     >
-      {/* Masthead: name left, the other door right — the one thing
-          someone who cannot sign in is actually looking for. */}
-      <div className="auth-fade mb-14 flex items-center justify-between">
-        <span className="text-[15px] font-semibold tracking-tight text-white">
+      {/* The hero: brand, statement, then the card. Centred, because
+          there is no second column to balance against — the photograph
+          is the whole page behind it. */}
+      <div className="mb-9 text-center">
+        <p className="auth-fade text-[13px] font-medium uppercase tracking-[0.18em] text-white/60">
           Andalan Warna Prima
-        </span>
-        <Link
-          href={signupHref}
-          className="group flex items-center gap-1.5 text-[13px] text-white/55 transition-colors duration-200 hover:text-white"
-        >
-          <UserPlus className="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-px" />
-          Sign Up
-        </Link>
+        </p>
+        <h1 className="auth-fade mt-5 text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-white [animation-delay:70ms] sm:text-[40px]">
+          Run the whole job
+          <br />
+          from one desk.
+        </h1>
       </div>
 
-      <h1 className="auth-fade mb-9 text-[42px] font-semibold leading-none tracking-[-0.03em] text-white [animation-delay:60ms]">
-        Sign In
-      </h1>
-
-      <form action={handleSubmit} className="space-y-3.5">
+      {/* The card. Its own blur and fill, so the fields never depend on
+          which part of the photograph happens to be behind them. */}
+      <div className="auth-fade rounded-[26px] border border-white/12 bg-black/45 p-6 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)] backdrop-blur-xl [animation-delay:140ms] sm:p-7">
+      <form action={handleSubmit} className="space-y-3">
         {next && <input type="hidden" name="next" value={next} />}
 
         {error && (
@@ -171,7 +169,18 @@ export function LoginForm({ next }: LoginFormProps) {
         </div>
       </form>
 
-      <p className="auth-fade mt-14 text-[12px] text-white/55 [animation-delay:340ms]">
+        <p className="mt-6 text-center text-[13px] text-white/55">
+          Don&apos;t have an account?{" "}
+          <Link
+            href={signupHref}
+            className="font-medium text-white underline-offset-4 transition-opacity duration-200 hover:underline hover:opacity-80"
+          >
+            Sign Up
+          </Link>
+        </p>
+      </div>
+
+      <p className="auth-fade mt-8 text-center text-[12px] text-white/45 [animation-delay:380ms]">
         © {new Date().getFullYear()} PT Andalan Warna Prima
       </p>
     </div>

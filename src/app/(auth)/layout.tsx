@@ -1,24 +1,19 @@
 import { getLoginHeroUrl } from "@/features/auth/queries";
 
 /**
- * The signed-out shell: the photograph runs the full width, and the form
- * sits on the right under a dark, faintly graded, translucent panel.
- * Shared by login, signup and forgot-password so the three read as one
- * product.
+ * The signed-out shell: the photograph fills the screen and the form
+ * floats on it in a glass card. Shared by login, signup and
+ * forgot-password so the three read as one product.
  *
- * The photograph spans the whole screen rather than only its own column
- * because the panel over it is translucent — and a see-through panel on a
- * solid surface is just a darker solid surface. Blurred as well as
- * darkened, so detail behind the fields cannot compete with them.
+ * There is no split and no side panel — the photograph is the page. A
+ * vignette pulls the edges down so the card has something to sit against,
+ * and the card carries its own blur, so the type never depends on what
+ * happens to be behind it at that moment.
  *
  * The photograph is uploaded in Settings → Branding and read here with no
- * session (see getLoginHeroUrl). A file committed at
- * /public/login-hero.jpg still works as a second source, and under both
- * sits the CSS backdrop in .auth-hero — so the panel is never blank, it
- * only ever loses the photo.
- *
- * Below lg the panel covers the screen: half a phone is too much to spend
- * on decoration when the keyboard is about to take the other half.
+ * session (see getLoginHeroUrl). A file at /public/login-hero.jpg still
+ * works as a second source, and under both sits the CSS backdrop in
+ * .auth-hero — so the page is never blank, it only ever loses the photo.
  */
 export default async function AuthLayout({
   children,
@@ -40,43 +35,17 @@ export default async function AuthLayout({
             : undefined
         }
       />
-      {/* A vignette over the exposed half, so the photograph's corners do
-          not glare beside the panel. */}
+      {/* Two layers doing different jobs: a vignette that darkens the
+          edges and leaves the middle of the photograph alone, and a flat
+          wash that lifts every white pixel off it a little. */}
       <div
         aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(75%_65%_at_28%_45%,transparent_0%,rgba(0,0,0,0.5)_100%)]"
+        className="absolute inset-0 bg-[radial-gradient(95%_75%_at_50%_45%,transparent_0%,rgba(0,0,0,0.58)_100%)]"
       />
+      <div aria-hidden className="absolute inset-0 bg-black/25" />
 
-      <div className="relative grid min-h-screen lg:grid-cols-2">
-        {/* Left column is deliberately empty — the photograph is the
-            content there, and anything set over it competes with it. */}
-        <div className="hidden lg:block" />
-
-        {/* 35% tint and almost no blur. The blur was the reason this
-            did not read as transparent: at 3xl the photograph behind
-            was ground into a flat brown wash, so there was nothing
-            recognisable to see through to. 2px keeps the edge off the
-            detail without hiding what it is.
-
-            Legibility comes from a soft scrim behind the form column
-            instead (below) — darkening only where the type actually is,
-            rather than dimming the whole panel to protect a few lines. */}
-        <div className="relative flex items-center justify-center bg-gradient-to-b from-black/35 via-black/32 to-black/40 px-6 py-10 backdrop-blur-[2px] sm:px-10 lg:px-16">
-          {/* The scrim. Sits behind the form only, falling off to nothing
-              well before the panel's edges, so the photograph stays
-              visible around it while the type keeps a dark bed. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_46%_at_50%_50%,rgba(0,0,0,0.62)_0%,rgba(0,0,0,0.34)_45%,transparent_78%)]"
-          />
-          {/* One hairline of light down the join — the only thing marking
-              where the panel begins. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-y-0 left-0 hidden w-px bg-gradient-to-b from-transparent via-white/20 to-transparent lg:block"
-          />
-          <div className="w-full max-w-[400px]">{children}</div>
-        </div>
+      <div className="relative flex min-h-screen items-center justify-center px-5 py-12 sm:px-6">
+        <div className="w-full max-w-[420px]">{children}</div>
       </div>
     </div>
   );
