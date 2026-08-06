@@ -171,7 +171,7 @@ export function LoginForm({ next }: LoginFormProps) {
         </div>
       </form>
 
-      <p className="auth-fade mt-14 text-[12px] text-white/40 [animation-delay:340ms]">
+      <p className="auth-fade mt-14 text-[12px] text-white/55 [animation-delay:340ms]">
         © {new Date().getFullYear()} PT Andalan Warna Prima
       </p>
     </div>
