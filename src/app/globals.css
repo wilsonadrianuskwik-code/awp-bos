@@ -497,6 +497,27 @@
   }
 }
 
+/* Chrome paints its own background and text colour into an autofilled
+   field, and there is no property that simply turns that off. On a light
+   form it passes unnoticed; on the sign-in page it replaced the
+   translucent dark field with a pale lavender block, which is what the
+   fields looked like once a saved password was offered.
+   
+   The inset shadow is the standard way round it — it covers the painted
+   background without being a background — and text-fill-color is the
+   only thing Chrome honours for the text itself. The absurd transition
+   delay stops the yellow flashing in on first paint. */
+.auth-hero input:-webkit-autofill,
+.auth-hero input:-webkit-autofill:hover,
+.auth-hero input:-webkit-autofill:focus,
+.auth-hero input:-webkit-autofill:active {
+  -webkit-text-fill-color: #fff;
+  -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.1) inset;
+  box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.1) inset;
+  caret-color: #fff;
+  transition: background-color 100000s ease-in-out 0s;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -52,14 +52,23 @@ export default async function AuthLayout({
             content there, and anything set over it competes with it. */}
         <div className="hidden lg:block" />
 
-        {/* 25%, averaged across the gradient. At this alpha the panel is
-            barely tinting anything and the blur is doing nearly all the
-            work of separating white type from the photograph — which is
-            why it is turned all the way up. Legibility here depends on
-            the image behind it: a dark or evenly-lit photo is fine, a
-            bright one with hard detail right behind the fields will be
-            tight. */}
-        <div className="relative flex items-center justify-center bg-gradient-to-b from-black/22 via-black/25 to-black/28 px-6 py-10 backdrop-blur-3xl sm:px-10 lg:px-16">
+        {/* 25% tint and almost no blur. The blur was the reason this
+            did not read as transparent: at 3xl the photograph behind
+            was ground into a flat brown wash, so there was nothing
+            recognisable to see through to. 2px keeps the edge off the
+            detail without hiding what it is.
+
+            Legibility comes from a soft scrim behind the form column
+            instead (below) — darkening only where the type actually is,
+            rather than dimming the whole panel to protect a few lines. */}
+        <div className="relative flex items-center justify-center bg-gradient-to-b from-black/25 via-black/22 to-black/30 px-6 py-10 backdrop-blur-[2px] sm:px-10 lg:px-16">
+          {/* The scrim. Sits behind the form only, falling off to nothing
+              well before the panel's edges, so the photograph stays
+              visible around it while the type keeps a dark bed. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_46%_at_50%_50%,rgba(0,0,0,0.62)_0%,rgba(0,0,0,0.34)_45%,transparent_78%)]"
+          />
           {/* One hairline of light down the join — the only thing marking
               where the panel begins. */}
           <div
