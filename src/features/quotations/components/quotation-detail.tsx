@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/collapsible";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
+import { DocumentAuditCard } from "@/features/activities/components/document-audit-card";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { QuotationLifecycleTimeline } from "./quotation-lifecycle-timeline";
@@ -372,6 +373,14 @@ export function QuotationDetail({
                 itemCount={quotation.line_items.length}
                 sticky={false}
               />
+
+              <Panel>
+                <PanelHeader title="Record" />
+                <DocumentAuditCard
+                  activities={activities}
+                  createdAt={quotation.created_at}
+                />
+              </Panel>
             </div>
           </TabsContent>
 

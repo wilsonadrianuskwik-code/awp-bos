@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
 import { getWorkspaceBySlug } from "@/lib/workspace";
-import { getDeliveryOrderById } from "@/features/delivery-orders/queries";
+import {
+  getDeliveryOrderActivities,
+  getDeliveryOrderById,
+} from "@/features/delivery-orders/queries";
 import { DeliveryOrderDetailView } from "@/features/delivery-orders/components/delivery-order-detail";
 
 export default async function DeliveryOrderDetailRoute({
@@ -15,9 +18,12 @@ export default async function DeliveryOrderDetailRoute({
   const deliveryOrder = await getDeliveryOrderById(workspace.id, doId);
   if (!deliveryOrder) notFound();
 
+  const activities = await getDeliveryOrderActivities(doId);
+
   return (
     <DeliveryOrderDetailView
       deliveryOrder={deliveryOrder}
+      activities={activities}
       workspaceId={workspace.id}
       workspaceSlug={workspaceSlug}
       workspaceName={workspace.name}

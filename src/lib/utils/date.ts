@@ -44,3 +44,25 @@ export function formatDateLong(date: string | Date | null | undefined): string {
     year: "numeric",
   });
 }
+
+/**
+ * Date and time together, for audit trails — "06 Aug 2026, 21:19".
+ *
+ * 24-hour, because these are timestamps to be compared with each other
+ * rather than read aloud, and am/pm makes that harder at a glance.
+ * Rendered in the reader's own timezone, which is what someone asking
+ * "when was this changed?" means.
+ */
+export function formatDateTime(date: string | Date | null | undefined): string {
+  if (!date) return "—";
+  const parsed = typeof date === "string" ? new Date(date) : date;
+  if (Number.isNaN(parsed.getTime())) return "—";
+  return parsed.toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}

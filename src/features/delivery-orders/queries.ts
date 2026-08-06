@@ -113,3 +113,19 @@ export async function getDocumentRelationships(workspaceId: string, documentType
   }
   return (data ?? []) as { direction: string; related_type: string; related_id: string; relationship: string }[];
 }
+
+// Who touched this delivery order and when — the same shape every other
+// document type's activity query returns, so DocumentAuditCard can read
+// them all without knowing which it has.
+export async function getDeliveryOrderActivities(doId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("activities")
+    .select("*, actor:profiles!actor_id(full_name, avatar_url)")
+    .eq("entity_type", "delivery_order")
+    .eq("entity_id", doId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  return data ?? [];
+}

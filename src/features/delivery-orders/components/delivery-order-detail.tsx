@@ -22,6 +22,8 @@ import {
   PrintButton,
 } from "@/features/documents/components/print-button";
 import { DocumentToolbar } from "@/features/documents/components/detail/document-toolbar";
+import { DocumentAuditCard } from "@/features/activities/components/document-audit-card";
+import type { Activity } from "@/features/activities/types";
 import {
   Fact,
   FactGrid,
@@ -40,6 +42,7 @@ const NEXT_STATUS: Record<string, string | null> = {
 
 export function DeliveryOrderDetailView({
   deliveryOrder,
+  activities,
   workspaceId,
   workspaceSlug,
   workspaceName,
@@ -48,6 +51,7 @@ export function DeliveryOrderDetailView({
   branding,
 }: {
   deliveryOrder: DeliveryOrderDetail;
+  activities: Activity[];
   workspaceId: string;
   workspaceSlug: string;
   workspaceName: string;
@@ -250,6 +254,14 @@ export function DeliveryOrderDetailView({
               </li>
             ))}
           </ul>
+        </Panel>
+
+        <Panel>
+          <PanelHeader title="Record" />
+          <DocumentAuditCard
+            activities={activities}
+            createdAt={deliveryOrder.created_at}
+          />
         </Panel>
       </div>
 

@@ -14,6 +14,7 @@ import {
 import { StatusBadge } from "@/components/shared/status-badge";
 import { LineItemsTable } from "@/features/line-items/components/line-items-table";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
+import { DocumentAuditCard } from "@/features/activities/components/document-audit-card";
 import { PurchaseOrderStatusActions } from "@/features/purchase-orders/components/purchase-order-status-actions";
 import { PurchaseOrderLinks } from "@/features/purchase-orders/components/purchase-order-links";
 import { useWorkspace } from "@/providers/workspace-provider";
@@ -276,6 +277,14 @@ export function PurchaseOrderDetail({
                   }
                   settings={poSettings}
                   dense
+                />
+              </Panel>
+
+              <Panel>
+                <PanelHeader title="Record" />
+                <DocumentAuditCard
+                  activities={activities}
+                  createdAt={purchaseOrder.created_at}
                 />
               </Panel>
             </div>

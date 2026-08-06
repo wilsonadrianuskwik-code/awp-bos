@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/collapsible";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActivityTimeline } from "@/features/activities/components/activity-timeline";
+import { DocumentAuditCard } from "@/features/activities/components/document-audit-card";
 import { useWorkspace } from "@/providers/workspace-provider";
 import { useToast } from "@/providers/toast-provider";
 import { LineItemsTable } from "@/features/line-items/components/line-items-table";
@@ -465,6 +466,14 @@ export function InvoiceDetail({
                       </FactGrid>
                     </div>
                   )}
+                </Panel>
+
+                <Panel>
+                  <PanelHeader title="Record" />
+                  <DocumentAuditCard
+                    activities={activities}
+                    createdAt={invoice.created_at}
+                  />
                 </Panel>
               </div>
             </div>
