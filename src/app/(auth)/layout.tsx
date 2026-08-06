@@ -52,7 +52,7 @@ export default async function AuthLayout({
             content there, and anything set over it competes with it. */}
         <div className="hidden lg:block" />
 
-        {/* 25% tint and almost no blur. The blur was the reason this
+        {/* 35% tint and almost no blur. The blur was the reason this
             did not read as transparent: at 3xl the photograph behind
             was ground into a flat brown wash, so there was nothing
             recognisable to see through to. 2px keeps the edge off the
@@ -61,7 +61,7 @@ export default async function AuthLayout({
             Legibility comes from a soft scrim behind the form column
             instead (below) — darkening only where the type actually is,
             rather than dimming the whole panel to protect a few lines. */}
-        <div className="relative flex items-center justify-center bg-gradient-to-b from-black/25 via-black/22 to-black/30 px-6 py-10 backdrop-blur-[2px] sm:px-10 lg:px-16">
+        <div className="relative flex items-center justify-center bg-gradient-to-b from-black/35 via-black/32 to-black/40 px-6 py-10 backdrop-blur-[2px] sm:px-10 lg:px-16">
           {/* The scrim. Sits behind the form only, falling off to nothing
               well before the panel's edges, so the photograph stays
               visible around it while the type keeps a dark bed. */}
