@@ -440,76 +440,78 @@
    the rule below zeroes durations rather than easings, so a spring
    simply lands at its final value. */
 /* ------------------------------------------------------------------ */
-/* Auth hero backdrop.                                                 */
+/* Sign-in.                                                            */
 /*                                                                     */
-/* A painted-and-coated industrial interior, drawn entirely in CSS: a  */
-/* dark hall lit warm from one side and cool from the other, over a    */
-/* glossy epoxy floor that catches the light. No image file, so it     */
-/* costs nothing to load and there is no photo licence to honour.      */
+/* One rounded card floating on a soft page: a dark photographic panel  */
+/* beside a light form panel.                                          */
 /*                                                                     */
-/* To use a real photograph instead, drop one in /public and set       */
-/*                                                                     */
-/*   .auth-hero { --auth-photo: url("/login-hero.jpg"); }              */
-/*                                                                     */
-/* It layers on top; every gradient below stays as the fallback, so a  */
-/* missing or slow file degrades to this rather than to a blank panel. */
+/* THE PHOTOGRAPH. Drop a wide image at /public/login-hero.jpg and it   */
+/* appears automatically. There is no build step and no import — the    */
+/* file being present is the whole switch. Underneath it sits a CSS     */
+/* backdrop in the same key, so a missing, slow or failed image leaves  */
+/* a finished-looking panel rather than a hole. To point at a different */
+/* file, change --auth-photo below.                                     */
 /* ------------------------------------------------------------------ */
+.auth-page {
+  background:
+    radial-gradient(80% 60% at 15% 0%, hsl(var(--muted)) 0%, transparent 60%),
+    radial-gradient(70% 55% at 100% 100%, hsl(var(--muted)) 0%, transparent 55%),
+    hsl(var(--background));
+}
+
+/* The card edge. A hairline plus a wide, soft shadow — the shadow does
+   the lifting, the border only stops it dissolving into a light page. */
+.auth-card {
+  border: 1px solid hsl(var(--border) / 0.7);
+  box-shadow:
+    0 1px 2px hsl(220 40% 12% / 0.04),
+    0 12px 28px -8px hsl(220 40% 12% / 0.1),
+    0 40px 80px -32px hsl(220 40% 12% / 0.22);
+}
+
 .auth-hero {
-  background-color: #080b12;
+  /* Fallback, and the bed the photo sits on: a coated interior lit warm
+     from one side, cool from the other. */
+  background-color: #0b0d12;
   background-image:
-    var(--auth-photo, none),
-    /* horizon: the wall meets the floor, and the floor runs darker */
-    linear-gradient(
-      180deg,
-      rgba(8, 11, 18, 0) 46%,
-      rgba(8, 11, 18, 0.72) 57%,
-      #05070c 100%
-    ),
-    /* warm light through a high window, right */
-    radial-gradient(58% 44% at 76% 16%, rgba(255, 173, 71, 0.3), transparent 70%),
-    /* cool fill, left */
-    radial-gradient(52% 38% at 16% 10%, rgba(78, 138, 255, 0.28), transparent 70%),
-    /* the floor throwing that light back up */
-    radial-gradient(95% 55% at 50% 104%, rgba(96, 152, 255, 0.2), transparent 72%);
+    linear-gradient(180deg, rgba(9, 11, 16, 0) 48%, rgba(6, 8, 12, 0.8) 100%),
+    radial-gradient(60% 45% at 74% 14%, rgba(255, 176, 62, 0.34), transparent 70%),
+    radial-gradient(52% 40% at 14% 8%, rgba(86, 140, 255, 0.24), transparent 70%);
+}
+
+.auth-hero-photo {
+  --auth-photo: url("/login-hero.jpg");
+  background-image: var(--auth-photo);
   background-size: cover;
   background-position: center;
+  /* A slow drift so the panel is alive without asking to be watched.
+     transform only — nothing here triggers layout or paint. */
+  animation: auth-pan 34s ease-in-out infinite alternate;
 }
 
-/* The reflection streaks on the coating. Kept on their own element so
-   they can be masked to the lower half and drift without the rest of
-   the panel moving with them. */
-.auth-sheen {
-  background-image: repeating-linear-gradient(
-    100deg,
-    transparent 0 78px,
-    rgba(255, 255, 255, 0.055) 78px 84px,
-    transparent 84px 150px
-  );
-  -webkit-mask-image: linear-gradient(180deg, transparent 52%, #000 78%, transparent 100%);
-  mask-image: linear-gradient(180deg, transparent 52%, #000 78%, transparent 100%);
-  animation: auth-drift 24s linear infinite;
-}
-
-@keyframes auth-drift {
+@keyframes auth-pan {
   from {
-    transform: translate3d(-150px, 0, 0);
+    transform: scale(1.06) translate3d(-1%, 0, 0);
   }
   to {
-    transform: translate3d(0, 0, 0);
+    transform: scale(1.14) translate3d(1%, -1.5%, 0);
   }
 }
 
-/* One slow breath on the whole backdrop, so the panel is never quite
-   static without ever asking to be watched. */
-@keyframes auth-bloom {
-  0%,
-  100% {
-    opacity: 0.55;
-    transform: scale(1);
+/* Entrance. One shared keyframe, staggered by inline animation-delay at
+   the call site, so the order lives next to the markup it orders. */
+.auth-fade {
+  animation: auth-fade 0.62s var(--spring-gentle) both;
+}
+
+@keyframes auth-fade {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
   }
-  50% {
-    opacity: 0.85;
-    transform: scale(1.08);
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 }
 

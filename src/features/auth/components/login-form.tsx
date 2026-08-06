@@ -2,16 +2,28 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Loader2, UserPlus } from "lucide-react";
 import { signIn } from "@/features/auth/actions";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils/cn";
 
 type LoginFormProps = {
   next?: string;
 };
+
+/**
+ * Pill inputs, one accent, and a lot of air.
+ *
+ * The fields are styled here rather than through <Input>: the app's input
+ * is a 6px-radius control sized for dense forms, and pulling it toward
+ * this shape would have dragged every table filter and dialog with it.
+ * Two fields on one page is the cheaper side of that trade.
+ */
+const FIELD =
+  "h-[54px] w-full rounded-full border border-input bg-background px-5 text-[15px] text-foreground " +
+  "placeholder:text-muted-foreground/70 outline-none transition-[border-color,box-shadow,background-color] duration-200 " +
+  "hover:border-muted-foreground/40 " +
+  "focus:border-[hsl(var(--auth-accent))] focus:bg-background focus:shadow-[0_0_0_4px_hsl(var(--auth-accent)/0.12)]";
 
 export function LoginForm({ next }: LoginFormProps) {
   const [error, setError] = useState<string | null>(null);
@@ -28,141 +40,145 @@ export function LoginForm({ next }: LoginFormProps) {
       setLoading(false);
     }
     // On success the action redirects; leaving `loading` set keeps the
-    // button busy through the navigation instead of flicking back to
+    // button busy through the navigation rather than flicking back to
     // "Sign in" for the frame before the page changes.
   }
 
   return (
-    <div className="stagger-rise">
-      {/* The mark repeats here because below lg the hero column — and the
-          logo on it — is not rendered, and a sign-in box with nothing to
-          identify it is a phishing page. */}
-      <div className="mb-8 flex items-center gap-3 lg:hidden">
-        <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/95 text-[15px] font-bold text-slate-900 shadow-lg shadow-black/30">
-          A
-        </span>
-        <span className="text-sm font-semibold tracking-wide text-white/90">
-          PT Andalan Warna Prima
-        </span>
+    <div
+      // Scoped to this form: the amber is the sign-in page's accent, taken
+      // off the hard hats in the photograph, and has no business leaking
+      // into the app's cobalt.
+      style={{ "--auth-accent": "32 95% 44%" } as React.CSSProperties}
+    >
+      {/* Masthead: mark left, the other door right — the one thing
+          someone who cannot sign in is actually looking for. */}
+      <div className="auth-fade mb-14 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-foreground text-[13px] font-bold text-background">
+            A
+          </span>
+          <span className="text-[15px] font-semibold tracking-tight">
+            Andalan Warna Prima
+          </span>
+        </div>
+        <Link
+          href={signupHref}
+          className="group flex items-center gap-1.5 text-[13px] text-muted-foreground transition-colors duration-200 hover:text-foreground"
+        >
+          <UserPlus className="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-px" />
+          Sign Up
+        </Link>
       </div>
 
-      <div
-        className={cn(
-          // Glass over the hero on small screens; a plain surface in the
-          // form column, where there is nothing behind it to show through.
-          "rounded-2xl border border-white/10 bg-white/[0.07] p-7 shadow-2xl shadow-black/40 backdrop-blur-xl",
-          "lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-none"
+      <h1 className="auth-fade mb-9 text-[42px] font-semibold leading-none tracking-[-0.03em] [animation-delay:60ms]">
+        Sign In
+      </h1>
+
+      <form action={handleSubmit} className="space-y-3.5">
+        {next && <input type="hidden" name="next" value={next} />}
+
+        {error && (
+          <div
+            role="alert"
+            className="animate-page-enter rounded-2xl border border-destructive/25 bg-destructive/10 px-5 py-3 text-[13px] text-destructive"
+          >
+            {error}
+          </div>
         )}
-      >
-        <div className="mb-7">
-          <h2 className="text-2xl font-semibold tracking-tight text-white lg:text-foreground">
-            Welcome back
-          </h2>
-          <p className="mt-1.5 text-sm text-white/55 lg:text-muted-foreground">
-            Sign in to continue to your workspace.
-          </p>
+
+        <div className="auth-fade [animation-delay:120ms]">
+          <Label htmlFor="email" className="sr-only">
+            Email
+          </Label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="Email address"
+            required
+            autoComplete="email"
+            autoFocus
+            className={FIELD}
+          />
         </div>
 
-        <form action={handleSubmit} className="space-y-5">
-          {next && <input type="hidden" name="next" value={next} />}
-
-          {error && (
-            <div
-              role="alert"
-              className="animate-page-enter rounded-lg border border-destructive/30 bg-destructive/15 px-3.5 py-2.5 text-sm text-destructive-foreground lg:text-destructive"
-            >
-              {error}
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label
-              htmlFor="email"
-              className="text-white/75 lg:text-foreground"
-            >
-              Email
-            </Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="name@example.com"
+        <div className="auth-fade [animation-delay:180ms]">
+          <Label htmlFor="password" className="sr-only">
+            Password
+          </Label>
+          <div className="relative">
+            <input
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
               required
-              autoComplete="email"
-              autoFocus
-              className="h-11 border-white/15 bg-white/10 text-white placeholder:text-white/35 focus-visible:ring-white/30 lg:border-input lg:bg-background lg:text-foreground lg:placeholder:text-muted-foreground lg:focus-visible:ring-ring"
+              autoComplete="current-password"
+              className={cn(FIELD, "pr-14")}
             />
+            {/* tabIndex -1 on purpose: getting from the password field to
+                the submit button should not mean tabbing past a toggle.
+                It stays clickable, and screen readers announce it. */}
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-pressed={showPassword}
+              className="absolute right-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground"
+            >
+              {showPassword ? (
+                <EyeOff className="h-[18px] w-[18px]" />
+              ) : (
+                <Eye className="h-[18px] w-[18px]" />
+              )}
+            </button>
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label
-                htmlFor="password"
-                className="text-white/75 lg:text-foreground"
-              >
-                Password
-              </Label>
-              <Link
-                href="/forgot-password"
-                className="text-xs text-white/50 transition-colors hover:text-white lg:text-muted-foreground lg:hover:text-primary"
-              >
-                Forgot password?
-              </Link>
-            </div>
-            <div className="relative">
-              <Input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                required
-                autoComplete="current-password"
-                className="h-11 pr-11 border-white/15 bg-white/10 text-white placeholder:text-white/35 focus-visible:ring-white/30 lg:border-input lg:bg-background lg:text-foreground lg:focus-visible:ring-ring"
-              />
-              {/* tabIndex -1: reaching the submit button from the password
-                  field should not require tabbing past a reveal toggle.
-                  It stays clickable, and screen readers announce it. */}
-              <button
-                type="button"
-                tabIndex={-1}
-                onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                aria-pressed={showPassword}
-                className="absolute right-1 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-md text-white/45 transition-colors hover:text-white lg:text-muted-foreground lg:hover:text-foreground"
-              >
-                {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </button>
-            </div>
-          </div>
+        <div className="auth-fade pl-5 [animation-delay:220ms]">
+          <Link
+            href="/forgot-password"
+            className="text-[13px] font-medium text-[hsl(var(--auth-accent))] underline-offset-4 transition-opacity duration-200 hover:underline hover:opacity-80"
+          >
+            Forgot password?
+          </Link>
+        </div>
 
-          <Button
+        <div className="auth-fade pt-5 [animation-delay:280ms]">
+          <button
             type="submit"
             disabled={loading}
-            className="h-11 w-full text-[15px] transition-transform duration-150 active:scale-[0.985]"
+            className={cn(
+              "group relative flex h-[54px] w-full items-center justify-center gap-2.5 overflow-hidden rounded-full",
+              "text-[15px] font-semibold text-white",
+              "bg-[linear-gradient(100deg,hsl(24_95%_50%),hsl(38_95%_50%))] bg-[length:180%_100%] bg-[position:0%_0%]",
+              "shadow-[0_8px_20px_-6px_hsl(var(--auth-accent)/0.5)]",
+              "transition-[background-position,transform,box-shadow] duration-300",
+              "hover:bg-[position:100%_0%] hover:shadow-[0_12px_26px_-6px_hsl(var(--auth-accent)/0.62)]",
+              "active:scale-[0.985]",
+              "disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:shadow-[0_8px_20px_-6px_hsl(var(--auth-accent)/0.5)]"
+            )}
           >
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="h-[18px] w-[18px] animate-spin" />
                 Signing in…
               </>
             ) : (
-              "Sign in"
+              <>
+                Sign In
+                <ArrowRight className="h-[18px] w-[18px] transition-transform duration-300 group-hover:translate-x-1" />
+              </>
             )}
-          </Button>
-        </form>
+          </button>
+        </div>
+      </form>
 
-        <p className="mt-7 text-center text-sm text-white/50 lg:text-muted-foreground">
-          Don&apos;t have an account?{" "}
-          <Link
-            href={signupHref}
-            className="font-medium text-white underline-offset-4 hover:underline lg:text-primary"
-          >
-            Sign up
-          </Link>
-        </p>
+      <div className="auth-fade mt-14 flex items-center justify-between text-[12px] text-muted-foreground [animation-delay:340ms]">
+        <span>© {new Date().getFullYear()} PT Andalan Warna Prima</span>
+        <span className="hidden sm:inline">Rupiah · Indonesia</span>
       </div>
     </div>
   );
