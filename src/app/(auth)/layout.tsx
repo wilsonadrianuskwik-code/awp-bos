@@ -52,12 +52,14 @@ export default async function AuthLayout({
             content there, and anything set over it competes with it. */}
         <div className="hidden lg:block" />
 
-        {/* Roughly half the previous opacity, so the photograph reads
-            through properly. The blur goes up a step to compensate: at
-            this alpha the panel alone no longer separates white type from
-            a bright, busy image, and blur does that work without
-            darkening anything further. */}
-        <div className="relative flex items-center justify-center bg-gradient-to-b from-black/42 via-black/48 to-black/55 px-6 py-10 backdrop-blur-3xl sm:px-10 lg:px-16">
+        {/* 25%, averaged across the gradient. At this alpha the panel is
+            barely tinting anything and the blur is doing nearly all the
+            work of separating white type from the photograph — which is
+            why it is turned all the way up. Legibility here depends on
+            the image behind it: a dark or evenly-lit photo is fine, a
+            bright one with hard detail right behind the fields will be
+            tight. */}
+        <div className="relative flex items-center justify-center bg-gradient-to-b from-black/22 via-black/25 to-black/28 px-6 py-10 backdrop-blur-3xl sm:px-10 lg:px-16">
           {/* One hairline of light down the join — the only thing marking
               where the panel begins. */}
           <div
