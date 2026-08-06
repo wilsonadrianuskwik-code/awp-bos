@@ -104,6 +104,7 @@ export function PaymentsList({ payments, count }: PaymentsListProps) {
     },
     {
       accessorKey: "payment_method",
+      meta: { className: "hidden lg:table-cell" },
       header: "Method",
       cell: ({ row }) => (
         <Badge variant="secondary">
@@ -113,6 +114,7 @@ export function PaymentsList({ payments, count }: PaymentsListProps) {
     },
     {
       id: "invoice",
+      meta: { className: "hidden md:table-cell" },
       header: "Invoice",
       cell: ({ row }) => {
         const invoice = row.original.invoice;
@@ -129,6 +131,7 @@ export function PaymentsList({ payments, count }: PaymentsListProps) {
     },
     {
       id: "client",
+      meta: { className: "hidden lg:table-cell" },
       header: "Client",
       cell: ({ row }) => {
         const client = row.original.invoice?.client;

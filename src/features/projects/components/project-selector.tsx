@@ -102,7 +102,7 @@ export function ProjectSelector({
             <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent align="start" className="w-[320px] p-0">
+        <PopoverContent align="start" className="w-[calc(100vw-2rem)] p-0 sm:w-[320px]">
           <div className="p-2">
             <Input
               autoFocus

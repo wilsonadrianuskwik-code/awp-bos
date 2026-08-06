@@ -56,6 +56,7 @@ const columns: ColumnDef<Project, unknown>[] = [
   },
   {
     accessorKey: "budget",
+    meta: { className: "hidden lg:table-cell" },
     header: "Budget",
     cell: ({ row }) => {
       const budget = row.original.budget;
@@ -64,6 +65,7 @@ const columns: ColumnDef<Project, unknown>[] = [
   },
   {
     accessorKey: "start_date",
+    meta: { className: "hidden md:table-cell" },
     header: "Start Date",
     cell: ({ row }) => {
       const value = row.getValue("start_date") as string | null;
@@ -72,6 +74,7 @@ const columns: ColumnDef<Project, unknown>[] = [
   },
   {
     accessorKey: "created_at",
+    meta: { className: "hidden xl:table-cell" },
     header: "Created",
     cell: ({ row }) => formatDate(row.getValue("created_at") as string),
   },

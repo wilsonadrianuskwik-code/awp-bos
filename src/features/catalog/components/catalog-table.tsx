@@ -74,6 +74,7 @@ export function CatalogTable({
     },
     {
       id: "sku",
+      meta: { className: "hidden md:table-cell" },
       header: "SKU",
       cell: ({ row }) => (
         <span className="font-mono text-xs text-muted-foreground">
@@ -83,6 +84,7 @@ export function CatalogTable({
     },
     {
       id: "item_type",
+      meta: { className: "hidden lg:table-cell" },
       header: "Type",
       cell: ({ row }) => (
         <Badge variant="secondary">{ITEM_TYPE_LABEL[row.original.item_type]}</Badge>
@@ -90,6 +92,7 @@ export function CatalogTable({
     },
     {
       id: "default_category",
+      meta: { className: "hidden xl:table-cell" },
       header: "Category",
       cell: ({ row }) => (
         <span className="text-[13px] text-muted-foreground">
@@ -122,6 +125,7 @@ export function CatalogTable({
     },
     {
       id: "created_at",
+      meta: { className: "hidden xl:table-cell" },
       header: "Created",
       accessorFn: (row) => row.created_at,
       enableSorting: true,

@@ -47,6 +47,7 @@ export function ProformaInvoiceTable({
     },
     {
       id: "title",
+      meta: { className: "hidden lg:table-cell" },
       header: "Title",
       cell: ({ row }) => row.original.title || "—",
     },
@@ -73,6 +74,7 @@ export function ProformaInvoiceTable({
     },
     {
       id: "issue_date",
+      meta: { className: "hidden md:table-cell" },
       header: "Issue Date",
       cell: ({ row }) =>
         formatDate(row.original.issue_date),

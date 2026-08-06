@@ -166,7 +166,7 @@ export function DocumentFilterBar({
             onChange={(e) => setSearch(e.target.value)}
             onBlur={() => apply({ q: search.trim() || null })}
             placeholder="Search number or customer"
-            className="h-9 w-[260px] pl-8"
+            className="h-9 w-full pl-8 sm:w-[260px]"
           />
         </form>
 
@@ -174,7 +174,7 @@ export function DocumentFilterBar({
           value={get("project") || ALL}
           onValueChange={(v) => apply({ project: v })}
         >
-          <SelectTrigger className="h-9 w-[200px]">
+          <SelectTrigger className="h-9 w-full sm:w-[200px]">
             <SelectValue placeholder="All projects" />
           </SelectTrigger>
           <SelectContent>
@@ -188,7 +188,7 @@ export function DocumentFilterBar({
         </Select>
 
         <Select value={get("type") || ALL} onValueChange={(v) => apply({ type: v })}>
-          <SelectTrigger className="h-9 w-[175px]">
+          <SelectTrigger className="h-9 w-full sm:w-[175px]">
             <SelectValue placeholder="All types" />
           </SelectTrigger>
           <SelectContent>
@@ -213,7 +213,7 @@ export function DocumentFilterBar({
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="start" className="w-[380px] space-y-4 p-4">
+          <PopoverContent align="start" className="w-[calc(100vw-2rem)] space-y-4 p-4 sm:w-[380px]">
             <Field label="Status">
               <Select
                 value={get("status") || ALL}

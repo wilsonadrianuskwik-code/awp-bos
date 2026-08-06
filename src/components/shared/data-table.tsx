@@ -62,6 +62,28 @@ type DataTableProps<TData> = {
 // 13px cell text, 11px uppercase column labels, ~40px rows, hairline row
 // separators, quiet hover. Numeric columns should set `tabular-nums` in
 // their cell renderers so digits align.
+/**
+ * Per-column classes, applied to the header cell and every body cell of
+ * that column alike — the two have to move together or a hidden column
+ * shifts the row out of step with its header.
+ *
+ * The reason this exists is width. A list table carries seven to nine
+ * columns, which is right at a desk and unusable on a phone: the table
+ * scrolls sideways inside its box, so nothing is broken, but reading a
+ * row means dragging it back and forth. Columns tagged here drop out
+ * below their breakpoint, leaving the three or four that identify a row.
+ * Nothing is removed at lg and up, so the desktop table is untouched.
+ *
+ * Set it through TanStack's `meta`:
+ *
+ *   { id: "due_date", header: "Due Date", meta: { className: "hidden lg:table-cell" } }
+ */
+export type ColumnMeta = { className?: string };
+
+function columnClassName(def: { meta?: unknown }): string | undefined {
+  return (def.meta as ColumnMeta | undefined)?.className;
+}
+
 export function DataTable<TData>({
   columns,
   data,
@@ -148,7 +170,10 @@ export function DataTable<TData>({
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className="h-9 px-3 text-left align-middle text-[11px] font-semibold uppercase tracking-wider text-foreground/70 first:pl-4 last:pr-4"
+                  className={cn(
+                    "h-9 px-3 text-left align-middle text-[11px] font-semibold uppercase tracking-wider text-foreground/70 first:pl-4 last:pr-4",
+                    columnClassName(header.column.columnDef)
+                  )}
                 >
                   {header.isPlaceholder ? null : header.column.getCanSort() ? (
                     <button
@@ -287,7 +312,8 @@ export function DataTable<TData>({
                       className={cn(
                         "px-3 py-2.5 align-middle first:pl-4 last:pr-4",
                         // Only when there's no checkbox cell to carry it.
-                        !selection && cellIndex === 0 && stripeClass
+                        !selection && cellIndex === 0 && stripeClass,
+                        columnClassName(cell.column.columnDef)
                       )}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

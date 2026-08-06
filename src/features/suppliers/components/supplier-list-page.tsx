@@ -42,26 +42,31 @@ const columns: ColumnDef<Supplier, unknown>[] = [
   },
   {
     accessorKey: "company",
+    meta: { className: "hidden lg:table-cell" },
     header: "Company",
     cell: ({ row }) => row.getValue("company") || "—",
   },
   {
     accessorKey: "email",
+    meta: { className: "hidden md:table-cell" },
     header: "Email",
     cell: ({ row }) => row.getValue("email") || "—",
   },
   {
     accessorKey: "phone",
+    meta: { className: "hidden xl:table-cell" },
     header: "Phone",
     cell: ({ row }) => row.getValue("phone") || "—",
   },
   {
     accessorKey: "payment_terms",
+    meta: { className: "hidden xl:table-cell" },
     header: "Payment Terms",
     cell: ({ row }) => `${row.getValue("payment_terms")} days`,
   },
   {
     accessorKey: "created_at",
+    meta: { className: "hidden lg:table-cell" },
     header: "Created",
     cell: ({ row }) => formatDate(row.getValue("created_at") as string),
   },

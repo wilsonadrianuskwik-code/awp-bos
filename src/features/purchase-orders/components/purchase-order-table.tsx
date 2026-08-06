@@ -62,6 +62,7 @@ export function PurchaseOrderTable({
     },
     {
       id: "project",
+      meta: { className: "hidden lg:table-cell" },
       header: "Project",
       cell: ({ row }) => (
         <span className="truncate text-[13px]">
@@ -76,6 +77,7 @@ export function PurchaseOrderTable({
     },
     {
       id: "issue_date",
+      meta: { className: "hidden md:table-cell" },
       header: "Issue Date",
       accessorFn: (row) => row.issue_date,
       enableSorting: true,
@@ -87,6 +89,7 @@ export function PurchaseOrderTable({
     },
     {
       id: "expected_date",
+      meta: { className: "hidden xl:table-cell" },
       header: "Expected Date",
       accessorFn: (row) => row.expected_date,
       enableSorting: true,

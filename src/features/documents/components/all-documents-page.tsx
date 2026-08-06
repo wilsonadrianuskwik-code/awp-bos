@@ -40,6 +40,7 @@ const columns: ColumnDef<AnyDocument, unknown>[] = [
   },
   {
     id: "project",
+    meta: { className: "hidden lg:table-cell" },
     header: "Project",
     cell: ({ row }) =>
       row.original.project ? (
@@ -73,6 +74,7 @@ const columns: ColumnDef<AnyDocument, unknown>[] = [
   },
   {
     id: "payment_date",
+    meta: { className: "hidden xl:table-cell" },
     header: "Paid On",
     cell: ({ row }) =>
       row.original.payment_date
@@ -85,6 +87,7 @@ const columns: ColumnDef<AnyDocument, unknown>[] = [
   },
   {
     accessorKey: "created_at",
+    meta: { className: "hidden lg:table-cell" },
     header: "Created",
     cell: ({ row }) =>
       new Date(row.original.created_at).toLocaleDateString("en-GB", {

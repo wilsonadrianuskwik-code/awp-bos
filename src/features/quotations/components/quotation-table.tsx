@@ -40,6 +40,7 @@ export function QuotationTable({
   const columns: ColumnDef<QuotationWithClient, unknown>[] = [
     {
       id: "internal_id",
+      meta: { className: "hidden xl:table-cell" },
       header: "Internal ID",
       cell: ({ row }) => (
         <span className="font-mono text-xs text-muted-foreground">
@@ -79,6 +80,7 @@ export function QuotationTable({
     },
     {
       id: "project",
+      meta: { className: "hidden lg:table-cell" },
       header: "Project",
       cell: ({ row }) => (
         <span className="truncate text-[13px]">
@@ -93,6 +95,7 @@ export function QuotationTable({
     },
     {
       id: "created_at",
+      meta: { className: "hidden xl:table-cell" },
       header: "Created Date",
       accessorFn: (row) => row.created_at,
       enableSorting: true,
@@ -104,6 +107,7 @@ export function QuotationTable({
     },
     {
       id: "expiry_date",
+      meta: { className: "hidden md:table-cell" },
       header: "Valid Until",
       accessorFn: (row) => row.expiry_date,
       enableSorting: true,
@@ -126,6 +130,7 @@ export function QuotationTable({
     },
     {
       id: "converted_invoice",
+      meta: { className: "hidden xl:table-cell" },
       header: "Converted Invoice",
       cell: ({ row }) =>
         row.original.converted_invoice ? (

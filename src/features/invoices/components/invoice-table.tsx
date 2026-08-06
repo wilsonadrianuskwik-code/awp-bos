@@ -44,6 +44,7 @@ export function InvoiceTable({
   const columns: ColumnDef<InvoiceWithClient, unknown>[] = [
     {
       id: "internal_id",
+      meta: { className: "hidden xl:table-cell" },
       header: "Internal ID",
       cell: ({ row }) => (
         <span className="font-mono text-xs text-muted-foreground">
@@ -90,6 +91,7 @@ export function InvoiceTable({
     },
     {
       id: "created_at",
+      meta: { className: "hidden lg:table-cell" },
       header: "Created Date",
       accessorFn: (row) => row.created_at,
       enableSorting: true,
@@ -101,6 +103,7 @@ export function InvoiceTable({
     },
     {
       id: "due_date",
+      meta: { className: "hidden md:table-cell" },
       header: "Due Date",
       accessorFn: (row) => row.due_date,
       enableSorting: true,
@@ -123,6 +126,7 @@ export function InvoiceTable({
     },
     {
       id: "source_quotation",
+      meta: { className: "hidden xl:table-cell" },
       header: "Source Quotation",
       cell: ({ row }) =>
         row.original.source_quotation ? (
